@@ -88,45 +88,10 @@ if (!function_exists('slugify')) {
         return $text;
     }
 }
-// Base URL Paths
-if (!function_exists('get_base_url_for_images')) {
-    function get_base_url_for_images()
-    {
-        return "https://www.marchamarlo.com/product_images/";
-    }
-}
-if (!function_exists('get_base_url_for_attachments')) {
-    function get_base_url_for_attachments()
-    {
-        return "https://www.marchamarlo.com/chat_attachments/";
-    }
-}
-if (!function_exists('get_base_url_for_user')) {
-    function get_base_url_for_user()
-    {
-        return "https://www.marchamarlo.com/user_images/";
-    }
-}
-// Add notification
-if (!function_exists('add_notification')) {
-    function add_notification($notification_text, $notification_type, $reference_id, $user_id)
-    {
-        \App\Models\Notification::create([
-            'message' => $notification_text,
-            'type' => $notification_type,
-            'reference_id' => $reference_id,
-            'user_id' => $user_id
-        ]);
-    }
-}
 
 if (!function_exists('send_email')) {
     function send_email($email_body, $email_address, $subject)
     {
-//        Mail::send('email_templates.forget_password', $data, function ($message) use ($email_address) {
-//            $message->from('no_reply@marchamarlo.com', 'MarchaMarlo Dev Team');
-//            $message->to($email_address)->cc('danish.sheraz575@gmail.com');
-//        });
         $em = "no_reply@marchamarlo.com";
         $na = "Marcha Marlo Dev Team";
         $from = $na . "<" . $em . ">";

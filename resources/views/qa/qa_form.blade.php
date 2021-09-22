@@ -5,19 +5,16 @@
 
 @endsection
 @section('content')
-   
-
     <form method="" action="">
         @csrf
-            <div class="card">
-                <div class="card-header" style="justify-content: space-between;">
-                    <h4>Quality Assurance Form</h4>
-                </div>
-                <div class="form-row">
-                   <div class="col-4">
-                           <input type="text" class="form-control" placeholder="Greetings" >
-                   </div>
-                    <div class="col-4">
+        <div class="card">
+            <div class="card-header" style="justify-content: space-between;">
+                <h4>Quality Assurance Form</h4>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <strong CLASS="form-check-inline">Greetings:</strong>
                         <div class="form-check form-check-inline">
                             <label class="form-check-label" for="radio1" > Yes </label>
                             <input class="form-check-input" type="radio" name="radio" id="radio1" value="option1" checked>
@@ -25,54 +22,36 @@
                         <div class="form-check form-check-inline">
                             <label class="form-check-label" for="radio2" > No </label>
                             <input class="form-check-input" type="radio" name="radio" id="radio2" value="option2">
-                        </div>        
-                    </div>
-                    <div class="col-4">
-                            <textarea class="form-control" id="textarea" rows="2" placeholder="Comments"></textarea>
-                    </div>
-                    <div class="form-group row">
-                        <div class="form-check form-check-inline">
-                            <input class="form-control" type="text" placeholder="Used Correct Greetings" readonly>
                         </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-control" type="text" placeholder="Used Assurity Statement" readonly>
-                        </div>    
+                        <p>Used Correct Greetings, Used Assurity Statement</p>
+
+                    </div>
+                    <div class="col-6">
+                        <textarea class="form-control" id="textarea" rows="2" placeholder="Comments"></textarea>
                     </div>
                 </div>
-
-
-                    <div class="form-row">
-                            <div class="col-4">
-                                <input type="text" class="form-control" placeholder="Customer Name" >
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <strong CLASS="form-check-inline">Greetings:</strong>
+                        <div class="form-check form-check-inline">
+                            <label class="form-check-label" for="radio1" > Yes </label>
+                            <input class="form-check-input" type="radio" name="radio" id="radio1" value="option1" checked>
                         </div>
-                        <div class="col4">
-                            <div class="form-check form-check-inline">
-                                <label class="form-check-label" for="radio3" > Yes </label>
-                                <input class="form-check-input" type="radio" name="radio1" id="radio3" value="option1" checked>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <label class="form-check-label" for="radio4" > No </label>
-                                <input class="form-check-input" type="radio" name="radio1" id="radio4" value="option2">
-                            </div>        
+                        <div class="form-check form-check-inline">
+                            <label class="form-check-label" for="radio2" > No </label>
+                            <input class="form-check-input" type="radio" name="radio" id="radio2" value="option2">
                         </div>
-                        <div class="col-4">
-                                <textarea class="form-control" id="textarea" rows="2" placeholder="Comments"></textarea>
-                        </div>
-                        <div class="form-group row">
-                            <div class="form-check form-check-inline">
-                                <input class="form-control" type="text" placeholder="Used the customer's name at least once during the call" readonly>
-                            </div>
-                            
-                        </div>
-                        
+                        <p>Used Correct Greetings, Used Assurity Statement</p>
                     </div>
+                    <div class="col-6">
+                        <textarea class="form-control" id="textarea" rows="2" placeholder="Comments"></textarea>
+                    </div>
+                </div>
             </div>
-
-                
-      </form> 
-
+        </div>
+    </form>
 @endsection
- @section('footer_scripts')
+@section('footer_scripts')
     {{-- <script src="{{ asset('assets/bundles/select2/dist/js/select2.full.min.js') }}"></script>
     <script>
         $( document ).ready(function() {
@@ -93,4 +72,4 @@
             });
         });
     </script> --}}
-@endsection 
+@endsection
