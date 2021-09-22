@@ -4,6 +4,7 @@
  * @Copyright:   Copyright (c) Danish Sheraz,
  * @Senior-Developer: Danish Sheraz
  **/
+
 // date time helpers
 use Illuminate\Support\Facades\Mail;
 

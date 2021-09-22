@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -17,11 +16,25 @@ Route::get('/route-cache', function() {
     Cache::flush();
     return 'Routes cache cleared';
 });
-Route::get('/', 'App\Http\Controllers\MainController@index')->name('home');
-Route::get('/contact-us', 'App\Http\Controllers\MainController@contact')->name('contact');
-Route::get('/about-us', 'App\Http\Controllers\MainController@about')->name('about');
-Route::get('/how-we-work', 'App\Http\Controllers\MainController@how_we_work')->name('how_we_work');
-Route::get('/privacy-policy', 'App\Http\Controllers\MainController@privacy_policy')->name('policy');
+Route::get('/user_roles', 'App\Http\Controller\UserController@test');
+Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
+    Route::get('/home', 'App\Http\Controllers\DashboardController@index')->name('dashboard');
+    Route::get('/users', 'App\Http\Controllers\UserController@list')->name('users');
+    Route::get('/user_roles', 'App\Http\Controllers\RolesController@list')->name('roles_list');
+    // Route::post('/user_roles/{id}', 'App\Http\Controllers\RolesController@edit')->name('roles_edit');
+    Route::post('/user_roles', 'App\Http\Controllers\RolesController@store')->name('roles_store');
+    Route::post('/update_role', 'App\Http\Controllers\RolesController@update')->name('roles_update');
+    Route::get('/roles_delete{id}', 'App\Http\Controllers\RolesController@delete')->name('roles_delete');
 
-Route::post('/submit_property_form', 'App\Http\Controllers\MainController@submit_property_form')->name('submit_property_form');
-Route::post('/submit_contact_form', 'App\Http\Controllers\MainController@submit_contact_form')->name('submit_contact_form');
+    Route::get('/quality', function(){
+        $data['page_title'] = "Atlantis BPO Quality Assurance";
+        return view('qa.qa_form', $data);
+    });
+});
+
+
+
+Route::get('/logout', 'App\Http\Controllers\UserController@logout')->name('logout');
+Route::get('/login', 'App\Http\Controllers\UserController@index')->name('login');
+Route::post('/do_login', 'App\Http\Controllers\UserController@login')->name('do_login');
+

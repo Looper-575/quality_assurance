@@ -7,12 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class UserRole extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $table = 'users';
-    protected $primaryKey = 'user_id';
+    protected $table = 'user_roles';
+    protected $primaryKey = 'role_id';
     const CREATED_AT = 'added_on';
     const UPDATED_AT = 'modified_on';
 
@@ -22,14 +22,11 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'full_name',
-        'email',
-        'password',
-        'gender',
-        'city',
-        'contact_number',
-        'remember_token',
-        'role_id',
+        'title',
+        'slug',
+        'added_by',
+        'modified_by',
+
     ];
 
     /**
@@ -38,9 +35,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password',
-        'remember_token',
-        'email_verified_at',
+      
     ];
 
     /**
@@ -49,12 +44,23 @@ class User extends Authenticatable
      * @var array
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        'modified_on' => 'datetime',
         'added_on' => 'datetime',
     ];
 
+
     public function role()
     {
-        return $this->belongsTo(UserRole::class, 'role_id', 'role_id');
+        return $this->hasMany(User::class, 'role_id', 'role_id');
+    }
+
+    public function added_by_user()
+    {
+        return $this->belongsTo(User::class, 'added_by', 'user_id');
+    }
+
+    public function modified_by_user()
+    {
+        return $this->belongsTo(User::class, 'modified_by', 'user_id');
     }
 }

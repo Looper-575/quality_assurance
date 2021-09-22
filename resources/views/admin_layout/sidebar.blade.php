@@ -9,20 +9,19 @@
         </div>
         <ul class="sidebar-menu">
             <li class="menu-header">Main</li>
-            <li class="dropdown">
-                <a href="/" class="nav-link"><i data-feather="monitor"></i><span>Dashboard</span></a>
+            <li class="{{ @request()->is('home') ? 'active' : '' }}">
+                <a href="{{route('dashboard')}}" class="nav-link"><i data-feather="monitor"></i><span>Dashboard</span></a>
             </li>
             <li class="{{ @request()->is('qa') ? 'active' : '' }}">
-                <a href="/products" class="nav-link"><i data-feather="grid"></i><span>Products</span></a>
+                <a href="{{route('users')}}" class="nav-link"><i data-feather="grid"></i><span>Users</span></a>
             </li>
             <li class="{{ @request()->is('categories') ? 'active' : '' }}">
                 <a href="/categories" class="nav-link"><i data-feather="list"></i><span>Categories</span></a>
             </li>
             <li class="dropdown">
-                <a href="#" class="menu-toggle nav-link has-dropdown"><i
-                        data-feather="briefcase"></i><span>Widgets</span></a>
+                <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="briefcase"></i><span>Settings</span></a>
                 <ul class="dropdown-menu">
-                    <li><a class="nav-link" href="widget-chart.html">Chart Widgets</a></li>
+                    <li><a class="nav-link" href="widget-chart.html">User Roles</a></li>
                     <li><a class="nav-link" href="widget-data.html">Data Widgets</a></li>
                 </ul>
             </li>

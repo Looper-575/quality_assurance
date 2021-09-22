@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 class UserController extends Controller
 {
     /**
+     *
      * Create a new controller instance.
      *
      * @return void
@@ -20,6 +20,34 @@ class UserController extends Controller
     {
         //$this->middleware('auth');
     }
+    
+
+
+    public function index()
+    {
+        if(Auth::user() && Auth::user()->user_id){
+            return redirect('home');
+        }
+        $data['page_title'] = "Atlantis BPO Quality Assurance";
+        //$data['qa'] = Product::where('status', '!=', 0)->get();
+        return view('auth.login_form',$data);
+    }
+
+
+    public function list()
+    {
+        $data['page_title'] = "Atlantis BPO CRM - Users List";
+        //$data['qa'] = Product::where('status', '!=', 0)->get();      
+        return view('users.user_list',$data);
+    }
+
+    public function user_form()
+    {
+        $data['page_title'] = "Atlantis BPO CRM - Users Form";
+        //$data['qa'] = Product::where('status', '!=', 0)->get();
+        return view('users.user_form',$data);
+    }
+
 
     /**
      * Show the application dashboard.
@@ -80,6 +108,6 @@ class UserController extends Controller
     public function logout()
     {
         Auth::logout();
-        return redirect('home');
+        return redirect('login');
     }
 }
