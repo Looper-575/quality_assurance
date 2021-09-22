@@ -24,7 +24,6 @@
                             <input class="form-check-input" type="radio" name="radio" id="radio2" value="option2">
                         </div>
                         <p>Used Correct Greetings, Used Assurity Statement</p>
-
                     </div>
                     <div class="col-6">
                         <textarea class="form-control" id="textarea" rows="2" placeholder="Comments"></textarea>
