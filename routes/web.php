@@ -27,6 +27,9 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::get('/roles_delete{id}', 'App\Http\Controllers\RolesController@delete')->name('roles_delete');
     // routes for Quality Assurance
      Route::get('/quality_assurance' ,'App\Http\Controllers\QAController@list')->name('qa_list');
+     Route::post('/qa_store', 'App\Http\Controllers\QAController')->name('qa_store');
+
+     
   
 });
 

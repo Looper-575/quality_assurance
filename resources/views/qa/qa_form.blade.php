@@ -71,7 +71,7 @@
                         <p>Used Correct Greetings, Used Assurity Statement</p>
                     </div>
                     <div class="col-6">
-                        <textarea class="form-control" id="textarea" rows="2" placeholder="Comments"></textarea>
+                        <textarea class="form-control" name="greetings_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
                     </div>
                 </div>
                 
@@ -89,7 +89,7 @@
                         <p>Used the customer's name at least once during the call</p>
                     </div>
                     <div class="col-6">
-                        <textarea class="form-control" id="textarea" rows="2" placeholder="Comments"></textarea>
+                        <textarea class="form-control" name="customer_name_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
                     </div>
                 </div>
 
@@ -107,7 +107,7 @@
                         <p>Used listening skills (doesn't interrupt, remembers info, etc)</p>
                     </div>
                     <div class="col-6">
-                        <textarea class="form-control" id="textarea" rows="2" placeholder="Comments"></textarea>
+                        <textarea class="form-control" name="listening_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
                     </div>
                 </div>
 
@@ -127,7 +127,7 @@
                              Showed empathy when appropriate,  Apologized when appropriate </p><br>            
                     </div>
                     <div class="col-6">
-                        <textarea class="form-control" id="textarea" rows="2" placeholder="Comments"></textarea>
+                        <textarea class="form-control" name="courtesy_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
                     </div>
                 </div>
 
@@ -145,7 +145,7 @@
                         <p>Prompt System Navigation </p><br>            
                     </div>
                     <div class="col-6">
-                        <textarea class="form-control" id="textarea" rows="2" placeholder="Comments"></textarea>
+                        <textarea class="form-control" name="equipment_use_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
                     </div>
                 </div>
 
@@ -166,7 +166,7 @@
                         </p>            
                     </div>
                     <div class="col-6">
-                        <textarea class="form-control" id="textarea" rows="2" placeholder="Comments"></textarea>
+                        <textarea class="form-control" name="soft_skills_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
                     </div>
                 </div>
 
@@ -186,7 +186,7 @@
                         </p>            
                     </div>
                     <div class="col-6">
-                        <textarea class="form-control" id="textarea" rows="2" placeholder="Comments"></textarea>
+                        <textarea class="form-control" name="using_hold_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
                     </div>
                 </div> 
 
@@ -205,7 +205,7 @@
                         </p>            
                     </div>
                     <div class="col-6">
-                        <textarea class="form-control" id="textarea" rows="2" placeholder="Comments"></textarea>
+                        <textarea class="form-control" name="connecting_calls_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
                     </div>
                 </div>
 
@@ -225,7 +225,7 @@
                         </p>            
                     </div>
                     <div class="col-6">
-                        <textarea class="form-control" id="textarea" rows="2" placeholder="Comments"></textarea>
+                        <textarea class="form-control" name="closing_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
                     </div>
                 </div>
 
@@ -247,7 +247,7 @@
                         </p>            
                     </div>
                     <div class="col-6">
-                        <textarea class="form-control" id="textarea" rows="2" placeholder="Comments"></textarea>
+                        <textarea class="form-control" name="automatic_fail_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
                     </div>
                 </div>
 
