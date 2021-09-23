@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Models\UserRole;
- 
+
 
 class RolesController extends Controller
 {
@@ -38,7 +38,7 @@ class RolesController extends Controller
             $check = UserRole::where('title', $request->title)->where('status', 1)->get();
             if(count($check)>0) {
                 $response['status'] = "Failue";
-                $response['result'] = "Record Already Exists"; 
+                $response['result'] = "Record Already Exists";
             } else {
                 $role = new UserRole;
                 $role->added_by = Auth::user()->user_id;
@@ -46,7 +46,7 @@ class RolesController extends Controller
                 $role->slug = slugify($request->title);
                 $role->save();
                 $response['status'] = "Success";
-                $response['result'] = "Added Successfully";  
+                $response['result'] = "Added Successfully";
             }
         } else {
             $response['status'] = "Failure!";
@@ -66,7 +66,7 @@ class RolesController extends Controller
             $check = UserRole::where('title', $request->title)->where('role_id', '!=', $request->role_id)->get();
             if(count($check)>0) {
                 $response['status'] = "Failue";
-                $response['result'] = "Record Already Exists"; 
+                $response['result'] = "Record Already Exists";
             } else {
                 UserRole::where('role_id', $request->role_id)->update([
                     'modified_by' => Auth::user()->user_id,
@@ -75,7 +75,7 @@ class RolesController extends Controller
 
                 ]);
                 $response['status'] = "Success";
-                $response['result'] = "Updated Successfully";  
+                $response['result'] = "Updated Successfully";
             }
         } else {
             $response['status'] = "Failure!";
@@ -84,16 +84,14 @@ class RolesController extends Controller
         return response()->json($response);
     }
 
-    Public function delete($role_id)
+    Public function delete(Request $request)
     {
-        $role = UserRole::where('role_id', $role_id)->update([
+        $role = UserRole::where('role_id', $request->role_id)->update([
             'status' => 0,
         ]);
         $response['status'] = "Success";
         $response['result'] = "Deleted Successfully";
         return response()->json($response);
-
-        return redirect()->back();
     }
 
 }
