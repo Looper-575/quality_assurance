@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\UserRole;
  
 
-class RolesController extends Controller
+class QAController extends Controller
 {
     /**
      *
@@ -21,6 +21,9 @@ class RolesController extends Controller
     {
         //$this->middleware('auth');
     }
-        public
+    public function list(){
 
+        $data['page_title'] = "Atlantis BPO CRM - Roles";
+        return view('qa.qa_form' , $data);
+    }
 }

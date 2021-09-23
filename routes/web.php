@@ -25,11 +25,9 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::post('/user_roles', 'App\Http\Controllers\RolesController@store')->name('roles_store');
     Route::post('/update_role', 'App\Http\Controllers\RolesController@update')->name('roles_update');
     Route::get('/roles_delete{id}', 'App\Http\Controllers\RolesController@delete')->name('roles_delete');
-
-    Route::get('/quality', function(){
-        $data['page_title'] = "Atlantis BPO Quality Assurance";
-        return view('qa.qa_form', $data);
-    });
+    // routes for Quality Assurance
+     Route::get('/quality_assurance' ,'App\Http\Controllers\QAController@list')->name('qa_list');
+  
 });
 
 
