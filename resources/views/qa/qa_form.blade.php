@@ -27,7 +27,7 @@
                 <div class="row mb-2">
                     <div class="col-6">
                         <label for="call_date"><strong> Call Date  </strong> </label>
-                        <input class="form-control type="date" name="call_date" >
+                        <input class="form-control type="datetime" name="call_date" >
                     </div>  
                     <div class="col-6">
                         <label for="no_responses"> No Responses </label>
