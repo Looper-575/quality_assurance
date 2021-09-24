@@ -14,7 +14,7 @@ class QualityAssurance extends Authenticatable
     protected $table = 'quality_assessment'; 
     protected $primarykey = 'qa_id';
     const CREATED_AT ='added_on';
-    conjst UPDATED_AT = 'modified_on';
+    const UPDATED_AT = 'modified_on';
 
     /**
      * The attributes that are mass assignable.
