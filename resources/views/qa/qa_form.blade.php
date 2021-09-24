@@ -57,24 +57,38 @@
                 <div class="row mb-3">
                     <div class="col-6">
                         <strong CLASS="form-check-inline">Greetings</strong><br>
-                        <p class="form-check form-check-inline">Used Correct Greetings</p>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="greetings_radio1" > Yes </label>
-                            <input class="form-check-input" type="radio" name="greetings" value="1" id="greetings_radio1"  checked>
+
+                        <div class="row">
+                            <div class="col-7">
+                                <p class="form-check form-check-inline">Used Correct Greetings</p>
+                            </div>
+                            <div class="col-5">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="greetings_radio1" > Yes </label>
+                                    <input class="form-check-input" type="radio" name="greetings" value="1" id="greetings_radio1"  checked>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="greetings_radio2" > No </label>
+                                    <input class="form-check-input" type="radio" name="greetings" value="0" id="greetings_radio2" >
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="greetings_radio2" > No </label>
-                            <input class="form-check-input" type="radio" name="greetings" value="0" id="greetings_radio2" >
-                        </div><br>
-                        <p class="form-check form-check-inline"> Used Assurity Statement</p>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="greetings_radio1" > Yes </label>
-                            <input class="form-check-input" type="radio" name="greetings" value="1" id="greetings_radio1"  checked>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="greetings_radio2" > No </label>
-                            <input class="form-check-input" type="radio" name="greetings" value="0" id="greetings_radio2" >
-                        </div>
+
+                        <div class="row">
+                            <div class="col-7">
+                                <p class="form-check form-check-inline"> Used Assurity Statement</p>
+                            </div>
+                            <div class="col-5">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="greetings_radio1" > Yes </label>
+                                    <input class="form-check-input" type="radio" name="greetings" value="1" id="greetings_radio1"  checked>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="greetings_radio2" > No </label>
+                                    <input class="form-check-input" type="radio" name="greetings" value="0" id="greetings_radio2" >
+                                </div>
+                            </div>
+                        </div>               
                     </div>
                     <div class="col-6">
                         <textarea class="form-control" name="greetings_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
@@ -83,16 +97,22 @@
                 <div class="row mb-3">
                     <div class="col-6">
                         <strong CLASS="form-check-inline">Customer Name</strong><br>
-                        <p class="form-check form-check-inline">Used the customer's name at least once during the call</p> 
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="customer_radio1" > Yes </label>
-                            <input class="form-check-input" type="radio" name="customer_name" value="1" id="customer_radio1"  checked>
+
+                        <div class="row">
+                            <div class="col-7">
+                                <p class="form-check form-check-inline">Used the customer's name at least once during the call</p> 
+                            </div>
+                            <div class="col-5">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="customer_radio1" > Yes </label>
+                                    <input class="form-check-input" type="radio" name="customer_name" value="1" id="customer_radio1"  checked>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="customer_radio2" > No </label>
+                                    <input class="form-check-input" type="radio" name="customer_name" value="0" id="customer_radio2" >
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="customer_radio2" > No </label>
-                            <input class="form-check-input" type="radio" name="customer_name" value="0" id="customer_radio2" >
-                        </div>
-                       
                     </div>
                     <div class="col-6">
                         <textarea class="form-control" name="customer_name_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
@@ -126,31 +146,42 @@
                 <div class="row mb-3">
                     <div class="col-6">
                         <strong CLASS="form-check-inline"> Courtesy </strong><br>
-                        <p class="form-check form-check-inline" >Used "please" when appropriate </p>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="courtesy_radio1" > Yes </label>
-                            <input class="form-check-input" type="radio" name="courtesy" value="1" id="courtesy_radio1"  checked>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="courtesy_radio2" > No </label>
-                            <input class="form-check-input" type="radio" name="courtesy" value="0" id="courtesy_radio2" >
-                        </div>
-
-                         <p class="form-check form-check-inline"> Used "thank you" when appropriate</p>
-                         <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="courtesy_radio1" > Yes </label>
-                            <input class="form-check-input" type="radio" name="courtesy" value="1" id="courtesy_radio1"  checked>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="courtesy_radio2" > No </label>
-                            <input class="form-check-input" type="radio" name="courtesy" value="0" id="courtesy_radio2" >
-                        </div>
-
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-7">
+                                <p class="form-check form-check-inline" >Used "please" when appropriate </p>
+                            </div>
+                            <div class="col-5">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="courtesy_radio1" > Yes </label>
+                                    <input class="form-check-input" type="radio" name="courtesy" value="1" id="courtesy_radio1"  checked>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="courtesy_radio2" > No </label>
+                                    <input class="form-check-input" type="radio" name="courtesy" value="0" id="courtesy_radio2" >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-7">
+                                <p class="form-check form-check-inline"> Used "thank you" when appropriate</p>
+                            </div>
+                            <div class="col-5">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="courtesy_radio1" > Yes </label>
+                                    <input class="form-check-input" type="radio" name="courtesy" value="1" id="courtesy_radio1"  checked>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="courtesy_radio2" > No </label>
+                                    <input class="form-check-input" type="radio" name="courtesy" value="0" id="courtesy_radio2" >
+                                </div>
+                            </div>
+                        </div> 
+                        
+                        <div class="row">
+                            <div class="col-7">
                                 <p class="form-check form-check-inline" >Showed interest and willingness to assist the customer</p>
                             </div>
-                            <div class="col-6">
+                            <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="courtesy_radio1" > Yes </label>
                                     <input class="form-check-input" type="radio" name="courtesy" value="1" id="courtesy_radio1"  checked>
@@ -161,8 +192,12 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        <div class="row">
+                            <div class="col-7">
                                 <p class="form-check form-check-inline">Showed empathy when appropriate</p>
-                                
+                            </div>
+                            <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="courtesy_radio1" > Yes </label>
                                     <input class="form-check-input" type="radio" name="courtesy" value="1" id="courtesy_radio1"  checked>
@@ -171,8 +206,14 @@
                                     <label class="form-check-label" for="courtesy_radio2" > No </label>
                                     <input class="form-check-input" type="radio" name="courtesy" value="0" id="courtesy_radio2" >
                                 </div>
-                                
+                            </div>
+                        </div> 
+
+                        <div class="row">
+                            <div class="col-7">
                                 <p class="form-check form-check-inline"> Apologized when appropriate </p>
+                            </div>
+                            <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="courtesy_radio1" > Yes </label>
                                     <input class="form-check-input" type="radio" name="courtesy" value="1" id="courtesy_radio1"  checked>
@@ -181,6 +222,8 @@
                                     <label class="form-check-label" for="courtesy_radio2" > No </label>
                                     <input class="form-check-input" type="radio" name="courtesy" value="0" id="courtesy_radio2" >
                                 </div>
+                            </div>
+                        </div>                        
                     </div>
                     <div class="col-6">
                         <textarea class="form-control" name="courtesy_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
@@ -191,16 +234,21 @@
                     <div class="col-6">
                         <strong CLASS="form-check-inline"> Equipment Use </strong><br>
 
-                        <p class="form-check form-check-inline">Prompt System Navigation </p>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="equipment_radio1" > Yes </label>
-                            <input class="form-check-input" type="radio" name="equipment_use" value="1" id="equipment_radio1"  checked>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="equipment_radio2" > No </label>
-                            <input class="form-check-input" type="radio" name="equipment_use"  value="0" id="equipment_radio2" >
-                        </div>
-
+                        <div class="row">
+                            <div class="col-7">
+                                <p class="form-check form-check-inline">Prompt System Navigation </p>
+                            </div>
+                            <div class="col-5">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="equipment_radio1" > Yes </label>
+                                    <input class="form-check-input" type="radio" name="equipment_use" value="1" id="equipment_radio1"  checked>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="equipment_radio2" > No </label>
+                                    <input class="form-check-input" type="radio" name="equipment_use"  value="0" id="equipment_radio2" >
+                                </div>
+                            </div>
+                        </div>  
                     </div>
                     <div class="col-6">
                         <textarea class="form-control" name="equipment_use_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
@@ -210,65 +258,103 @@
                 <div class="row mb-3">
                     <div class="col-6">
                                 <strong CLASS="form-check-inline"> Soft Skills </strong><br>
+                                
+                                <div class="row">
+                                    <div class="col-7">
+                                        <p class="form-check form-check-inline">Voice reflected energy and enthusiasm</p>
 
-                                <p class="form-check form-check-inline">Voice reflected energy and enthusiasm</p>
-                                <div class="form-check form-check-inline">
-                                    <label class="form-check-label" for="soft_skills_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="soft_skills" value="1" id="soft_skills_radio1"  checked>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <label class="form-check-label" for="soft_skills_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="soft_skills" value="0"  id="soft_skills_radio2" >
-                                </div>
-
-                                    <p class="form-check form-check-inline">Avoided long silence (more than 20 seconds)</p>
-                                <div class="form-check form-check-inline">
-                                    <label class="form-check-label" for="soft_skills_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="soft_skills" value="1" id="soft_skills_radio1"  checked>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <label class="form-check-label" for="soft_skills_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="soft_skills" value="0"  id="soft_skills_radio2" >
-                                </div>
-                                <p class="form-check form-check-inline">Used polite/appropriate tone</p>
-                                <div class="form-check form-check-inline">
-                                    <label class="form-check-label" for="soft_skills_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="soft_skills" value="1" id="soft_skills_radio1"  checked>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <label class="form-check-label" for="soft_skills_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="soft_skills" value="0"  id="soft_skills_radio2" >
-                                </div>
-
-                                <p class="form-check form-check-inline">Used proper grammar and business language</p>
-                                <div class="form-check form-check-inline">
-                                    <label class="form-check-label" for="soft_skills_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="soft_skills" value="1" id="soft_skills_radio1"  checked>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <label class="form-check-label" for="soft_skills_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="soft_skills" value="0"  id="soft_skills_radio2" >
+                                    </div>
+                                    <div class="col-5">
+                                        <div class="form-check form-check-inline">
+                                            <label class="form-check-label" for="soft_skills_radio1" > Yes </label>
+                                            <input class="form-check-input" type="radio" name="soft_skills" value="1" id="soft_skills_radio1"  checked>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <label class="form-check-label" for="soft_skills_radio2" > No </label>
+                                            <input class="form-check-input" type="radio" name="soft_skills" value="0"  id="soft_skills_radio2" >
+                                        </div>
+                                    </div>
                                 </div>
                                 
-                                <p class="form-check form-check-inline"> Refrained from using company terms and jargon</p>
-                                <div class="form-check form-check-inline">
-                                    <label class="form-check-label" for="soft_skills_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="soft_skills" value="1" id="soft_skills_radio1"  checked>
+                                <div class="row">
+                                    <div class="col-7">
+                                        <p class="form-check form-check-inline">Avoided long silence (more than 20 seconds)</p>
+                                    </div>
+                                    <div class="col-5">
+                                        <div class="form-check form-check-inline">
+                                            <label class="form-check-label" for="soft_skills_radio1" > Yes </label>
+                                            <input class="form-check-input" type="radio" name="soft_skills" value="1" id="soft_skills_radio1"  checked>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <label class="form-check-label" for="soft_skills_radio2" > No </label>
+                                            <input class="form-check-input" type="radio" name="soft_skills" value="0"  id="soft_skills_radio2" >
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="form-check form-check-inline">
-                                    <label class="form-check-label" for="soft_skills_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="soft_skills" value="0"  id="soft_skills_radio2" >
+
+                                <div class="row">
+                                    <div class="col-7">
+                                        <p class="form-check form-check-inline">Used polite/appropriate tone</p>
+                                    </div>
+                                    <div class="col-5">
+                                        <div class="form-check form-check-inline">
+                                            <label class="form-check-label" for="soft_skills_radio1" > Yes </label>
+                                            <input class="form-check-input" type="radio" name="soft_skills" value="1" id="soft_skills_radio1"  checked>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <label class="form-check-label" for="soft_skills_radio2" > No </label>
+                                            <input class="form-check-input" type="radio" name="soft_skills" value="0"  id="soft_skills_radio2" >
+                                        </div>                                        
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-7">
+                                        <p class="form-check form-check-inline">Used proper grammar and business language</p>
+                                    </div>
+                                    <div class="col-5">
+                                        <div class="form-check form-check-inline">
+                                            <label class="form-check-label" for="soft_skills_radio1" > Yes </label>
+                                            <input class="form-check-input" type="radio" name="soft_skills" value="1" id="soft_skills_radio1"  checked>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <label class="form-check-label" for="soft_skills_radio2" > No </label>
+                                            <input class="form-check-input" type="radio" name="soft_skills" value="0"  id="soft_skills_radio2" >
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-7">
+                                        <p class="form-check form-check-inline"> Refrained from using company terms and jargon</p>
+                                    </div>
+                                    <div class="col-5">
+                                        <div class="form-check form-check-inline">
+                                            <label class="form-check-label" for="soft_skills_radio1" > Yes </label>
+                                            <input class="form-check-input" type="radio" name="soft_skills" value="1" id="soft_skills_radio1"  checked>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <label class="form-check-label" for="soft_skills_radio2" > No </label>
+                                            <input class="form-check-input" type="radio" name="soft_skills" value="0"  id="soft_skills_radio2" >
+                                        </div>
+                                    </div>
                                 </div>
                                 
-                                <p class="form-check form-check-inline"> Used positive words (I know, I'm certain,etc)</p>
-                                <div class="form-check form-check-inline">
-                                    <label class="form-check-label" for="soft_skills_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="soft_skills" value="1" id="soft_skills_radio1"  checked>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <label class="form-check-label" for="soft_skills_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="soft_skills" value="0"  id="soft_skills_radio2" >
-                                </div>
+                                <div class="row">
+                                    <div class="col-7">
+                                        <p class="form-check form-check-inline"> Used positive words (I know, I'm certain,etc)</p>
+                                    </div>
+                                    <div class="col-5">
+                                        <div class="form-check form-check-inline">
+                                            <label class="form-check-label" for="soft_skills_radio1" > Yes </label>
+                                            <input class="form-check-input" type="radio" name="soft_skills" value="1" id="soft_skills_radio1"  checked>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <label class="form-check-label" for="soft_skills_radio2" > No </label>
+                                            <input class="form-check-input" type="radio" name="soft_skills" value="0"  id="soft_skills_radio2" >
+                                        </div>
+                                    </div>
+                                </div>    
                     </div>
                      <div class="col-6">
                         <textarea class="form-control" name="soft_skills_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
@@ -278,36 +364,54 @@
                 <div class="row mb-3">
                     <div class="col-6">
                         <strong CLASS="form-check-inline"> Using Hold  </strong><br>
-                        <p class="form-check form-check-inline">Informed the Customer before placing them on hold</p>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="using_hold_radio1" > Yes </label>
-                            <input class="form-check-input" type="radio" name="using_hold" value="1" id="using_hold_radio1"  checked>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="using_hold_radio2" > No </label>
-                            <input class="form-check-input" type="radio" name="using_hold" value="0"  id="using_hold_radio2" >
-                        </div>
 
-                        <p class="form-check form-check-inline">Kept in touch during long hold</p>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="using_hold_radio1" > Yes </label>
-                            <input class="form-check-input" type="radio" name="using_hold" value="1" id="using_hold_radio1"  checked>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="using_hold_radio2" > No </label>
-                            <input class="form-check-input" type="radio" name="using_hold" value="0"  id="using_hold_radio2" >
-                        </div>
+                            <div class="row">
+                                <div class="col-7">
+                                    <p class="form-check form-check-inline">Informed the Customer before placing them on hold</p>
+                                </div>
+                                <div class="col-5">
+                                    <div class="form-check form-check-inline">
+                                        <label class="form-check-label" for="using_hold_radio1" > Yes </label>
+                                        <input class="form-check-input" type="radio" name="using_hold" value="1" id="using_hold_radio1"  checked>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <label class="form-check-label" for="using_hold_radio2" > No </label>
+                                        <input class="form-check-input" type="radio" name="using_hold" value="0"  id="using_hold_radio2" >
+                                    </div>
+                                </div>
+                            </div>
 
-                        <p class="form-check form-check-inline"> Thanked the customer for holding</p>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="using_hold_radio1" > Yes </label>
-                            <input class="form-check-input" type="radio" name="using_hold" value="1" id="using_hold_radio1"  checked>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="using_hold_radio2" > No </label>
-                            <input class="form-check-input" type="radio" name="using_hold" value="0"  id="using_hold_radio2" >
-                        </div>
-
+                            <div class="row">
+                                <div class="col-7">
+                                    <p class="form-check form-check-inline">Kept in touch during long hold</p>
+                                </div>
+                                <div class="col-5">
+                                    <div class="form-check form-check-inline">
+                                        <label class="form-check-label" for="using_hold_radio1" > Yes </label>
+                                        <input class="form-check-input" type="radio" name="using_hold" value="1" id="using_hold_radio1"  checked>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <label class="form-check-label" for="using_hold_radio2" > No </label>
+                                        <input class="form-check-input" type="radio" name="using_hold" value="0"  id="using_hold_radio2" >
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="row">
+                                <div class="col-7">
+                                    <p class="form-check form-check-inline"> Thanked the customer for holding</p>
+                                </div>
+                                <div class="col-5">
+                                    <div class="form-check form-check-inline">
+                                        <label class="form-check-label" for="using_hold_radio1" > Yes </label>
+                                        <input class="form-check-input" type="radio" name="using_hold" value="1" id="using_hold_radio1"  checked>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <label class="form-check-label" for="using_hold_radio2" > No </label>
+                                        <input class="form-check-input" type="radio" name="using_hold" value="0"  id="using_hold_radio2" >
+                                    </div>
+                                </div>
+                            </div>    
                     </div>
                     <div class="col-6">
                         <textarea class="form-control" name="using_hold_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
@@ -318,26 +422,37 @@
                     <div class="col-6">
                         <strong CLASS="form-check-inline"> Connecting Calls  </strong><br>
 
-                        <p class="form-check form-check-inline">  Connected to the correct department/Queue,</p>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="using_hold_radio1" > Yes </label>
-                            <input class="form-check-input" type="radio" name="using_hold" value="1" id="using_hold_radio1"  checked>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="using_hold_radio2" > No </label>
-                            <input class="form-check-input" type="radio" name="using_hold" value="0"  id="using_hold_radio2" >
+                        <div class="row">
+                            <div class="col-7">
+                                <p class="form-check form-check-inline">  Connected to the correct department/Queue</p>
+                            </div>
+                            <div class="col-5">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="using_hold_radio1" > Yes </label>
+                                    <input class="form-check-input" type="radio" name="using_hold" value="1" id="using_hold_radio1"  checked>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="using_hold_radio2" > No </label>
+                                    <input class="form-check-input" type="radio" name="using_hold" value="0"  id="using_hold_radio2" >
+                                </div>
+                            </div>
                         </div>
 
-                        <p class="form-check form-check-inline">Informed customer where & why they were connected</p>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="connecting_calls_radio1" > Yes </label>
-                            <input class="form-check-input" type="radio" name="connecting_calls" value="1" id="connecting_calls_radio1"  checked>
+                        <div class="row">
+                            <div class="col-7">
+                                <p class="form-check form-check-inline">Informed customer where & why they were connected</p>
+                            </div>
+                            <div class="col-5">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="connecting_calls_radio1" > Yes </label>
+                                    <input class="form-check-input" type="radio" name="connecting_calls" value="1" id="connecting_calls_radio1"  checked>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="connecting_calls_radio2" > No </label>
+                                    <input class="form-check-input" type="radio" name="connecting_calls" value="0"  id="connecting_calls_radio2" >
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="connecting_calls_radio2" > No </label>
-                            <input class="form-check-input" type="radio" name="connecting_calls" value="0"  id="connecting_calls_radio2" >
-                        </div>
-                        
                     </div>
                     <div class="col-6">
                         <textarea class="form-control" name="connecting_calls_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
@@ -348,26 +463,37 @@
                     <div class="col-6">
                         <strong CLASS="form-check-inline"> Closing </strong><br>
 
-                        <p class="form-check form-check-inline">Quick Recap of the Order</p>   
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="closing_radio1" > Yes </label>
-                            <input class="form-check-input" type="radio" name="closing" value="1" id="closing_radio1"  checked>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="closing_radio2" > No </label>
-                            <input class="form-check-input" type="radio" name="closing" value="0" id="closing_radio2" >
-                        </div>
-
-                        <p class="form-check form-check-inline">Used proper closing - and asked further assistance</p>   
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="closing_radio1" > Yes </label>
-                            <input class="form-check-input" type="radio" name="closing" value="1" id="closing_radio1"  checked>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="closing_radio2" > No </label>
-                            <input class="form-check-input" type="radio" name="closing" value="0" id="closing_radio2" >
+                        <div class="row">
+                            <div class="col-7">
+                                <p class="form-check form-check-inline">Quick Recap of the Order</p> 
+                            </div>
+                            <div class="col-5">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="closing_radio1" > Yes </label>
+                                    <input class="form-check-input" type="radio" name="closing" value="1" id="closing_radio1"  checked>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="closing_radio2" > No </label>
+                                    <input class="form-check-input" type="radio" name="closing" value="0" id="closing_radio2" >
+                                </div>
+                            </div>
                         </div>
 
+                        <div class="row">
+                            <div class="col-7">
+                                <p class="form-check form-check-inline">Used proper closing - and asked further assistance</p> 
+                            </div>
+                            <div class="col-5">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="closing_radio1" > Yes </label>
+                                    <input class="form-check-input" type="radio" name="closing" value="1" id="closing_radio1"  checked>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="closing_radio2" > No </label>
+                                    <input class="form-check-input" type="radio" name="closing" value="0" id="closing_radio2" >
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-6">
                         <textarea class="form-control" name="closing_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
@@ -377,35 +503,53 @@
                 <div class="row mb-3">
                     <div class="col-6">
                         <strong CLASS="form-check-inline"> Automatic Fail </strong><br>
+
+                        <div class="row">
+                            <div class="col-7">
+                                <p class="form-check form-check-inline">Misquoting the price</p>
+                            </div>
+                            <div class="col-5">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="automatic_fail_radio1" > Yes </label>
+                                    <input class="form-check-input" type="radio" name="automatic_fail" value="1" id="automatic_fail_radio1"  checked>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="automatic_fail_radio2" > No </label>
+                                    <input class="form-check-input" type="radio" name="automatic_fail" value="0"  id="automatic_fail_radio2" >
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-7">
+                                <p class="form-check form-check-inline">Disconnected call without sufficient reason</p>
+                            </div>
+                            <div class="col-5">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="automatic_fail_radio1" > Yes </label>
+                                    <input class="form-check-input" type="radio" name="automatic_fail" value="1" id="automatic_fail_radio1"  checked>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="automatic_fail_radio2" > No </label>
+                                    <input class="form-check-input" type="radio" name="automatic_fail" value="0"  id="automatic_fail_radio2" >
+                                </div>
+                            </div>
+                        </div>
                         
-                        <p class="form-check form-check-inline">Misquoting the price</p>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="automatic_fail_radio1" > Yes </label>
-                            <input class="form-check-input" type="radio" name="automatic_fail" value="1" id="automatic_fail_radio1"  checked>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="automatic_fail_radio2" > No </label>
-                            <input class="form-check-input" type="radio" name="automatic_fail" value="0"  id="automatic_fail_radio2" >
-                        </div>
-
-                        <p class="form-check form-check-inline">Disconnected call without sufficient reason</p>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="automatic_fail_radio1" > Yes </label>
-                            <input class="form-check-input" type="radio" name="automatic_fail" value="1" id="automatic_fail_radio1"  checked>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="automatic_fail_radio2" > No </label>
-                            <input class="form-check-input" type="radio" name="automatic_fail" value="0"  id="automatic_fail_radio2" >
-                        </div>
-
-                        <p class="form-check form-check-inline">Failure to answer call</p>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="automatic_fail_radio1" > Yes </label>
-                            <input class="form-check-input" type="radio" name="automatic_fail" value="1" id="automatic_fail_radio1"  checked>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label" for="automatic_fail_radio2" > No </label>
-                            <input class="form-check-input" type="radio" name="automatic_fail" value="0"  id="automatic_fail_radio2" >
+                        <div class="row">
+                            <div class="col-7">
+                                <p class="form-check form-check-inline">Failure to answer call</p>
+                            </div>
+                            <div class="col-5">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="automatic_fail_radio1" > Yes </label>
+                                    <input class="form-check-input" type="radio" name="automatic_fail" value="1" id="automatic_fail_radio1"  checked>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="automatic_fail_radio2" > No </label>
+                                    <input class="form-check-input" type="radio" name="automatic_fail" value="0"  id="automatic_fail_radio2" >
+                                </div>
+                            </div>
                         </div>
 
                         <div class="row">
@@ -426,7 +570,7 @@
 
                         <div class="row">
                             <div class="col-7">
-                                <p class="form-check form-check-inline">Changing Customer details while reprocessing the order (name, number, email etc)</p>
+                                 <p class="form-check form-check-inline">Changing Customer details while reprocessing the order (name, number, email etc)</p>
                             </div>
                             <div class="col-5">
                                 <div class="form-check form-check-inline">
@@ -440,26 +584,37 @@
                             </div>
                         </div>
 
-                                    <p class="form-check form-check-inline">Fabricating information</p>
-                                    <div class="form-check form-check-inline">
-                                        <label class="form-check-label" for="automatic_fail_radio1" > Yes </label>
-                                        <input class="form-check-input" type="radio" name="automatic_fail" value="1" id="automatic_fail_radio1"  checked>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <label class="form-check-label" for="automatic_fail_radio2" > No </label>
-                                        <input class="form-check-input" type="radio" name="automatic_fail" value="0"  id="automatic_fail_radio2" >
-                                    </div><br>
+                        <div class="row">
+                            <div class="col-7">
+                                <p class="form-check form-check-inline">Fabricating information</p>
+                            </div>
+                            <div class="col-5">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="automatic_fail_radio1" > Yes </label>
+                                    <input class="form-check-input" type="radio" name="automatic_fail" value="1" id="automatic_fail_radio1"  checked>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="automatic_fail_radio2" > No </label>
+                                    <input class="form-check-input" type="radio" name="automatic_fail" value="0"  id="automatic_fail_radio2" >
+                                </div><br>
+                            </div>
+                        </div>
 
-                                    <p class="form-check form-check-inline">other</p>
-                                    <div class="form-check form-check-inline">
-                                        <label class="form-check-label" for="automatic_fail_radio1" > Yes </label>
-                                        <input class="form-check-input" type="radio" name="automatic_fail" value="1" id="automatic_fail_radio1"  checked>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <label class="form-check-label" for="automatic_fail_radio2" > No </label>
-                                        <input class="form-check-input" type="radio" name="automatic_fail" value="0"  id="automatic_fail_radio2" >
-                                    </div>
-                        
+                        <div class="row">
+                            <div class="col-7">
+                                <p class="form-check form-check-inline">other</p>
+                            </div>
+                            <div class="col-5">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="automatic_fail_radio1" > Yes </label>
+                                    <input class="form-check-input" type="radio" name="automatic_fail" value="1" id="automatic_fail_radio1"  checked>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label" for="automatic_fail_radio2" > No </label>
+                                    <input class="form-check-input" type="radio" name="automatic_fail" value="0"  id="automatic_fail_radio2" >
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-6">
                         <textarea class="form-control" name="automatic_fail_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
