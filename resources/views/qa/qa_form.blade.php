@@ -54,6 +54,7 @@
                         <input class="form-control" type="text" name="monitor_percentage" readonly>
                     </div>
                 </div>
+                
                 <div class="row mb-3">
                     <div class="col-6">
                         <strong CLASS="form-check-inline">Greetings</strong><br>
@@ -65,11 +66,11 @@
                             <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="greetings_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="greetings" value="1" id="greetings_radio1"  checked>
+                                    <input class="form-check-input" type="radio" name="greetings_correct" value="1" id="greetings_radio1"  checked>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="greetings_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="greetings" value="0" id="greetings_radio2" >
+                                    <input class="form-check-input" type="radio" name="greetings_correct" value="0" id="greetings_radio2" >
                                 </div>
                             </div>
                         </div>
@@ -81,11 +82,11 @@
                             <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="greetings_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="greetings" value="1" id="greetings_radio1"  checked>
+                                    <input class="form-check-input" type="radio" name="greetings_assurity_statement" value="1" id="greetings_radio1"  checked>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="greetings_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="greetings" value="0" id="greetings_radio2" >
+                                    <input class="form-check-input" type="radio" name="greetings_assurity_statement" value="0" id="greetings_radio2" >
                                 </div>
                             </div>
                         </div>               
@@ -94,6 +95,7 @@
                         <textarea class="form-control" name="greetings_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
                     </div>
                 </div>
+                <hr>
                 <div class="row mb-3">
                     <div class="col-6">
                         <strong CLASS="form-check-inline">Customer Name</strong><br>
@@ -105,20 +107,20 @@
                             <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="customer_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="customer_name" value="1" id="customer_radio1"  checked>
+                                    <input class="form-check-input" type="radio" name="customer_name_call" value="1" id="customer_radio1"  checked>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="customer_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="customer_name" value="0" id="customer_radio2" >
+                                    <input class="form-check-input" type="radio" name="customer_name_call" value="0" id="customer_radio2" >
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-6">
-                        <textarea class="form-control" name="customer_name_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
+                        <textarea class="form-control" name="customer_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
                     </div>
                 </div>
-
+                <hr>
                 <div class="row mb-3">
                     <div class="col-6">
                         <strong CLASS="form-check-inline">Listening</strong><br>
@@ -129,11 +131,11 @@
                             <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="listening_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="listening" value="1" id="listening_radio1"  checked>
+                                    <input class="form-check-input" type="radio" name="listening_skills" value="1" id="listening_radio1"  checked>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="listening_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="listening" value="0" id="listening_radio2" >
+                                    <input class="form-check-input" type="radio" name="listening_skills" value="0" id="listening_radio2" >
                                 </div>
                             </div>    
                         </div>
@@ -142,7 +144,7 @@
                         <textarea class="form-control" name="listening_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
                     </div>
                 </div>
-
+                <hr>
                 <div class="row mb-3">
                     <div class="col-6">
                         <strong CLASS="form-check-inline"> Courtesy </strong><br>
@@ -153,11 +155,11 @@
                             <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="courtesy_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="courtesy" value="1" id="courtesy_radio1"  checked>
+                                    <input class="form-check-input" type="radio" name="courtesy_please" value="1" id="courtesy_radio1"  checked>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="courtesy_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="courtesy" value="0" id="courtesy_radio2" >
+                                    <input class="form-check-input" type="radio" name="courtesy_please" value="0" id="courtesy_radio2" >
                                 </div>
                             </div>
                         </div>
@@ -168,11 +170,11 @@
                             <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="courtesy_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="courtesy" value="1" id="courtesy_radio1"  checked>
+                                    <input class="form-check-input" type="radio" name="courtesy_thank_you" value="1" id="courtesy_radio1"  checked>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="courtesy_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="courtesy" value="0" id="courtesy_radio2" >
+                                    <input class="form-check-input" type="radio" name="courtesy_thank_you" value="0" id="courtesy_radio2" >
                                 </div>
                             </div>
                         </div> 
@@ -184,11 +186,11 @@
                             <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="courtesy_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="courtesy" value="1" id="courtesy_radio1"  checked>
+                                    <input class="form-check-input" type="radio" name="courtesy_interest" value="1" id="courtesy_radio1"  checked>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="courtesy_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="courtesy" value="0" id="courtesy_radio2" >
+                                    <input class="form-check-input" type="radio" name="courtesy_interest" value="0" id="courtesy_radio2" >
                                 </div>
                             </div>
                         </div>
@@ -200,11 +202,11 @@
                             <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="courtesy_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="courtesy" value="1" id="courtesy_radio1"  checked>
+                                    <input class="form-check-input" type="radio" name="courtesy_empathy" value="1" id="courtesy_radio1"  checked>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="courtesy_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="courtesy" value="0" id="courtesy_radio2" >
+                                    <input class="form-check-input" type="radio" name="courtesy_empathy" value="0" id="courtesy_radio2" >
                                 </div>
                             </div>
                         </div> 
@@ -216,11 +218,11 @@
                             <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="courtesy_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="courtesy" value="1" id="courtesy_radio1"  checked>
+                                    <input class="form-check-input" type="radio" name="courtesy_Apologized" value="1" id="courtesy_radio1"  checked>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="courtesy_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="courtesy" value="0" id="courtesy_radio2" >
+                                    <input class="form-check-input" type="radio" name="courtesy_Apologized" value="0" id="courtesy_radio2" >
                                 </div>
                             </div>
                         </div>                        
@@ -229,7 +231,7 @@
                         <textarea class="form-control" name="courtesy_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
                     </div>
                 </div>
-
+                <hr>
                 <div class="row mb-3">
                     <div class="col-6">
                         <strong CLASS="form-check-inline"> Equipment Use </strong><br>
@@ -241,20 +243,20 @@
                             <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="equipment_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="equipment_use" value="1" id="equipment_radio1"  checked>
+                                    <input class="form-check-input" type="radio" name="equipment_system" value="1" id="equipment_radio1"  checked>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="equipment_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="equipment_use"  value="0" id="equipment_radio2" >
+                                    <input class="form-check-input" type="radio" name="equipment_system"  value="0" id="equipment_radio2" >
                                 </div>
                             </div>
                         </div>  
                     </div>
                     <div class="col-6">
-                        <textarea class="form-control" name="equipment_use_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
+                        <textarea class="form-control" name="equipment_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
                     </div>
                 </div>
-
+                <hr>
                 <div class="row mb-3">
                     <div class="col-6">
                                 <strong CLASS="form-check-inline"> Soft Skills </strong><br>
@@ -267,11 +269,11 @@
                                     <div class="col-5">
                                         <div class="form-check form-check-inline">
                                             <label class="form-check-label" for="soft_skills_radio1" > Yes </label>
-                                            <input class="form-check-input" type="radio" name="soft_skills" value="1" id="soft_skills_radio1"  checked>
+                                            <input class="form-check-input" type="radio" name="soft_skills_energy" value="1" id="soft_skills_radio1"  checked>
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <label class="form-check-label" for="soft_skills_radio2" > No </label>
-                                            <input class="form-check-input" type="radio" name="soft_skills" value="0"  id="soft_skills_radio2" >
+                                            <input class="form-check-input" type="radio" name="soft_skills_energy" value="0"  id="soft_skills_radio2" >
                                         </div>
                                     </div>
                                 </div>
@@ -283,11 +285,11 @@
                                     <div class="col-5">
                                         <div class="form-check form-check-inline">
                                             <label class="form-check-label" for="soft_skills_radio1" > Yes </label>
-                                            <input class="form-check-input" type="radio" name="soft_skills" value="1" id="soft_skills_radio1"  checked>
+                                            <input class="form-check-input" type="radio" name="soft_skill_avoided_silence" value="1" id="soft_skills_radio1"  checked>
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <label class="form-check-label" for="soft_skills_radio2" > No </label>
-                                            <input class="form-check-input" type="radio" name="soft_skills" value="0"  id="soft_skills_radio2" >
+                                            <input class="form-check-input" type="radio" name="soft_skill_avoided_silence" value="0"  id="soft_skills_radio2" >
                                         </div>
                                     </div>
                                 </div>
@@ -299,11 +301,11 @@
                                     <div class="col-5">
                                         <div class="form-check form-check-inline">
                                             <label class="form-check-label" for="soft_skills_radio1" > Yes </label>
-                                            <input class="form-check-input" type="radio" name="soft_skills" value="1" id="soft_skills_radio1"  checked>
+                                            <input class="form-check-input" type="radio" name="soft_skill_polite" value="1" id="soft_skills_radio1"  checked>
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <label class="form-check-label" for="soft_skills_radio2" > No </label>
-                                            <input class="form-check-input" type="radio" name="soft_skills" value="0"  id="soft_skills_radio2" >
+                                            <input class="form-check-input" type="radio" name="soft_skill_polite" value="0"  id="soft_skills_radio2" >
                                         </div>                                        
                                     </div>
                                 </div>
@@ -315,11 +317,11 @@
                                     <div class="col-5">
                                         <div class="form-check form-check-inline">
                                             <label class="form-check-label" for="soft_skills_radio1" > Yes </label>
-                                            <input class="form-check-input" type="radio" name="soft_skills" value="1" id="soft_skills_radio1"  checked>
+                                            <input class="form-check-input" type="radio" name="soft_skill_grammar" value="1" id="soft_skills_radio1"  checked>
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <label class="form-check-label" for="soft_skills_radio2" > No </label>
-                                            <input class="form-check-input" type="radio" name="soft_skills" value="0"  id="soft_skills_radio2" >
+                                            <input class="form-check-input" type="radio" name="soft_skill_grammar" value="0"  id="soft_skills_radio2" >
                                         </div>
                                     </div>
                                 </div>
@@ -331,11 +333,11 @@
                                     <div class="col-5">
                                         <div class="form-check form-check-inline">
                                             <label class="form-check-label" for="soft_skills_radio1" > Yes </label>
-                                            <input class="form-check-input" type="radio" name="soft_skills" value="1" id="soft_skills_radio1"  checked>
+                                            <input class="form-check-input" type="radio" name="soft_skill_refrained_company" value="1" id="soft_skills_radio1"  checked>
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <label class="form-check-label" for="soft_skills_radio2" > No </label>
-                                            <input class="form-check-input" type="radio" name="soft_skills" value="0"  id="soft_skills_radio2" >
+                                            <input class="form-check-input" type="radio" name="soft_skill_refrained_company" value="0"  id="soft_skills_radio2" >
                                         </div>
                                     </div>
                                 </div>
@@ -347,11 +349,11 @@
                                     <div class="col-5">
                                         <div class="form-check form-check-inline">
                                             <label class="form-check-label" for="soft_skills_radio1" > Yes </label>
-                                            <input class="form-check-input" type="radio" name="soft_skills" value="1" id="soft_skills_radio1"  checked>
+                                            <input class="form-check-input" type="radio" name="soft_skill_positive_words" value="1" id="soft_skills_radio1"  checked>
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <label class="form-check-label" for="soft_skills_radio2" > No </label>
-                                            <input class="form-check-input" type="radio" name="soft_skills" value="0"  id="soft_skills_radio2" >
+                                            <input class="form-check-input" type="radio" name="soft_skill_positive_words" value="0"  id="soft_skills_radio2" >
                                         </div>
                                     </div>
                                 </div>    
@@ -360,7 +362,7 @@
                         <textarea class="form-control" name="soft_skills_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
                     </div>
                 </div>
-
+                <hr>
                 <div class="row mb-3">
                     <div class="col-6">
                         <strong CLASS="form-check-inline"> Using Hold  </strong><br>
@@ -372,11 +374,11 @@
                                 <div class="col-5">
                                     <div class="form-check form-check-inline">
                                         <label class="form-check-label" for="using_hold_radio1" > Yes </label>
-                                        <input class="form-check-input" type="radio" name="using_hold" value="1" id="using_hold_radio1"  checked>
+                                        <input class="form-check-input" type="radio" name="using_hold_informed_customer" value="1" id="using_hold_radio1"  checked>
                                     </div>
                                     <div class="form-check form-check-inline">
                                         <label class="form-check-label" for="using_hold_radio2" > No </label>
-                                        <input class="form-check-input" type="radio" name="using_hold" value="0"  id="using_hold_radio2" >
+                                        <input class="form-check-input" type="radio" name="using_hold_informed_customer" value="0"  id="using_hold_radio2" >
                                     </div>
                                 </div>
                             </div>
@@ -388,11 +390,11 @@
                                 <div class="col-5">
                                     <div class="form-check form-check-inline">
                                         <label class="form-check-label" for="using_hold_radio1" > Yes </label>
-                                        <input class="form-check-input" type="radio" name="using_hold" value="1" id="using_hold_radio1"  checked>
+                                        <input class="form-check-input" type="radio" name="using_hold_touch" value="1" id="using_hold_radio1"  checked>
                                     </div>
                                     <div class="form-check form-check-inline">
                                         <label class="form-check-label" for="using_hold_radio2" > No </label>
-                                        <input class="form-check-input" type="radio" name="using_hold" value="0"  id="using_hold_radio2" >
+                                        <input class="form-check-input" type="radio" name="using_hold_touch" value="0"  id="using_hold_radio2" >
                                     </div>
                                 </div>
                             </div>
@@ -404,11 +406,11 @@
                                 <div class="col-5">
                                     <div class="form-check form-check-inline">
                                         <label class="form-check-label" for="using_hold_radio1" > Yes </label>
-                                        <input class="form-check-input" type="radio" name="using_hold" value="1" id="using_hold_radio1"  checked>
+                                        <input class="form-check-input" type="radio" name="using_hold_thanked" value="1" id="using_hold_radio1"  checked>
                                     </div>
                                     <div class="form-check form-check-inline">
                                         <label class="form-check-label" for="using_hold_radio2" > No </label>
-                                        <input class="form-check-input" type="radio" name="using_hold" value="0"  id="using_hold_radio2" >
+                                        <input class="form-check-input" type="radio" name="using_hold_thanked" value="0"  id="using_hold_radio2" >
                                     </div>
                                 </div>
                             </div>    
@@ -417,7 +419,7 @@
                         <textarea class="form-control" name="using_hold_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
                     </div>
                 </div>
-
+                <hr>
                 <div class="row mb-3">
                     <div class="col-6">
                         <strong CLASS="form-check-inline"> Connecting Calls  </strong><br>
@@ -428,12 +430,12 @@
                             </div>
                             <div class="col-5">
                                 <div class="form-check form-check-inline">
-                                    <label class="form-check-label" for="using_hold_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="using_hold" value="1" id="using_hold_radio1"  checked>
+                                    <label class="form-check-label" for="connecting_calls_department" > Yes </label>
+                                    <input class="form-check-input" type="radio" name="connecting_calls_department" value="1" id="connecting_calls_department"  checked>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="form-check-label" for="using_hold_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="using_hold" value="0"  id="using_hold_radio2" >
+                                    <label class="form-check-label" for="connecting_calls_department" > No </label>
+                                    <input class="form-check-input" type="radio" name="connecting_calls_department" value="0"  id="connecting_calls_department" >
                                 </div>
                             </div>
                         </div>
@@ -445,11 +447,11 @@
                             <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="connecting_calls_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="connecting_calls" value="1" id="connecting_calls_radio1"  checked>
+                                    <input class="form-check-input" type="radio" name="connecting_calls_customer" value="1" id="connecting_calls_radio1"  checked>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="connecting_calls_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="connecting_calls" value="0"  id="connecting_calls_radio2" >
+                                    <input class="form-check-input" type="radio" name="connecting_calls_customer" value="0"  id="connecting_calls_radio2" >
                                 </div>
                             </div>
                         </div>
@@ -458,7 +460,7 @@
                         <textarea class="form-control" name="connecting_calls_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
                     </div>
                 </div>
-
+                <hr>
                 <div class="row mb-3">
                     <div class="col-6">
                         <strong CLASS="form-check-inline"> Closing </strong><br>
@@ -470,11 +472,11 @@
                             <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="closing_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="closing" value="1" id="closing_radio1"  checked>
+                                    <input class="form-check-input" type="radio" name="closing_recap" value="1" id="closing_radio1"  checked>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="closing_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="closing" value="0" id="closing_radio2" >
+                                    <input class="form-check-input" type="radio" name="closing_recap" value="0" id="closing_radio2" >
                                 </div>
                             </div>
                         </div>
@@ -486,11 +488,11 @@
                             <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="closing_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="closing" value="1" id="closing_radio1"  checked>
+                                    <input class="form-check-input" type="radio" name="clossing_assistance" value="1" id="closing_radio1"  checked>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="closing_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="closing" value="0" id="closing_radio2" >
+                                    <input class="form-check-input" type="radio" name="clossing_assistance" value="0" id="closing_radio2" >
                                 </div>
                             </div>
                         </div>
@@ -499,7 +501,7 @@
                         <textarea class="form-control" name="closing_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
                     </div>
                 </div>
-
+                <hr>
                 <div class="row mb-3">
                     <div class="col-6">
                         <strong CLASS="form-check-inline"> Automatic Fail </strong><br>
@@ -511,11 +513,11 @@
                             <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="automatic_fail_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="automatic_fail" value="1" id="automatic_fail_radio1"  checked>
+                                    <input class="form-check-input" type="radio" name="automatic_fail_misquoting" value="1" id="automatic_fail_radio1"  checked>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="automatic_fail_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="automatic_fail" value="0"  id="automatic_fail_radio2" >
+                                    <input class="form-check-input" type="radio" name="automatic_fail_misquoting" value="0"  id="automatic_fail_radio2" >
                                 </div>
                             </div>
                         </div>
@@ -527,11 +529,11 @@
                             <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="automatic_fail_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="automatic_fail" value="1" id="automatic_fail_radio1"  checked>
+                                    <input class="form-check-input" type="radio" name="automatic_fail_disconnected" value="1" id="automatic_fail_radio1"  checked>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="automatic_fail_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="automatic_fail" value="0"  id="automatic_fail_radio2" >
+                                    <input class="form-check-input" type="radio" name="automatic_fail_disconnected" value="0"  id="automatic_fail_radio2" >
                                 </div>
                             </div>
                         </div>
@@ -543,11 +545,11 @@
                             <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="automatic_fail_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="automatic_fail" value="1" id="automatic_fail_radio1"  checked>
+                                    <input class="form-check-input" type="radio" name="automatic_fail_fanswer" value="1" id="automatic_fail_radio1"  checked>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="automatic_fail_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="automatic_fail" value="0"  id="automatic_fail_radio2" >
+                                    <input class="form-check-input" type="radio" name="automatic_fail_answer" value="0"  id="automatic_fail_radio2" >
                                 </div>
                             </div>
                         </div>
@@ -559,11 +561,11 @@
                             <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="automatic_fail_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="automatic_fail" value="1" id="automatic_fail_radio1"  checked>
+                                    <input class="form-check-input" type="radio" name="automatic_fail_repeating_details" value="1" id="automatic_fail_radio1"  checked>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="automatic_fail_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="automatic_fail" value="0"  id="automatic_fail_radio2" >
+                                    <input class="form-check-input" type="radio" name="automatic_fail_repeating_details" value="0"  id="automatic_fail_radio2" >
                                 </div>
                             </div>
                         </div>
@@ -575,11 +577,11 @@
                             <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="automatic_fail_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="automatic_fail" value="1" id="automatic_fail_radio1"  checked>
+                                    <input class="form-check-input" type="radio" name="automatic_fail_changing_details" value="1" id="automatic_fail_radio1"  checked>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="automatic_fail_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="automatic_fail" value="0"  id="automatic_fail_radio2" >
+                                    <input class="form-check-input" type="radio" name="automatic_fail_changing_details" value="0"  id="automatic_fail_radio2" >
                                 </div>
                             </div>
                         </div>
@@ -591,11 +593,11 @@
                             <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="automatic_fail_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="automatic_fail" value="1" id="automatic_fail_radio1"  checked>
+                                    <input class="form-check-input" type="radio" name="automatic_fail_fabricating" value="1" id="automatic_fail_radio1"  checked>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="automatic_fail_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="automatic_fail" value="0"  id="automatic_fail_radio2" >
+                                    <input class="form-check-input" type="radio" name="automatic_fail_fabricating" value="0"  id="automatic_fail_radio2" >
                                 </div><br>
                             </div>
                         </div>
@@ -607,11 +609,11 @@
                             <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="automatic_fail_radio1" > Yes </label>
-                                    <input class="form-check-input" type="radio" name="automatic_fail" value="1" id="automatic_fail_radio1"  checked>
+                                    <input class="form-check-input" type="radio" name="automatic_fail_other" value="1" id="automatic_fail_radio1"  checked>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="automatic_fail_radio2" > No </label>
-                                    <input class="form-check-input" type="radio" name="automatic_fail" value="0"  id="automatic_fail_radio2" >
+                                    <input class="form-check-input" type="radio" name="automatic_fail_other" value="0"  id="automatic_fail_radio2" >
                                 </div>
                             </div>
                         </div>
@@ -620,7 +622,7 @@
                         <textarea class="form-control" name="automatic_fail_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
                     </div>
                 </div>
-
+                <hr>
                 <div class="row mb-3">
                     <div class="col-6">
                         <strong CLASS="form-check-inline"> Monitor By </strong>
@@ -629,7 +631,7 @@
                         <textarea class="form-control" id="textarea" name="monitor_by" rows="2" placeholder="Additional Comments"></textarea>
                     </div>
                 </div>
-
+                <hr>
                 <div class="row">
                     <div class="col-12">
                         <button class="btn btn-primary" type="submit">Save</button>

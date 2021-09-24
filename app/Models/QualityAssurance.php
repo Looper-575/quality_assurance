@@ -23,10 +23,17 @@ class QualityAssurance extends Authenticatable
      */
 
         protected $fillable = [
-            'rep_name', 'call_date', 'call_type' , 'call_number', 'greetings', 'greetings_comment',
-            'customer_name', 'customer_name_comment', 'listening', 'listening_comment', 'courtesy', 'courtesy_comment',
-            'equipment_use',  'equipment_use_comment', 'soft_skills', ' soft_skills_comment', 'using_hold',	' using_hold_comment',
-            'connecting_calls', 'connecting_calls_comment',  'closing', 'closing_comment',  'automatic_fail',' automatic_fail_comment', 
+            'rep_name', 'call_date', 'call_type' , 'call_number',
+            'greetings_correct', 'greetings_assurity_statement', 'greetings_comment',
+            'customer_name_call', 'customer_comment', 
+            'listening_skills', 'listening_comment', 
+            'courtesy_please', 'courtesy_thank_you','courtesy_interest', 'courtesy_empathy', 'courtesy_Apologized' , 'courtesy_comment',
+            'equipment_system',  'equipment_comment',
+            'soft_skills_energy', 'soft_skill_avoided_silence', 'soft_skill_polite', 'soft_skill_grammar', 'soft_skill_refrained_company', 'soft_skill_positive_words', 'soft_skills_comment',
+            'using_hold_informed_customer', 'using_hold_touch' ,'using_hold_thanked', 'using_hold_comment',
+            'connecting_calls_department', 'connecting_calls_customer', 'connecting_calls_comment',
+            'closing_recap', 'clossing_assistance', 'closing_comment', 
+            'automatic_fail_misquoting',' automatic_fail_disconnected', 'automatic_fail_answer', 'automatic_fail_repeating_details', 'automatic_fail_changing_details','automatic_fail_fabricating', 'automatic_fail_other', 'automatic_fail_comment', 
             'additional_comment', 'yes_responses', 'no_responses', 'automatic_fail_response', 'monitor_percentage',
         ];
 
