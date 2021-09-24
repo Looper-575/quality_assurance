@@ -409,10 +409,10 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-7">
                                 <p class="form-check form-check-inline"> Repeating confidential details back to the customer like Credit Card and SSN</p>
                             </div>
-                            <div class="col-6">
+                            <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="automatic_fail_radio1" > Yes </label>
                                     <input class="form-check-input" type="radio" name="automatic_fail" value="1" id="automatic_fail_radio1"  checked>
@@ -425,10 +425,10 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-7">
                                 <p class="form-check form-check-inline">Changing Customer details while reprocessing the order (name, number, email etc)</p>
                             </div>
-                            <div class="col-6">
+                            <div class="col-5">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="automatic_fail_radio1" > Yes </label>
                                     <input class="form-check-input" type="radio" name="automatic_fail" value="1" id="automatic_fail_radio1"  checked>
