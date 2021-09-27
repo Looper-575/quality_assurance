@@ -41,8 +41,8 @@ class QAController extends Controller
                 'call_number'=> 'required',
                 'greetings_correct' => 'required',
                 'greetings_assurity_statement'=> 'required',
-                'customer_name_call' => 'required', 
-                'listening_skills' => 'required', 
+                'customer_name_call' => 'required',
+                'listening_skills' => 'required',
                 'courtesy_please' => 'required',
                 'courtesy_thank_you' => 'required',
                 'courtesy_interest' => 'required',
@@ -54,31 +54,32 @@ class QAController extends Controller
                 'soft_skill_polite' => 'required',
                 'soft_skill_grammar' => 'required',
                 'soft_skill_refrained_company' => 'required',
-                'soft_skill_positive_words' => 'required',   
+                'soft_skill_positive_words' => 'required',
                 'using_hold_informed_customer' => 'required',
                 'using_hold_touch' => 'required',
-                'using_hold_thanked' => 'required', 
+                'using_hold_thanked' => 'required',
                 'connecting_calls_department' => 'required',
                 'connecting_calls_customer' => 'required',
                 'closing_recap' => 'required',
-                'clossing_assistance' => 'required', 
-                'automatic_fail_misquoting' => 'required', 
-                'automatic_fail_disconnected' => 'required', 
+                'clossing_assistance' => 'required',
+                'automatic_fail_misquoting' => 'required',
+                'automatic_fail_disconnected' => 'required',
                 'automatic_fail_answer' => 'required',
                 'automatic_fail_repeating_details' => 'required',
-                'automatic_fail_changing_details' => 'required', 
-                'automatic_fail_fabricating' => 'required',  
+                'automatic_fail_changing_details' => 'required',
+                'automatic_fail_fabricating' => 'required',
         ]);
 
         if($validator->passes()) {
+            //dd($request);
             $qa = new QualityAssurance;
             $qa->added_by = Auth::user()->user_id;
-            $qa->rep_name	= $request->rep_name;
+            $qa->agent_id	= $request->rep_name;
             $qa->call_date = $request->call_date;
             $qa->call_type = $request->call_type;
             $qa->call_number = $request->call_number;
             $qa->greetings_correct = $request->greetings_correct;
-            $qa-> greetings_assurity_statement  = $request->greetings_assurity_statement;
+            $qa->greetings_assurity_statement  = $request->greetings_assurity_statement;
             $qa->greetings_comment = $request->greetings_comment;
             $qa->customer_name_call = $request->customer_name_call;
             $qa->customer_comment = $request->customer_comment;

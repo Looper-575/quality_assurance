@@ -17,7 +17,7 @@
                         <select class="form-control" name="rep_name" id="" required>
                             <option class="form-control" value="" selected>Plese Select</option>
                             @foreach($agents as $agent)
-                            <option value="{{$agent->user_id}}">{{$agent->full_name}}</option>                                  
+                            <option value="{{$agent->user_id}}">{{$agent->full_name}}</option>
                             @endforeach
                         </select>
                     </div>
@@ -685,7 +685,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="automatic_fail_fabricating3" > N/A </label>
-                                    <input class="form-check-input auto_na_radio" type="radio" name="auomatic_fail_fabricating" id="automatic_fail_fabricating3" value="2">
+                                    <input class="form-check-input auto_na_radio" type="radio" name="automatic_fail_fabricating" id="automatic_fail_fabricating3" value="2">
                                 </div>
                             </div>
                         </div>
@@ -735,7 +735,7 @@
                 <hr>
                 <div class="row mb-3">
                     <div class="col-12">
-                        <textarea class="form-control" id="textarea" name="monitor_by" rows="2" placeholder="Additional Comments"></textarea>
+                        <textarea class="form-control" id="textarea" name="additional_comment" rows="2" placeholder="Additional Comments"></textarea>
                     </div>
                 </div>
                 <div class="row">
