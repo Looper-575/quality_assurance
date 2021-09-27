@@ -126,7 +126,6 @@ class QAController extends Controller
             $qa->save();
             $response['status'] = "Success";
             $response['result'] = "Added Successfully";
-            return redirect()->back();
         }
         else {
             $response['status'] = "Failure!";

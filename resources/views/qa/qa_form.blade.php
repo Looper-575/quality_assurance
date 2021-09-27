@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
 @endsection
 @section('content')
-    <form method="post" action="{{route('qa_save')}}">
+    <form method="post" id="qa_form" action="">
         @csrf
         <div class="card">
             <div class="card-header" style="justify-content: space-between;">
@@ -759,12 +759,12 @@
                 $(".select2").select2();
             }
             //form submission;
-            $('#product_form').submit(function (e) {
+            $('#qa_form').submit(function (e) {
                 e.preventDefault();
                 let data = new FormData(this);
-                let a = function(){ };
+                let a = function(){ window.location.reload(); };
                 let arr = [a];
-                call_ajax_with_functions('','route here',data,arr);
+                call_ajax_with_functions('','{{route('qa_save')}}',data,arr);
             });
             $('.yes_radio').click(function (){
                 calculate_score();
