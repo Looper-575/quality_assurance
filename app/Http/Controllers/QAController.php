@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Models\QualityAssurance;
+use App\Models\User;
 
 class QAController extends Controller
 {
@@ -23,6 +24,10 @@ class QAController extends Controller
     public function list(){
 
         $data['page_title'] = "Atlantis BPO CRM - Roles";
+        $data['agents'] = User::where([
+            'role_id'=> 2,
+            'status'=> 1,
+            ])->get();
         return view('qa.qa_form' , $data);
     }
 
@@ -30,25 +35,39 @@ class QAController extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'rep_name'=> 'required',
-            'call_date'=>'required|date',
-            'call_type'=> 'required',
-            'call_number'=> 'required',
-            /*using_hold_comment
-            connecting_calls_department
-            connecting_calls_customer
-            connecting_calls_comment
-            closing_recap
-            clossing_assistance
-            closing_comment
-            automatic_fail_misquoting
-            automatic_fail_disconnected
-            automatic_fail_answer
-            automatic_fail_repeating_details
-            automatic_fail_changing_details
-            automatic_fail_fabricating
-            automatic_fail_other
-            automatic_fail_comment*/
+                'rep_name'=> 'required',
+                'call_date'=>'required|date',
+                'call_type'=> 'required',
+                'call_number'=> 'required',
+                'greetings_correct' => 'required',
+                'greetings_assurity_statement'=> 'required',
+                'customer_name_call' => 'required', 
+                'listening_skills' => 'required', 
+                'courtesy_please' => 'required',
+                'courtesy_thank_you' => 'required',
+                'courtesy_interest' => 'required',
+                'courtesy_empathy' => 'required',
+                'courtesy_Apologized' => 'required',
+                'equipment_system' => 'required',
+                'soft_skills_energy' => 'required',
+                'soft_skill_avoided_silence' => 'required',
+                'soft_skill_polite' => 'required',
+                'soft_skill_grammar' => 'required',
+                'soft_skill_refrained_company' => 'required',
+                'soft_skill_positive_words' => 'required',   
+                'using_hold_informed_customer' => 'required',
+                'using_hold_touch' => 'required',
+                'using_hold_thanked' => 'required', 
+                'connecting_calls_department' => 'required',
+                'connecting_calls_customer' => 'required',
+                'closing_recap' => 'required',
+                'clossing_assistance' => 'required', 
+                'automatic_fail_misquoting' => 'required', 
+                'automatic_fail_disconnected' => 'required', 
+                'automatic_fail_answer' => 'required',
+                'automatic_fail_repeating_details' => 'required',
+                'automatic_fail_changing_details' => 'required', 
+                'automatic_fail_fabricating' => 'required',  
         ]);
 
         if($validator->passes()) {
@@ -74,18 +93,18 @@ class QAController extends Controller
             $qa->equipment_system = $request-> equipment_system;
             $qa->equipment_comment = $request->equipment_comment;
             $qa->soft_skills_energy = $request->soft_skills_energy;
-            $qa->soft_skill_avoided_silence   = $request-> soft_skill_avoided_silence;
+            $qa->soft_skill_avoided_silence  = $request-> soft_skill_avoided_silence;
             $qa->soft_skill_polite = $request->soft_skill_polite;
             $qa->soft_skill_grammar = $request->soft_skill_grammar;
-            $qa-> soft_skill_refrained_company= $request->soft_skill_refrained_company;
-            $qa-> soft_skill_positive_words = $request->soft_skill_positive_words;
-            $qa-> soft_skills_comment = $request->soft_skills_comment;
-            $qa-> using_hold_informed_customer = $request->using_hold_informed_customer;
+            $qa->soft_skill_refrained_company= $request->soft_skill_refrained_company;
+            $qa->soft_skill_positive_words = $request->soft_skill_positive_words;
+            $qa->soft_skills_comment = $request->soft_skills_comment;
+            $qa->using_hold_informed_customer = $request->using_hold_informed_customer;
             $qa->using_hold_touch = $request->using_hold_touch;
             $qa->using_hold_thanked = $request->using_hold_thanked;
             $qa->using_hold_comment = $request->using_hold_comment;
-            $qa->connecting_calls_department = $request->using_hold_comment;
-            $qa->connecting_calls_customer = $request->using_hold_comment;
+            $qa->connecting_calls_department = $request->connecting_calls_department;
+            $qa->connecting_calls_customer = $request->connecting_calls_customer;
             $qa->connecting_calls_comment = $request->connecting_calls_comment;
             $qa->closing_recap = $request->closing_recap;
             $qa->clossing_assistance = $request->clossing_assistance;
@@ -99,10 +118,10 @@ class QAController extends Controller
             $qa->automatic_fail_other = $request->automatic_fail_other;
             $qa-> automatic_fail_comment = $request->automatic_fail_comment;
             $qa->additional_comment = $request->additional_comment;
-            $qa->yes_responses = $request->yes_resp;
-            $qa->no_responses = $request->no_resp;
-            $qa->automatic_fail_response = $request->auto_fail_resp;
-            $qa->monitor_percentage = $request->monitor_percent;
+            $qa->yes_responses = $request->yes_responses;
+            $qa->no_responses = $request->no_responses;
+            $qa->automatic_fail_response = $request->automatic_fail_response;
+            $qa->monitor_percentage = $request->monitor_percentage;
             $qa->save();
             $response['status'] = "Success";
             $response['result'] = "Added Successfully";
@@ -114,4 +133,6 @@ class QAController extends Controller
         }
         return response()->json($response);
     }
+
+
 }

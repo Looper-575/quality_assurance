@@ -14,7 +14,12 @@
                 <div class="row mb-2">
                     <div class="col-6 mb-2">
                         <label  for="agent_id"><strong> Rep Name  </strong> </label>
-                        <input class="form-control" type="text" name="rep_name">
+                        <select class="form-control" name="rep_name" id="" required>
+                            <option class="form-control" value="" selected>Plese Select</option>
+                            @foreach($agents as $agent)
+                            <option value="{{$agent->user_id}}">{{$agent->full_name}}</option>                                  
+                            @endforeach
+                        </select>
                     </div>
                     <div class="col-6 mb-2">
                         <label for="call_date"><strong> Call Date  </strong> </label>
@@ -435,7 +440,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="using_hold_touch3"> N/A </label>
-                                    <input class="form-check-input na_radio" type="radio" name="using_hold_touch" id="using_hold_touch3" value=2">
+                                    <input class="form-check-input na_radio" type="radio" name="using_hold_touch" id="using_hold_touch3" value="2">
                                 </div>
                             </div>
                         </div>
