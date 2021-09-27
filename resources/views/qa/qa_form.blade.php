@@ -444,7 +444,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col-7">
                                 <p class="form-check form-check-inline"> Thanked the customer for holding</p>
