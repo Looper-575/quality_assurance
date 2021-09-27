@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Models\QualityAssurance;
 use App\Models\User;
+use App\Models\CallType;
 
 class QAController extends Controller
 {
@@ -26,8 +27,9 @@ class QAController extends Controller
         $data['page_title'] = "Atlantis BPO CRM - Roles";
         $data['agents'] = User::where([
             'role_id'=> 2,
-            'status'=> 1,
+            'status'=> 1,    
             ])->get();
+        $data['call_types'] = CallType::get();
         return view('qa.qa_form' , $data);
     }
 
@@ -68,6 +70,7 @@ class QAController extends Controller
                 'automatic_fail_repeating_details' => 'required',
                 'automatic_fail_changing_details' => 'required',
                 'automatic_fail_fabricating' => 'required',
+                'additional_comment' => 'required',
         ]);
 
         if($validator->passes()) {
