@@ -53,7 +53,6 @@
         </div>
     </div>
 @endsection
-
 @section('footer_scripts')
     <script>
         let role_form_modal = (function () {/*
@@ -136,5 +135,4 @@
         }
 
     </script>
-
 @endsection

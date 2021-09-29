@@ -7,7 +7,6 @@
         <div class="col-12">
             <form method="post" id="">
                 @csrf
-               
                 <div class="card">
                     <div class="card-header">
                         <h4>User Form</h4>
