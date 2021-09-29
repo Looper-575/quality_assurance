@@ -34,6 +34,7 @@
             <th>Listening</th>
             <th>Equipment Use</th>
         </tr>
+        <tr>
         <td>
             listening Skills: <strong>{{$status_arr[$qa_data->listening_skills]}}</strong>
         </td>
@@ -41,11 +42,13 @@
             Prompt System: <strong>{{$status_arr[$qa_data->equipment_system]}}</strong><br>
 
         </td>
+        </tr>
         <tr>
             <th>Courtesy</th>
             <th>Using Hold</th>
 
         </tr>
+        <tr>
         <td>
             Courtesy Please: <strong>{{$status_arr[$qa_data->courtesy_please]}}</strong><br>
             Courtesy Thank You: <strong>{{$status_arr[$qa_data->courtesy_thank_you]}}</strong><br>
@@ -58,11 +61,12 @@
             Kept in Touch: <strong>{{$status_arr[$qa_data->using_hold_touch]}}</strong><br>
             Thanked the Customer: <strong>{{$status_arr[$qa_data->using_hold_thanked]}}</strong><br>
         </td>
-
+        </tr>
         <tr>
             <th>Closing</th>
             <th>Connecting Calls </th>
         </tr>
+        <tr>
         <td>
             Quick Recap: <strong>{{$status_arr[$qa_data->closing_recap]}}</strong><br>
             Used Proper Closing: <strong>{{$status_arr[$qa_data->clossing_assistance]}}</strong><br>
@@ -71,11 +75,12 @@
             Connected to Department: <strong>{{$status_arr[$qa_data->connecting_calls_department]}}</strong><br>
             Informed customer: <strong>{{$status_arr[$qa_data->connecting_calls_customer]}}</strong><br>
         </td>
-
+        </tr>
         <tr>
             <th>Soft Skills</th>
             <th>Automatic Fail</th>
         </tr>
+        <tr>
         <td>
             Voice Reflected: <strong>{{$status_arr[$qa_data->soft_skills_energy]}}</strong><br>
             Avoided Long Silence: <strong>{{$status_arr[$qa_data->soft_skill_avoided_silence]}}</strong><br>
@@ -93,6 +98,7 @@
             Fabricating Information: <strong>{{$status_arr[$qa_data->automatic_fail_fabricating]}}</strong><br>
             Other: <strong>{{$status_arr[$qa_data->automatic_fail_other]}}</strong><br>
         </td>
+        </tr>
     </table>
 </div>
 
