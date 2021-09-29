@@ -21,33 +21,6 @@
         </ul>
     </div>
     <ul class="navbar-nav navbar-right">
-        <!--
-        Admin Messages for Bug Reports
-        <li class="dropdown dropdown-list-toggle">
-            <a href="#" data-toggle="dropdown" class="nav-link nav-link-lg message-toggle">
-                <i data-feather="mail"></i><span class="badge headerBadge1">6 </span>
-            </a>
-            <div class="dropdown-menu dropdown-list dropdown-menu-right pullDown">
-                <div class="dropdown-header">
-                    Messages
-                    <div class="float-right">
-                        <a href="#">Mark All As Read</a>
-                    </div>
-                </div>
-                <div class="dropdown-list-content dropdown-list-message">
-                    <a href="#" class="dropdown-item">
-                        <span class="dropdown-item-avatar text-white"> <img alt="image" src="assets/img/users/user-1.png" class="rounded-circle"></span>
-                        <span class="dropdown-item-desc"> <span class="message-user">John Deo</span>
-                        <span class="time messege-text">Please check your mail !!</span>
-                        <span class="time">2 Min Ago</span></span>
-                    </a>
-                </div>
-                <div class="dropdown-footer text-center">
-                    <a href="#">View All <i class="fas fa-chevron-right"></i></a>
-                </div>
-            </div>
-        </li>
-        -->
         <li class="dropdown dropdown-list-toggle">
             <a href="#" data-toggle="dropdown" class="nav-link notification-toggle nav-link-lg">
                 <i data-feather="bell" class="bell"></i>
@@ -96,8 +69,8 @@
                 <a href="timeline.html" class="dropdown-item has-icon"> <i class="fas fa-bolt"></i>Activities</a>
                 <a href="#" class="dropdown-item has-icon"> <i class="fas fa-cog"></i>Settings</a>
                 <div class="dropdown-divider"></div>
-                <a href="auth-login.html" class="dropdown-item has-icon text-danger"> <i
-                        class="fas fa-sign-out-alt"></i>Logout</a>
+                <a href="{{route('login')}}" class="dropdown-item has-icon text-danger">
+                    <i class="fas fa-sign-out-alt"></i>Logout</a>
             </div>
         </li>
     </ul>

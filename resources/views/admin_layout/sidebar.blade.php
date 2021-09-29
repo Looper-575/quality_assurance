@@ -21,11 +21,9 @@
             <li class="{{ @request()->is('qa_form') ? 'active' : '' }}">
                 <a href="{{route('qa_form')}}" class="nav-link"><i data-feather="list"></i><span>Quality Assurance</span></a>
             </li>
-
             <li class="dropdown">
-            
-            </li>
 
+            </li>
             <li class="dropdown">
                 <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="briefcase"></i><span>Settings</span></a>
                 <ul class="dropdown-menu">
