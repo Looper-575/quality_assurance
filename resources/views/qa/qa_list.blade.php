@@ -18,7 +18,7 @@
                                 <thead>
                                 <tr>
                                     <th>S.No.</th>
-                                    <th>Agent</th> 
+                                    <th>Agent</th>
                                     <th>Call Date</th>
                                     <th>Call Type</th>
                                     <th>Call Number</th>
@@ -30,8 +30,8 @@
                                 </thead>
                                 <?php $i=1 ?>
                                 <tbody>
-                                    @foreach ($qa_lists as $qa_list) 
-                                    
+                                    @foreach ($qa_lists as $qa_list)
+
                                   <tr>
                                         <td>{{ $i++ }}</td>
                                         <td>{{ $qa_list->agent->full_name }}</td>
@@ -46,7 +46,7 @@
                                             {{-- <button type="button"  class="btn btn-danger role_delete" >Delete</button> --}}
                                         </td>
                                     </tr>
-                                    @endforeach         
+                                    @endforeach
                                 </tbody>
                             </table>
                     </div>
@@ -54,7 +54,7 @@
             </div>
         </div>
     </div>
-              
+
 @endsection
 
 @section('footer_scripts')
@@ -66,9 +66,9 @@
         function view_qa(qa_id) {
             let data = new FormData();
             data.append('qa_id', qa_id);
-            data.append('_token', '{{ csrf_token(); }}');
+            data.append('_token', '{{ csrf_token() }}');
             call_ajax_modal('POST', '{{route('qa_single_data')}}', data, 'Quality Assessment View');
         }
-        
+
     </script>
 @endsection
