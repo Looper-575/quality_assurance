@@ -5,38 +5,88 @@
 @section('content')
     <div class="row">
         <div class="col-12">
-            <form method="post" id="">
+            <form method="post" id="product_form">
                 @csrf
+                @if (isset($product))
+                    @method('put')
+                @endif
                 <div class="card">
                     <div class="card-header">
-                        <h4>User Form</h4>
+                        <h4>Product Form</h4>
                     </div>
                     <div class="card-body" id="add_more_cats_data">
                         <div class="row">
                             <div class="col-6">
                                 <div class="form-group">
-                                    <label>First Name</label>
-                                    <input name="first_name"  type="text" class="form-control">
+                                    <label>Title</label>
+                                    <input name="title" required type="text" class="form-control"
+                                           value="{{ isset($product) ? $product->title : '' }}">
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="form-group">
-                                    <label>Last Name</label>
-                                    <input name="last_name"  type="text" class="form-control">
+                                    <label>Category</label>
+                                    <select class="form-control select2" name="category_id" >
+                                        @foreach($categories as $category)
+                                            <option {{ isset($product) && $product->category_id == $category->category_id ? 'selected' : '' }}
+                                                    value="{{ $category->category_id }}">{{ $category->title }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <label>Condition</label>
+                                    <select class="form-control select2" name="condition" >
+                                        <option {{ isset($product) && $product->condition == 'Used' ? 'selected' : '' }} value="Used">Used</option>
+                                        <option {{ isset($product) && $product->condition == 'New' ? 'selected' : '' }} value="New">New</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <label>Value</label>
+                                    <input name="value" required type="text" class="form-control"
+                                           value="{{ isset($product) ? $product->value : '' }}">
+                                </div>
+                            </div>
                             <div class="col-6">
                                 <div class="form-group">
-                                    <label>Address</label>
-                                    <input name="address"  type="text" class="form-control">
+                                    <label>City</label>
+                                    <input name="location" required type="text" class="form-control"
+                                           value="{{ isset($product) ? $product->location : '' }}">
                                 </div>
                             </div>
                             <div class="col-6">
-
+                                <div class="form-group">
+                                    <label>Product Description</label>
+                                    <textarea name="description" required type="text" class="form-control description"
+                                              style=" height: 86px !important; ">{{ isset($product) ? $product->description : '' }}</textarea>
+                                </div>
                             </div>
-
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>Pictures</label>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <input name="images[]" {{ isset($product) ? '' : 'required' }} type="file" accept="image/*"
+                                                   class="form-control images">
+                                        </div>
+                                        <div class="col-6">
+                                            <input name="images[]" type="file" accept="image/*"
+                                                   class="form-control images">
+                                        </div>
+                                        <div class="col-6">
+                                            <input name="images[]" type="file" accept="image/*"
+                                                   class="form-control images">
+                                        </div>
+                                        <div class="col-6">
+                                            <input name="images[]" type="file" accept="image/*"
+                                                   class="form-control images">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="card-footer text-right">
@@ -49,7 +99,7 @@
     </div>
 @endsection
 @section('footer_scripts')
-    {{-- <script src="{{ asset('assets/bundles/select2/dist/js/select2.full.min.js') }}"></script>
+    <script src="{{ asset('assets/bundles/select2/dist/js/select2.full.min.js') }}"></script>
     <script>
         $( document ).ready(function() {
             if (jQuery().select2) {
@@ -68,5 +118,5 @@
                 window.location.href="{{route('qa.index')}}";
             });
         });
-    </script> --}}
+    </script>
 @endsection
