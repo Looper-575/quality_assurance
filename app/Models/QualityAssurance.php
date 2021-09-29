@@ -23,7 +23,7 @@ class QualityAssurance extends Authenticatable
      */
 
         protected $fillable = [
-            'rep_name', 'call_date', 'call_type' , 'call_number',
+            'rep_name', 'call_date', 'call_type_id' , 'call_number',
             'greetings_correct', 'greetings_assurity_statement', 'greetings_comment',
             'customer_name_call', 'customer_comment', 
             'listening_skills', 'listening_comment', 
@@ -45,7 +45,7 @@ class QualityAssurance extends Authenticatable
     protected $hidden = [
       
     ];
-
+    
     /**
      * The attributes that should be cast to native types.
      *
@@ -56,5 +56,16 @@ class QualityAssurance extends Authenticatable
         'added_on' => 'datetime',
     ];
 
+
+
+    public function agent()
+    {
+        return $this->belongsTo(User::class, 'agent_id', 'user_id');
+    }
+
+    public function call_type()
+    {
+        return $this->belongsTo(CallType::class, 'call_type_id' , 'call_type_id');
+    }
 
 }

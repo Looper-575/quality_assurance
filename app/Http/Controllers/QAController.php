@@ -22,7 +22,7 @@ class QAController extends Controller
     {
         //$this->middleware('auth');
     }
-    public function list(){
+    public function form(){
 
         $data['page_title'] = "Atlantis BPO CRM - Roles";
         $data['agents'] = User::where([
@@ -33,10 +33,28 @@ class QAController extends Controller
         return view('qa.qa_form' , $data);
     }
 
+    public function list()
+    {
+        $data['page_title'] = "Atlantis BPO CRM - Roles";
+        $data['qa_lists'] = QualityAssurance::where([
+            'status'=> 1,
+            ])->with(['agent','call_type'])->get();
+           // dd($data);
+        // $data['qa_single_data'] = QualityAssurance::find($id)->get();
+        return view('qa.qa_list', $data);
+    }
+
+    public function show(Request $request)
+    {
+        $data['qa_data'] = QualityAssurance::where([
+            'qa_id' => $request->qa_id,
+        ])->with(['agent', 'call_type'])->get()[0];
+        return view('qa.qa_single', $data);
+    }
+
     public function save(Request $request)
     {
-
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->all(),[
                 'rep_name'=> 'required',
                 'call_date'=>'required|date',
                 'call_type'=> 'required',
@@ -79,7 +97,7 @@ class QAController extends Controller
             $qa->added_by = Auth::user()->user_id;
             $qa->agent_id	= $request->rep_name;
             $qa->call_date = $request->call_date;
-            $qa->call_type = $request->call_type;
+            $qa->call_type_id = $request->call_type;
             $qa->call_number = $request->call_number;
             $qa->greetings_correct = $request->greetings_correct;
             $qa->greetings_assurity_statement  = $request->greetings_assurity_statement;
@@ -136,6 +154,4 @@ class QAController extends Controller
         }
         return response()->json($response);
     }
-
-
 }

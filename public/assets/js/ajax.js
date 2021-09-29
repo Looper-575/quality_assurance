@@ -132,7 +132,8 @@ function call_ajax_modal(method, php_file, form_data, title) {
  * @param {string} title
  * @param {a[]} functions
  */
-function call_ajax_modal_with_functions(php_file, form_data, title, functions) {
+function call_ajax_modal_with_functions(php_file, form_data, title, functions)
+ {
     let request =  new XMLHttpRequest();
     request.open("POST", php_file, true);
     request.send(form_data);
@@ -159,4 +160,19 @@ function call_ajax_modal_with_functions(php_file, form_data, title, functions) {
             }
         }
     }
+}
+
+function print_div(print_target) {
+    let divElements = document.getElementById(print_target).innerHTML;
+    newpage = window.open('', '_blank');
+    data = "<link rel='stylesheet' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>";
+    let script = newpage.document.createElement('script');
+    script.setAttribute('type', 'text/javascript');
+    script.innerHTML = "setInterval(function(){ window.print(); window.close(); }, 2000);";
+    newpage.document.body.innerHTML = data + divElements;
+    newpage.document.body.appendChild(script);
+    var $link = $(newpage.document.body).find('a');
+    $($link).replaceWith(function(){
+        return $("<span>" + $(this).html() + "</span>");
+    });
 }

@@ -26,8 +26,10 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::post('/update_role', 'App\Http\Controllers\RolesController@update')->name('roles_update');
     Route::post('/delete_role', 'App\Http\Controllers\RolesController@delete')->name('roles_delete');
     // routes for Quality Assurance
-    Route::get('/qa_form' ,'App\Http\Controllers\QAController@list')->name('qa_form');
+    Route::get('/qa_form' ,'App\Http\Controllers\QAController@form')->name('qa_form');
     Route::post('/qa_save', 'App\Http\Controllers\QAController@save')->name('qa_save');
+    Route::get('/qa_list', 'App\Http\Controllers\QAController@list')->name('qa_list');
+    Route::post('/qa_single_data', 'App\Http\Controllers\QAController@show')->name('qa_single_data');
 });
 
 

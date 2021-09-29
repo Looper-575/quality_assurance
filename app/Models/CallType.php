@@ -22,7 +22,7 @@ class CallType extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'call_type',
+        'title',
     ];
 
     /**
