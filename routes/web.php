@@ -19,7 +19,7 @@ Route::get('/route-cache', function() {
 Route::get('/user_roles', 'App\Http\Controller\UserController@test');
 Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::get('/home', 'App\Http\Controllers\DashboardController@index')->name('dashboard');
-    Route::get('/users', 'App\Http\Controllers\UserController@list')->name('users');
+    Route::get('/users', 'App\Http\Controllers\UserController@user_form')->name('users');
     Route::get('/roles_list', 'App\Http\Controllers\RolesController@list')->name('roles_list');
     // Route::post('/user_roles/{id}', 'App\Http\Controllers\RolesController@edit')->name('roles_edit');
     Route::post('/save_role', 'App\Http\Controllers\RolesController@store')->name('roles_store');

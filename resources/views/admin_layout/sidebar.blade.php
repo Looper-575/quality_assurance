@@ -18,17 +18,29 @@
             <li class="{{ @request()->is('categories') ? 'active' : '' }}">
                 <a href="/categories" class="nav-link"><i data-feather="list"></i><span>Categories</span></a>
             </li>
-            <li class="{{ @request()->is('qa_form') ? 'active' : '' }}">
+            {{-- <li class="{{ @request()->is('qa_form') ? 'active' : '' }}">
                 <a href="{{route('qa_form')}}" class="nav-link"><i data-feather="list"></i><span>Quality Assurance</span></a>
-            </li>
-            <li class="dropdown">
+            </li> --}}
 
+            <li class="dropdown">
+                <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="briefcase"></i><span>Quality Assurance</span></a>
+                <ul class="dropdown-menu">
+                    <li class="{{ @request()->is('qa_form') ? 'active' : '' }}">
+                        <a href="{{route('qa_form')}}" class="nav-link"><i data-feather="list"></i><span>Form</span></a>
+                    </li>
+                    <li class="{{ @request()->is('qa_list') ? 'active' : '' }}">
+                        <a href="{{route('qa_list')}}" class="nav-link"><i data-feather="list"></i><span>List</span></a>
+                    </li>
+                </ul>
             </li>
+           
             <li class="dropdown">
                 <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="briefcase"></i><span>Settings</span></a>
                 <ul class="dropdown-menu">
+                    
+                    {{-- <li><a class="nav-link" href="{{ route('add_user') }}">Add User</a></li> --}}
                     <li><a class="nav-link" href="{{route('roles_list')}}">User Roles</a></li>
-                    <li><a class="nav-link" href="widget-data.html">Data Widgets</a></li>
+                    {{-- <li><a class="nav-link" href="widget-data.html">Data Widgets</a></li> --}}
                 </ul>
             </li>
             <li class="dropdown">

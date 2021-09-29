@@ -9,7 +9,7 @@
             <div class="card">
                 <div class="card-header" style="justify-content: space-between;">
                     <h4>Quality Assurance List</h4>
-                    <a class="btn btn-icon icon-left btn-primary" href="{{ route('qa_list') }}">
+                    <a class="btn btn-icon icon-left btn-primary" href="{{ route('qa_form') }}">
                         <i class="fas fa-plus"></i> Add new</a>
                 </div>
                     <div class="card-body">
