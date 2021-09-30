@@ -5,7 +5,7 @@
 @section('content')
     <div class="row">
         <div class="col-12">
-            <form method="post" id="" action="{{ route('user_save') }}">
+            <form method="post" id="" action="{{ route('user_save') }}" enctype="multipart/form-data">
                 @csrf
                 <div class="card">
                     <div class="card-header">
