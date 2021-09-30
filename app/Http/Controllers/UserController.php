@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Models\UserRole;
 
 class UserController extends Controller
 {
@@ -37,13 +38,16 @@ class UserController extends Controller
     public function list()
     {
         $data['page_title'] = "Atlantis BPO CRM - Users List";
+        $data['user_lists'] = User::where('status' , 1)->get();
         //$data['qa'] = Product::where('status', '!=', 0)->get();      
-        return view('users.user_list',$data);
+        return view('users.user_list', $data);
     }
 
     public function user_form()
     {
         $data['page_title'] = "Atlantis BPO CRM - Users Form";
+        $data['user_roles'] = UserRole::get();
+        
         //$data['qa'] = Product::where('status', '!=', 0)->get();
         return view('users.user_form',$data);
     }
@@ -104,6 +108,113 @@ class UserController extends Controller
         }
         return view('public_pages.verify_account', $data);
     }
+
+    public function save(Request $request){
+
+        $validator = Validator::make($request->all(),[
+            'full_name' => 'required',
+            'email' => 'required',
+            "images"  => "image|mimes:png,gif,jpeg,jpg|max:1024",
+            'password' => 'required|unique:users,email',
+            'gender' => 'required',
+            'postal_address' => 'required',
+            'contact_number' => 'required',
+            'role_id' => 'required',
+        ]);
+// learn file validator
+        if($validator->passes()){
+
+            $user = new User;
+            $user->added_by = Auth::user()->user_id;
+            $user->full_name = $request->full_name;
+            $user->email = $request->email;
+            $user->password = encrypt_password($request->input('password'));
+            $user_image = "";
+            if($request->file('image')) {
+                $file = $request->file('image');
+                $user_image = time() . rand(1, 100) . '.' . $file->extension();
+                $file->move(public_path('user_images'), $user_image);
+            }
+            //  var_dump($request->file('image'));
+            // dd($user_image);
+            $user->image = $user_image;
+
+            $user->gender = $request->gender;
+            $user->postal_address = $request->postal_address;
+            $user->contact_number = $request->contact_number;
+            $user->role_id = $request->role_id;
+            $user->save();
+            return redirect()->back();
+            $response['status'] = 'success';
+            $response['result'] = 'Added Succesfully';
+        } else{
+            $response['status']= 'failuer';
+            $response['result'] = $validator->errors()->toJson();
+        }
+        return response()->json($response);
+    }
+
+    // public function update(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'full_name' => 'required',
+    //         'email' => 'required',
+    //         "images"  => "image|mimes:png,gif,jpeg,jpg|max:1024",
+    //         'password' => 'required|unique:users,email',
+    //         'gender' => 'required',
+    //         'postal_address' => 'required',
+    //         'contact_number' => 'required',
+    //         'role_id' => 'required',
+    //     ]);
+    //     if ($validator->passes()) {
+    //         $check = User::where('full_name', $request->full_name)->where('user_id', '!=', $request->user_id)->get();
+    //         if(count($check)>0) {
+    //             $response['status'] = "Failue";
+    //             $response['result'] = "Record Already Exists";
+    //         } else {
+    //             $user_image = "";
+    //             if($request->file('image')) {
+    //                 $file = $request->file('image');
+    //                 $user_image = time() . rand(1, 100) . '.' . $file->extension();
+    //                 $file->move(public_path('user_images'), $user_image);
+    //             }
+    //             User::where('user_id', $request->user_id)->update([
+    //                 'modified_by' => Auth::user()->user_id,
+    //                 'full_name' = $request->full_name,
+    //                 $user->full_name = $request->full_name;
+    //                 $user->email = $request->email;
+    //                 $user->image = $user_image;
+    //                 $user->gender = $request->gender;
+    //                 $user->postal_address = $request->postal_address;
+    //                 $user->contact_number = $request->contact_number;
+    //                 $user->role_id = $request->role_id;
+
+    //             ]);
+    //             $response['status'] = "Success";
+    //             $response['result'] = "Updated Successfully";
+    //         }
+    //     } else {
+    //         $response['status'] = "Failure!";
+    //         $response['result'] = $validator->errors()->toJson();
+    //     }
+    //     return response()->json($response);
+    // }
+
+
+
+
+
+    Public function delete(Request $request)
+    {
+        $role = User::where('user_id', $request->user_id)->update([
+            'status' => 0,
+        ]);
+        $response['status'] = "Success";
+        $response['result'] = "Deleted Successfully";
+        return response()->json($response);
+    }
+    
+    
 
     public function logout()
     {

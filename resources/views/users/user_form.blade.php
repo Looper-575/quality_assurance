@@ -5,38 +5,81 @@
 @section('content')
     <div class="row">
         <div class="col-12">
-            <form method="post" id="">
+            <form method="post" id="" action="{{ route('user_save') }}">
                 @csrf
                 <div class="card">
                     <div class="card-header">
                         <h4>User Form</h4>
                     </div>
                     <div class="card-body" id="add_more_cats_data">
+                        
                         <div class="row">
                             <div class="col-6">
                                 <div class="form-group">
-                                    <label>First Name</label>
-                                    <input name="first_name"  type="text" class="form-control">
+                                    <label class="form-check-label"> Full Name</label>
+                                    <input name="full_name"   type="text" class="form-control">
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="form-group">
-                                    <label>Last Name</label>
-                                    <input name="last_name"  type="text" class="form-control">
+                                    <label class="form-check-label">Email</label>
+                                    <input name="email"  type="email" class="form-control">
+                                </div>
+                            </div>
+                       
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label class="form-check-label">Password</label>
+                                    <input name="password"  type="password" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label class="form-check-label">Image</label>
+                                    <input name="image"  type="file" class="form-control">
                                 </div>
                             </div>
                         </div>
+
                         <div class="row">
                             <div class="col-6">
                                 <div class="form-group">
-                                    <label>Address</label>
-                                    <input name="address"  type="text" class="form-control">
+                                    <label class="form-check-label">Gender</label><br>
+                                    <div class="form-check form-check-inline">
+                                        <label class="form-check-label" for="male">Male </label>
+                                        <input class="form-check-input" name="gender" id="male" type="radio"  value="1" checked >
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <label class="form-check-label" for="female"> Female </label>
+                                        <input class="form-check-input" name="gender" id="female" type="radio"  value="0">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-6">
+                           </div>
 
+                           <div class="col-6">
+                            <div class="form-group">
+                                <label class="form-check-label" for="">Postal Address</label>
+                                <input  class="form-control type="text" name="postal_address" id="">
                             </div>
+                           </div>
 
+                           <div class="col-6">
+                            <div class="form-group">
+                                <label class="form-check-label" for="">Contact Number</label>
+                                <input  class="form-control type="number" name="contact_number" id="">
+                            </div>
+                           </div>
+
+                           <div class="col-6">
+                            <label  for="agent_id"><strong> Role  </strong> </label>
+                            <select class="form-control" name="role_id" id="" required>
+                            <option class="form-control" value="" selected>Plese Select</option>
+                            @foreach($user_roles as $user_role)
+                            <option value="{{$user_role->role_id}}">{{$user_role->title}}</option>
+                            @endforeach
+                            </select>
+                           </div>
                         </div>
                     </div>
                     <div class="card-footer text-right">

@@ -18,8 +18,14 @@ Route::get('/route-cache', function() {
 });
 Route::get('/user_roles', 'App\Http\Controller\UserController@test');
 Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
+    //Routes for Users
     Route::get('/home', 'App\Http\Controllers\DashboardController@index')->name('dashboard');
     Route::get('/users', 'App\Http\Controllers\UserController@user_form')->name('users');
+    Route::post('/user_save', 'App\Http\Controllers\UserController@save')->name('user_save');
+    Route::get('/users_list', 'App\Http\Controllers\UserController@list')->name('users_list');
+    Route::post('/user_delete', 'App\Http\Controllers\UserController@delete')->name('user_delete');
+
+    //Routes for Roles
     Route::get('/roles_list', 'App\Http\Controllers\RolesController@list')->name('roles_list');
     // Route::post('/user_roles/{id}', 'App\Http\Controllers\RolesController@edit')->name('roles_edit');
     Route::post('/save_role', 'App\Http\Controllers\RolesController@store')->name('roles_store');
