@@ -12,7 +12,6 @@
                         <h4>User Form</h4>
                     </div>
                     <div class="card-body" id="add_more_cats_data">
-                        
                         <div class="row">
                             <div class="col-6">
                                 <div class="form-group">
@@ -26,7 +25,7 @@
                                     <input name="email"  type="email" class="form-control">
                                 </div>
                             </div>
-                       
+
                             <div class="col-6">
                                 <div class="form-group">
                                     <label class="form-check-label">Password</label>
