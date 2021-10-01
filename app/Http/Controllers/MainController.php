@@ -17,7 +17,8 @@ class MainController extends Controller
     {
         $data['page_title'] = "Atlantis BPO Quality Assurance";
         //$data['qa'] = Product::where('status', '!=', 0)->get();
-        return view('qa.qa_form',$data);
+//        return view('qa.qa_form',$data);
+        return view('lead_form' ,  $data);
     }
 
     public function login()

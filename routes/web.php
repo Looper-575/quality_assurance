@@ -36,6 +36,8 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::post('/qa_save', 'App\Http\Controllers\QAController@save')->name('qa_save');
     Route::get('/qa_list', 'App\Http\Controllers\QAController@list')->name('qa_list');
     Route::post('/qa_single_data', 'App\Http\Controllers\QAController@show')->name('qa_single_data');
+    //  routes for Lead
+    Route::get('/lead_form', 'App\Http\Controllers\MainController@index');
 });
 
 

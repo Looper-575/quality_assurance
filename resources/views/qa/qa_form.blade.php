@@ -27,11 +27,11 @@
                     </div>
                     <div class="col-6 mb-1">
                         <label for="call_type"><strong> Call Type </strong></label>
-                        <select class="form-control" name="call_type" id="call_type"> 
+                        <select class="form-control" name="call_type" id="call_type">
                             <option value="" class="fomr-control">Please Select</option>
                                 @foreach ($call_types as $call_type)
                                     <option value="{{ $call_type->call_type_id }}"> {{ $call_type->title }} </option>
-                                @endforeach    
+                                @endforeach
                         </select>
                     </div>
                     <div class="col-6 mb-1">
