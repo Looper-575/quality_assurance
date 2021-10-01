@@ -689,13 +689,3 @@ img.img-attachment {
     height: 150px !important;
     border-radius: 0px !important;
 }
-/* =============== Lead Form CSS =================== */
-.sp_checks, .att_checks, .dt_checks, .el_checks, .mc_checks, .v_checks, .h_checks, .sl_checks, .o_checks, .c_checks, .other_checks {
-    display: none;
-}
-input#spectrum:checked + .sp_checks, input#att:checked + .att_checks, input#direct_tv:checked + .dt_checks, input#earth_link:checked + .el_checks,
-input#mediacom:checked + .mc_checks, input#viasat:checked + .v_checks, input#hughesnet:checked + .h_checks, input#sudden_link:checked + .sl_checks,
-input#optimum:checked + .o_checks, input#cox:checked + .c_checks, input#others:checked + .other_checks {
-    display: block !important;
-    margin-top: 5px;
-}
