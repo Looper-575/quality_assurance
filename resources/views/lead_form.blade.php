@@ -248,7 +248,6 @@
                                 <hr>
                             </div>
                         </div>
-
                         <div class="form-check">
                             <label class="form-check-label" for="others"> Others </label>
                             <input class="form-check-input" type="checkbox" id="others" name="others">
