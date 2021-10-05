@@ -110,7 +110,8 @@
             $('#background_fade_form').fadeIn();
         });
 
-        function delete_role (me) {
+        function delete_role (me)
+        {
             let id = me.value;
             let data = new FormData();
             data.append('role_id', id);

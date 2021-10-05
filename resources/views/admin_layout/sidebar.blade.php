@@ -15,6 +15,12 @@
             <li class="{{ @request()->is('qa') ? 'active' : '' }}">
                 <a href="{{route('users')}}" class="nav-link"><i data-feather="grid"></i><span>Users</span></a>
             </li>
+{{--            <li class="{{ @request()->is('lead_form') ? 'active' : '' }}">--}}
+{{--                <a href="{{route('lead_form')}}" class="nav-link"><i data-feather="grid"></i><span>Lead Form</span></a>--}}
+{{--            </li>--}}
+            <li class="{{ @request()->is('lead_list') ? 'active' : '' }}">
+                <a href="{{route('lead_list')}}" class="nav-link"><i data-feather="grid"></i><span>Leads</span></a>
+            </li>
             <li class="{{ @request()->is('categories') ? 'active' : '' }}">
                 <a href="/categories" class="nav-link"><i data-feather="list"></i><span>Categories</span></a>
             </li>
@@ -33,11 +39,11 @@
                     </li>
                 </ul>
             </li>
-           
+
             <li class="dropdown">
                 <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="briefcase"></i><span>Settings</span></a>
                 <ul class="dropdown-menu">
-                    
+
                     {{-- <li><a class="nav-link" href="{{ route('add_user') }}">Add User</a></li> --}}
                     <li><a class="nav-link" href="{{route('roles_list')}}">User Roles</a></li>
                     {{-- <li><a class="nav-link" href="widget-data.html">Data Widgets</a></li> --}}

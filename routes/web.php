@@ -27,7 +27,6 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
 
     //Routes for Roles
     Route::get('/roles_list', 'App\Http\Controllers\RolesController@list')->name('roles_list');
-    // Route::post('/user_roles/{id}', 'App\Http\Controllers\RolesController@edit')->name('roles_edit');
     Route::post('/save_role', 'App\Http\Controllers\RolesController@store')->name('roles_store');
     Route::post('/update_role', 'App\Http\Controllers\RolesController@update')->name('roles_update');
     Route::post('/delete_role', 'App\Http\Controllers\RolesController@delete')->name('roles_delete');
@@ -37,7 +36,12 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::get('/qa_list', 'App\Http\Controllers\QAController@list')->name('qa_list');
     Route::post('/qa_single_data', 'App\Http\Controllers\QAController@show')->name('qa_single_data');
     //  routes for Lead
-    Route::get('/lead_form', 'App\Http\Controllers\MainController@index');
+    Route::get('/lead_form', 'App\Http\Controllers\CallDispositionController@form')->name('lead_form');
+    Route::post('/lead_save', 'App\Http\Controllers\CallDispositionController@save')->name('lead_save');
+    Route::get('/lead_list' , 'App\Http\Controllers\CallDispositionController@list')->name('lead_list');
+    Route::post('/lead_delete', 'App\Http\Controllers\CallDispositionController@delete')->name('lead_delete');
+    Route::get('/lead_edit/{id}' , 'App\Http\Controllers\CallDispositionController@edit')->name('lead_edit');
+    Route::put('/lead_update/{id}' , 'App\Http\Controllers\CallDispositionController@upate')->name('lead_update');
 });
 
 
