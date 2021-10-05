@@ -5,7 +5,7 @@
           href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
 @endsection
 @section('content')
-    <form method="post" id="" action="{{route('lead_save')}}" enctype="multipart/form-data">
+    <form method="post" id="lead_form" enctype="multipart/form-data">
         @csrf
         <div class="card">
             <div class="card-header" style="justify-content: space-between;">
@@ -50,11 +50,11 @@
                         </div>
                         <div class="form-group">
                             <label class="form-check-label">Initial Bill </label>
-                            <input type="text" class="form-control" name="initial_bill" id="initial_bill">
+                            <input type="number" class="form-control" name="initial_bill" id="initial_bill">
                         </div>
                         <div class="form-group">
                             <label class="form-check-label">Monthly Bill </label>
-                            <input type="text" class="form-control" name="monthly_bill" id="monthly_bill">
+                            <input type="number" class="form-control" name="monthly_bill" id="monthly_bill">
                         </div>
                         <div class="form-group">
                             <label class="form-check-label">Order Confirmation Number</label>
@@ -121,7 +121,7 @@
                         </div>
                         <div class="form-check">
                             <label class="form-check-label" for="direct_tv"> Direct Tv </label>
-                            <input class="form-check-input" type="checkbox" id="direct_tv" name="direct_tv" value="direct_tv">
+                            <input class="form-check-input" type="checkbox" id="direct_tv" name="direct_tv" value="directtv">
                             <div class="dt_checks mb-2">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="dt_cable"> Cable </label>
@@ -132,7 +132,7 @@
                         </div>
                         <div class="form-check">
                             <label class="form-check-label" for="earth_link"> Earth link </label>
-                            <input class="form-check-input" type="checkbox" id="earth_link" name="earth_link" value="earth_link">
+                            <input class="form-check-input" type="checkbox" id="earth_link" name="earth_link" value="earthlink">
                             <div class="el_checks mb-2">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="el_internet"> Internet </label>
@@ -196,7 +196,7 @@
                         </div>
                         <div class="form-check">
                             <label class="form-check-label" for="sudden_link"> Suddenlink </label>
-                            <input class="form-check-input" type="checkbox" id="sudden_link" name="sudden_link" value="sudden_link">
+                            <input class="form-check-input" type="checkbox" id="sudden_link" name="sudden_link" value="suddenlink">
                             <div class="sl_checks mb-2">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="sl_internet"> Internet </label>
@@ -327,6 +327,13 @@
             } else {
                 $('#prof_install').fadeOut();
             }
+        });
+        $('#lead_form').submit(function (e) {
+            e.preventDefault();
+            let data = new FormData(this);
+            let a = function(){ window.location.href = "{{route('lead_list')}}"; };
+            let arr = [a];
+            call_ajax_with_functions('','{{route('lead_save')}}',data,arr);
         });
     </script>
 @endsection

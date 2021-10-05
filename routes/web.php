@@ -41,7 +41,7 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::get('/lead_list' , 'App\Http\Controllers\CallDispositionController@list')->name('lead_list');
     Route::post('/lead_delete', 'App\Http\Controllers\CallDispositionController@delete')->name('lead_delete');
     Route::get('/lead_edit/{id}' , 'App\Http\Controllers\CallDispositionController@edit')->name('lead_edit');
-    Route::put('/lead_update/{id}' , 'App\Http\Controllers\CallDispositionController@upate')->name('lead_update');
+    Route::post('/lead_update/{id}' , 'App\Http\Controllers\CallDispositionController@update')->name('lead_update');
 });
 
 

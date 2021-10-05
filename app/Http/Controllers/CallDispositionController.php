@@ -174,7 +174,6 @@ class CallDispositionController extends Controller
                     $call_disp_service->mobile = 0;
                     $call_disp_service->save();
                 }
-
                 if(isset($request->optimum)){
                     $call_disp_service = new CallDispositionsService;
                     $call_disp_service->call_id = $call_id;
@@ -204,7 +203,7 @@ class CallDispositionController extends Controller
                 if(isset($request->others)){
                     $call_disp_service = new CallDispositionsService;
                     $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->others;
+                    $call_disp_service->provider_name = $request->other_specify;
                     $call_disp_service->internet = isset($request->other_internet) ? $request->other_internet : 0;
                     isset($request->other_internet ) ? $services_sold++ : 0;
                     $call_disp_service->cable = isset($request->other_cable) ? $request->other_cable : 0;
@@ -233,10 +232,10 @@ class CallDispositionController extends Controller
             }
         }
         else{
-                $response['status'] = 'failure';
-                $response['result']= $validator->errors()->toJson();
+            $response['status'] = 'failure';
+            $response['result']= $validator->errors()->toJson();
         }
-            return response()->json($response);
+        return response()->json($response);
     }
 
     public function edit($id)
@@ -245,6 +244,7 @@ class CallDispositionController extends Controller
         $data['lead_edit'] = CallDisposition::where('call_id',$id)->with(['call_dispositions_services'])->get()[0];
         return view('lead_edit' , $data);
     }
+
     public  function update(Request $request ,$id)
     {
         $validator = Validator::make($request->all(),[
@@ -400,7 +400,7 @@ class CallDispositionController extends Controller
                 if (isset($request->others)) {
                     $call_disp_service = new CallDispositionsService;
                     $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->others;
+                    $call_disp_service->provider_name = $request->other_specify;
                     $call_disp_service->internet = isset($request->other_internet) ? $request->other_internet : 0;
                     isset($request->other_internet) ? $services_sold++ : 0;
                     $call_disp_service->cable = isset($request->other_cable) ? $request->other_cable : 0;
@@ -432,9 +432,16 @@ class CallDispositionController extends Controller
                 DB::commit();
             } catch(Exception $e) {
                 DB::rollBack();
+                dd($e);
             }
+            $response['status'] = 'success';
+            $response['result']= "Updated Successfully";
+            echo "success";
+        } else {
+            $response['status'] = 'failure';
+            $response['result']= $validator->errors()->toJson();
         }
-
+        return response()->json($response);
     }
 
     Public function delete(Request $request)

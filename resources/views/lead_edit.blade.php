@@ -5,7 +5,7 @@
           href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
 @endsection
 @section('content')
-    <form method="post" id="" action="{{route('lead_update' , $lead_edit->call_id)}}" enctype="multipart/form-data">
+    <form method="post" id="lead_form" enctype="multipart/form-data">
         @csrf
         <div class="card">
             <div class="card-header" style="justify-content: space-between;">
@@ -39,14 +39,17 @@
                             <label class="form-check-label">Phone Number </label>
                             <input type="tel" class="form-control" name="phone_number" value="{{$lead_edit->phone_number}}" id="phone_number">
                         </div>
-
+                        <div class="form-group">
+                            <label class="form-check-label">Email </label>
+                            <input type="email" class="form-control" name="email" value="{{$lead_edit->email}}" id="email">
+                        </div>
                         <div class="form-group">
                             <label class="form-check-label">Initial Bill </label>
-                            <input type="text" class="form-control" name="initial_bill" value="{{$lead_edit->initial_bill}}" id="initial_bill">
+                            <input type="number" class="form-control" name="initial_bill" value="{{$lead_edit->initial_bill}}" id="initial_bill">
                         </div>
                         <div class="form-group">
                             <label class="form-check-label">Monthly Bill </label>
-                            <input type="text" class="form-control" name="monthly_bill" value="{{$lead_edit->monthly_bill}}" id="monthly_bill">
+                            <input type="number" class="form-control" name="monthly_bill" value="{{$lead_edit->monthly_bill}}" id="monthly_bill">
                         </div>
                         <div class="form-group">
                             <label class="form-check-label">Order Confirmation Number</label>
@@ -68,10 +71,22 @@
                     <?php
                     $providers_arr = [];
                     foreach ($lead_edit->call_dispositions_services as $service){
-                        $providers_arr[$service->provider_name]['internet'] = $service->internet;
-                        $providers_arr[$service->provider_name]['cable'] = $service->cable;
-                        $providers_arr[$service->provider_name]['phone'] = $service->phone;
-                        $providers_arr[$service->provider_name]['mobile'] = $service->mobile;
+                        if($service->provider_name != 'spectrum' && $service->provider_name != 'att' &&
+                            $service->provider_name != 'directtv' && $service->provider_name != 'earthlink' &&
+                            $service->provider_name != 'mediacom' &&  $service->provider_name != 'viasat'
+                            &&  $service->provider_name != 'hughesnet' &&  $service->provider_name != 'suddenlink' &&
+                            $service->provider_name != 'optimum' &&  $service->provider_name != 'cox') {
+                            $providers_arr['other']['title'] = $service->provider_name;
+                            $providers_arr['other']['internet'] = $service->internet;
+                            $providers_arr['other']['cable'] = $service->cable;
+                            $providers_arr['other']['phone'] = $service->phone;
+                            $providers_arr['other']['mobile'] = $service->mobile;
+                        } else {
+                            $providers_arr[$service->provider_name]['internet'] = $service->internet;
+                            $providers_arr[$service->provider_name]['cable'] = $service->cable;
+                            $providers_arr[$service->provider_name]['phone'] = $service->phone;
+                            $providers_arr[$service->provider_name]['mobile'] = $service->mobile;
+                        }
                     }
                     ?>
                     <div class="col-6">
@@ -84,19 +99,19 @@
                             <div class="sp_checks mb-2">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="sp_internet"> Internet </label>
-                                    <input class="form-check-input"  {{(isset($providers_arr['spectrum']) && $providers_arr['spectrum']['internet']==1) ? 'checked': ''}}  type="checkbox" name="sp_internet" id="sp_internet" value="$lead_edit->sp_internet">
+                                    <input class="form-check-input"  {{(isset($providers_arr['spectrum']) && $providers_arr['spectrum']['internet']==1) ? 'checked': ''}}  type="checkbox" name="sp_internet" id="sp_internet" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="sp_phone"> Phone </label>
-                                    <input class="form-check-input" {{(isset($providers_arr['spectrum']) && $providers_arr['spectrum']['phone']==1) ? 'checked': ''}} type="checkbox" name="sp_phone" id="sp_phone" value="{{$lead_edit->sp_phone}}">
+                                    <input class="form-check-input" {{(isset($providers_arr['spectrum']) && $providers_arr['spectrum']['phone']==1) ? 'checked': ''}} type="checkbox" name="sp_phone" id="sp_phone" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="sp_cable"> Cable </label>
-                                    <input class="form-check-input" {{(isset($providers_arr['spectrum']) && $providers_arr['spectrum']['cable']==1) ? 'checked': ''}} type="checkbox" name="sp_cable" id="sp_cable" value="{{$lead_edit->sp_cable}}">
+                                    <input class="form-check-input" {{(isset($providers_arr['spectrum']) && $providers_arr['spectrum']['cable']==1) ? 'checked': ''}} type="checkbox" name="sp_cable" id="sp_cable" value="1}">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="sp_mobile"> Mobile </label>
-                                    <input class="form-check-input"  {{(isset($providers_arr['spectrum']) && $providers_arr['spectrum']['mobile']==1) ? 'checked': ''}} type="checkbox" name="sp_mobile" id="sp_mobile" value="{{$lead_edit->sp_mobile}}">
+                                    <input class="form-check-input"  {{(isset($providers_arr['spectrum']) && $providers_arr['spectrum']['mobile']==1) ? 'checked': ''}} type="checkbox" name="sp_mobile" id="sp_mobile" value="1">
                                 </div>
                                 <hr>
                             </div>
@@ -122,30 +137,30 @@
                         </div>
                         <div class="form-check">
                             <label class="form-check-label" for="direct_tv"> Direct Tv </label>
-                            <input class="form-check-input" {{isset($providers_arr['direct_tv']) ? 'checked' : ''}} type="checkbox" id="direct_tv" name="direct_tv" value="direct_tv">
+                            <input class="form-check-input" {{isset($providers_arr['direct_tv']) ? 'checked' : ''}} type="checkbox" id="direct_tv" name="direct_tv" value="directtv">
                             <div class="dt_checks mb-2">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="dt_cable"> Cable </label>
-                                    <input class="form-check-input" {{isset($providers_arr['direct_tv']) && $providers_arr['direct_tv']['cable'] ? 'checked' : '' }} type="checkbox" name="dt_cable" id="dt_cable" value="1">
+                                    <input class="form-check-input" {{isset($providers_arr['direct_tv']) && $providers_arr['directtv']['cable'] ? 'checked' : '' }} type="checkbox" name="dt_cable" id="dt_cable" value="1">
                                 </div>
                                 <hr>
                             </div>
                         </div>
                         <div class="form-check">
                             <label class="form-check-label" for="earth_link"> Earth link </label>
-                            <input class="form-check-input" {{isset($providers_arr['earth_link']) ? 'checked': ''}} type="checkbox" id="earth_link" name="earth_link" value="earth_link">
+                            <input class="form-check-input" {{isset($providers_arr['earth_link']) ? 'checked': ''}} type="checkbox" id="earth_link" name="earth_link" value="earthlink">
                             <div class="el_checks mb-2">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="el_internet"> Internet </label>
-                                    <input class="form-check-input" {{isset($providers_arr['earth_link']) && $providers_arr['earth_link']['internet'] ? 'checked': '' }} type="checkbox" name="el_internet" id="el_internet" value="1">
+                                    <input class="form-check-input" {{isset($providers_arr['earth_link']) && $providers_arr['earthlink']['internet'] ? 'checked': '' }} type="checkbox" name="el_internet" id="el_internet" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="el_phone"> Phone </label>
-                                    <input class="form-check-input" {{isset($providers_arr['earth_link']) && $providers_arr['earth_link']['phone'] ? 'checked' : '' }} type="checkbox" name="el_phone" id="el_phone" value="1">
+                                    <input class="form-check-input" {{isset($providers_arr['earth_link']) && $providers_arr['earthlink']['phone'] ? 'checked' : '' }} type="checkbox" name="el_phone" id="el_phone" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="el_cable"> Cable </label>
-                                    <input class="form-check-input" {{isset($providers_arr['earth_link']) && $providers_arr['earth_link']['cable'] ? 'checked' : ''}} type="checkbox" name="el_cable" id="el_cable" value="1">
+                                    <input class="form-check-input" {{isset($providers_arr['earth_link']) && $providers_arr['earthlink']['cable'] ? 'checked' : ''}} type="checkbox" name="el_cable" id="el_cable" value="1">
                                 </div>
                                 <hr>
                             </div>
@@ -197,19 +212,19 @@
                         </div>
                         <div class="form-check">
                             <label class="form-check-label" for="sudden_link"> Suddenlink </label>
-                            <input class="form-check-input" {{isset($providers_arr['sudden_link']) ? 'checked' : ''}} type="checkbox" id="sudden_link" name="sudden_link" value="sudden_link">
+                            <input class="form-check-input" {{isset($providers_arr['sudden_link']) ? 'checked' : ''}} type="checkbox" id="sudden_link" name="sudden_link" value="suddenlink">
                             <div class="sl_checks mb-2">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="sl_internet"> Internet </label>
-                                    <input class="form-check-input" {{isset($providers_arr['sudden_link']) && $providers_arr['sudden_link']['internet'] ? 'checked' : ''}}  type="checkbox" name="sl_internet" id="sl_internet" value="1">
+                                    <input class="form-check-input" {{isset($providers_arr['sudden_link']) && $providers_arr['suddenlink']['internet'] ? 'checked' : ''}}  type="checkbox" name="sl_internet" id="sl_internet" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="sl_phone"> Phone </label>
-                                    <input class="form-check-input" {{isset($providers_arr['sudden_link']) && $providers_arr['sudden_link']['phone'] ? 'checked' : ''}} type="checkbox" name="sl_phone" id="sl_phone" value="1">
+                                    <input class="form-check-input" {{isset($providers_arr['sudden_link']) && $providers_arr['suddenlink']['phone'] ? 'checked' : ''}} type="checkbox" name="sl_phone" id="sl_phone" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="sl_cable"> Cable </label>
-                                    <input class="form-check-input" {{isset($providers_arr['sudden_link']) && $providers_arr['sudden_link']['cable'] ? 'checked' : ''}} type="checkbox" name="sl_cable" id="sl_cable" value="1">
+                                    <input class="form-check-input" {{isset($providers_arr['sudden_link']) && $providers_arr['suddenlink']['cable'] ? 'checked' : ''}} type="checkbox" name="sl_cable" id="sl_cable" value="1">
                                 </div>
                                 <hr>
                             </div>
@@ -254,25 +269,24 @@
                         </div>
                         <div class="form-check">
                             <label class="form-check-label" for="others"> Others </label>
-                            <input class="form-check-input" {{isset($providers_arr['others']) ? 'checked' : ''}} type="checkbox" id="others" name="others" value="others">
+                            <input class="form-check-input" type="checkbox" id="others" name="others" {{isset($providers_arr['other']) ? 'checked' : ''}} >
                             <div class="other_checks mb-2">
-                                <input type="text" class="form-control mb-2" name="other_specify"
-                                       placeholder="Specify Other">
+                                <input type="text" class="form-control mb-2" value="{{isset($providers_arr['other']['title']) ? $providers_arr['other']['title'] : ''}}" name="other_specify" placeholder="Specify Other">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="other_internet"> Internet </label>
-                                    <input class="form-check-input"  {{isset($providers_arr['others']) && $providers_arr['others']['internet'] ? 'checked' : ''}}  type="checkbox" name="other_internet" id="other_internet" value="1">
+                                    <input class="form-check-input"  {{isset($providers_arr['others']) && $providers_arr['other']['internet'] ? 'checked' : ''}}  type="checkbox" name="other_internet" id="other_internet" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="other_phone"> Phone </label>
-                                    <input class="form-check-input" {{isset($providers_arr['others']) && $providers_arr['others']['phone'] ? 'checked' : ''}} type="checkbox" name="other_phone" id="other_phone" value="1">
+                                    <input class="form-check-input" {{isset($providers_arr['others']) && $providers_arr['other']['phone'] ? 'checked' : ''}} type="checkbox" name="other_phone" id="other_phone" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="other_cable"> Cable </label>
-                                    <input class="form-check-input" {{isset($providers_arr['others']) && $providers_arr['others']['cable'] ? 'checked' : ''}} type="checkbox" name="other_cable" id="other_cable" value="1">
+                                    <input class="form-check-input" {{isset($providers_arr['others']) && $providers_arr['other']['cable'] ? 'checked' : ''}} type="checkbox" name="other_cable" id="other_cable" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="others_mobile"> Mobile </label>
-                                    <input class="form-check-input" {{isset($providers_arr['others']) && $providers_arr['others']['mobile'] ? 'checked' : ''}} type="checkbox" name="other_mobile" id="others_mobile" value="1">
+                                    <input class="form-check-input" {{isset($providers_arr['others']) && $providers_arr['other']['mobile'] ? 'checked' : ''}} type="checkbox" name="other_mobile" id="others_mobile" value="1">
                                 </div>
                                 <hr>
                             </div>
@@ -320,6 +334,14 @@
 @endsection
 @section('footer_scripts')
     <script src="{{ asset('assets/bundles/select2/dist/js/select2.full.min.js') }}"></script>
-
+    <script>
+        $('#lead_form').submit(function (e) {
+            e.preventDefault();
+            let data = new FormData(this);
+            let a = function(){ window.location.href = "{{route('lead_list')}}"; };
+            let arr = [a];
+            call_ajax_with_functions('','{{route('lead_update' , $lead_edit->call_id)}}',data,arr);
+        });
+    </script>
 
 @endsection
