@@ -18,34 +18,34 @@
                             <thead>
                             <tr>
                                 <th>S.No</th>
-                                <th>Namne</th>
+                                <th>Name</th>
                                 <th>Email</th>
+                                <th>Role</th>
                                 <th>Gender</th>
                                 <th>Address</th>
                                 <th>Contact</th>
-                                <th>Status</th>
+                                <th>Manager</th>
                                 <th>Action</th>
                             </tr>
                             </thead>
                             <?php $i=1 ?>
                             <tbody>
-                                @foreach ($user_lists as $user_list)
-                                        <tr>
-                                            <td>{{ $i++ }}</td>
-                                            <td>{{ $user_list->full_name }}</td>
-                                            <td>{{ $user_list->email }}</td>
-                                            <td>{{ $user_list->gender }}</td>
-                                            <td>{{ $user_list->postal_address }}</td>
-                                            <td>{{ $user_list->contact_number }}</td>
-                                            <td>{{ $user_list->status }}</td>
-                                            <td>
-                                                <button class="btn btn-primary edit_user" id="{{$user_list->user_id}}">Edit</button>
-                                                <button class="btn btn-danger" onclick="delete_user(this);" value="{{$user_list->user_id}}">Delete</button>
-                                            </td>
-                                        </tr>
-                                @endforeach
-
-
+                            @foreach ($user_lists as $user_list)
+                                <tr>
+                                    <td>{{ $i++ }}</td>
+                                    <td>{{ $user_list->full_name }}</td>
+                                    <td>{{ $user_list->email }}</td>
+                                    <td>{{ $user_list->role->title }}</td>
+                                    <td>{{ $user_list->gender }}</td>
+                                    <td>{{ $user_list->postal_address }}</td>
+                                    <td>{{ $user_list->contact_number }}</td>
+                                    <td>{{ isset($user_list->manager->full_name) ? $user_list->manager->full_name : '' }}</td>
+                                    <td>
+                                        <button class="btn btn-primary edit_user" id="{{$user_list->user_id}}">Edit</button>
+                                        <button class="btn btn-danger" onclick="delete_user(this);" value="{{$user_list->user_id}}">Delete</button>
+                                    </td>
+                                </tr>
+                            @endforeach
                             </tbody>
                         </table>
                     </div>

@@ -1,11 +1,11 @@
 <?php
 namespace App\Http\Controllers;
-use App\Models\User;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Models\UserRole;
+use App\Models\User;
 class UserController extends Controller
 {
     public function __construct()
@@ -23,13 +23,20 @@ class UserController extends Controller
     public function list()
     {
         $data['page_title'] = "Atlantis BPO CRM - Users List";
-        $data['user_lists'] = User::where('status' , 1)->get();
+        $data['user_lists'] = User::where('status' , 1)->with(['role', 'manager'])->get();
         return view('users.user_list', $data);
     }
     public function user_form(Request $request)
     {
         $data['page_title'] = "Atlantis BPO CRM - Users Form";
         $data['user_roles'] = UserRole::where('status',1)->get();
+        $data['managers'] = User::where([
+            'status' => 1,
+            'role_id' => 2,
+        ])->orWhere([
+            'status' => 1,
+            'role_id' => 3,
+        ])->get();
         if(isset($request->user_id)){
             $data['user'] = User::where('user_id',$request->user_id)->get()[0];
         } else {
@@ -113,6 +120,7 @@ class UserController extends Controller
                 User::where('user_id', $request->user_id)->update([
                     'full_name' => $request->full_name,
                     'role_id' => $request->role_id,
+                    'manager_id' => $request->manager_id,
                     'gender' => $request->gender,
                     'contact_number' => $request->contact_number,
                     'postal_address' => $request->postal_address,
@@ -122,6 +130,7 @@ class UserController extends Controller
                 $user->added_by = Auth::user()->user_id;
                 $user->full_name = $request->full_name;
                 $user->email = $request->email;
+                $user->manager_id = $request->manager_id;
                 $user->password = encrypt_password($request->input('password'));
                 $user_image = "";
                 if($request->file('image')) {
@@ -144,50 +153,7 @@ class UserController extends Controller
         }
         return response()->json($response);
     }
-    // public function update(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'full_name' => 'required',
-    //         'email' => 'required',
-    //         "images"  => "image|mimes:png,gif,jpeg,jpg|max:1024",
-    //         'password' => 'required|unique:users,email',
-    //         'gender' => 'required',
-    //         'postal_address' => 'required',
-    //         'contact_number' => 'required',
-    //         'role_id' => 'required',
-    //     ]);
-    //     if ($validator->passes()) {
-    //         $check = User::where('full_name', $request->full_name)->where('user_id', '!=', $request->user_id)->get();
-    //         if(count($check)>0) {
-    //             $response['status'] = "Failue";
-    //             $response['result'] = "Record Already Exists";
-    //         } else {
-    //             $user_image = "";
-    //             if($request->file('image')) {
-    //                 $file = $request->file('image');
-    //                 $user_image = time() . rand(1, 100) . '.' . $file->extension();
-    //                 $file->move(public_path('user_images'), $user_image);
-    //             }
-    //             User::where('user_id', $request->user_id)->update([
-    //                 'modified_by' => Auth::user()->user_id,
-    //                 'full_name' = $request->full_name,
-    //                 $user->full_name = $request->full_name;
-    //                 $user->email = $request->email;
-    //                 $user->image = $user_image;
-    //                 $user->gender = $request->gender;
-    //                 $user->postal_address = $request->postal_address;
-    //                 $user->contact_number = $request->contact_number;
-    //                 $user->role_id = $request->role_id;
-    //             ]);
-    //             $response['status'] = "Success";
-    //             $response['result'] = "Updated Successfully";
-    //         }
-    //     } else {
-    //         $response['status'] = "Failure!";
-    //         $response['result'] = $validator->errors()->toJson();
-    //     }
-    //     return response()->json($response);
-    // }
+
     Public function delete(Request $request)
     {
         $role = User::where('user_id', $request->user_id)->update([
