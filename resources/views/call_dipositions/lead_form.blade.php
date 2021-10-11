@@ -5,14 +5,15 @@
           href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
 @endsection
 @section('content')
+<!-- TODO: asfdsafsdaf -->
     <form method="post" id="lead_form" enctype="multipart/form-data">
         @csrf
-{{--        // todo if phone selected show new mobile number feild--}}
-{{--        // todo if mobile selected show nuber of lines --}}
-{{--        // todo professional date will be datetime --}}
+<!--         TODO:  if phone selected show "new number" feild -->
+{{--        // TODO: if mobile selected show number of lines --}}
+{{--        // TODO:  professional date will be datetime --}}
         <div class="card">
             <div class="card-header" style="justify-content: space-between;">
-                <h4>Lead Form</h4>
+                <h4>Lead Form sasa</h4>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -67,11 +68,15 @@
                         </div>
                         <div class="form-group" id="prof_install" style="display: none">
                             <label class="form-check-label" for="installation_date">Installation Date</label>
-                            <input required type="date" class="form-control" name="installation_date" id="installation_date">
+                            <input required type="datetime-local" class="form-control" name="installation_date" id="installation_date">
                         </div>
                         <div class="form-group" id="new_phone_div" style="display: none">
                             <label class="form-check-label" for="new_phone">New Phone Number</label>
                             <input required type="tel" class="form-control" name="new_phone" id="new_phone">
+                        </div>
+                        <div class="form-group" id="new_lines_div" style="display: none">
+                            <label class="form-check-label" for="new_lines">New Lines</label>
+                            <input required type="tel" class="form-control" name="new_lines" id="new_lines">
                         </div>
                     </div>
                     <div class="col-6">
@@ -96,7 +101,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="sp_mobile"> Mobile </label>
-                                    <input class="form-check-input" type="checkbox" name="sp_mobile" id="sp_mobile" value="1">
+                                    <input class="form-check-input mobile_check" type="checkbox" name="sp_mobile" id="sp_mobile" value="1">
                                 </div>
                                 <hr>
                             </div>
@@ -272,7 +277,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="others_mobile"> Mobile </label>
-                                    <input class="form-check-input" type="checkbox" name="other_mobile" id="others_mobile" value="1">
+                                    <input class="form-check-input mobile_check" type="checkbox" name="other_mobile" id="others_mobile" value="1">
                                 </div>
                                 <hr>
                             </div>
@@ -334,15 +339,50 @@
             let arr = [a];
             call_ajax_with_functions('','{{route('lead_save')}}',data,arr);
         });
+        
         $('.phone_check').change(function () {
            if(this.checked) {
                $('#new_phone_div').fadeIn();
-               $('#new_phone')[0].addAttribute('required', true);
+               $('#new_phone').attr('required', true);
                alert('checked');
            } else {
-               $('#new_phone_div').fadeOut().val('');
-               $('#new_phone')[0].removeAttribute('required', true);
-               alert('unchecked');
+            blnChck = false;
+            $('.phone_check').each(function (index, obj) {
+                if (this.checked === true) {
+                    blnChck = true;
+                    return;
+                }
+            });
+
+            if(blnChck === false){
+                $('#new_phone_div').fadeOut().val('');
+               $('#new_phone')[0].removeAttribute('required');
+            //    alert('unchecked');
+            }
+               
+           }
+        });
+
+        
+        $('.mobile_check').change(function () {
+           if(this.checked) {
+               $('#new_lines_div').fadeIn();
+               $('#new_lines').attr('required', true);
+               alert('checked');
+           } else {
+            blnChck = false;
+            $('.mobile_check').each(function (index, obj) {
+                if (this.checked === true) {
+                    blnChck = true;
+                    return;
+                }
+            });
+
+            if(blnChck === false){
+                $('#new_lines_div').fadeOut().val('');
+               $('#new_lines')[0].removeAttribute('required');
+            }
+               
            }
         });
     </script>
