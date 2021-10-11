@@ -15,57 +15,55 @@
                 <div class="row">
                     <div class="col-6">
                         <div class="form-group">
-                            <label class="form-check-label">Was mobile pitched to customer </label>
-                            <select name="was_mobile_pitched"  class="form-control">
-                                <option value="{{$lead_edit->call_id}}"> {{$lead_edit->was_mobile_pitched}}</option>
-                                <option value="1" >Yes</option>
-                                <option value="0" >No</option>
+                            <label for="was_mobile_pitched" class="form-check-label">Was mobile pitched to customer </label>
+                            <select name="was_mobile_pitched" id="was_mobile_pitched" class="form-control">
+                                <option {{$lead_edit->call_id==1 ? 'selected' : ''}} value="1" >Yes</option>
+                                <option {{$lead_edit->call_id==0 ? 'selected' : ''}} value="0" >No</option>
                             </select>
                         </div>
-                    </div>
-
-                </div>
-                <div class="row">
-                    <div class="col-6">
                         <div class="form-group">
-                            <label class="form-check-label" for="agent_name"> DID</label>
-                            <input type="number" class="form-control" name="did" value="{{$lead_edit->did}}" id="did">
+                            <label class="form-check-label" for="did"> DID</label>
+                            <input type="text" class="form-control" name="did" value="{{$lead_edit->did}}" id="did">
                         </div>
                         <div class="form-group">
-                            <label class="form-check-label">Service Address </label>
+                            <label class="form-check-label" for="customer_name">Customer Name </label>
+                            <input type="text" class="form-control" name="customer_name" value="{{$lead_edit->customer_name}}" id="customer_name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-check-label" for="service_address">Service Address </label>
                             <input type="text" class="form-control" name="service_address" value="{{$lead_edit->service_address}}" id="service_address">
                         </div>
                         <div class="form-group">
-                            <label class="form-check-label">Phone Number </label>
+                            <label class="form-check-label" for="phone_number">Phone Number </label>
                             <input type="tel" class="form-control" name="phone_number" value="{{$lead_edit->phone_number}}" id="phone_number">
                         </div>
                         <div class="form-group">
-                            <label class="form-check-label">Email </label>
+                            <label class="form-check-label" for="email">Email </label>
                             <input type="email" class="form-control" name="email" value="{{$lead_edit->email}}" id="email">
                         </div>
                         <div class="form-group">
-                            <label class="form-check-label">Initial Bill </label>
+                            <label class="form-check-label" for="initial_bill">Initial Bill </label>
                             <input type="number" class="form-control" name="initial_bill" value="{{$lead_edit->initial_bill}}" id="initial_bill">
                         </div>
                         <div class="form-group">
-                            <label class="form-check-label">Monthly Bill </label>
+                            <label class="form-check-label" for="monthly_bill">Monthly Bill </label>
                             <input type="number" class="form-control" name="monthly_bill" value="{{$lead_edit->monthly_bill}}" id="monthly_bill">
                         </div>
                         <div class="form-group">
-                            <label class="form-check-label">Order Confirmation Number</label>
-                            <input type="number" class="form-control" name="order_confirmation_number" value="{{$lead_edit->order_confirmation_number }}" id="confirmation_number">
+                            <label class="form-check-label" for="order_confirmation_number">Order Confirmation Number</label>
+                            <input type="number" class="form-control" name="order_confirmation_number" value="{{$lead_edit->order_confirmation_number }}" id="order_confirmation_number">
                         </div>
                         <div class="form-group">
-                            <label class="form-check-label">Order Number</label>
+                            <label class="form-check-label" for="order_number">Order Number</label>
                             <input type="number" class="form-control" name="order_number" value="{{$lead_edit->order_number}}" id="order_number">
                         </div>
                         <div class="form-group">
-                            <label class="form-check-label">Account Number</label>
+                            <label class="form-check-label" for="account_number">Account Number</label>
                             <input type="number" class="form-control" name="account_number" value="{{$lead_edit->account_number}}" id="account_number">
                         </div>
-                        <div class="form-group" id="prof_install" style="display: none">
-                            <label class="form-check-label">If Professional Install, Installation Date?</label>
-                            <input type="date" class="form-control" name="installation_date"  id="installation_date">
+                        <div class="form-group" id="prof_install" style="display: {{$lead_edit->installation_type=='2' ? 'block' : 'none'}}">
+                            <label class="form-check-label" for="installation_date">Installation Date</label>
+                            <input type="date" class="form-control date_picker" value="{{$lead_edit->installation_date}}" name="installation_date"  id="installation_date">
                         </div>
                     </div>
                     <?php
@@ -91,7 +89,8 @@
                     ?>
                     <div class="col-6">
                         <div class="form-group">
-                            <label for="" class="form-check-label">Providers</label>
+                            <br>
+                            <strong>Providers</strong>
                         </div>
                         <div class="form-check">
                             <label class="form-check-label" for="spectrum"> spectrum </label>
@@ -271,22 +270,22 @@
                             <label class="form-check-label" for="others"> Others </label>
                             <input class="form-check-input" type="checkbox" id="others" name="others" {{isset($providers_arr['other']) ? 'checked' : ''}} >
                             <div class="other_checks mb-2">
-                                <input type="text" class="form-control mb-2" value="{{isset($providers_arr['other']['title']) ? $providers_arr['other']['title'] : ''}}" name="other_specify" placeholder="Specify Other">
+                                <input type="text" class="form-control mb-2" value="{{isset($providers_arr['other']['title']) ? $providers_arr['other']['title'] : ''}}" name="other_specify" id="other_specify">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="other_internet"> Internet </label>
-                                    <input class="form-check-input"  {{isset($providers_arr['others']) && $providers_arr['other']['internet'] ? 'checked' : ''}}  type="checkbox" name="other_internet" id="other_internet" value="1">
+                                    <input class="form-check-input"  {{isset($providers_arr['other']) && $providers_arr['other']['internet'] ? 'checked' : ''}}  type="checkbox" name="other_internet" id="other_internet" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="other_phone"> Phone </label>
-                                    <input class="form-check-input" {{isset($providers_arr['others']) && $providers_arr['other']['phone'] ? 'checked' : ''}} type="checkbox" name="other_phone" id="other_phone" value="1">
+                                    <input class="form-check-input" {{isset($providers_arr['other']) && $providers_arr['other']['phone'] ? 'checked' : ''}} type="checkbox" name="other_phone" id="other_phone" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="other_cable"> Cable </label>
-                                    <input class="form-check-input" {{isset($providers_arr['others']) && $providers_arr['other']['cable'] ? 'checked' : ''}} type="checkbox" name="other_cable" id="other_cable" value="1">
+                                    <input class="form-check-input" {{isset($providers_arr['other']) && $providers_arr['other']['cable'] ? 'checked' : ''}} type="checkbox" name="other_cable" id="other_cable" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="others_mobile"> Mobile </label>
-                                    <input class="form-check-input" {{isset($providers_arr['others']) && $providers_arr['other']['mobile'] ? 'checked' : ''}} type="checkbox" name="other_mobile" id="others_mobile" value="1">
+                                    <input class="form-check-input" {{isset($providers_arr['other']) && $providers_arr['other']['mobile'] ? 'checked' : ''}} type="checkbox" name="other_mobile" id="others_mobile" value="1">
                                 </div>
                                 <hr>
                             </div>
@@ -320,14 +319,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-6 ">
-                        <button class="btn btn-primary float-right ml-3">Reset</button>
-                        <button class="btn btn-primary float-right"> Update</button>
-
+                    <div class="col-12">
+                        <button class="btn btn-danger float-right ml-3" type="button" onclick="window.location.href='{{route('lead_list')}}'">Cancel</button>
+                        <button class="btn btn-danger float-right ml-3" type="reset">Reset</button>
+                        <button class="btn btn-primary float-right" type="submit"> Update</button>
                     </div>
-
                 </div>
-
             </div>
         </div>
     </form>
@@ -341,6 +338,13 @@
             let a = function(){ window.location.href = "{{route('lead_list')}}"; };
             let arr = [a];
             call_ajax_with_functions('','{{route('lead_update' , $lead_edit->call_id)}}',data,arr);
+        });
+        $('input[name=installation_type]').change(function (){
+            if(this.value==2){
+                $('#prof_install').fadeIn();
+            } else {
+                $('#prof_install').fadeOut();
+            }
         });
     </script>
 

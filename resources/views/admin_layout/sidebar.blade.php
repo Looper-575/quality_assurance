@@ -3,7 +3,7 @@
         <div class="sidebar-brand">
             <a href="index.html">
                 <img alt="image" src="{{ asset('assets/img/logo.png') }}" class="header-logo" />
-                <img class="logo-name" alt="image" src="{{ asset('assets/img/logo-text.png') }}" style="width: 150px" />
+                <img class="logo-name" alt="image" src="{{ asset('assets/img/logo-text.png') }}" style="width: 90px" />
             </a>
         </div>
         <ul class="sidebar-menu">
@@ -13,9 +13,6 @@
             </li>
             <li class="{{ @request()->is('lead_list') ? 'active' : '' }}">
                 <a href="{{route('lead_list')}}" class="nav-link"><i data-feather="phone"></i><span>Call Disposition</span></a>
-            </li>
-            <li class="{{ @request()->is('categories') ? 'active' : '' }}">
-                <a href="/categories" class="nav-link"><i data-feather="list"></i><span>Categories</span></a>
             </li>
             <li class="dropdown">
                 <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="briefcase"></i><span>Quality Assurance</span></a>

@@ -35,23 +35,17 @@
                 <div class="dropdown-list-content dropdown-list-icons">
                     <a href="#" class="dropdown-item dropdown-item-unread">
                         <span class="dropdown-item-icon bg-primary text-white"> <i class="fas fa-code"></i></span>
-                        <span class="dropdown-item-desc"> Template update is available now!
-                            <span class="time">2 Min Ago</span>
+                        <span class="dropdown-item-desc"> This feature will be available soon
+                            <span class="time">0 Min Ago</span>
                         </span>
                     </a>
-                    <a href="#" class="dropdown-item">
+                    {{--<a href="#" class="dropdown-item">
                         <span class="dropdown-item-icon bg-info text-white"><i class="far fa-user"></i></span>
                         <span class="dropdown-item-desc">
                             <b>You</b> and <b>Dedik Sugiharto</b> are now friends
                             <span class="time">10 Hours Ago</span>
                         </span>
-                    </a>
-                     <a href="#" class="dropdown-item">
-                         <span class="dropdown-item-icon bg-info text-white"> <i class="fas	fa-bell"></i></span>
-                         <span class="dropdown-item-desc"> Welcome to Otika template!
-                             <span class="time">Yesterday</span>
-                         </span>
-                    </a>
+                    </a>--}}
                 </div>
                 <div class="dropdown-footer text-center">
                     <a href="#">View All <i class="fas fa-chevron-right"></i></a>
@@ -65,11 +59,9 @@
             </a>
             <div class="dropdown-menu dropdown-menu-right pullDown">
                 <div class="dropdown-title">Hello Sarah Smith</div>
-                <a href="profile.html" class="dropdown-item has-icon"><i class="far fa-user"></i> Profile</a>
-                <a href="timeline.html" class="dropdown-item has-icon"> <i class="fas fa-bolt"></i>Activities</a>
-                <a href="#" class="dropdown-item has-icon"> <i class="fas fa-cog"></i>Settings</a>
+                <a href="javascript:;" class="dropdown-item has-icon"><i class="far fa-user"></i> Profile</a>
                 <div class="dropdown-divider"></div>
-                <a href="{{route('login')}}" class="dropdown-item has-icon text-danger">
+                <a href="{{route('logout')}}" class="dropdown-item has-icon text-danger">
                     <i class="fas fa-sign-out-alt"></i>Logout</a>
             </div>
         </li>

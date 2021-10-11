@@ -18,45 +18,44 @@
                             <thead>
                             <tr>
                                 <th>S.No.</th>
+                                <th>Added On</th>
                                 <th>DID</th>
                                 <th>Service Address</th>
                                 <th>Phone Number</th>
-                                <th>Initial Bill</th>
-                                <th>Monthly Bill</th>
+                                <th>Customer Name</th>
                                 <th>Order Number</th>
                                 <th>Account Number</th>
                                 <th>Provider Name</th>
+                                <th>Services Sold</th>
                                 <th>Agent Name</th>
-
                                 <th>Action</th>
                             </tr>
                             </thead>
                             <?php $i=1 ?>
                             <tbody>
                             @foreach ($call_disp_lists as $call_disp_list)
-
                                 <tr>
                                     <td>{{ $i++ }}</td>
+                                    <td>{{ parse_datetime_get($call_disp_list->added_on) }}</td>
                                     <td>{{ $call_disp_list->did }}</td>
                                     <td>{{ $call_disp_list->service_address }}</td>
                                     <td>{{ $call_disp_list->phone_number }}</td>
-                                    <td>{{ $call_disp_list->initial_bill }}</td>
-                                    <td>{{ $call_disp_list->monthly_bill }}</td>
+                                    <td>{{ $call_disp_list->customer_name }}</td>
                                     <td>{{ $call_disp_list->order_number }}</td>
                                     <td>{{ $call_disp_list->account_number }}</td>
                                     <?php
                                     $providers=null;
-                                    for($i=0; $i<count($call_disp_list->call_dispositions_services); $i++){
+                                    for($i=0; $i<count($call_disp_list->call_dispositions_services); $i++) {
                                         $providers .= $call_disp_list->call_dispositions_services[$i]->provider_name.', ';
                                     }
                                     ?>
                                     <td>{{ $providers }}</td>
+                                    <td>{{ $call_disp_list->services_sold }}</td>
                                     <td>{{ $call_disp_list->user->full_name }}</td>
-{{--                                    <td>{{parse_datetime_get($call_disp_list->added_on)}}</td>--}}
                                     <td>
-{{--                                        <a href="javascript:view_qa({{$qa_list->qa_id}});"  class="btn btn-primary"> Show </a>--}}
-                                        <a  class="btn btn-primary" href="{{route('lead_edit' , $call_disp_list->call_id)}}"> Edit </a>
-                                        <button type="button" onclick="delete_lead(this);" value="{{$call_disp_list->call_id}}" class="btn btn-danger role_delete" >Delete</button>
+                                        <button type="button" onclick="view_lead(this)" value="{{$call_disp_list->call_id}}" class="btn btn-info"> Show </button>
+                                        <a class="btn btn-primary" href="{{route('lead_edit' , $call_disp_list->call_id)}}"> Edit </a>
+                                        <button type="button" onclick="delete_lead(this);" value="{{$call_disp_list->call_id}}" class="btn btn-danger" >Delete</button>
                                     </td>
                                 </tr>
                             @endforeach
@@ -76,15 +75,7 @@
     <script src="{{ asset('assets/bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/js/page/datatables.js') }}"></script>
     <script>
-        {{--function view_qa(qa_id) {--}}
-        {{--    let data = new FormData();--}}
-        {{--    data.append('qa_id', qa_id);--}}
-        {{--    data.append('_token', '{{ csrf_token() }}');--}}
-        {{--    call_ajax_modal('POST', '{{route('qa_single_data')}}', data, 'Quality Assessment View');--}}
-        {{--}--}}
-
-        function delete_lead (me)
-        {
+        function delete_lead (me) {
             let id = me.value;
             let data = new FormData();
             data.append('call_id', id);
@@ -106,6 +97,9 @@
                     call_ajax('', '{{route('lead_delete')}}', data);
                 }
             })
+        }
+        function view_lead() {
+
         }
     </script>
 @endsection

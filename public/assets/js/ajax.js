@@ -72,7 +72,7 @@ function call_ajax_with_functions(response_div, php_file, form_data, functions) 
             if(response_div == '') {
                 try {
                     json = JSON.parse(request.responseText);
-                    if(json.status=="Success") {
+                    if(json.status.toLowerCase()=="success") {
                         swal("Success", json.result, "success");
                     } else {
                         swal("Failure", json.result, "error");
@@ -87,8 +87,15 @@ function call_ajax_with_functions(response_div, php_file, form_data, functions) 
             if(functions.length > 0) {
                 if(request.responseText.toLowerCase().search('fail') !== -1) {
                 } else {
-                    while (functions.length) {
-                        functions.shift().call();
+                    try {
+                        json = JSON.parse(request.responseText);
+                        if(json.status.toLowerCase()=="success") {
+                            while (functions.length) {
+                                functions.shift().call();
+                            }
+                        }
+                    } catch (ex){
+
                     }
                 }
             }

@@ -7,8 +7,8 @@
     <!-- General CSS Files -->
     <link rel="stylesheet" href="{{ asset('assets/css/app.min.css') }}">
     <!-- Page Specific Plugins -->
-    @yield('header_scripts')
-    <!-- Template CSS -->
+@yield('header_scripts')
+<!-- Template CSS -->
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/components.css') }}">
     <!-- Custom style CSS -->
@@ -21,9 +21,9 @@
 <div id="app">
     <div class="main-wrapper main-wrapper-1">
         <div class="navbar-bg"></div>
-        @include('admin_layout.header')
-        @include('admin_layout.sidebar')
-        <!-- Main Content -->
+    @include('admin_layout.header')
+    @include('admin_layout.sidebar')
+    <!-- Main Content -->
         <div class="main-content">
             <section class="section">
                 <div class="section-body">
@@ -125,7 +125,7 @@
         <!-- /Main Content -->
         <footer class="main-footer">
             <div class="footer-left">
-                <a href="templateshub.net">Templateshub</a></a>
+                Developed By <strong><a href="atlantisbpo.com">Atlantis BPO Dev Team</a></strong>
             </div>
             <div class="footer-right">
             </div>

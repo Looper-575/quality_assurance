@@ -7,6 +7,9 @@
 @section('content')
     <form method="post" id="lead_form" enctype="multipart/form-data">
         @csrf
+{{--        // todo if phone selected show new mobile number feild--}}
+{{--        // todo if mobile selected show nuber of lines --}}
+{{--        // todo professional date will be datetime --}}
         <div class="card">
             <div class="card-header" style="justify-content: space-between;">
                 <h4>Lead Form</h4>
@@ -15,67 +18,65 @@
                 <div class="row">
                     <div class="col-6">
                         <div class="form-group">
-                            <label class="form-check-label">Was mobile pitched to customer </label>
-                            <select name="was_mobile_pitched"  class="form-control">
+                            <label class="form-check-label" for="was_mobile_pitched">Was mobile pitched to customer </label>
+                            <select required name="was_mobile_pitched" id="was_mobile_pitched" class="form-control">
                                 <option value="">Select</option>
                                 <option value="1">Yes</option>
                                 <option value="0">No</option>
                             </select>
                         </div>
-                    </div>
-{{--                    <div class="col-6">--}}
-{{--                        <div class="form-group">--}}
-{{--                            <label class="form-check-label" for="month">Fiscal Month</label>--}}
-{{--                            <input class="form-control" required type="text" name="fiscal_month" id="month" readonly>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-                </div>
-                <div class="row">
-                    <div class="col-6">
                         <div class="form-group">
-                            <label class="form-check-label" for="agent_name"> DID</label>
-                            <input type="number" class="form-control" name="did" id="did">
+                            <label class="form-check-label" for="did"> DID</label>
+                            <input required type="tel" class="form-control" name="did" id="did">
                         </div>
                         <div class="form-group">
-                            <label class="form-check-label">Service Address </label>
-                            <input type="text" class="form-control" name="service_address" id="service_address">
+                            <label class="form-check-label" for="customer_name">Customer Name </label>
+                            <input required type="text" class="form-control" name="customer_name" id="customer_name">
                         </div>
                         <div class="form-group">
-                            <label class="form-check-label">Phone Number </label>
-                            <input type="tel" class="form-control" name="phone_number" id="phone_number">
+                            <label class="form-check-label" for="service_address">Service Address </label>
+                            <input required type="text" class="form-control" name="service_address" id="service_address">
                         </div>
                         <div class="form-group">
-                            <label class="form-check-label">Email </label>
-                            <input type="email" class="form-control" name="email" id="email">
+                            <label class="form-check-label" for="phone_number">Phone Number </label>
+                            <input required type="tel" class="form-control" name="phone_number" id="phone_number">
                         </div>
                         <div class="form-group">
-                            <label class="form-check-label">Initial Bill </label>
-                            <input type="number" class="form-control" name="initial_bill" id="initial_bill">
+                            <label class="form-check-label" for="email">Email </label>
+                            <input required type="email" class="form-control" name="email" id="email">
                         </div>
                         <div class="form-group">
-                            <label class="form-check-label">Monthly Bill </label>
-                            <input type="number" class="form-control" name="monthly_bill" id="monthly_bill">
+                            <label class="form-check-label" for="initial_bill">Initial Bill </label>
+                            <input required type="number" class="form-control" name="initial_bill" id="initial_bill">
                         </div>
                         <div class="form-group">
-                            <label class="form-check-label">Order Confirmation Number</label>
-                            <input type="number" class="form-control" name="order_confirmation_number" id="confirmation_number">
+                            <label class="form-check-label" for="monthly_bill">Monthly Bill </label>
+                            <input required type="number" class="form-control" name="monthly_bill" id="monthly_bill">
                         </div>
                         <div class="form-group">
-                            <label class="form-check-label">Order Number</label>
-                            <input type="number" class="form-control" name="order_number" id="order_number">
+                            <label class="form-check-label" for="confirmation_number">Order Confirmation Number</label>
+                            <input required type="number" class="form-control" name="order_confirmation_number" id="confirmation_number">
                         </div>
                         <div class="form-group">
-                            <label class="form-check-label">Account Number</label>
-                            <input type="number" class="form-control" name="account_number" id="account_number">
+                            <label class="form-check-label" for="order_number">Order Number</label>
+                            <input required type="number" class="form-control" name="order_number" id="order_number">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-check-label" for="account_number">Account Number</label>
+                            <input required type="number" class="form-control" name="account_number" id="account_number">
                         </div>
                         <div class="form-group" id="prof_install" style="display: none">
-                            <label class="form-check-label">If Professional Install, Installation Date?</label>
-                            <input type="date" class="form-control" name="installation_date" id="installation_date">
+                            <label class="form-check-label" for="installation_date">Installation Date</label>
+                            <input required type="date" class="form-control" name="installation_date" id="installation_date">
+                        </div>
+                        <div class="form-group" id="new_phone_div" style="display: none">
+                            <label class="form-check-label" for="new_phone">New Phone Number</label>
+                            <input required type="tel" class="form-control" name="new_phone" id="new_phone">
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="form-group">
-                            <label for="" class="form-check-label">Providers</label>
+                            <br> <strong>Providers</strong>
                         </div>
                         <div class="form-check">
                             <label class="form-check-label" for="spectrum"> spectrum </label>
@@ -87,7 +88,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="sp_phone"> Phone </label>
-                                    <input class="form-check-input" type="checkbox" name="sp_phone" id="sp_phone" value="1">
+                                    <input class="form-check-input phone_check" type="checkbox" name="sp_phone" id="sp_phone" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="sp_cable"> Cable </label>
@@ -110,7 +111,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="att_phone"> Phone </label>
-                                    <input class="form-check-input" type="checkbox" name="att_phone" id="att_phone" value="1">
+                                    <input class="form-check-input phone_check" type="checkbox" name="att_phone" id="att_phone" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="att_cable"> Cable </label>
@@ -140,7 +141,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="el_phone"> Phone </label>
-                                    <input class="form-check-input" type="checkbox" name="el_phone" id="el_phone" value="1">
+                                    <input class="form-check-input phone_check" type="checkbox" name="el_phone" id="el_phone" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="el_cable"> Cable </label>
@@ -159,7 +160,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="mc_phone"> Phone </label>
-                                    <input class="form-check-input" type="checkbox" name="mc_phone" id="mc_phone" value="1">
+                                    <input class="form-check-input phone_check" type="checkbox" name="mc_phone" id="mc_phone" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="mc_cable"> Cable </label>
@@ -178,7 +179,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="v_phone"> Phone </label>
-                                    <input class="form-check-input" type="checkbox" name="v_phone" id="v_phone" value="1">
+                                    <input class="form-check-input phone_check" type="checkbox" name="v_phone" id="v_phone" value="1">
                                 </div>
                                 <hr>
                             </div>
@@ -204,7 +205,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="sl_phone"> Phone </label>
-                                    <input class="form-check-input" type="checkbox" name="sl_phone" id="sl_phone" value="1">
+                                    <input class="form-check-input phone_check" type="checkbox" name="sl_phone" id="sl_phone" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="sl_cable"> Cable </label>
@@ -223,7 +224,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="o_phone"> Phone </label>
-                                    <input class="form-check-input" type="checkbox" name="o_phone" id="o_phone" value="1">
+                                    <input class="form-check-input phone_check" type="checkbox" name="o_phone" id="o_phone" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="o_cable"> Cable </label>
@@ -242,7 +243,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="c_phone"> Phone </label>
-                                    <input class="form-check-input" type="checkbox" name="c_phone" id="c_phone" value="1">
+                                    <input class="form-check-input phone_check" type="checkbox" name="c_phone" id="c_phone" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="c_cable"> Cable </label>
@@ -263,7 +264,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="other_phone"> Phone </label>
-                                    <input class="form-check-input" type="checkbox" name="other_phone" id="other_phone" value="1">
+                                    <input class="form-check-input phone_check" type="checkbox" name="other_phone" id="other_phone" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="other_cable"> Cable </label>
@@ -278,42 +279,40 @@
                         </div>
                         <div class="form-group">
                             <label class="form-check-label"> Pre Payment </label><br><br>
-                            <div class="form-check ">
+                            <div class="form-check">
                                 <label class="form-check-label" for="pre_payment1"> Yes </label>
                                 <input class="form-check-input " type="radio" name="pre_payment" id="pre_payment1" value="1">
                             </div>
-                            <div class="form-check ">
+                            <div class="form-check">
                                 <label class="form-check-label" for="pre_payment2"> No </label>
                                 <input class="form-check-input " type="radio" name="pre_payment" id="pre_payment2" value="0">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="form-check-label"> Installation Type </label><br><br>
-                            <div class="form-check ">
+                            <div class="form-check">
                                 <label class="form-check-label" for="self_install"> Self Install </label>
                                 <input class="form-check-input yes_radio" type="radio" name="installation_type"
                                        id="self_install" value="1">
                             </div>
-                            <div class="form-check ">
+                            <div class="form-check">
                                 <label class="form-check-label" for="professional_install"> Professional Install </label>
                                 <input class="form-check-input yes_radio" type="radio" name="installation_type"
                                        id="professional_install" value="2">
                             </div>
-                            <div class="form-check ">
-                                <label class="form-check-label" for="store_picup"> Store Pickup </label>
+                            <div class="form-check">
+                                <label class="form-check-label" for="store_pickup"> Store Pickup </label>
                                 <input class="form-check-input yes_radio" type="radio" name="installation_type"
-                                       id="store_picup" value="3">
+                                       id="store_pickup" value="3">
                             </div>
                         </div>
                     </div>
-                    <div class="col-6 ">
-                        <button class="btn btn-primary float-right ml-3">Reset</button>
+                    <div class="col-12">
+                        <button type="button" class="btn btn-danger float-right ml-3"
+                                onclick="window.location.href='{{route('lead_list')}}'">Cancel</button>
                         <button class="btn btn-primary float-right"> Save</button>
-
                     </div>
-
                 </div>
-
             </div>
         </div>
     </form>
@@ -334,6 +333,17 @@
             let a = function(){ window.location.href = "{{route('lead_list')}}"; };
             let arr = [a];
             call_ajax_with_functions('','{{route('lead_save')}}',data,arr);
+        });
+        $('.phone_check').change(function () {
+           if(this.checked) {
+               $('#new_phone_div').fadeIn();
+               $('#new_phone')[0].addAttribute('required', true);
+               alert('checked');
+           } else {
+               $('#new_phone_div').fadeOut().val('');
+               $('#new_phone')[0].removeAttribute('required', true);
+               alert('unchecked');
+           }
         });
     </script>
 @endsection

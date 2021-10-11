@@ -12,24 +12,19 @@ use Illuminate\Support\Facades\DB;
 
 class CallDispositionController extends Controller
 {
-    /**
-     * Home page.
-     *
-     * @return \Illuminate\View\View
-     */
     public function form()
     {
-        $data['page_title'] = "Atlantis BPO Quality Assurance";
-        return view('lead_form',$data);
+        $data['page_title'] = "Atlantis BPO CRM - Call Disposition Form";
+        return view('call_dipositions.lead_form',$data);
     }
 
     public function list()
     {
-        $data['page_title'] = "Atlantis BPO CRM - Roles";
+        $data['page_title'] = "Atlantis BPO CRM - Call Dispositions List";
         $data['call_disp_lists'] = CallDisposition::where([
             'status' => 1 ,
         ])->with(['call_dispositions_services', 'user'])->groupBy('call_id')->get();
-        return view('lead_list' , $data);
+        return view('call_dipositions.lead_list' , $data);
     }
 
     public  function save(Request $request)
@@ -47,15 +42,14 @@ class CallDispositionController extends Controller
             'pre_payment'=> 'required',
             'account_number'=> 'required',
         ]);
-        if ($validator->passes())
-        {
+        if ($validator->passes()) {
             DB::beginTransaction();
-            try
-            {
+            try {
                 $call_disp = new CallDisposition;
                 $call_disp->added_by = Auth::user()->user_id;
                 $call_disp->did = $request->did;
                 $call_disp->was_mobile_pitched = $request->was_mobile_pitched;
+                $call_disp->customer_name = $request->customer_name;
                 $call_disp->service_address = $request->service_address;
                 $call_disp->phone_number = $request->phone_number;
                 $call_disp->email = $request->email;
@@ -71,167 +65,18 @@ class CallDispositionController extends Controller
                 $call_disp->save();
                 $call_disp->fresh();
                 $call_id = $call_disp->call_id;
-                $services_sold = 0; // new column for this and update
-                if (isset($request->spectrum)) {
-                    $call_disp_service = new CallDispositionsService;
-                    $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->spectrum;
-                    $call_disp_service->internet = isset($request->sp_internet) ? $request->sp_internet : 0;
-                    isset($request->sp_internet) ? $services_sold++ : 0;
-                    $call_disp_service->cable = isset($request->sp_cable) ? $request->sp_cable : 0 ;
-                    isset($request->sp_cable) ? $services_sold++ : 0 ;
-                    $call_disp_service->phone = isset($request->sp_phone) ? $request->sp_phone : 0;
-                    isset($request->sp_phone) ? $services_sold++ : 0;
-                    $call_disp_service->mobile = isset($request->sp_mobile) ? $request->sp_mobile : 0;
-                    isset($request->sp_mobile) ? $services_sold++ : 0;
-                    $call_disp_service->save();
-                }
-                if (isset($request->att)) {
-                    $call_disp_service = new CallDispositionsService;
-                    $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->att;
-                    $call_disp_service->internet = isset($request->att_internet) ? $request->att_internet : 0;
-                    isset($request->att_internet) ? $services_sold++ : 0;
-                    $call_disp_service->cable = isset($request->att_cable) ? $request->att_cable : 0;
-                    isset($request->att_cable) ? $services_sold++ : 0;
-                    $call_disp_service->phone = isset($request->att_phone) ? $request->att_phone : 0;
-                    isset($request->att_phone) ? $services_sold++ : 0;
-                    $call_disp_service->mobile = 0;
-                    $call_disp_service->save();
-
-                }
-                if(isset($request->direct_tv)) {
-                    $call_disp_service = new CallDispositionsService;
-                    $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->direct_tv;
-                    $call_disp_service->cable = isset($request->dt_cable) ? $request->dt_cable : 0;
-                    isset($request->dt_cable) ? $services_sold++ : 0;
-                    $call_disp_service->phone = 0 ;
-                    $call_disp_service->mobile = 0;
-                    $call_disp_service->internet = 0;
-
-                    $call_disp_service->save();
-                }
-                if(isset($request->earth_link)){
-                    $call_disp_service = new CallDispositionsService;
-                    $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->earth_link;
-                    $call_disp_service->internet = isset($request->el_internet) ? $request->el_internet : 0;
-                    isset($request->el_internet ) ? $services_sold++ : 0;
-                    $call_disp_service->cable =  isset($request->el_cable) ? $request->el_cable : 0;
-                    isset($request->el_cable ) ? $services_sold++ : 0;
-                    $call_disp_service->phone = isset($request->el_phone) ? $request->el_phone : 0;
-                    isset($request->el_phone ) ? $services_sold++ : 0;
-                    $call_disp_service->mobile = 0;
-                    $call_disp_service->save();
-                }
-                if(isset($request->mediacom)){
-                    $call_disp_service = new CallDispositionsService;
-                    $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->mediacom;
-                    $call_disp_service->internet = isset($request->mc_internet) ? $request->mc_internet : 0;
-                    isset($request->mc_internet) ? $services_sold++ : 0;
-                    $call_disp_service->cable = isset($request->mc_cable) ? $request->mc_cable : 0;
-                    isset($request->mc_cable) ? $services_sold++ : 0;
-                    $call_disp_service->phone = isset($request->mc_phone) ? $request->mc_phone : 0;
-                    isset($request->mc_phone) ? $services_sold++ : 0;
-                    $call_disp_service->mobile = 0 ;
-                    $call_disp_service->save();
-                }
-                if(isset($request->viasat)){
-                    $call_disp_service = new CallDispositionsService;
-                    $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->viasat;
-                    $call_disp_service->internet = isset($request->v_internet) ? $request->v_internet : 0;
-                    isset($request->v_internet ) ? $services_sold++ : 0;
-                    $call_disp_service->phone =  isset($request->v_phone) ? $request->v_phone : 0;
-                    isset($request->v_phone ) ? $services_sold++ : 0;
-                    $call_disp_service->cable = 0;
-                    $call_disp_service->mobile = 0;
-                    $call_disp_service->save();
-                }
-                if(isset($request->hughesnet)){
-                    $call_disp_service = new CallDispositionsService;
-                    $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->hughesnet;
-                    $call_disp_service->internet = isset($request->h_internet) ? $request->h_internet : 0;
-                    isset($request->h_internet ) ? $services_sold++ : 0;
-                    $call_disp_service->cable = 0 ;
-                    $call_disp_service->phone = 0;
-                    $call_disp_service->mobile = 0;
-                    $call_disp_service->save();
-                }
-                if(isset($request->sudden_link)){
-                    $call_disp_service = new CallDispositionsService;
-                    $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->sudden_link;
-                    $call_disp_service->internet = isset($request->sl_internet) ? $request->sl_internet : 0;
-                    isset($request->sl_internet ) ? $services_sold++ : 0;
-                    $call_disp_service->cable = isset($request->sl_cable) ? $request->sl_cable : 0;
-                    isset($request->sl_cable ) ? $services_sold++ : 0;
-                    $call_disp_service->phone = isset($request->sl_phone) ? $request->sl_phone : 0;
-                    isset($request->sl_phone ) ? $services_sold++ : 0;
-                    $call_disp_service->mobile = 0;
-                    $call_disp_service->save();
-                }
-                if(isset($request->optimum)){
-                    $call_disp_service = new CallDispositionsService;
-                    $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->optimum;
-                    $call_disp_service->internet = isset($request->o_internet) ? $request->o_internet : 0;
-                    isset($request->o_internet ) ? $services_sold++ : 0;
-                    $call_disp_service->cable = isset($request->o_cable) ? $request->o_cable : 0;
-                    isset($request->o_cable ) ? $services_sold++ : 0;
-                    $call_disp_service->phone = isset($request->o_phone) ? $request->o_phone : 0;
-                    isset($request->sp_phone ) ? $services_sold++ : 0;
-                    $call_disp_service->mobile = 0 ;
-                    $call_disp_service->save();
-                }
-                if(isset($request->cox)){
-                    $call_disp_service = new CallDispositionsService;
-                    $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->cox;
-                    $call_disp_service->internet = isset($request->c_internet) ? $request->c_internet : 0;
-                    isset($request->c_internet) ? $services_sold++ : 0;
-                    $call_disp_service->cable = isset($request->c_cable) ? $request->c_cable : 0;
-                    isset($request->c_cable ) ? $services_sold++ : 0;
-                    $call_disp_service->phone = isset($request->c_phone) ? $request->c_phone : 0;
-                    isset($request->c_phone ) ? $services_sold++ : 0;
-                    $call_disp_service->mobile = 0 ;
-                    $call_disp_service->save();
-                }
-                if(isset($request->others)){
-                    $call_disp_service = new CallDispositionsService;
-                    $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->other_specify;
-                    $call_disp_service->internet = isset($request->other_internet) ? $request->other_internet : 0;
-                    isset($request->other_internet ) ? $services_sold++ : 0;
-                    $call_disp_service->cable = isset($request->other_cable) ? $request->other_cable : 0;
-                    isset($request->other_cable ) ? $services_sold++ : 0;
-                    $call_disp_service->phone = isset($request->other_phone) ? $request->other_phone : 0;
-                    isset($request->other_phone ) ? $services_sold++ : 0;
-                    $call_disp_service->mobile = isset($request->other_mobile) ? $request->other_mobile : 0;
-                    isset($request->other_mobile ) ? $services_sold++ : 0;
-                    $call_disp_service->save();
-                }
-                  $call_disp->services_sold = $services_sold;
-                    $call_disp->save();
-                if($call_disp && $call_disp_service)
-                {
-                    DB::commit();
-                }else{
-                    DB::rollback();
-                }
-
+                $services_sold = $this->add_services($call_id, $request);
+                $call_disp->services_sold = $services_sold;
+                $call_disp->save();
+                DB::commit();
                 $response['status'] = 'success';
                 $response['result'] = "Added Successfully";
-            }
-            catch(Exception $ex)
-            {
+            } catch(Exception $ex) {
                 DB::rollback();
+                $response['status'] = 'failure';
+                $response['result'] = "Unexpected Db Error";
             }
-        }
-        else{
+        } else {
             $response['status'] = 'failure';
             $response['result']= $validator->errors()->toJson();
         }
@@ -240,12 +85,12 @@ class CallDispositionController extends Controller
 
     public function edit($id)
     {
-        $data['page_title'] = "Atlantis BPO CRM - Roles";
+        $data['page_title'] = "Atlantis BPO CRM - Call Disposition Form";
         $data['lead_edit'] = CallDisposition::where('call_id',$id)->with(['call_dispositions_services'])->get()[0];
-        return view('lead_edit' , $data);
+        return view('call_dipositions.lead_edit' , $data);
     }
 
-    public  function update(Request $request ,$id)
+    public  function update(Request $request ,$call_id)
     {
         $validator = Validator::make($request->all(),[
             'was_mobile_pitched'=> 'required',
@@ -259,161 +104,16 @@ class CallDispositionController extends Controller
             'order_number'=> 'required',
             'pre_payment'=> 'required',
             'account_number'=> 'required',
-//          'remarks'=> 'required',
         ]);
-        if ($validator->passes())
-        {
+        if ($validator->passes()) {
             DB::beginTransaction();
             try {
-                CallDispositionsService::where('call_id', $request->call_id)->delete();
-                $call_id = $id;
-                $services_sold = 0;
-                if (isset($request->spectrum)) {
-                    $call_disp_service = new CallDispositionsService;
-                    $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->spectrum;
-                    $call_disp_service->internet = isset($request->sp_internet) ? $request->sp_internet : 0;
-                    isset($request->sp_internet) ? $services_sold++ : 0;
-                    $call_disp_service->cable = isset($request->sp_cable) ? $request->sp_cable : 0;
-                    isset($request->sp_cable) ? $services_sold++ : 0;
-                    $call_disp_service->phone = isset($request->sp_phone) ? $request->sp_phone : 0;
-                    isset($request->sp_phone) ? $services_sold++ : 0;
-                    $call_disp_service->mobile = isset($request->sp_mobile) ? $request->sp_mobile : 0;
-                    isset($request->sp_mobile) ? $services_sold++ : 0;
-                    $call_disp_service->save();
-                }
-                if (isset($request->att)) {
-                    $call_disp_service = new CallDispositionsService;
-                    $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->att;
-                    $call_disp_service->internet = isset($request->att_internet) ? $request->att_internet : 0;
-                    isset($request->att_internet) ? $services_sold++ : 0;
-                    $call_disp_service->cable = isset($request->att_cable) ? $request->att_cable : 0;
-                    isset($request->att_cable) ? $services_sold++ : 0;
-                    $call_disp_service->phone = isset($request->att_phone) ? $request->att_phone : 0;
-                    isset($request->att_phone) ? $services_sold++ : 0;
-                    $call_disp_service->mobile = 0;
-                    $call_disp_service->save();
-
-                }
-                if (isset($request->direct_tv)) {
-                    $call_disp_service = new CallDispositionsService;
-                    $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->direct_tv;
-                    $call_disp_service->cable = isset($request->dt_cable) ? $request->dt_cable : 0;
-                    isset($request->dt_cable) ? $services_sold++ : 0;
-                    $call_disp_service->phone = 0;
-                    $call_disp_service->mobile = 0;
-                    $call_disp_service->internet = 0;
-
-                    $call_disp_service->save();
-                }
-                if (isset($request->earth_link)) {
-                    $call_disp_service = new CallDispositionsService;
-                    $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->earth_link;
-                    $call_disp_service->internet = isset($request->el_internet) ? $request->el_internet : 0;
-                    isset($request->el_internet) ? $services_sold++ : 0;
-                    $call_disp_service->cable = isset($request->el_cable) ? $request->el_cable : 0;
-                    isset($request->el_cable) ? $services_sold++ : 0;
-                    $call_disp_service->phone = isset($request->el_phone) ? $request->el_phone : 0;
-                    isset($request->el_phone) ? $services_sold++ : 0;
-                    $call_disp_service->mobile = 0;
-                    $call_disp_service->save();
-                }
-                if (isset($request->mediacom)) {
-                    $call_disp_service = new CallDispositionsService;
-                    $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->mediacom;
-                    $call_disp_service->internet = isset($request->mc_internet) ? $request->mc_internet : 0;
-                    isset($request->mc_internet) ? $services_sold++ : 0;
-                    $call_disp_service->cable = isset($request->mc_cable) ? $request->mc_cable : 0;
-                    isset($request->mc_cable) ? $services_sold++ : 0;
-                    $call_disp_service->phone = isset($request->mc_phone) ? $request->mc_phone : 0;
-                    isset($request->mc_phone) ? $services_sold++ : 0;
-                    $call_disp_service->mobile = 0;
-                    $call_disp_service->save();
-                }
-                if (isset($request->viasat)) {
-                    $call_disp_service = new CallDispositionsService;
-                    $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->viasat;
-                    $call_disp_service->internet = isset($request->v_internet) ? $request->v_internet : 0;
-                    isset($request->v_internet) ? $services_sold++ : 0;
-                    $call_disp_service->phone = isset($request->v_phone) ? $request->v_phone : 0;
-                    isset($request->v_phone) ? $services_sold++ : 0;
-                    $call_disp_service->cable = 0;
-                    $call_disp_service->mobile = 0;
-                    $call_disp_service->save();
-                }
-                if (isset($request->hughesnet)) {
-                    $call_disp_service = new CallDispositionsService;
-                    $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->hughesnet;
-                    $call_disp_service->internet = isset($request->h_internet) ? $request->h_internet : 0;
-                    isset($request->h_internet) ? $services_sold++ : 0;
-                    $call_disp_service->cable = 0;
-                    $call_disp_service->phone = 0;
-                    $call_disp_service->mobile = 0;
-                    $call_disp_service->save();
-                }
-                if (isset($request->sudden_link)) {
-                    $call_disp_service = new CallDispositionsService;
-                    $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->sudden_link;
-                    $call_disp_service->internet = isset($request->sl_internet) ? $request->sl_internet : 0;
-                    isset($request->sl_internet) ? $services_sold++ : 0;
-                    $call_disp_service->cable = isset($request->sl_cable) ? $request->sl_cable : 0;
-                    isset($request->sl_cable) ? $services_sold++ : 0;
-                    $call_disp_service->phone = isset($request->sl_phone) ? $request->sl_phone : 0;
-                    isset($request->sl_phone) ? $services_sold++ : 0;
-                    $call_disp_service->mobile = 0;
-                    $call_disp_service->save();
-                }
-
-                if (isset($request->optimum)) {
-                    $call_disp_service = new CallDispositionsService;
-                    $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->optimum;
-                    $call_disp_service->internet = isset($request->o_internet) ? $request->o_internet : 0;
-                    isset($request->o_internet) ? $services_sold++ : 0;
-                    $call_disp_service->cable = isset($request->o_cable) ? $request->o_cable : 0;
-                    isset($request->o_cable) ? $services_sold++ : 0;
-                    $call_disp_service->phone = isset($request->o_phone) ? $request->o_phone : 0;
-                    isset($request->sp_phone) ? $services_sold++ : 0;
-                    $call_disp_service->mobile = 0;
-                    $call_disp_service->save();
-                }
-                if (isset($request->cox)) {
-                    $call_disp_service = new CallDispositionsService;
-                    $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->cox;
-                    $call_disp_service->internet = isset($request->c_internet) ? $request->c_internet : 0;
-                    isset($request->c_internet) ? $services_sold++ : 0;
-                    $call_disp_service->cable = isset($request->c_cable) ? $request->c_cable : 0;
-                    isset($request->c_cable) ? $services_sold++ : 0;
-                    $call_disp_service->phone = isset($request->c_phone) ? $request->c_phone : 0;
-                    isset($request->c_phone) ? $services_sold++ : 0;
-                    $call_disp_service->mobile = 0;
-                    $call_disp_service->save();
-                }
-                if (isset($request->others)) {
-                    $call_disp_service = new CallDispositionsService;
-                    $call_disp_service->call_id = $call_id;
-                    $call_disp_service->provider_name = $request->other_specify;
-                    $call_disp_service->internet = isset($request->other_internet) ? $request->other_internet : 0;
-                    isset($request->other_internet) ? $services_sold++ : 0;
-                    $call_disp_service->cable = isset($request->other_cable) ? $request->other_cable : 0;
-                    isset($request->other_cable) ? $services_sold++ : 0;
-                    $call_disp_service->phone = isset($request->other_phone) ? $request->other_phone : 0;
-                    isset($request->other_phone) ? $services_sold++ : 0;
-                    $call_disp_service->mobile = isset($request->other_mobile) ? $request->other_mobile : 0;
-                    isset($request->other_mobile) ? $services_sold++ : 0;
-                    $call_disp_service->save();
-                }
-                $lead_update = CallDisposition::where('call_id', $id)->update([
+                CallDispositionsService::where('call_id', $call_id)->delete();
+                $services_sold = $this->add_services($call_id, $request);
+                $lead_update = CallDisposition::where('call_id', $call_id)->update([
                     'did' => $request->did,
                     'was_mobile_pitched' => $request->was_mobile_pitched,
+                    'customer_name' => $request->customer_name,
                     'service_address' => $request->service_address,
                     'phone_number' => $request->phone_number,
                     'email' => $request->email,
@@ -430,13 +130,13 @@ class CallDispositionController extends Controller
                     'modified_by' => Auth::user()->user_id,
                 ]);
                 DB::commit();
+                $response['status'] = 'success';
+                $response['result']= "Updated Successfully";
             } catch(Exception $e) {
                 DB::rollBack();
-                dd($e);
+                $response['status'] = 'failure';
+                $response['result'] = "Unexpected Db Error";
             }
-            $response['status'] = 'success';
-            $response['result']= "Updated Successfully";
-            echo "success";
         } else {
             $response['status'] = 'failure';
             $response['result']= $validator->errors()->toJson();
@@ -444,7 +144,7 @@ class CallDispositionController extends Controller
         return response()->json($response);
     }
 
-    Public function delete(Request $request)
+    public function delete(Request $request)
     {
         $data = CallDisposition::where('call_id', $request->call_id)->update([
             'status' => 0,
@@ -452,5 +152,153 @@ class CallDispositionController extends Controller
         $response['status'] = "Success";
         $response['result'] = "Deleted Successfully";
         return response()->json($response);
+    }
+
+    protected function add_services($call_id, $request)
+    {
+        $services_sold = 0; // new column for this and update
+        if (isset($request->spectrum)) {
+            $call_disp_service = new CallDispositionsService;
+            $call_disp_service->call_id = $call_id;
+            $call_disp_service->provider_name = $request->spectrum;
+            $call_disp_service->internet = isset($request->sp_internet) ? $request->sp_internet : 0;
+            isset($request->sp_internet) ? $services_sold++ : 0;
+            $call_disp_service->cable = isset($request->sp_cable) ? $request->sp_cable : 0 ;
+            isset($request->sp_cable) ? $services_sold++ : 0 ;
+            $call_disp_service->phone = isset($request->sp_phone) ? $request->sp_phone : 0;
+            isset($request->sp_phone) ? $services_sold++ : 0;
+            $call_disp_service->mobile = isset($request->sp_mobile) ? $request->sp_mobile : 0;
+            isset($request->sp_mobile) ? $services_sold++ : 0;
+            $call_disp_service->save();
+        }
+        if (isset($request->att)) {
+            $call_disp_service = new CallDispositionsService;
+            $call_disp_service->call_id = $call_id;
+            $call_disp_service->provider_name = $request->att;
+            $call_disp_service->internet = isset($request->att_internet) ? $request->att_internet : 0;
+            isset($request->att_internet) ? $services_sold++ : 0;
+            $call_disp_service->cable = isset($request->att_cable) ? $request->att_cable : 0;
+            isset($request->att_cable) ? $services_sold++ : 0;
+            $call_disp_service->phone = isset($request->att_phone) ? $request->att_phone : 0;
+            isset($request->att_phone) ? $services_sold++ : 0;
+            $call_disp_service->mobile = 0;
+            $call_disp_service->save();
+
+        }
+        if(isset($request->direct_tv)) {
+            $call_disp_service = new CallDispositionsService;
+            $call_disp_service->call_id = $call_id;
+            $call_disp_service->provider_name = $request->direct_tv;
+            $call_disp_service->cable = isset($request->dt_cable) ? $request->dt_cable : 0;
+            isset($request->dt_cable) ? $services_sold++ : 0;
+            $call_disp_service->phone = 0 ;
+            $call_disp_service->mobile = 0;
+            $call_disp_service->internet = 0;
+
+            $call_disp_service->save();
+        }
+        if(isset($request->earth_link)){
+            $call_disp_service = new CallDispositionsService;
+            $call_disp_service->call_id = $call_id;
+            $call_disp_service->provider_name = $request->earth_link;
+            $call_disp_service->internet = isset($request->el_internet) ? $request->el_internet : 0;
+            isset($request->el_internet ) ? $services_sold++ : 0;
+            $call_disp_service->cable =  isset($request->el_cable) ? $request->el_cable : 0;
+            isset($request->el_cable ) ? $services_sold++ : 0;
+            $call_disp_service->phone = isset($request->el_phone) ? $request->el_phone : 0;
+            isset($request->el_phone ) ? $services_sold++ : 0;
+            $call_disp_service->mobile = 0;
+            $call_disp_service->save();
+        }
+        if(isset($request->mediacom)){
+            $call_disp_service = new CallDispositionsService;
+            $call_disp_service->call_id = $call_id;
+            $call_disp_service->provider_name = $request->mediacom;
+            $call_disp_service->internet = isset($request->mc_internet) ? $request->mc_internet : 0;
+            isset($request->mc_internet) ? $services_sold++ : 0;
+            $call_disp_service->cable = isset($request->mc_cable) ? $request->mc_cable : 0;
+            isset($request->mc_cable) ? $services_sold++ : 0;
+            $call_disp_service->phone = isset($request->mc_phone) ? $request->mc_phone : 0;
+            isset($request->mc_phone) ? $services_sold++ : 0;
+            $call_disp_service->mobile = 0 ;
+            $call_disp_service->save();
+        }
+        if(isset($request->viasat)){
+            $call_disp_service = new CallDispositionsService;
+            $call_disp_service->call_id = $call_id;
+            $call_disp_service->provider_name = $request->viasat;
+            $call_disp_service->internet = isset($request->v_internet) ? $request->v_internet : 0;
+            isset($request->v_internet ) ? $services_sold++ : 0;
+            $call_disp_service->phone =  isset($request->v_phone) ? $request->v_phone : 0;
+            isset($request->v_phone ) ? $services_sold++ : 0;
+            $call_disp_service->cable = 0;
+            $call_disp_service->mobile = 0;
+            $call_disp_service->save();
+        }
+        if(isset($request->hughesnet)){
+            $call_disp_service = new CallDispositionsService;
+            $call_disp_service->call_id = $call_id;
+            $call_disp_service->provider_name = $request->hughesnet;
+            $call_disp_service->internet = isset($request->h_internet) ? $request->h_internet : 0;
+            isset($request->h_internet ) ? $services_sold++ : 0;
+            $call_disp_service->cable = 0 ;
+            $call_disp_service->phone = 0;
+            $call_disp_service->mobile = 0;
+            $call_disp_service->save();
+        }
+        if(isset($request->sudden_link)){
+            $call_disp_service = new CallDispositionsService;
+            $call_disp_service->call_id = $call_id;
+            $call_disp_service->provider_name = $request->sudden_link;
+            $call_disp_service->internet = isset($request->sl_internet) ? $request->sl_internet : 0;
+            isset($request->sl_internet ) ? $services_sold++ : 0;
+            $call_disp_service->cable = isset($request->sl_cable) ? $request->sl_cable : 0;
+            isset($request->sl_cable ) ? $services_sold++ : 0;
+            $call_disp_service->phone = isset($request->sl_phone) ? $request->sl_phone : 0;
+            isset($request->sl_phone ) ? $services_sold++ : 0;
+            $call_disp_service->mobile = 0;
+            $call_disp_service->save();
+        }
+        if(isset($request->optimum)){
+            $call_disp_service = new CallDispositionsService;
+            $call_disp_service->call_id = $call_id;
+            $call_disp_service->provider_name = $request->optimum;
+            $call_disp_service->internet = isset($request->o_internet) ? $request->o_internet : 0;
+            isset($request->o_internet ) ? $services_sold++ : 0;
+            $call_disp_service->cable = isset($request->o_cable) ? $request->o_cable : 0;
+            isset($request->o_cable ) ? $services_sold++ : 0;
+            $call_disp_service->phone = isset($request->o_phone) ? $request->o_phone : 0;
+            isset($request->sp_phone ) ? $services_sold++ : 0;
+            $call_disp_service->mobile = 0 ;
+            $call_disp_service->save();
+        }
+        if(isset($request->cox)){
+            $call_disp_service = new CallDispositionsService;
+            $call_disp_service->call_id = $call_id;
+            $call_disp_service->provider_name = $request->cox;
+            $call_disp_service->internet = isset($request->c_internet) ? $request->c_internet : 0;
+            isset($request->c_internet) ? $services_sold++ : 0;
+            $call_disp_service->cable = isset($request->c_cable) ? $request->c_cable : 0;
+            isset($request->c_cable ) ? $services_sold++ : 0;
+            $call_disp_service->phone = isset($request->c_phone) ? $request->c_phone : 0;
+            isset($request->c_phone ) ? $services_sold++ : 0;
+            $call_disp_service->mobile = 0 ;
+            $call_disp_service->save();
+        }
+        if(isset($request->others)){
+            $call_disp_service = new CallDispositionsService;
+            $call_disp_service->call_id = $call_id;
+            $call_disp_service->provider_name = $request->other_specify;
+            $call_disp_service->internet = isset($request->other_internet) ? $request->other_internet : 0;
+            isset($request->other_internet ) ? $services_sold++ : 0;
+            $call_disp_service->cable = isset($request->other_cable) ? $request->other_cable : 0;
+            isset($request->other_cable ) ? $services_sold++ : 0;
+            $call_disp_service->phone = isset($request->other_phone) ? $request->other_phone : 0;
+            isset($request->other_phone ) ? $services_sold++ : 0;
+            $call_disp_service->mobile = isset($request->other_mobile) ? $request->other_mobile : 0;
+            isset($request->other_mobile ) ? $services_sold++ : 0;
+            $call_disp_service->save();
+        }
+        return $services_sold;
     }
 }

@@ -11,22 +11,22 @@ class CallDisposition extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-            protected $table = 'call_dispositions';
-            protected $primaryKey = 'call_id';
-            const CREATED_AT = 'added_on';
-            const UPDATED_AT = 'modified_on';
+    protected $table = 'call_dispositions';
+    protected $primaryKey = 'call_id';
+    const CREATED_AT = 'added_on';
+    const UPDATED_AT = 'modified_on';
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
 
-        protected $fillable = [
-            'was_mobile_pitched' , 'fiscal_month' , 'agent_name' , 'service_address' , 'phone_number', 'email',
-            'initial_bill', 'monthly_bill' , 'confirmation_number' , 'order_confirmation_number', 'order_number',
-            'installation_date', 'installation',
+    protected $fillable = [
+        'was_mobile_pitched', 'fiscal_month', 'customer_name', 'service_address' , 'phone_number', 'email',
+        'initial_bill', 'monthly_bill' , 'confirmation_number' , 'order_confirmation_number', 'order_number',
+        'installation_date', 'installation',
 
-        ];
+    ];
 
     /**
      * The attributes that should be hidden for arrays.
