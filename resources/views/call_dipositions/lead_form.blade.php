@@ -9,7 +9,7 @@
     <form method="post" id="lead_form" enctype="multipart/form-data">
         @csrf
 <!--         TODO:  if phone selected show "new number" feild -->
-{{--        // TODO: if mobile selected show number of lines --}}
+{{--        // TODO: if mobile selected show number of lines --}} 
 {{--        // TODO:  professional date will be datetime --}}
         <div class="card">
             <div class="card-header" style="justify-content: space-between;">
