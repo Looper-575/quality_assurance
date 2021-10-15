@@ -56,12 +56,18 @@ class CallDispositionController extends Controller
                 $call_disp->initial_bill = $request->initial_bill;
                 $call_disp->monthly_bill = $request->monthly_bill;
                 $call_disp->installation_type = $request->installation_type;
-                $call_disp->installation_date = $request->installation_date;
+                $call_disp->installation_date = $request->installation_date ? parse_datetime_store($request->installation_date) : '';
                 $call_disp->order_confirmation_number = $request->order_confirmation_number;
                 $call_disp->order_number = $request->order_number;
                 $call_disp->pre_payment = $request->pre_payment;
                 $call_disp->account_number = $request->account_number;
                 $call_disp->remarks = $request->remarks;
+                if(isset($request->mobile_lines)){
+                    $call_disp->mobile_lines = $request->mobile_lines;
+                }
+                if(isset($request->new_phone_number)){
+                    $call_disp->new_phone_number = $request->new_phone_number;
+                }
                 $call_disp->save();
                 $call_disp->fresh();
                 $call_id = $call_disp->call_id;
@@ -78,7 +84,7 @@ class CallDispositionController extends Controller
             }
         } else {
             $response['status'] = 'failure';
-            $response['result']= $validator->errors()->toJson();
+            $response['result'] = $validator->errors()->toJson();
         }
         return response()->json($response);
     }
@@ -120,13 +126,15 @@ class CallDispositionController extends Controller
                     'initial_bill' => $request->initial_bill,
                     'monthly_bill' => $request->monthly_bill,
                     'installation_type' => $request->installation_type,
-                    'installation_date' => $request->installation_date,
+                    'installation_date' => $request->installation_date ? parse_datetime_store($request->installation_date) : '' ,
                     'order_confirmation_number' => $request->order_confirmation_number,
                     'order_number' => $request->order_number,
                     'services_sold' => $services_sold,
                     'pre_payment' => $request->pre_payment,
                     'account_number' => $request->account_number,
                     'remarks' => $request->remarks,
+                    'mobile_lines' => $request->mobile_lines,
+                    'new_phone_number' => $request->new_phone_number,
                     'modified_by' => Auth::user()->user_id,
                 ]);
                 DB::commit();

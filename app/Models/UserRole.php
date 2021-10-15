@@ -35,7 +35,7 @@ class UserRole extends Authenticatable
      * @var array
      */
     protected $hidden = [
-      
+
     ];
 
     /**
@@ -43,10 +43,6 @@ class UserRole extends Authenticatable
      *
      * @var array
      */
-    protected $casts = [
-        'modified_on' => 'datetime',
-        'added_on' => 'datetime',
-    ];
 
 
     public function role()

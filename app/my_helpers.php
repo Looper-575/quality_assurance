@@ -38,6 +38,12 @@ if (!function_exists('get_time')) {
     }
 }
 // date time helpers
+if (!function_exists('parse_datetime_get_datepicker')) {
+    function parse_datetime_get_datepicker($date)
+    {
+        return date('Y-m-d\TH:i', strtotime($date));
+    }
+}
 if (!function_exists('parse_datetime_get')) {
     function parse_datetime_get($date)
     {
@@ -50,6 +56,13 @@ if (!function_exists('parse_date_store')) {
     function parse_date_store($date)
     {
         return date('Y-m-d', strtotime($date));
+    }
+}
+// parse date to for db
+if (!function_exists('parse_datetime_store')) {
+    function parse_datetime_store($date)
+    {
+        return date('Y-m-d H:i:s', strtotime($date));
     }
 }
 // parse date to for get

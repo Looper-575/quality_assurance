@@ -24,8 +24,7 @@ class CallDisposition extends Authenticatable
     protected $fillable = [
         'was_mobile_pitched', 'fiscal_month', 'customer_name', 'service_address' , 'phone_number', 'email',
         'initial_bill', 'monthly_bill' , 'confirmation_number' , 'order_confirmation_number', 'order_number',
-        'installation_date', 'installation',
-
+        'installation_date', 'installation', 'new_phone_number', 'mobile_lines'
     ];
 
     /**

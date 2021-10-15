@@ -1,5 +1,5 @@
 @extends('admin_layout.template')
-@section('header_scripts') 
+@section('header_scripts')
     <link rel="stylesheet" href="{{ asset('assets/bundles/select2/dist/css/select2.min.css') }}">
     <link rel="stylesheet"
           href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
@@ -63,7 +63,15 @@
                         </div>
                         <div class="form-group" id="prof_install" style="display: {{$lead_edit->installation_type=='2' ? 'block' : 'none'}}">
                             <label class="form-check-label" for="installation_date">Installation Date</label>
-                            <input type="date" class="form-control date_picker" value="{{$lead_edit->installation_date}}" name="installation_date"  id="installation_date">
+                            <input type="datetime-local" class="form-control date_picker" value="{{$lead_edit->installation_date ? parse_datetime_get_datepicker($lead_edit->installation_date) : ''}}" name="installation_date"  id="installation_date">
+                        </div>
+                        <div class="form-group" id="new_phone_div" style="display: {{$lead_edit->new_phone_number != '' ? 'block' : 'none'}}">
+                            <label class="form-check-label" for="new_phone">New Phone Number</label>
+                            <input {{$lead_edit->new_phone_number != '' ? 'required' : ''}} type="tel" class="form-control" value="{{$lead_edit->new_phone_number}}" name="new_phone_number" id="new_phone">
+                        </div>
+                        <div class="form-group" id="new_lines_div" style="display: {{$lead_edit->mobile_lines != '' ? 'block' : 'none'}}">
+                            <label class="form-check-label" for="new_lines">Number of Mobile Lines</label>
+                            <input {{$lead_edit->mobile_lines != '' ? 'required' : ''}} type="number" max="99" class="form-control" value="{{$lead_edit->mobile_lines}}" name="mobile_lines" id="new_lines">
                         </div>
                     </div>
                     <?php
@@ -102,7 +110,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="sp_phone"> Phone </label>
-                                    <input class="form-check-input" {{(isset($providers_arr['spectrum']) && $providers_arr['spectrum']['phone']==1) ? 'checked': ''}} type="checkbox" name="sp_phone" id="sp_phone" value="1">
+                                    <input class="form-check-input phone_check" {{(isset($providers_arr['spectrum']) && $providers_arr['spectrum']['phone']==1) ? 'checked': ''}} type="checkbox" name="sp_phone" id="sp_phone" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="sp_cable"> Cable </label>
@@ -110,7 +118,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="sp_mobile"> Mobile </label>
-                                    <input class="form-check-input"  {{(isset($providers_arr['spectrum']) && $providers_arr['spectrum']['mobile']==1) ? 'checked': ''}} type="checkbox" name="sp_mobile" id="sp_mobile" value="1">
+                                    <input class="form-check-input mobile_check"  {{(isset($providers_arr['spectrum']) && $providers_arr['spectrum']['mobile']==1) ? 'checked': ''}} type="checkbox" name="sp_mobile" id="sp_mobile" value="1">
                                 </div>
                                 <hr>
                             </div>
@@ -125,7 +133,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="att_phone"> Phone </label>
-                                    <input class="form-check-input" {{(isset($providers_arr['att']) && $providers_arr['att']['phone']==1) ? 'checked': ''}} type="checkbox" name="att_phone" id="att_phone" value="1">
+                                    <input class="form-check-input phone_check" {{(isset($providers_arr['att']) && $providers_arr['att']['phone']==1) ? 'checked': ''}} type="checkbox" name="att_phone" id="att_phone" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="att_cable"> Cable </label>
@@ -155,7 +163,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="el_phone"> Phone </label>
-                                    <input class="form-check-input" {{isset($providers_arr['earth_link']) && $providers_arr['earthlink']['phone'] ? 'checked' : '' }} type="checkbox" name="el_phone" id="el_phone" value="1">
+                                    <input class="form-check-input phone_check" {{isset($providers_arr['earth_link']) && $providers_arr['earthlink']['phone'] ? 'checked' : '' }} type="checkbox" name="el_phone" id="el_phone" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="el_cable"> Cable </label>
@@ -174,7 +182,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="mc_phone"> Phone </label>
-                                    <input class="form-check-input" {{isset($providers_arr['mediacom']) && $providers_arr['mediacom']['phone'] ? 'checked' : ''}} type="checkbox" name="mc_phone" id="mc_phone" value="1">
+                                    <input class="form-check-input phone_check" {{isset($providers_arr['mediacom']) && $providers_arr['mediacom']['phone'] ? 'checked' : ''}} type="checkbox" name="mc_phone" id="mc_phone" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="mc_cable"> Cable </label>
@@ -193,7 +201,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="v_phone"> Phone </label>
-                                    <input class="form-check-input" {{isset($providers_arr['viasat']) && $providers_arr['viasat']['phone'] ? 'checked' : ''}} type="checkbox" name="v_phone" id="v_phone" value="1">
+                                    <input class="form-check-input phone_check" {{isset($providers_arr['viasat']) && $providers_arr['viasat']['phone'] ? 'checked' : ''}} type="checkbox" name="v_phone" id="v_phone" value="1">
                                 </div>
                                 <hr>
                             </div>
@@ -219,7 +227,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="sl_phone"> Phone </label>
-                                    <input class="form-check-input" {{isset($providers_arr['sudden_link']) && $providers_arr['suddenlink']['phone'] ? 'checked' : ''}} type="checkbox" name="sl_phone" id="sl_phone" value="1">
+                                    <input class="form-check-input phone_check" {{isset($providers_arr['sudden_link']) && $providers_arr['suddenlink']['phone'] ? 'checked' : ''}} type="checkbox" name="sl_phone" id="sl_phone" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="sl_cable"> Cable </label>
@@ -238,7 +246,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="o_phone"> Phone </label>
-                                    <input class="form-check-input" {{isset($providers_arr['optimum']) && $providers_arr['optimum']['phone'] ? 'checked' : ''}} type="checkbox" name="o_phone" id="o_phone" value="1">
+                                    <input class="form-check-input phone_check" {{isset($providers_arr['optimum']) && $providers_arr['optimum']['phone'] ? 'checked' : ''}} type="checkbox" name="o_phone" id="o_phone" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="o_cable"> Cable </label>
@@ -257,7 +265,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="c_phone"> Phone </label>
-                                    <input class="form-check-input" {{isset($providers_arr['cox']) && $providers_arr['cox']['phone'] ? 'checked' : ''}} type="checkbox" name="c_phone" id="c_phone" value="1">
+                                    <input class="form-check-input phone_check" {{isset($providers_arr['cox']) && $providers_arr['cox']['phone'] ? 'checked' : ''}} type="checkbox" name="c_phone" id="c_phone" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="c_cable"> Cable </label>
@@ -277,7 +285,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="other_phone"> Phone </label>
-                                    <input class="form-check-input" {{isset($providers_arr['other']) && $providers_arr['other']['phone'] ? 'checked' : ''}} type="checkbox" name="other_phone" id="other_phone" value="1">
+                                    <input class="form-check-input phone_check" {{isset($providers_arr['other']) && $providers_arr['other']['phone'] ? 'checked' : ''}} type="checkbox" name="other_phone" id="other_phone" value="1">
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="other_cable"> Cable </label>
@@ -285,7 +293,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="others_mobile"> Mobile </label>
-                                    <input class="form-check-input" {{isset($providers_arr['other']) && $providers_arr['other']['mobile'] ? 'checked' : ''}} type="checkbox" name="other_mobile" id="others_mobile" value="1">
+                                    <input class="form-check-input mobile_check" {{isset($providers_arr['other']) && $providers_arr['other']['mobile'] ? 'checked' : ''}} type="checkbox" name="other_mobile" id="others_mobile" value="1">
                                 </div>
                                 <hr>
                             </div>
@@ -344,6 +352,47 @@
                 $('#prof_install').fadeIn();
             } else {
                 $('#prof_install').fadeOut();
+                $('#installation_date').val('');
+            }
+        });
+
+        $('.phone_check').change(function () {
+            if (this.checked) {
+                $('#new_phone_div').fadeIn();
+                $('#new_phone').attr('required', true);
+            } else {
+                blnChck = false;
+                $('.phone_check').each(function (index, obj) {
+                    if (this.checked === true) {
+                        blnChck = true;
+
+                    }
+                });
+                if (blnChck === false) {
+                    $('#new_phone_div').fadeOut();
+                    $('#new_phone')[0].removeAttribute('required');
+                    $('#new_phone').val('');
+                }
+            }
+        });
+
+        $('.mobile_check').change(function () {
+            if (this.checked) {
+                $('#new_lines_div').fadeIn();
+                $('#new_lines').attr('required', true);
+            } else {
+                blnChck = false;
+                $('.mobile_check').each(function (index, obj) {
+                    if (this.checked === true) {
+                        blnChck = true;
+
+                    }
+                });
+                if (blnChck === false) {
+                    $('#new_lines_div').fadeOut();
+                    $('#new_lines')[0].removeAttribute('required');
+                    $('#new_lines').val('');
+                }
             }
         });
     </script>
