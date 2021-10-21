@@ -29,7 +29,7 @@
                             <select class="form-control" name="manager_id">
                                 <option class="form-control" value="0" selected disabled>Plese Select</option>
                                 @foreach($managers as $manager)
-                                    <option {{$user ? ($user->role_id == $manager->user_id ? 'selected' : '' ): ''}}
+                                    <option {{$user ? ($user->manager_id == $manager->user_id ? 'selected' : '' ): ''}}
                                             value="{{$manager->user_id}}">{{$manager->full_name}}</option>
                                 @endforeach
                             </select>

@@ -25,15 +25,9 @@ $("[data-checkboxes]").each(function () {
 });
 if(jQuery().dataTable) {
     $("#datatable").dataTable({
-        "columnDefs": [
-            { "sortable": false, "targets": [0] }
-        ],
         stateSave: true
     });
     $("#chkbox_table").dataTable({
-        "columnDefs": [
-            { "sortable": false, "targets": [0] }
-        ],
         order: [[1, "asc"]], //column indexes is zero based
         stateSave: true
     });

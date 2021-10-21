@@ -15,7 +15,7 @@ class MainController extends Controller
      */
     public function index()
     {
-        $data['page_title'] = "Atlantis BPO Quality Assurance";
+        $data['page_title'] = "Atlantis BPO CRM";
         //$data['qa'] = Product::where('status', '!=', 0)->get();
 //        return view('qa.qa_form',$data);
 //        return view('lead_form' ,  $data);
@@ -23,7 +23,7 @@ class MainController extends Controller
 
     public function login()
     {
-        $data['page_title'] = "Atlantis BPO Quality Assurance";
+        $data['page_title'] = "Atlantis BPO CRM";
         //$data['qa'] = Product::where('status', '!=', 0)->get();
         return view('pages.home',$data);
     }

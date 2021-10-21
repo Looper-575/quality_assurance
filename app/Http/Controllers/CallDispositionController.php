@@ -21,9 +21,18 @@ class CallDispositionController extends Controller
     public function list()
     {
         $data['page_title'] = "Atlantis BPO CRM - Call Dispositions List";
-        $data['call_disp_lists'] = CallDisposition::where([
-            'status' => 1 ,
-        ])->with(['call_dispositions_services', 'user'])->groupBy('call_id')->get();
+        $role = Auth::user()->role->slug;
+        if($role === 'csr'){
+            $data['call_disp_lists'] = CallDisposition::where([
+                'status' => 1 ,
+                'added_by' => Auth::user()->user_id
+            ])->with(['call_dispositions_services', 'user'])->groupBy('call_id')->get();
+        } else {
+            $data['call_disp_lists'] = CallDisposition::where([
+                'status' => 1 ,
+            ])->with(['call_dispositions_services', 'user'])->groupBy('call_id')->get();
+        }
+
         return view('call_dipositions.lead_list' , $data);
     }
 
@@ -56,7 +65,7 @@ class CallDispositionController extends Controller
                 $call_disp->initial_bill = $request->initial_bill;
                 $call_disp->monthly_bill = $request->monthly_bill;
                 $call_disp->installation_type = $request->installation_type;
-                $call_disp->installation_date = $request->installation_date ? parse_datetime_store($request->installation_date) : '';
+                $call_disp->installation_date = $request->installation_date ? parse_datetime_store($request->installation_date) : null;
                 $call_disp->order_confirmation_number = $request->order_confirmation_number;
                 $call_disp->order_number = $request->order_number;
                 $call_disp->pre_payment = $request->pre_payment;
@@ -126,7 +135,7 @@ class CallDispositionController extends Controller
                     'initial_bill' => $request->initial_bill,
                     'monthly_bill' => $request->monthly_bill,
                     'installation_type' => $request->installation_type,
-                    'installation_date' => $request->installation_date ? parse_datetime_store($request->installation_date) : '' ,
+                    'installation_date' => $request->installation_date ? parse_datetime_store($request->installation_date) : null,
                     'order_confirmation_number' => $request->order_confirmation_number,
                     'order_number' => $request->order_number,
                     'services_sold' => $services_sold,

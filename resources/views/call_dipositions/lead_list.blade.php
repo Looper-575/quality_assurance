@@ -4,6 +4,7 @@
     <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
 @endsection
 @section('content')
+    <?php $role = Auth::user()->role->title ?>
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -18,32 +19,33 @@
                             <thead>
                             <tr>
                                 <th>S.No.</th>
-                                <th>Added On</th>
                                 <th>DID</th>
-                                <th>Service Address</th>
-                                <th>Phone Number</th>
-                                <th>Customer Name</th>
-                                <th>Order Number</th>
                                 <th>Account Number</th>
+                                <th>Confirmation Number</th>
+                                <th>Order Number</th>
+                                <th>Customer Name</th>
+                                <th>Phone Number</th>
+                                <th>Service Address</th>
                                 <th>Provider Name</th>
                                 <th>Services Sold</th>
                                 <th>Agent Name</th>
+                                <th>Added On</th>
                                 <th>Action</th>
                             </tr>
                             </thead>
-                            <?php $i=1 ?>
+                            <?php $sno=1 ?>
                             <tbody>
                             @foreach ($call_disp_lists as $call_disp_list)
                                 <tr>
-                                    <td>{{ $i++ }}</td>
-                                    <td>{{ parse_datetime_get($call_disp_list->added_on) }}</td>
+                                    <td>{{ $sno++ }}</td>
                                     <td>{{ $call_disp_list->did }}</td>
-                                    <td>{{ $call_disp_list->service_address }}</td>
-                                    <td>{{ $call_disp_list->phone_number }}</td>
-                                    <td>{{ $call_disp_list->customer_name }}</td>
-                                    <td>{{ $call_disp_list->order_number }}</td>
                                     <td>{{ $call_disp_list->account_number }}</td>
-                                    <?php
+                                    <td>{{ $call_disp_list->order_confirmation_number }}</td>
+                                    <td>{{ $call_disp_list->order_number }}</td>
+                                    <td>{{ $call_disp_list->customer_name }}</td>
+                                    <td>{{ $call_disp_list->phone_number }}</td>
+                                    <td>{{ $call_disp_list->service_address }}</td>
+                                <?php
                                     $providers=null;
                                     for($i=0; $i<count($call_disp_list->call_dispositions_services); $i++) {
                                         $providers .= $call_disp_list->call_dispositions_services[$i]->provider_name.', ';
@@ -52,10 +54,15 @@
                                     <td>{{ $providers }}</td>
                                     <td>{{ $call_disp_list->services_sold }}</td>
                                     <td>{{ $call_disp_list->user->full_name }}</td>
+                                    <td>{{ parse_datetime_get($call_disp_list->added_on) }}</td>
                                     <td>
-                                        <button type="button" onclick="view_lead(this)" value="{{$call_disp_list->call_id}}" class="btn btn-info"> Show </button>
-                                        <a class="btn btn-primary" href="{{route('lead_edit' , $call_disp_list->call_id)}}"> Edit </a>
-                                        <button type="button" onclick="delete_lead(this);" value="{{$call_disp_list->call_id}}" class="btn btn-danger" >Delete</button>
+                                        <button type="button" title="View" onclick="view_lead(this)" value="{{$call_disp_list->call_id}}" class="btn btn-info"> <i class="fa fa-eye"></i> </button>
+                                        @if($role === 'Admin' || $role === 'Manager' || $role === 'Supervisor')
+                                            <a title="Edit" class="btn btn-primary" href="{{route('lead_edit' , $call_disp_list->call_id)}}"> <i class="fa fa-edit"></i> </a>
+                                        @endif
+                                        @if($role === 'Admin')
+                                            <button title="Delete" type="button" onclick="delete_lead(this);" value="{{$call_disp_list->call_id}}" class="btn btn-danger" ><i class="fa fa-trash"></i></button>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

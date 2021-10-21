@@ -57,6 +57,11 @@
                             <input required type="number" class="form-control" name="monthly_bill" id="monthly_bill">
                         </div>
                         <div class="form-group">
+                            <label class="form-check-label" for="account_number">Account Number</label>
+                            <input required type="number" class="form-control" name="account_number"
+                                   id="account_number">
+                        </div>
+                        <div class="form-group">
                             <label class="form-check-label" for="confirmation_number">Order Confirmation Number</label>
                             <input required type="number" class="form-control" name="order_confirmation_number"
                                    id="confirmation_number">
@@ -65,15 +70,9 @@
                             <label class="form-check-label" for="order_number">Order Number</label>
                             <input required type="number" class="form-control" name="order_number" id="order_number">
                         </div>
-                        <div class="form-group">
-                            <label class="form-check-label" for="account_number">Account Number</label>
-                            <input required type="number" class="form-control" name="account_number"
-                                   id="account_number">
-                        </div>
                         <div class="form-group" id="prof_install" style="display: none">
                             <label class="form-check-label" for="installation_date">Installation Date</label>
-                            <input type="datetime-local" class="form-control" name="installation_date"
-                                   id="installation_date">
+                            <input type="datetime-local" class="form-control" name="installation_date" id="installation_date">
                         </div>
                         <div class="form-group" id="new_phone_div" style="display: none">
                             <label class="form-check-label" for="new_phone">New Phone Number</label>

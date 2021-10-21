@@ -50,16 +50,16 @@
                             <input type="number" class="form-control" name="monthly_bill" value="{{$lead_edit->monthly_bill}}" id="monthly_bill">
                         </div>
                         <div class="form-group">
+                            <label class="form-check-label" for="account_number">Account Number</label>
+                            <input type="number" class="form-control" name="account_number" value="{{$lead_edit->account_number}}" id="account_number">
+                        </div>
+                        <div class="form-group">
                             <label class="form-check-label" for="order_confirmation_number">Order Confirmation Number</label>
                             <input type="number" class="form-control" name="order_confirmation_number" value="{{$lead_edit->order_confirmation_number }}" id="order_confirmation_number">
                         </div>
                         <div class="form-group">
                             <label class="form-check-label" for="order_number">Order Number</label>
                             <input type="number" class="form-control" name="order_number" value="{{$lead_edit->order_number}}" id="order_number">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-check-label" for="account_number">Account Number</label>
-                            <input type="number" class="form-control" name="account_number" value="{{$lead_edit->account_number}}" id="account_number">
                         </div>
                         <div class="form-group" id="prof_install" style="display: {{$lead_edit->installation_type=='2' ? 'block' : 'none'}}">
                             <label class="form-check-label" for="installation_date">Installation Date</label>
@@ -329,7 +329,7 @@
                     </div>
                     <div class="col-12">
                         <button class="btn btn-danger float-right ml-3" type="button" onclick="window.location.href='{{route('lead_list')}}'">Cancel</button>
-                        <button class="btn btn-danger float-right ml-3" type="reset">Reset</button>
+                        <button class="btn btn-info float-right ml-3" type="reset">Reset</button>
                         <button class="btn btn-primary float-right" type="submit"> Update</button>
                     </div>
                 </div>

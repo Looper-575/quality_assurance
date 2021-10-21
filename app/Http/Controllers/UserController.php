@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Models\UserRole;
 use App\Models\User;
@@ -17,7 +18,7 @@ class UserController extends Controller
         if(Auth::user() && Auth::user()->user_id){
             return redirect('home');
         }
-        $data['page_title'] = "Atlantis BPO Quality Assurance";
+        $data['page_title'] = "Atlantis BPO CRM";
         return view('auth.login_form',$data);
     }
     public function list()
@@ -30,13 +31,17 @@ class UserController extends Controller
     {
         $data['page_title'] = "Atlantis BPO CRM - Users Form";
         $data['user_roles'] = UserRole::where('status',1)->get();
+        DB::enableQueryLog();
         $data['managers'] = User::where([
             'status' => 1,
+        ])->Where([
+            'role_id' => 3,
+        ])->orWhere([
             'role_id' => 2,
         ])->orWhere([
-            'status' => 1,
-            'role_id' => 3,
+            'role_id' => 1,
         ])->get();
+
         if(isset($request->user_id)){
             $data['user'] = User::where('user_id',$request->user_id)->get()[0];
         } else {
@@ -55,7 +60,7 @@ class UserController extends Controller
                 'email'=>$request->input('email'),
                 'password'=>encrypt_password($request->input('password')),
                 'status'=>1
-            ])->get();
+            ])->with(['role'])->get();
             if(count($user)>0) {
                 Auth::login($user[0]);
                 $response['status'] = "Success";
@@ -153,7 +158,6 @@ class UserController extends Controller
         }
         return response()->json($response);
     }
-
     Public function delete(Request $request)
     {
         $role = User::where('user_id', $request->user_id)->update([

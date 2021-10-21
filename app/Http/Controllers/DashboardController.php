@@ -15,11 +15,11 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        $data['page_title'] = "Atlantis BPO Quality Assurance";
+        $data['page_title'] = "Atlantis BPO CRM";
         return view('dashboard.d1',$data);
     }
 
-    
+
 
     protected function send_contact_email($name, $email,$comment)
     {

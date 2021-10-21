@@ -41,13 +41,61 @@
                                     <td>{{ $user_list->contact_number }}</td>
                                     <td>{{ isset($user_list->manager->full_name) ? $user_list->manager->full_name : '' }}</td>
                                     <td>
-                                        <button class="btn btn-primary edit_user" id="{{$user_list->user_id}}">Edit</button>
-                                        <button class="btn btn-danger" onclick="delete_user(this);" value="{{$user_list->user_id}}">Delete</button>
+                                        <button title="Edit" class="btn btn-primary edit_user" id="{{$user_list->user_id}}"><i class="fa fa-edit"></i></button>
+                                        <button title="Delete" class="btn btn-danger" onclick="delete_user(this);" value="{{$user_list->user_id}}"><i class="fa fa-trash"></i></button>
+                                        <button title="Change Password" class="btn btn-info" onclick="change_password(this);" value="{{$user_list->user_id}}"><i class="fa fa-key"></i></button>
                                     </td>
                                 </tr>
                             @endforeach
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="background_fade" style="z-index:9999999; height: 100% !important; min-height: 100%; width: 100%; position: fixed; top: 0; background-color: rgba(0, 0, 0, 0.7);display:none;">
+        <div id="processing" style="z-index:99999999;display: block; padding-right: 17px;" class="modal fade show" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="formModal">Change Password</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="">
+                            <div class="form-group">
+                                <label>Username</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <i class="fas fa-envelope"></i>
+                                        </div>
+                                    </div>
+                                    <input type="text" class="form-control" placeholder="Email" name="email">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Password</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <i class="fas fa-lock"></i>
+                                        </div>
+                                    </div>
+                                    <input type="password" class="form-control" placeholder="Password" name="password">
+                                </div>
+                            </div>
+                            <div class="form-group mb-0">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" name="remember" class="custom-control-input" id="remember-me">
+                                    <label class="custom-control-label" for="remember-me">Remember Me</label>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-primary m-t-15 waves-effect">LOGIN</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -81,6 +129,7 @@
             let arr = [a,b];
             call_ajax_with_functions('', '{{route('user_save')}}', data, arr);
         }
+
         $('.edit_user').click(function () {
             let data = new FormData();
             data.append('user_id', this.id);
@@ -109,6 +158,9 @@
                     call_ajax('', '{{route('user_delete')}}', data);
                 }
             })
+        }
+        function change_password() {
+            $('#change_pass_modal').modal('show');
         }
     </script>
 @endsection
