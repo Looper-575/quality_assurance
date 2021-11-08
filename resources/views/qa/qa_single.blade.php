@@ -40,13 +40,11 @@
         </td>
         <td>
             Prompt System: <strong>{{$status_arr[$qa_data->equipment_system]}}</strong><br>
-
         </td>
         </tr>
         <tr>
             <th>Courtesy</th>
             <th>Using Hold</th>
-
         </tr>
         <tr>
         <td>
@@ -98,6 +96,9 @@
             Fabricating Information: <strong>{{$status_arr[$qa_data->automatic_fail_fabricating]}}</strong><br>
             Other: <strong>{{$status_arr[$qa_data->automatic_fail_other]}}</strong><br>
         </td>
+        </tr>
+        <tr> 
+            <td colspan="2"><strong>Comments</strong>: {{$qa_data->additional_comment}}</td>
         </tr>
     </table>
 </div>

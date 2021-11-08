@@ -1,4 +1,3 @@
-<?php $role = Auth::user()->role->title ?>
 <div class="main-sidebar sidebar-style-2">
     <aside id="sidebar-wrapper">
         <div class="sidebar-brand">
@@ -7,14 +6,16 @@
                 <img class="logo-name" alt="image" src="{{ asset('assets/img/logo-text.png') }}" style="width: 90px" />
             </a>
         </div>
+        <?php $role = Auth::user()->role->title ?>
+
         <ul class="sidebar-menu">
             <li class="menu-header">Main</li>
             <li class="{{ @request()->is('home') ? 'active' : '' }}">
                 <a href="{{route('dashboard')}}" class="nav-link"><i data-feather="monitor"></i><span>Dashboard</span></a>
             </li>
-            @if($role === 'Admin' || $role === 'Manager' || $role === 'Supervisor' || $role === 'Customer Services Representative')
+            @if($role === 'Admin' || $role === 'Manager' || $role === 'Team Lead' || $role === 'Customer Services Representative')
                 <li class="dropdown">
-                    <a href="#" class="menu-toggle nav-link has-dropdown {{ @request()->is('lead_form') || @request()->is('lead_list')  ? 'toggled' : '' }}"><i data-feather="briefcase"></i><span>Call Disposition</span></a>
+                    <a href="#" class="menu-toggle nav-link has-dropdown {{ @request()->is('lead_form') || @request()->is('lead_list')  ? 'toggled' : '' }}"><i data-feather="phone"></i><span>Call Disposition</span></a>
                     <ul class="dropdown-menu" style="display:  {{ @request()->is('lead_form') || @request()->is('lead_list')  ? 'block' : 'none' }}">
                         <li class="{{ @request()->is('lead_form') ? 'active' : '' }}">
                             <a href="{{route('lead_form')}}" class="nav-link"><i data-feather="list"></i><span>Form</span></a>
@@ -25,7 +26,7 @@
                     </ul>
                 </li>
             @endif
-            @if($role === 'Admin' || $role === 'Manager' || $role === 'Supervisor' || $role === 'QA')
+            @if($role === 'Admin' || $role === 'Manager' || $role === 'Team Lead' || $role === 'QA')
                 <li class="dropdown">
                     <a href="#" class="menu-toggle nav-link has-dropdown {{ @request()->is('qa_form') || @request()->is('qa_list')  ? 'toggled' : '' }}"><i data-feather="briefcase"></i><span>Quality Assurance</span></a>
                     <ul class="dropdown-menu" style="display:  {{ @request()->is('qa_form') || @request()->is('qa_list')  ? 'block' : 'none' }}">

@@ -19,8 +19,10 @@ class UserController extends Controller
             return redirect('home');
         }
         $data['page_title'] = "Atlantis BPO CRM";
-        return view('auth.login_form',$data);
+        // die("dffdsafdsf");
+        return view('Auth.login_form',$data);
     }
+
     public function list()
     {
         $data['page_title'] = "Atlantis BPO CRM - Users List";
@@ -171,5 +173,16 @@ class UserController extends Controller
     {
         Auth::logout();
         return redirect('login');
+    }
+    public function change_password(Request $request)
+    {
+        User::where([
+            'user_id' => $request->user_id,
+        ])->update([
+            'password' => encrypt_password($request->password)
+        ]);
+        $response['status'] = "Success";
+        $response['result'] = "Password Updated Successfully";
+        return response()->json($response);
     }
 }

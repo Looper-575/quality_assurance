@@ -14,7 +14,7 @@
                 <div class="row mb-2">
                     <div class="col-6 mb-2">
                         <label  for="agent_id"><strong> Rep Name  </strong> </label>
-                        <select class="form-control" name="rep_name" id="" required>
+                        <select class="form-control select2" name="rep_name" id="" required>
                             <option class="form-control" value="" selected>Plese Select</option>
                             @foreach($agents as $agent)
                             <option value="{{$agent->user_id}}">{{$agent->full_name}}</option>

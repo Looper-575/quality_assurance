@@ -19,7 +19,10 @@ class DashboardController extends Controller
         return view('dashboard.d1',$data);
     }
 
-
+    public function default()
+    {
+        return redirect('home');
+    }
 
     protected function send_contact_email($name, $email,$comment)
     {

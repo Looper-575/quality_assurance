@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Enquiry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use App\Models\CallDisposition;
-use App\Models\CallDispositionsService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\CallDisposition;
+use App\Models\CallDispositionsService;
+use App\Models\CallDispositionsDid;
+use function Couchbase\defaultDecoder;
+
 
 class CallDispositionController extends Controller
 {
@@ -16,7 +19,27 @@ class CallDispositionController extends Controller
     {
         $data['page_title'] = "Atlantis BPO CRM - Call Disposition Form";
         return view('call_dipositions.lead_form',$data);
+
     }
+
+    public function show(Request $request)
+    {
+        $data['lead_data'] = CallDisposition::where([
+            'call_id' => $request->call_id,
+        ])->with('call_dispositions_services')->get()[0];
+        return view('call_dipositions.lead_view' , $data);
+    }
+
+    public function call_disposition_did()
+    {
+
+        $data['lead_did_data'] = CallDispositionsDid::where([
+            'status' => 1,
+        ])->get();
+
+        return view('call_dipositions.partials.sale_lead_form', $data);
+    }
+
 
     public function list()
     {
@@ -26,75 +49,114 @@ class CallDispositionController extends Controller
             $data['call_disp_lists'] = CallDisposition::where([
                 'status' => 1 ,
                 'added_by' => Auth::user()->user_id
-            ])->with(['call_dispositions_services', 'user'])->groupBy('call_id')->get();
+            ])->with(['call_dispositions_services' , 'user' ])->groupBy('call_id')->get();
         } else {
             $data['call_disp_lists'] = CallDisposition::where([
                 'status' => 1 ,
-            ])->with(['call_dispositions_services', 'user'])->groupBy('call_id')->get();
+            ])->with(['call_dispositions_services' ,'user'])->groupBy('call_id')->get();
         }
-
         return view('call_dipositions.lead_list' , $data);
     }
 
     public  function save(Request $request)
     {
-        $validator = Validator::make($request->all(),[
-            'was_mobile_pitched'=> 'required',
-            'service_address'=> 'required',
-            'phone_number'=>'required',
-            'email'=> 'required',
-            'initial_bill'=> 'required',
-            'monthly_bill'=> 'required',
-            'installation_type'=> 'required',
-            'order_confirmation_number'=> 'required',
-            'order_number'=> 'required',
-            'pre_payment'=> 'required',
-            'account_number'=> 'required',
-        ]);
-        if ($validator->passes()) {
-            DB::beginTransaction();
-            try {
-                $call_disp = new CallDisposition;
-                $call_disp->added_by = Auth::user()->user_id;
-                $call_disp->did = $request->did;
-                $call_disp->was_mobile_pitched = $request->was_mobile_pitched;
-                $call_disp->customer_name = $request->customer_name;
-                $call_disp->service_address = $request->service_address;
-                $call_disp->phone_number = $request->phone_number;
-                $call_disp->email = $request->email;
-                $call_disp->initial_bill = $request->initial_bill;
-                $call_disp->monthly_bill = $request->monthly_bill;
-                $call_disp->installation_type = $request->installation_type;
-                $call_disp->installation_date = $request->installation_date ? parse_datetime_store($request->installation_date) : null;
-                $call_disp->order_confirmation_number = $request->order_confirmation_number;
-                $call_disp->order_number = $request->order_number;
-                $call_disp->pre_payment = $request->pre_payment;
-                $call_disp->account_number = $request->account_number;
-                $call_disp->remarks = $request->remarks;
-                if(isset($request->mobile_lines)){
-                    $call_disp->mobile_lines = $request->mobile_lines;
+        if($request->disposition_type == 'Sale Made')
+        {
+            $validator = Validator::make($request->all(), [
+                'did_id' => 'required',
+                'disposition_type' => 'required',
+                'was_mobile_pitched' => 'required',
+                'customer_name' => 'required',
+                'service_address' => 'required',
+                'phone_number' => 'required',
+                'email' => 'required',
+//                'initial_bill' => 'required',
+//                'monthly_bill' => 'required',
+                'installation_type' => 'required',
+                'order_confirmation_number' => 'required',
+                'order_number' => 'required',
+                'pre_payment' => 'required',
+                'account_number' => 'required',
+            ]);
+            if ($validator->passes()) {
+                DB::beginTransaction();
+                try {
+
+                    $call_disp = new CallDisposition;
+                    $call_disp->added_by = Auth::user()->user_id;
+                    $call_disp->did_id = $request->did_id;
+                    $call_disp->disposition_type = $request->disposition_type;
+                    $call_disp->was_mobile_pitched = $request->was_mobile_pitched;
+                    $call_disp->customer_name = $request->customer_name;
+                    $call_disp->service_address = $request->service_address;
+                    $call_disp->phone_number = $request->phone_number;
+                    $call_disp->email = $request->email;
+//                    $call_disp->initial_bill = $request->initial_bill;
+//                    $call_disp->monthly_bill = $request->monthly_bill;
+                    $call_disp->installation_type = $request->installation_type;
+                    $call_disp->installation_date = $request->installation_date ? parse_datetime_store($request->installation_date) : null;
+                    $call_disp->order_confirmation_number = $request->order_confirmation_number;
+                    $call_disp->order_number = $request->order_number;
+                    $call_disp->pre_payment = $request->pre_payment;
+                    $call_disp->account_number = $request->account_number;
+
+                    if (isset($request->mobile_lines)) {
+                        $call_disp->mobile_lines = $request->mobile_lines;
+                    }
+                    if (isset($request->new_phone_number)) {
+                        $call_disp->new_phone_number = $request->new_phone_number;
+                    }
+                    $call_disp->save();
+                    $call_disp->fresh();
+                    $call_id = $call_disp->call_id;
+                    $services_sold = $this->add_services($call_id, $request);
+                    $call_disp->services_sold = $services_sold;
+                    $call_disp->save();
+                    DB::commit();
+                    $response['status'] = 'success';
+                    $response['result'] = "Added Successfully";
+                } catch (Exception $ex) {
+                    DB::rollback();
+                    $response['status'] = 'failure';
+                    $response['result'] = "Unexpected Db Error";
                 }
-                if(isset($request->new_phone_number)){
-                    $call_disp->new_phone_number = $request->new_phone_number;
-                }
-                $call_disp->save();
-                $call_disp->fresh();
-                $call_id = $call_disp->call_id;
-                $services_sold = $this->add_services($call_id, $request);
-                $call_disp->services_sold = $services_sold;
-                $call_disp->save();
-                DB::commit();
-                $response['status'] = 'success';
-                $response['result'] = "Added Successfully";
-            } catch(Exception $ex) {
-                DB::rollback();
-                $response['status'] = 'failure';
-                $response['result'] = "Unexpected Db Error";
             }
-        } else {
-            $response['status'] = 'failure';
-            $response['result'] = $validator->errors()->toJson();
+            else {
+                $response['status'] = 'failure';
+                $response['result'] = $validator->errors()->toJson();
+            }
         }
+        else
+        {
+            $validator = Validator::make($request->all(),[
+                'phone_number' => 'required',
+                'customer_name' => 'required',
+                'comments' => 'required',
+            ]);
+            if ($validator->passes()) {
+                 DB::beginTransaction();
+                try {
+                    $call_disp = new CallDisposition;
+                    $call_disp->added_by = Auth::user()->user_id;
+                    $call_disp->disposition_type = $request->disposition_type;
+                    $call_disp->customer_name = $request->customer_name;
+                    $call_disp->phone_number = $request->phone_number;
+                    $call_disp->comments = $request->comments;
+                    $call_disp->save();
+                    DB::commit();
+                    $response['status'] = 'success';
+                    $response['result'] = "Added Successfully";
+                } catch (Exception $e){
+                    DB::rollback();
+                    $response['status'] = 'failure';
+                    $response['result'] = "Unexpected Db Error";
+                }
+            }
+        }
+//        else {
+//            $response['status'] = 'failure';
+//            $response['result'] = $validator->errors()->toJson();
+//        }
         return response()->json($response);
     }
 
@@ -107,57 +169,86 @@ class CallDispositionController extends Controller
 
     public  function update(Request $request ,$call_id)
     {
-        $validator = Validator::make($request->all(),[
-            'was_mobile_pitched'=> 'required',
-            'service_address'=> 'required',
-            'phone_number'=>'required',
-            'email'=> 'required',
-            'initial_bill'=> 'required',
-            'monthly_bill'=> 'required',
-            'installation_type'=> 'required',
-            'order_confirmation_number'=> 'required',
-            'order_number'=> 'required',
-            'pre_payment'=> 'required',
-            'account_number'=> 'required',
-        ]);
-        if ($validator->passes()) {
-            DB::beginTransaction();
-            try {
-                CallDispositionsService::where('call_id', $call_id)->delete();
-                $services_sold = $this->add_services($call_id, $request);
-                $lead_update = CallDisposition::where('call_id', $call_id)->update([
-                    'did' => $request->did,
-                    'was_mobile_pitched' => $request->was_mobile_pitched,
-                    'customer_name' => $request->customer_name,
-                    'service_address' => $request->service_address,
-                    'phone_number' => $request->phone_number,
-                    'email' => $request->email,
-                    'initial_bill' => $request->initial_bill,
-                    'monthly_bill' => $request->monthly_bill,
-                    'installation_type' => $request->installation_type,
-                    'installation_date' => $request->installation_date ? parse_datetime_store($request->installation_date) : null,
-                    'order_confirmation_number' => $request->order_confirmation_number,
-                    'order_number' => $request->order_number,
-                    'services_sold' => $services_sold,
-                    'pre_payment' => $request->pre_payment,
-                    'account_number' => $request->account_number,
-                    'remarks' => $request->remarks,
-                    'mobile_lines' => $request->mobile_lines,
-                    'new_phone_number' => $request->new_phone_number,
-                    'modified_by' => Auth::user()->user_id,
-                ]);
-                DB::commit();
-                $response['status'] = 'success';
-                $response['result']= "Updated Successfully";
-            } catch(Exception $e) {
-                DB::rollBack();
+        if($request->disposition_type === 'Sale Made'){
+            $validator = Validator::make($request->all(),[
+                'was_mobile_pitched'=> 'required',
+                'service_address'=> 'required',
+                'phone_number'=>'required',
+                'email'=> 'required',
+//                'initial_bill'=> 'required',
+//                'monthly_bill'=> 'required',
+                'installation_type'=> 'required',
+                'order_confirmation_number'=> 'required',
+                'order_number'=> 'required',
+                'pre_payment'=> 'required',
+                'account_number'=> 'required',
+            ]);
+            if ($validator->passes()) {
+                DB::beginTransaction();
+                try {
+                    CallDispositionsService::where('call_id', $call_id)->delete();
+                    $services_sold = $this->add_services($call_id, $request);
+                    $lead_update = CallDisposition::where('call_id', $call_id)->update([
+
+                        'did_id' => $request->did_id,
+                        'was_mobile_pitched' => $request->was_mobile_pitched,
+                        'customer_name' => $request->customer_name,
+                        'service_address' => $request->service_address,
+                        'phone_number' => $request->phone_number,
+                        'email' => $request->email,
+                       /* 'initial_bill' => $request->initial_bill,
+                        'monthly_bill' => $request->monthly_bill,*/
+                        'installation_type' => $request->installation_type,
+                        'installation_date' => $request->installation_date ? parse_datetime_store($request->installation_date) : null,
+                        'order_confirmation_number' => $request->order_confirmation_number,
+                        'order_number' => $request->order_number,
+                        'services_sold' => $services_sold,
+                        'pre_payment' => $request->pre_payment,
+                        'account_number' => $request->account_number,
+                        'comments' => $request->comments,
+                        'mobile_lines' => $request->mobile_lines,
+                        'new_phone_number' => $request->new_phone_number,
+                        'modified_by' => Auth::user()->user_id,
+                    ]);
+                    DB::commit();
+                    $response['status'] = 'success';
+                    $response['result']= "Updated Successfully";
+                } catch(Exception $e) {
+                    DB::rollBack();
+                    $response['status'] = 'failure';
+                    $response['result'] = "Unexpected Db Error";
+                }
+            } else {
                 $response['status'] = 'failure';
-                $response['result'] = "Unexpected Db Error";
+                $response['result']= $validator->errors()->toJson();
             }
         } else {
-            $response['status'] = 'failure';
-            $response['result']= $validator->errors()->toJson();
+            $validator = Validator::make($request->all(),[
+                'phone_number'=>'required',
+                'customer_name' => 'required',
+                'comments' => 'required',
+            ]);
+            if($validator->passes()){
+                DB::beginTransaction();
+                try {
+                    $lead_update = CallDisposition::where('call_id', $call_id)->update([
+
+                        'customer_name' => $request->customer_name,
+                        'phone_number' => $request->phone_number,
+                        'comments' => $request->comments,
+                        'modified_by' => Auth::user()->user_id,
+                ]);
+                    DB::commit();
+                    $response['status'] = 'success';
+                    $response['result']= "Updated Successfully";
+                } catch(Exception $e) {
+                    DB::rollBack();
+                    $response['status'] = 'failure';
+                    $response['result'] = "Unexpected Db Error";
+                }
+            }
         }
+
         return response()->json($response);
     }
 
@@ -285,7 +376,7 @@ class CallDispositionController extends Controller
             $call_disp_service->cable = isset($request->o_cable) ? $request->o_cable : 0;
             isset($request->o_cable ) ? $services_sold++ : 0;
             $call_disp_service->phone = isset($request->o_phone) ? $request->o_phone : 0;
-            isset($request->sp_phone ) ? $services_sold++ : 0;
+            isset($request->o_phone ) ? $services_sold++ : 0;
             $call_disp_service->mobile = 0 ;
             $call_disp_service->save();
         }

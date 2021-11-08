@@ -49,7 +49,7 @@ class CallDispositionsService extends Authenticatable
 
 
     public function call_disposition(){
-       return $this->belongsTo(CallDisposition::class, 'call_id', 'call_id' );
+       return $this->BelongsTo(CallDisposition::class, 'call_id', 'call_id' );
     }
 
 }

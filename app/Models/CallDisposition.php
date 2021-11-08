@@ -50,8 +50,15 @@ class CallDisposition extends Authenticatable
         return $this->hasMany(CallDispositionsService::class, 'call_id' , 'call_id');
     }
 
+    public function call_disposition_did()
+    {
+        return $this->belongsTo(CallDispositionsDid::class , 'did_id' , 'did_id');
+    }
+
     public function user(){
         return $this->belongsTo(User::class, 'added_by' , 'user_id');
     }
+
+
 
 }

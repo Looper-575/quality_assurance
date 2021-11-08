@@ -26,8 +26,8 @@ class QAController extends Controller
 
         $data['page_title'] = "Atlantis BPO CRM - Roles";
         $data['agents'] = User::where([
-            'role_id'=> 2,
-            'status'=> 1,    
+            'role_id'=> 4,
+            'status'=> 1,
             ])->get();
         $data['call_types'] = CallType::get();
         return view('qa.qa_form' , $data);
@@ -92,7 +92,6 @@ class QAController extends Controller
         ]);
 
         if($validator->passes()) {
-            //dd($request);
             $qa = new QualityAssurance;
             $qa->added_by = Auth::user()->user_id;
             $qa->agent_id	= $request->rep_name;

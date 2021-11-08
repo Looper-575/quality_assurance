@@ -2,7 +2,7 @@
     <div class="form-inline mr-auto">
         <ul class="navbar-nav mr-3">
             <li>
-                <a href="#" data-toggle="sidebar" class="nav-link nav-link-lg collapse-btn">
+                <a href="#" id="nav_toggle_btn" data-toggle="sidebar" class="nav-link nav-link-lg collapse-btn">
                     <i data-feather="align-justify"></i>
                 </a>
             </li>
@@ -57,9 +57,10 @@
                 <img alt="image" src="{{ asset('assets/img/user.png') }}" class="user-img-radious-style">
                 <span class="d-sm-none d-lg-inline-block"></span>
             </a>
+            <?php $user = Auth::user(); ?>
             <div class="dropdown-menu dropdown-menu-right pullDown">
-                <div class="dropdown-title">Hello Sarah Smith</div>
-                <a href="javascript:;" class="dropdown-item has-icon"><i class="far fa-user"></i> Profile</a>
+                <div class="dropdown-title">{{$user->full_name}}</div>
+                {{--<a href="javascript:;" class="dropdown-item has-icon"><i class="far fa-user"></i> Profile</a>--}}
                 <div class="dropdown-divider"></div>
                 <a href="{{route('logout')}}" class="dropdown-item has-icon text-danger">
                     <i class="fas fa-sign-out-alt"></i>Logout</a>

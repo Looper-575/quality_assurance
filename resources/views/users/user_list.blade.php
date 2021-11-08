@@ -54,55 +54,36 @@
             </div>
         </div>
     </div>
-    <div id="background_fade" style="z-index:9999999; height: 100% !important; min-height: 100%; width: 100%; position: fixed; top: 0; background-color: rgba(0, 0, 0, 0.7);display:none;">
-        <div id="processing" style="z-index:99999999;display: block; padding-right: 17px;" class="modal fade show" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
+@endsection
+@section('footer_scripts')
+    <div id="change_pass_modal" style="z-index:9999999; height: 100% !important; min-height: 100%; width: 100%; position: fixed; top: 0; background-color: rgba(0, 0, 0, 0.7);display:none;">
+        <div style="z-index:99999999;display: block; padding-right: 17px; top: 100px" class="modal fade show" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog change_pass_modal" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="formModal">Change Password</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
+                        <h4 class="modal-title" id="modal_title">Change Password</h4>
+                        <button type="button" class="btn" onclick="$('#change_pass_modal').fadeOut();" aria-hidden="true"><i class="fas fa-times"></i></button>
                     </div>
                     <div class="modal-body">
-                        <form class="">
+                        <form id="change_pass_form">
                             <div class="form-group">
-                                <label>Username</label>
+                                <label for="change_password">Password</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text">
-                                            <i class="fas fa-envelope"></i>
-                                        </div>
+                                        <div class="input-group-text"><i class="fas fa-lock"></i></div>
                                     </div>
-                                    <input type="text" class="form-control" placeholder="Email" name="email">
+                                    @csrf
+                                    <input type="text" id="change_password" class="form-control" placeholder="Password" name="password">
+                                    <input type="hidden" name="user_id" id="c_user_id">
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label>Password</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text">
-                                            <i class="fas fa-lock"></i>
-                                        </div>
-                                    </div>
-                                    <input type="password" class="form-control" placeholder="Password" name="password">
-                                </div>
-                            </div>
-                            <div class="form-group mb-0">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" name="remember" class="custom-control-input" id="remember-me">
-                                    <label class="custom-control-label" for="remember-me">Remember Me</label>
-                                </div>
-                            </div>
-                            <button type="button" class="btn btn-primary m-t-15 waves-effect">LOGIN</button>
+                            <button type="submit" class="btn btn-primary m-t-15 waves-effect">Update Password</button>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-@endsection
-@section('footer_scripts')
     <script src="{{ asset('assets/bundles/jquery-ui/jquery-ui.min.js') }}"></script>
     <script src="{{ asset('assets/bundles/datatables/datatables.min.js') }}"></script>
     <script src="{{ asset('assets/bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js') }}"></script>
@@ -159,8 +140,18 @@
                 }
             })
         }
-        function change_password() {
-            $('#change_pass_modal').modal('show');
+        function change_password(me) {
+            $('#change_pass_modal').fadeIn();
+            $('#c_user_id').val(me.value);
         }
+        $('#change_pass_form').submit(function (e){
+            e.preventDefault();
+            let data = new FormData(this);
+            let a = function () {
+                $('#change_pass_modal').fadeOut();
+            }
+            let arr = [a];
+            call_ajax_with_functions('', '{{route('change_password')}}', data, arr);
+        });
     </script>
 @endsection

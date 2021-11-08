@@ -34,6 +34,7 @@ class LeaveApplicationController extends Controller
         $validator = Validator::make($request->all(),[
             'from'=> 'required',
             'to'=> 'required',
+
             'leave_type' => 'required',
             'half' => 'required_if:leave_type, == , half',
             'medical_report' => 'required_if:leave_type, == , 3',
