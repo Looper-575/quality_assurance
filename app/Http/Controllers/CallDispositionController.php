@@ -50,13 +50,13 @@ class CallDispositionController extends Controller
             $data['call_disp_lists'] = CallDisposition::where([
                 'status' => 1,
                 'added_by' => Auth::user()->user_id
-            ])->with(['call_dispositions_services' , 'user' ])->groupBy('call_id')->get();
+            ])->with(['call_dispositions_services' , 'user' ])->groupBy('call_id')->orderBy('call_id', 'DESC')->limit(500)->get();
         } else {
             $date = get_date();
+            $date2 = date('Y-m-d', strtotime('-1 day', strtotime($date)));
             $data['call_disp_lists'] = CallDisposition::where([
                 'status' => 1,
-            ])->whereDate('added_on', '>=', )
-                ->whereDate('added_on', '<=', parse_date_store($request->to))->
+            ])->whereDate('added_on', '>=', $date2)->whereDate('added_on', '<=', $date)->
             with(['call_dispositions_services'  ,'user'])->groupBy('call_id')->get();
         }
         return view('call_dipositions.dispositions_list' , $data);
