@@ -9,19 +9,19 @@
         @csrf
         <div class="card">
             <div class="card-header" style="justify-content: space-between;">
-                <h4>Lead Form</h4>
+                <h4>Disposition Form</h4>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-12">
                         <div class="form-group">
                             <label class="form-check-label" for="did"> Disposition Type</label>
-                            <input type="text" class="form-control" readonly name="disposition_type" value="  {{$lead_edit->disposition_type}}" id="disposition_type">
-
+                            <input type="text" class="form-control" readonly name="disposition_type_name" value="{{$lead_edit->call_disposition_types->title}}" id="disposition_type">
+                            <input type="hidden" class="form-control" name="disposition_type" value="{{$lead_edit->disposition_type}}" id="disposition_type">
                         </div>
                     </div>
                 </div>
-                @if($lead_edit->disposition_type === 'Sale Made')
+                @if($lead_edit->disposition_type == 1)
                     <div class="row">
                         <div class="col-6">
                             <div class="form-group">
@@ -45,12 +45,13 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-check-label" for="phone_number">Phone Number </label>
-                                <input type="tel" class="form-control" name="phone_number" value="{{$lead_edit->phone_number}}" id="phone_number">
+                                <input type="number" class="form-control" name="phone_number" value="{{$lead_edit->phone_number}}" id="phone_number">
                             </div>
                             <div class="form-group">
                                 <label class="form-check-label" for="email">Email </label>
                                 <input type="email" class="form-control" name="email" value="{{$lead_edit->email}}" id="email">
                             </div>
+
                             <div class="form-group">
                                 <label class="form-check-label" for="account_number">Account Number</label>
                                 <input type="number" class="form-control" name="account_number" value="{{$lead_edit->account_number}}" id="account_number">
@@ -330,7 +331,9 @@
                             </div>
                         </div>
                     </div>
+
                 @else
+
                     <div class="row">
                         <div class="col-6">
                             <div class="form-group">
@@ -339,7 +342,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-check-label" for="phone">Phone</label>
-                                <input required type="text" class="form-control" name="phone_number" id="phone_number" value="{{$lead_edit->phone_number}}">
+                                <input required type="number" class="form-control" name="phone_number" id="phone_number" value="{{$lead_edit->phone_number}}">
                             </div>
                         </div>
                         <div class="col-6">
@@ -379,6 +382,7 @@
                 $('#installation_date').val('');
             }
         });
+
         $('.phone_check').change(function () {
             if (this.checked) {
                 $('#new_phone_div').fadeIn();
@@ -398,6 +402,7 @@
                 }
             }
         });
+
         $('.mobile_check').change(function () {
             if (this.checked) {
                 $('#new_lines_div').fadeIn();

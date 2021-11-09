@@ -60,7 +60,7 @@
             <?php $user = Auth::user(); ?>
             <div class="dropdown-menu dropdown-menu-right pullDown">
                 <div class="dropdown-title">{{$user->full_name}}</div>
-                {{--<a href="javascript:;" class="dropdown-item has-icon"><i class="far fa-user"></i> Profile</a>--}}
+                <a href="javascript:;" class="dropdown-item has-icon"><i class="far fa-user"></i> Profile</a>
                 <div class="dropdown-divider"></div>
                 <a href="{{route('logout')}}" class="dropdown-item has-icon text-danger">
                     <i class="fas fa-sign-out-alt"></i>Logout</a>

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\CallDisposition;
 use App\Models\CallDispositionsService;
 use App\Models\CallDispositionsDid;
+use App\Models\CallDispositionsTypes;
 use function Couchbase\defaultDecoder;
 
 
@@ -18,8 +19,10 @@ class CallDispositionController extends Controller
     public function form()
     {
         $data['page_title'] = "Atlantis BPO CRM - Call Disposition Form";
-        return view('call_dipositions.lead_form',$data);
-
+        $data['disposition_types'] = CallDispositionsTypes::where([
+            'status' => 1,
+        ])->get();
+        return view('call_dipositions.disposition_form',$data);
     }
 
     public function show(Request $request)
@@ -27,7 +30,7 @@ class CallDispositionController extends Controller
         $data['lead_data'] = CallDisposition::where([
             'call_id' => $request->call_id,
         ])->with('call_dispositions_services')->get()[0];
-        return view('call_dipositions.lead_view' , $data);
+        return view('call_dipositions.disposition_view' , $data);
     }
 
     public function call_disposition_did()
@@ -36,10 +39,8 @@ class CallDispositionController extends Controller
         $data['lead_did_data'] = CallDispositionsDid::where([
             'status' => 1,
         ])->get();
-
-        return view('call_dipositions.partials.sale_lead_form', $data);
+        return view('call_dipositions.partials.sale_form', $data);
     }
-
 
     public function list()
     {
@@ -47,20 +48,23 @@ class CallDispositionController extends Controller
         $role = Auth::user()->role->slug;
         if($role === 'csr'){
             $data['call_disp_lists'] = CallDisposition::where([
-                'status' => 1 ,
+                'status' => 1,
                 'added_by' => Auth::user()->user_id
             ])->with(['call_dispositions_services' , 'user' ])->groupBy('call_id')->get();
         } else {
+            $date = get_date();
             $data['call_disp_lists'] = CallDisposition::where([
-                'status' => 1 ,
-            ])->with(['call_dispositions_services' ,'user'])->groupBy('call_id')->get();
+                'status' => 1,
+            ])->whereDate('added_on', '>=', )
+                ->whereDate('added_on', '<=', parse_date_store($request->to))->
+            with(['call_dispositions_services'  ,'user'])->groupBy('call_id')->get();
         }
-        return view('call_dipositions.lead_list' , $data);
+        return view('call_dipositions.dispositions_list' , $data);
     }
 
     public  function save(Request $request)
     {
-        if($request->disposition_type == 'Sale Made')
+        if($request->disposition_type == 1)
         {
             $validator = Validator::make($request->all(), [
                 'did_id' => 'required',
@@ -70,8 +74,6 @@ class CallDispositionController extends Controller
                 'service_address' => 'required',
                 'phone_number' => 'required',
                 'email' => 'required',
-//                'initial_bill' => 'required',
-//                'monthly_bill' => 'required',
                 'installation_type' => 'required',
                 'order_confirmation_number' => 'required',
                 'order_number' => 'required',
@@ -79,20 +81,18 @@ class CallDispositionController extends Controller
                 'account_number' => 'required',
             ]);
             if ($validator->passes()) {
+
                 DB::beginTransaction();
                 try {
-
                     $call_disp = new CallDisposition;
                     $call_disp->added_by = Auth::user()->user_id;
                     $call_disp->did_id = $request->did_id;
-                    $call_disp->disposition_type = $request->disposition_type;
+                    $call_disp->disposition_type = $request->disposition_type ;
                     $call_disp->was_mobile_pitched = $request->was_mobile_pitched;
                     $call_disp->customer_name = $request->customer_name;
                     $call_disp->service_address = $request->service_address;
                     $call_disp->phone_number = $request->phone_number;
                     $call_disp->email = $request->email;
-//                    $call_disp->initial_bill = $request->initial_bill;
-//                    $call_disp->monthly_bill = $request->monthly_bill;
                     $call_disp->installation_type = $request->installation_type;
                     $call_disp->installation_date = $request->installation_date ? parse_datetime_store($request->installation_date) : null;
                     $call_disp->order_confirmation_number = $request->order_confirmation_number;
@@ -125,20 +125,19 @@ class CallDispositionController extends Controller
                 $response['status'] = 'failure';
                 $response['result'] = $validator->errors()->toJson();
             }
-        }
-        else
-        {
+            return response()->json($response);
+        } else  {
             $validator = Validator::make($request->all(),[
                 'phone_number' => 'required',
-                'customer_name' => 'required',
+//                'customer_name' => 'required',
                 'comments' => 'required',
             ]);
             if ($validator->passes()) {
-                 DB::beginTransaction();
+                DB::beginTransaction();
                 try {
                     $call_disp = new CallDisposition;
                     $call_disp->added_by = Auth::user()->user_id;
-                    $call_disp->disposition_type = $request->disposition_type;
+                    $call_disp->disposition_type =$request->disposition_type ;
                     $call_disp->customer_name = $request->customer_name;
                     $call_disp->phone_number = $request->phone_number;
                     $call_disp->comments = $request->comments;
@@ -152,31 +151,29 @@ class CallDispositionController extends Controller
                     $response['result'] = "Unexpected Db Error";
                 }
             }
+            else{
+                $response['status'] = 'failure';
+                $response['result'] = $validator->errors()->toJson();
+            }
+            return response()->json($response);
         }
-//        else {
-//            $response['status'] = 'failure';
-//            $response['result'] = $validator->errors()->toJson();
-//        }
-        return response()->json($response);
     }
 
     public function edit($id)
     {
         $data['page_title'] = "Atlantis BPO CRM - Call Disposition Form";
         $data['lead_edit'] = CallDisposition::where('call_id',$id)->with(['call_dispositions_services'])->get()[0];
-        return view('call_dipositions.lead_edit' , $data);
+        return view('call_dipositions.disposition_edit' , $data);
     }
 
     public  function update(Request $request ,$call_id)
     {
-        if($request->disposition_type === 'Sale Made'){
+        if($request->disposition_type == 1) {
             $validator = Validator::make($request->all(),[
                 'was_mobile_pitched'=> 'required',
                 'service_address'=> 'required',
                 'phone_number'=>'required',
                 'email'=> 'required',
-//                'initial_bill'=> 'required',
-//                'monthly_bill'=> 'required',
                 'installation_type'=> 'required',
                 'order_confirmation_number'=> 'required',
                 'order_number'=> 'required',
@@ -189,15 +186,12 @@ class CallDispositionController extends Controller
                     CallDispositionsService::where('call_id', $call_id)->delete();
                     $services_sold = $this->add_services($call_id, $request);
                     $lead_update = CallDisposition::where('call_id', $call_id)->update([
-
                         'did_id' => $request->did_id,
                         'was_mobile_pitched' => $request->was_mobile_pitched,
                         'customer_name' => $request->customer_name,
                         'service_address' => $request->service_address,
                         'phone_number' => $request->phone_number,
                         'email' => $request->email,
-                       /* 'initial_bill' => $request->initial_bill,
-                        'monthly_bill' => $request->monthly_bill,*/
                         'installation_type' => $request->installation_type,
                         'installation_date' => $request->installation_date ? parse_datetime_store($request->installation_date) : null,
                         'order_confirmation_number' => $request->order_confirmation_number,
@@ -228,16 +222,15 @@ class CallDispositionController extends Controller
                 'customer_name' => 'required',
                 'comments' => 'required',
             ]);
-            if($validator->passes()){
+            if($validator->passes()) {
                 DB::beginTransaction();
                 try {
                     $lead_update = CallDisposition::where('call_id', $call_id)->update([
-
                         'customer_name' => $request->customer_name,
                         'phone_number' => $request->phone_number,
                         'comments' => $request->comments,
                         'modified_by' => Auth::user()->user_id,
-                ]);
+                    ]);
                     DB::commit();
                     $response['status'] = 'success';
                     $response['result']= "Updated Successfully";
@@ -246,9 +239,11 @@ class CallDispositionController extends Controller
                     $response['status'] = 'failure';
                     $response['result'] = "Unexpected Db Error";
                 }
+            } else {
+                $response['status'] = 'failure';
+                $response['result']= $validator->errors()->toJson();
             }
         }
-
         return response()->json($response);
     }
 
@@ -256,6 +251,7 @@ class CallDispositionController extends Controller
     {
         $data = CallDisposition::where('call_id', $request->call_id)->update([
             'status' => 0,
+            'modified_by' => Auth::user()->user_id,
         ]);
         $response['status'] = "Success";
         $response['result'] = "Deleted Successfully";
@@ -302,7 +298,6 @@ class CallDispositionController extends Controller
             $call_disp_service->phone = 0 ;
             $call_disp_service->mobile = 0;
             $call_disp_service->internet = 0;
-
             $call_disp_service->save();
         }
         if(isset($request->earth_link)){

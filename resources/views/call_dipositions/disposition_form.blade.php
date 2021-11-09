@@ -7,7 +7,7 @@
 @section('content')
     <div class="card">
         <div class="card-header" style="justify-content: space-between;">
-            <h4>Lead Form</h4>
+            <h4>Disposition Form</h4>
         </div>
         <div class="card-body">
             <form method="post" id="lead_form" enctype="multipart/form-data">
@@ -15,14 +15,12 @@
                 <div class="row">
                     <div class="col-6">
                         <div class="form-group">
-                            <label class="form-check-label" for="disposition_type">Disposition Type </label>
+                            <label class="form-check-label" for="disposition_type"> Disposition Type </label>
                             <select required name="disposition_type" id="disposition_type" class="form-control">
                                 <option disabled selected>Select</option>
-                                <option value="Sale Made">Sale Made</option>
-                                <option value="Call Back">Call Back</option>
-                                <option value="Customer Service">Customer Service</option>
-                                <option value="Declined Sale">Declined Sale</option>
-                                <option value="No Answer">No Answer</option>
+                                @foreach($disposition_types as $disposition_type)
+                                <option value="{{$disposition_type->disposition_type_id}}">{{$disposition_type->title}}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
@@ -30,13 +28,14 @@
                 <div class="row">
                     <div class="col-12">
                         <div id="main_form">
+
                         </div>
                     </div>
                     <div class="col-12">
                         <button type="button" class="btn btn-danger float-right ml-3"
                                 onclick="window.location.href='{{route('lead_list')}}'">Cancel
                         </button>
-                        <button class="btn btn-primary float-right"> Save</button>
+                        <button type="submit"  class="btn btn-primary float-right"> Save</button>
                     </div>
                 </div>
             </form>
@@ -57,13 +56,12 @@
             call_ajax_with_functions('', '{{route('lead_save')}}', data, arr);
         });
 
-
-
         $('#disposition_type').change(function (){
             let call_type = $(this).val();
             let data = new FormData();
             data.append('_token', "{{csrf_token()}}");
-            if(call_type == 'Sale Made') {
+            data.append('call_type', call_type);
+            if(call_type == '1') {
                 let a = function (){
                     init_form_functions();
                 }
@@ -126,6 +124,5 @@
                 }
             });
         }
-
     </script>
 @endsection

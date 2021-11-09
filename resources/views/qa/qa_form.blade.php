@@ -470,7 +470,7 @@
                         </div>
                     </div>
                     <div class="col-6">
-                        <textarea class="form-control" name="using_hold_comment" id="textarea" rows="2" placeholder="Comments"></textarea>
+                        <textarea class="form-control" name="Closing" id="textarea" rows="2" placeholder="Comments"></textarea>
                     </div>
                 </div>
                 <hr>
@@ -812,11 +812,11 @@
                     }
                 }
                 // Auto Fail Counts
-                let auto_yes_boxes = document.getElementsByClassName('auto_yes_radio');
-                let auto_no_boxes = document.getElementsByClassName('auto_no_radio');
-                let auto_na_boxes = document.getElementsByClassName('auto_na_radio');
-                let auto_yes_count = 0;
-                let auto_no_count = 0;
+                let auto_yes_boxes =  document.getElementsByClassName('auto_yes_radio');
+                let auto_no_boxes  =  document.getElementsByClassName('auto_no_radio');
+                let auto_na_boxes  =  document.getElementsByClassName('auto_na_radio');
+                let auto_yes_count =  0;
+                let auto_no_count  =  0;
                 for(let i=0; i < auto_yes_boxes.length; i++){
                     if(auto_yes_boxes[i].checked){
                         auto_yes_count++;

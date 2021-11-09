@@ -15,7 +15,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-striped" id="leads_datatable">
+                        <table class="table table-striped" id="chkbox_table">
                             <thead>
                             <tr>
                                 <th>S.No.</th>
@@ -35,7 +35,7 @@
                             @foreach ($call_disp_lists as $call_disp_list)
                                 <tr>
                                     <td>{{ $loop->index+1 }}</td>
-                                    <td>{{$call_disp_list->disposition_type}}</td>
+                                    <td>{{ $call_disp_list->call_disposition_types->title}}</td>
                                     <td>{{ isset($call_disp_list->call_disposition_did->title) ? $call_disp_list->call_disposition_did->title : ' ' }}</td>
                                     <td>{{ $call_disp_list->account_number }}<br>{{ $call_disp_list->order_confirmation_number }}<br>{{ $call_disp_list->order_number }}</td>
                                     <td>{{ $call_disp_list->customer_name }}<br>{{ $call_disp_list->phone_number }}</td>
@@ -74,9 +74,7 @@
     <script src="{{ asset('assets/bundles/jquery-ui/jquery-ui.min.js') }}"></script>
     <script src="{{ asset('assets/bundles/datatables/datatables.min.js') }}"></script>
     <script src="{{ asset('assets/bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js') }}"></script>
-    <script src="{{ asset('assets/js/page/moment.min.js') }}"></script>
-    <script src="{{ asset('assets/js/date-uk.js') }}"></script>
-
+    <script src="{{ asset('assets/js/page/datatables.js') }}"></script>
     <script>
         function delete_lead (me) {
             let id = me.value;
@@ -113,11 +111,5 @@
                 $('#nav_toggle_btn')[0].click();
             })
         },300);
-        // $.fn.dataTable.moment('d-m-Y g:i A' );
-        $("#leads_datatable").dataTable({
-            order: [[1, "asc"]], //column indexes is zero based
-            stateSave: true,
-
-        });
     </script>
 @endsection

@@ -24,10 +24,15 @@
         <tr>
             <td>
                 Correct Greetings: <strong>{{$status_arr[$qa_data->greetings_correct]}}</strong><br>
-                Assurity Staement: <strong>{{ $status_arr[$qa_data->greetings_assurity_statement]}}</strong>
+                Assurity Staement: <strong>{{ $status_arr[$qa_data->greetings_assurity_statement]}}</strong><br>
+                <strong>Comments</strong><br>
+                {{$qa_data->greetings_comment}}
+
             </td>
             <td>
-                Customer's Name: <strong>{{$status_arr[$qa_data->customer_name_call]}}</strong>
+                Customer's Name: <strong>{{$status_arr[$qa_data->customer_name_call]}}</strong><br>
+                <Strong>Comments</Strong><br>
+                {{$qa_data->customer_comment}}
             </td>
         </tr>
         <tr>
@@ -36,10 +41,14 @@
         </tr>
         <tr>
         <td>
-            listening Skills: <strong>{{$status_arr[$qa_data->listening_skills]}}</strong>
+            listening Skills: <strong>{{$status_arr[$qa_data->listening_skills]}}</strong><br>
+            <strong>Comments</strong><br>
+            {{$qa_data->listening_comment}}
         </td>
         <td>
             Prompt System: <strong>{{$status_arr[$qa_data->equipment_system]}}</strong><br>
+            <strong>Comments</strong><br>
+            {{$qa_data->equipment_comment}}
         </td>
         </tr>
         <tr>
@@ -53,11 +62,15 @@
             Courtesy Interest: <strong>{{$status_arr[$qa_data->courtesy_interest]}}</strong><br>
             Courtesy Empathy: <strong>{{$status_arr[$qa_data->courtesy_empathy]}}</strong><br>
             Courtesy Apologized: <strong>{{$status_arr[$qa_data->courtesy_Apologized]}}</strong><br>
+            <strong>Comments</strong><br>
+            {{$qa_data->courtesy_comment}}
         </td>
         <td>
             Informed the Customer: <strong>{{$status_arr[$qa_data->using_hold_informed_customer]}}</strong><br>
             Kept in Touch: <strong>{{$status_arr[$qa_data->using_hold_touch]}}</strong><br>
             Thanked the Customer: <strong>{{$status_arr[$qa_data->using_hold_thanked]}}</strong><br>
+            <strong>Comments</strong><br>
+            {{$qa_data->using_hold_comment}}
         </td>
         </tr>
         <tr>
@@ -68,10 +81,14 @@
         <td>
             Quick Recap: <strong>{{$status_arr[$qa_data->closing_recap]}}</strong><br>
             Used Proper Closing: <strong>{{$status_arr[$qa_data->clossing_assistance]}}</strong><br>
+            <strong>Comments</strong><br>
+            {{$qa_data->closing_comment}}
         </td>
         <td>
             Connected to Department: <strong>{{$status_arr[$qa_data->connecting_calls_department]}}</strong><br>
             Informed customer: <strong>{{$status_arr[$qa_data->connecting_calls_customer]}}</strong><br>
+            <strong>Comments</strong><br>
+            {{$qa_data->connecting_calls_comment}}
         </td>
         </tr>
         <tr>
@@ -86,6 +103,9 @@
             Used Grammar: <strong>{{$status_arr[$qa_data->soft_skill_grammar]}}</strong><br>
             Refrained: <strong>{{$status_arr[$qa_data->soft_skill_refrained_company]}}</strong><br>
             Used Positive Words: <strong>{{$status_arr[$qa_data->soft_skill_positive_words]}}</strong><br>
+            <strong>Comments</strong><br>
+            {{$qa_data->soft_skills_comment}}
+
         </td>
         <td>
             Misquoting the Price: <strong>{{$status_arr[$qa_data->automatic_fail_misquoting]}}</strong><br>
@@ -95,10 +115,14 @@
             Changing Customer Details: <strong>{{$status_arr[$qa_data->automatic_fail_changing_details]}}</strong><br>
             Fabricating Information: <strong>{{$status_arr[$qa_data->automatic_fail_fabricating]}}</strong><br>
             Other: <strong>{{$status_arr[$qa_data->automatic_fail_other]}}</strong><br>
+            <strong>Comments</strong><br>
+            {{$qa_data->automatic_fail_comment}}
         </td>
         </tr>
-        <tr> 
-            <td colspan="2"><strong>Comments</strong>: {{$qa_data->additional_comment}}</td>
+        <th>Additional Comments</th>
+        <tr>
+            <td colspan="2">{{$qa_data->additional_comment}}
+            </td>
         </tr>
     </table>
 </div>

@@ -72,7 +72,6 @@ class RolesController extends Controller
                     'modified_by' => Auth::user()->user_id,
                     'title' => $request->title,
                     'slug' => slugify($request->title),
-
                 ]);
                 $response['status'] = "Success";
                 $response['result'] = "Updated Successfully";

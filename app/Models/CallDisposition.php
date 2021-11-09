@@ -22,9 +22,11 @@ class CallDisposition extends Authenticatable
      */
 
     protected $fillable = [
-        'was_mobile_pitched', 'fiscal_month', 'customer_name', 'service_address' , 'phone_number', 'email',
-        'initial_bill', 'monthly_bill' , 'confirmation_number' , 'order_confirmation_number', 'order_number',
-        'installation_date', 'installation', 'new_phone_number', 'mobile_lines'
+         'did_id' , 'disposition_type' ,'was_mobile_pitched',
+         'customer_name', 'service_address' , 'phone_number', 'email',
+         'installation_date', 'installation_type', 'order_confirmation_number', 'order_number', 'pre_payment',
+         'account_number', 'services_sold' , 'new_phone_number', 'mobile_lines', 'comments',
+         'added_by' , '	modified_by',
     ];
 
     /**
@@ -53,6 +55,11 @@ class CallDisposition extends Authenticatable
     public function call_disposition_did()
     {
         return $this->belongsTo(CallDispositionsDid::class , 'did_id' , 'did_id');
+    }
+
+    public function call_disposition_types()
+    {
+        return $this->belongsTo(CallDispositionsTypes::class ,  'disposition_type', 'disposition_type_id');
     }
 
     public function user(){
