@@ -38,7 +38,7 @@
 
         <div class="form-group">
             <label class="form-check-label" for="account_number">Account Number</label>
-            <input required type="number" class="form-control" name="account_number"
+            <input  type="number" class="form-control" name="account_number"
                    id="account_number">
         </div>
         <div class="form-group">
@@ -48,7 +48,7 @@
         </div>
         <div class="form-group">
             <label class="form-check-label" for="order_number">Order Number</label>
-            <input required type="number" class="form-control" name="order_number" id="order_number">
+            <input  type="number" class="form-control" name="order_number" id="order_number">
         </div>
         <div class="form-group" id="prof_install" style="display: none">
             <label class="form-check-label" for="installation_date">Installation Date</label>

@@ -39,8 +39,6 @@ class QAController extends Controller
         $data['qa_lists'] = QualityAssurance::where([
             'status'=> 1,
             ])->with(['agent','call_type'])->get();
-           // dd($data);
-        // $data['qa_single_data'] = QualityAssurance::find($id)->get();
         return view('qa.qa_list', $data);
     }
 

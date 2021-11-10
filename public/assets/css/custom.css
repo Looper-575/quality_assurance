@@ -699,3 +699,8 @@ input#optimum:checked + .o_checks, input#cox:checked + .c_checks, input#others:c
     display: block !important;
     margin-top: 5px;
 }
+.select2-container{
+    clear: both !important;
+
+    /*/width: 100%;*/
+}

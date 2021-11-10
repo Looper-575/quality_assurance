@@ -24,8 +24,11 @@ Route::get('/route-cache', function() {
     Route::post('/do_login', 'App\Http\Controllers\UserController@login')->name('do_login');
 
 Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
-    //Routes for Users ///////////////////////
+    // Routes for dashboard
     Route::get('/home', 'App\Http\Controllers\DashboardController@index')->name('dashboard');
+    Route::get('/sale_dashboard' , 'App\Http\Controllers\DashboardController@sale_made_count')->name('sale_dashboard');
+
+    //Routes for Users ///////////////////////
     Route::get('/users', 'App\Http\Controllers\UserController@list')->name('users');
     Route::post('/user_form', 'App\Http\Controllers\UserController@user_form')->name('user_form');
     Route::post('/user_save', 'App\Http\Controllers\UserController@save')->name('user_save');
@@ -63,6 +66,7 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     // Routes for Lead Report
     Route::get('/lead_report' , 'App\Http\Controllers\ReportController@disposition_report_form')->name('lead_report');
     Route::post('/generate_disposition_report' , 'App\Http\Controllers\ReportController@generate_disposition_report')->name('generate_disposition_report');
+
     // Routes for leave application //////////////////////////////////
     Route::get('/leave_form' , 'App\Http\Controllers\LeaveApplicationController@index')->name('leave_form');
     Route::post('/leave_save' , 'App\Http\Controllers\LeaveApplicationController@save')->name('leave_save');

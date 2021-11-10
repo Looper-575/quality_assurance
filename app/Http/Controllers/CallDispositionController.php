@@ -76,9 +76,9 @@ class CallDispositionController extends Controller
                 'email' => 'required',
                 'installation_type' => 'required',
                 'order_confirmation_number' => 'required',
-                'order_number' => 'required',
+//                'order_number' => 'required',
                 'pre_payment' => 'required',
-                'account_number' => 'required',
+//                'account_number' => 'required',
             ]);
             if ($validator->passes()) {
 
