@@ -1,31 +1,161 @@
-@extends('admin_layout.template')
+@extends('layout.template')
 @section('header_scripts')
-    <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/datatables.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
+    <link href="{{asset('assets/css/datatables.min.css')}}" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
     <?php $role = Auth::user()->role->title ?>
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header" style="justify-content: space-between;">
-                    <h4>Call Disposition List</h4>
-                    <a class="btn btn-icon icon-left btn-primary" href="{{route('lead_form')}}">
-                        <i class="fas fa-plus"></i> Add new</a>
+    <div class="m-portlet m-portlet--tabs">
+        <div class="m-portlet__head">
+            <div class="m-portlet__head-caption">
+                <div class="m-portlet__head-title float-left">
+                    <h3 class="m-portlet__head-text">Call Disposition List</h3>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped" id="chkbox_table">
+            </div>
+            <div class="m-portlet__head-tools">
+                <ul class="nav nav-tabs m-tabs-line m-tabs-line--success m-tabs-line--2x m-tabs-line--right" role="tablist">
+                    <li class="nav-item m-tabs__item">
+                        <a class="nav-link m-tabs__link active" data-toggle="tab" href="#sale_made_list" role="tab">
+                            <i class="fa fa-money" aria-hidden="true"></i>
+                            Sale
+                        </a>
+                    </li>
+                    <li class="nav-item m-tabs__item">
+                        <a class="nav-link m-tabs__link" data-toggle="tab" href="#non_sale_list" role="tab">
+                            <i class="fa fa-tags" aria-hidden="true"></i>
+                            Non Sale
+                        </a>
+                    </li>
+                    <li class="nav-item m-tabs__item">
+                        <a class="nav-link m-tabs__link" href="{{route('lead_form')}}">
+                            <i class="fa fa-plus" aria-hidden="true"></i>
+                            Add New
+                        </a>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+        <div class="m-portlet__body">
+            <div class="tab-content">
+                <div class="tab-pane active" id="sale_made_list" role="tabpanel">
+                    <div style="width: 100%">
+                        <table class="datatable table table-bordered" style="width:100%">
                             <thead>
                             <tr>
-                                <th>S.No.</th>
-                                <th>Disposition Type</th>
                                 <th>DID Name </th>
-                                <th>Acc# / Conf# / Order#</th>
-                                <th>Customer Name / Phone#</th>
+                                <th>Account Number</th>
+                                <th>Confirmation Number</th>
+                                <th>Order  Number</th>
+                                <th>Mobile Work Order Number</th>
+                                <th>Customer Name</th>
+                                <th>Phone  Number</th>
                                 <th>Service Address</th>
                                 <th>Provider Name</th>
                                 <th>Services Sold</th>
+                                <th>Services</th>
+                                <th>Agent Name</th>
+                                <th>Transefer Status</th>
+                                <th>QA Status</th>
+                                <th>Added On</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach ($sale_made as $call_disp_list)
+                                <tr>
+                                    <td>{{ isset($call_disp_list->call_disposition_did->title) ? $call_disp_list->call_disposition_did->title : ' ' }}</td>
+                                    <td>{{ $call_disp_list->account_number }}</td>
+                                    <td>{{ $call_disp_list->order_confirmation_number }}</td>
+                                    <td>{{ $call_disp_list->order_number }}</td>
+                                    <td>{{ $call_disp_list->mobile_work_order_number }}</td>
+                                    <td>{{ $call_disp_list->customer_name }}</td>
+                                    <td>{{ $call_disp_list->phone_number }}</td>
+                                    <td>{{ $call_disp_list->service_address }}</td>
+                                    <?php
+                                    $providers=null;
+                                    for($i=0; $i<count($call_disp_list->call_dispositions_services); $i++) {
+                                        $providers .= $call_disp_list->call_dispositions_services[$i]->provider_name.', ';
+                                    }
+                                    ?>
+                                    <td>{{ $providers }}</td>
+                                    <td>{{ $call_disp_list->services_sold }}</td>
+                                    <td>
+                                        <?php
+
+                                        foreach ($call_disp_list->call_dispositions_services as $service){
+                                            if(isset($service->internet) && $service->internet == 1){
+                                                echo 'Internet,';
+                                            }
+                                            if(isset($service->cable) && $service->cable ==1){
+                                                echo 'cable,';
+                                            }
+                                            if(isset($service->phone) && $service->phone ==1){
+                                                echo 'phone,';
+                                            }
+                                            if(isset($service->mobile) && $service->mobile ==1){
+                                                echo 'mobile,';
+                                            }
+                                        }
+                                        ?>
+                                    </td>
+                                    <td>{{ $call_disp_list->user->full_name }}</td>
+                                    <td>{{$call_disp_list->sale_transferred==1?'Yes':'No'}}</td>
+                                    @if(isset($call_disp_list->qa_status))
+                                        <td> <span class="badge text-white"  style="background-color:<?php echo $call_disp_list->qa_status->badge_color; ?>;">{{ $call_disp_list->qa_status->monitor_percentage }} %</span></td>
+                                    @else
+                                        <td>NA</td>
+                                    @endif
+                                    <td>{{ parse_datetime_store($call_disp_list->added_on) }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a onclick="view_lead(this)" id="{{$call_disp_list->call_id}}" class="btn btn-primary" href="javascript:;" data-toggle="m-tooltip" data-placement="right" data-skin="dark" data-container="body">
+                                                <i class="la la-eye"></i>
+                                            </a>
+                                            @if($role === 'Admin' || $role === 'Manager' || $role === 'Team Lead')
+                                                <a class="btn btn-info"  href="{{route('lead_edit' , $call_disp_list->call_id)}}">
+                                                    <i class="la la-edit"></i>
+                                                </a>
+                                            @endif
+                                            @if($role === 'Admin')
+                                                <a href="javascript:;" onclick="delete_lead(this);" id="{{$call_disp_list->call_id}}" class="btn btn-danger" href="#" data-toggle="m-tooltip" data-placement="left">
+                                                    <i class="la la-trash"></i>
+                                                </a>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <th>DID Name </th>
+                                <th>Account Number</th>
+                                <th>Confirmation Number</th>
+                                <th>Order  Number</th>
+                                <th>Mobile Work Order Number</th>
+                                <th>Customer Name</th>
+                                <th>Phone  Number</th>
+                                <th>Service Address</th>
+                                <th>Provider Name</th>
+                                <th>Services Sold</th>
+                                <th>Services</th>
+                                <th>Agent Name</th>
+                                <th>QA Status</th>
+                                <th>Added On</th>
+                                <th>Action</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane" id="non_sale_list" role="tabpanel">
+                    <div style="width: 100%">
+                        <table class="datatable table table-bordered" style="width:100%">
+                            <thead>
+                            <tr>
+                                <th>Disposition Type</th>
+                                <th>Customer Name</th>
+                                <th>Phone  Number</th>
                                 <th>Agent Name</th>
                                 <th>Added On</th>
                                 <th>Action</th>
@@ -34,34 +164,41 @@
                             <tbody>
                             @foreach ($call_disp_lists as $call_disp_list)
                                 <tr>
-                                    <td>{{ $loop->index+1 }}</td>
                                     <td>{{ $call_disp_list->call_disposition_types->title}}</td>
-                                    <td>{{ isset($call_disp_list->call_disposition_did->title) ? $call_disp_list->call_disposition_did->title : ' ' }}</td>
-                                    <td>{{ $call_disp_list->account_number }}<br>{{ $call_disp_list->order_confirmation_number }}<br>{{ $call_disp_list->order_number }}</td>
-                                    <td>{{ $call_disp_list->customer_name }}<br>{{ $call_disp_list->phone_number }}</td>
-                                    <td>{{ $call_disp_list->service_address }}</td>
-                                <?php
-                                    $providers=null;
-                                    for($i=0; $i<count($call_disp_list->call_dispositions_services); $i++) {
-                                        $providers .= $call_disp_list->call_dispositions_services[$i]->provider_name.', ';
-                                    }
-                                    ?>
-                                    <td>{{ $providers }}</td>
-                                    <td>{{ $call_disp_list->services_sold }}</td>
+                                    <td>{{ $call_disp_list->customer_name }}</td>
+                                    <td>{{ $call_disp_list->phone_number }}</td>
                                     <td>{{ $call_disp_list->user->full_name }}</td>
                                     <td>{{ parse_datetime_store($call_disp_list->added_on) }}</td>
                                     <td>
-                                        <button type="button" title="View" onclick="view_lead(this)" value="{{$call_disp_list->call_id}}" class="btn btn-info"> <i class="fa fa-eye"></i> </button>
-                                        @if($role === 'Admin' || $role === 'Manager' || $role === 'Team Lead')
-                                            <a title="Edit" class="btn btn-primary" href="{{route('lead_edit' , $call_disp_list->call_id)}}"> <i class="fa fa-edit"></i> </a>
-                                        @endif
-                                        @if($role === 'Admin')
-                                            <button title="Delete" type="button" onclick="delete_lead(this);" value="{{$call_disp_list->call_id}}" class="btn btn-danger" ><i class="fa fa-trash"></i></button>
-                                        @endif
+                                        <div class="btn-group btn-group-sm">
+                                            <a onclick="view_lead(this)" id="{{$call_disp_list->call_id}}" class="btn btn-primary" href="javascript:;" data-toggle="m-tooltip" data-placement="right" data-skin="dark" data-container="body">
+                                                <i class="la la-eye"></i>
+                                            </a>
+                                            @if($role === 'Admin' || $role === 'Manager' || $role === 'Team Lead')
+                                                <a class="btn btn-info"  href="{{route('lead_edit' , $call_disp_list->call_id)}}">
+                                                    <i class="la la-edit"></i>
+                                                </a>
+                                            @endif
+                                            @if($role === 'Admin')
+                                                <a href="javascript:;" onclick="delete_lead(this);" id="{{$call_disp_list->call_id}}" class="btn btn-danger" href="#" data-toggle="m-tooltip" data-placement="left">
+                                                    <i class="la la-trash"></i>
+                                                </a>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
                             </tbody>
+                            <tfoot>
+                            <tr>
+                                <th>Disposition Type</th>
+                                <th>Customer Name</th>
+                                <th>Phone  Number</th>
+                                <th>Agent Name</th>
+                                <th>Added On</th>
+                                <th>Action</th>
+                            </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -69,15 +206,12 @@
         </div>
     </div>
 @endsection
-
 @section('footer_scripts')
-    <script src="{{ asset('assets/bundles/jquery-ui/jquery-ui.min.js') }}"></script>
-    <script src="{{ asset('assets/bundles/datatables/datatables.min.js') }}"></script>
-    <script src="{{ asset('assets/bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js') }}"></script>
-    <script src="{{ asset('assets/js/page/datatables.js') }}"></script>
+    <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
+    <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script>
         function delete_lead (me) {
-            let id = me.value;
+            let id = me.id;
             let data = new FormData();
             data.append('call_id', id);
             data.append('_token', "{{csrf_token()}}");
@@ -101,15 +235,9 @@
         }
         function view_lead(me) {
             let data = new FormData();
-            data.append('call_id', me.value);
+            data.append('call_id', me.id);
             data.append('_token', '{{ csrf_token() }}');
             call_ajax_modal('POST', '{{route('lead_single_data')}}', data, 'Call Disposition View');
         }
-        $(document).ready(function (){
-            // toggle sidebar
-            setTimeout(function (){
-                $('#nav_toggle_btn')[0].click();
-            })
-        },300);
     </script>
 @endsection

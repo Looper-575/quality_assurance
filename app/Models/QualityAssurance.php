@@ -68,4 +68,12 @@ class QualityAssurance extends Authenticatable
         return $this->belongsTo(CallType::class, 'call_type_id' , 'call_type_id');
     }
 
+    public function qa_status(){
+        return $this->hasOne(QAWithColorBadge::class, 'qa_id' , 'qa_id');
+    }
+
+    public function call_disposition(){
+        return $this->belongsTo(CallDisposition::class,'call_id','call_id');
+    }
+
 }

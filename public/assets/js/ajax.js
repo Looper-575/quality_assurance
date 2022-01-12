@@ -5,7 +5,7 @@ let modal = (function () {/*
                 <div class="modal-content">
                     <div class="modal-header">
                         <h4 class="modal-title" id="modal_title">Processing..</h4>
-                        <button type="button" class="btn" onclick="$('#background_fade').fadeOut(function() { $(this).remove(); });" aria-hidden="true"><i class="fas fa-times"></i></button>
+                        <button type="button" class="btn" onclick="$('#background_fade').fadeOut(function() { $(this).remove(); });" aria-hidden="true"><i class="fa fa-times"></i></button>
                     </div>
                     <div class="modal-body">
                         <div id="modal_data" style="padding: 5px 20px;">

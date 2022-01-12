@@ -16,10 +16,9 @@ class UserController extends Controller
     public function index()
     {
         if(Auth::user() && Auth::user()->user_id){
-            return redirect('home');
+            return redirect('/');
         }
         $data['page_title'] = "Atlantis BPO CRM";
-        // die("dffdsafdsf");
         return view('Auth.login_form',$data);
     }
 

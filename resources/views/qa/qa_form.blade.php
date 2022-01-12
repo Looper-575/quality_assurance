@@ -1,42 +1,91 @@
-@extends('admin_layout.template')
+@extends('layout.template')
 @section('header_scripts')
-    <link rel="stylesheet" href="{{ asset('assets/bundles/select2/dist/css/select2.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
+{{--    <link rel="stylesheet" href="{{ asset('assets/bundles/select2/dist/css/select2.min.css') }}">--}}
+{{--    <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">--}}
 @endsection
 @section('content')
-    <form method="post" id="qa_form" action="">
-        @csrf
-        <div class="card">
-            <div class="card-header" style="justify-content: space-between;">
-                <h4>Quality Assurance Form</h4>
+
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__head">
+            <div class="m-portlet__head-caption">
+                <div class="m-portlet__head-title">
+                    <h3 class="m-portlet__head-text">Quality Assurance Form</h3>
+                </div>
             </div>
-            <div class="card-body">
+        </div>
+        <div class="m-portlet__body">
+            <form class="m-form m-form--fit m-form--label-align-right" method="post" id="qa_form" action="">
+                @csrf
                 <div class="row mb-2">
-                    <div class="col-6 mb-2">
-                        <label  for="agent_id"><strong> Rep Name  </strong> </label>
-                        <select class="form-control select2" name="rep_name" id="" required>
-                            <option class="form-control" value="" selected>Plese Select</option>
-                            @foreach($agents as $agent)
-                            <option value="{{$agent->user_id}}">{{$agent->full_name}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-6 mb-2">
-                        <label for="call_date"><strong> Call Date  </strong> </label>
-                        <input class="form-control" type="date" name="call_date">
-                    </div>
                     <div class="col-6 mb-1">
                         <label for="call_type"><strong> Call Type </strong></label>
                         <select class="form-control" name="call_type" id="call_type">
-                            <option value="" class="fomr-control">Please Select</option>
+                            <option value="" class="fomr-control" {{isset($qa_data)?'disabled':''}} >Please Select</option>
+                            @if(isset($qa_data))
+                                <option selected value="{{$qa_data->call_disposition_types->disposition_type_id}}"> {{ $qa_data->call_disposition_types->title }} </option>
+                            @else
                                 @foreach ($call_types as $call_type)
-                                    <option value="{{ $call_type->call_type_id }}"> {{ $call_type->title }} </option>
+
+                                    <option value="{{ $call_type->call_type_id }}" > {{ $call_type->title }} </option>
                                 @endforeach
+                            @endif
+
                         </select>
                     </div>
-                    <div class="col-6 mb-1">
+
+                    @if(!isset($qa_data))
+
+                        <div class="col-6 mb-2">
+                            <label for="call_date"><strong> Call Date  </strong> </label>
+                            <input class="form-control" type="date" name="call_date" id="call_date" >
+                        </div>
+                     @endif
+
+
+                    @if(isset($qa_data))
+                        <input id="h_call_id" type="hidden" name="call_id" value="{{$qa_data->call_id}}">
+                        <div class="col-6 mb-1" id="filtered_numbers">
+                            <div>
+                                <label for="num_type"><strong> Order No / Order Confirmation Number / Account Number </strong></label>
+                                <input disabled class="form-control" type="text" value="{{$qa_data->order_number}}  /  {{$qa_data->order_confirmation_number}}  /  {{$qa_data->account_number}} ">
+                            </div>
+
+                        </div>
+
+                    @else
+                        <div class="col-6 mb-1" id="filtered_numbers">
+                            <div>
+                                <label for="num_type"><strong> Select </strong></label>
+                                <select class="form-control select2" name="call_id" id="num_type">
+                                </select>
+                            </div>
+
+                        </div>
+                     @endif
+
+                    <div class="col-6 mb-2">
+                            <label  for="agent_id"><strong> Rep Name  </strong> </label>
+                            <select class="form-control" name="rep_name" id="rep_name" required readonly>
+                                <option class="form-control" value="" selected {{isset($qa_data)?'disabled':''}}>Plese Select</option>
+                                @if(isset($qa_data))
+                                    <option selected value="{{$qa_data->user->user_id}}"> {{ $qa_data->user->full_name }} </option>
+                                @else
+                                    @foreach($agents as $agent)
+                                        <option value="{{$agent->user_id}}">{{$agent->full_name}}</option>
+                                    @endforeach
+                                 @endif
+
+                            </select>
+
+                    </div>
+                    <div class="col-6 mb-1" id="call_num_div">
                         <label for="call_num"><strong> Call Number  </strong> </label>
-                        <input class="form-control" type="text" name="call_number">
+                        @if(isset($qa_data))
+                            <input readonly class="form-control" type="text" name="call_number" value="{{$qa_data->phone_number}}" readonly>
+                        @else
+                            <input class="form-control" type="text" name="call_number" id="call_number" readonly>
+
+                        @endif
                     </div>
                 </div>
                 <hr>
@@ -46,7 +95,7 @@
 
                         <div class="row">
                             <div class="col-6">
-                                <p class="form-check form-check-inline">Used Correct Greetings</p>
+                                <p class=" form-check form-check-inline">Used Correct Greetings</p>
                             </div>
                             <div class="col-6">
                                 <div class="form-check form-check-inline">
@@ -751,118 +800,180 @@
                         <button class="btn btn-danger float-right ml-3" type="reset">Reset</button>
                         <button class="btn btn-primary float-right" type="submit">Save</button>
                     </div>
+                    {{--                </div>--}}
+                    {{--            </div>--}}
                 </div>
-            </div>
+            </form>
         </div>
-    </form>
-@endsection
-@section('footer_scripts')
-    <script src="{{ asset('assets/bundles/select2/dist/js/select2.full.min.js') }}"></script>
-    <script>
-        $( document ).ready(function() {
-            if (jQuery().select2) {
-                $(".select2").select2();
-            }
-            //form submission;
-            $('#qa_form').submit(function (e) {
-                e.preventDefault();
-                let data = new FormData(this);
-                let a = function(){ window.location.reload(); };
-                let arr = [a];
-                call_ajax_with_functions('','{{route('qa_save')}}',data,arr);
-            });
-            $('.yes_radio').click(function (){
-                calculate_score();
-            });
-            $('.no_radio').click(function (){
-                calculate_score();
-            });
-            $('.na_radio').click(function (){
-                calculate_score();
-            });
-            $('.auto_yes_radio').click(function (){
-                calculate_score();
-            });
-            $('.auto_no_radio').click(function (){
-                calculate_score();
-            });
-            $('.auto_na_radio').click(function (){
-                calculate_score();
-            });
-            function calculate_score() {
-                let yes_boxes = document.getElementsByClassName('yes_radio');
-                let no_boxes = document.getElementsByClassName('no_radio');
-                let na_boxes = document.getElementsByClassName('na_radio');
-                let yes_count = 0;
-                let no_count = 0;
-                // Main Counts
-                for(let i=0; i < yes_boxes.length; i++){
-                    if(yes_boxes[i].checked){
-                        yes_count++;
+    </div>
+        @endsection
+        @section('footer_scripts')
+            <script src="{{ asset('assets/bundles/select2/dist/js/select2.full.min.js') }}"></script>
+            <script>
+                function get_calls() {
+                    $('#call_number').val("");
+                    $('#rep_name').val("");
+                    if($('#call_type').val() == 1){
+                        $('#filtered_numbers').fadeIn();
+                        let date = $('#call_date').val();
+                        let data = new FormData();
+                        data.append('_token', "{{csrf_token()}}");
+                        data.append('type', 1);
+                        data.append('date', date);
+                        call_ajax('num_type', '{{ route('filter_nums') }}', data);
+
+                    }
+                    else if($('#call_type').val() == 2){
+                        let date = $('#call_date').val();
+                        let data = new FormData();
+                        data.append('_token', "{{csrf_token()}}");
+                        data.append('date', date);
+                        data.append('type', 2);
+                        call_ajax('num_type', '{{ route('filter_nums') }}', data);
+                    }
+                    else{
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Please select Call Type!',
+                        })
                     }
                 }
-                for(let i=0; i < no_boxes.length; i++){
-                    if(no_boxes[i].checked){
-                        no_count++;
+                $( document ).ready(function() {
+                    $('#call_date').change(function (){
+                        get_calls();
+                    });
+                    $('#call_type').change(function () {
+                        if($('#call_type').val() == 1){
+                            $('#call_num_div').fadeIn();
+                        } else if($('#call_type').val() == 2){
+                            $('#call_num_div').fadeOut();
+                        }
+
+                        if($('#call_date').val() != ''){
+                            get_calls();
+                        } else {
+                            $('#call_date').focus();
+                        }
+                    });
+
+                    $('#num_type').change(function(){
+                        let rep_id = this.options[this.selectedIndex].getAttribute('data-id');
+                        let call_num = this.options[this.selectedIndex].getAttribute('data-id22');
+                        $('#rep_name').val(rep_id);
+                        $('#call_number').val(call_num);
+                       // alert(rep_id);
+                    });
+
+                    if (jQuery().select2) {
+                        $(".select2").select2();
                     }
-                }
-                for(let i=0; i < na_boxes.length; i++){
-                    if(na_boxes[i].checked){
-                        yes_count++;
+                    //form submission;
+                    $('#qa_form').submit(function (e) {
+                        e.preventDefault();
+                        let data = new FormData(this);
+                        let h_call_id = $('#h_call_id');
+                        if($('#h_call_id').length == 0){
+                            var a = function(){ window.location.reload(); };
+                        }
+                        else{
+                            var a = function(){ window.location.href="{{route('qa_queue')}}"; };
+                        }
+                        let arr = [a];
+                        call_ajax_with_functions('','{{route('qa_save')}}',data,arr);
+                    });
+                    $('.yes_radio').click(function (){
+                        calculate_score();
+                    });
+                    $('.no_radio').click(function (){
+                        calculate_score();
+                    });
+                    $('.na_radio').click(function (){
+                        calculate_score();
+                    });
+                    $('.auto_yes_radio').click(function (){
+                        calculate_score();
+                    });
+                    $('.auto_no_radio').click(function (){
+                        calculate_score();
+                    });
+                    $('.auto_na_radio').click(function (){
+                        calculate_score();
+                    });
+                    function calculate_score() {
+                        let yes_boxes = document.getElementsByClassName('yes_radio');
+                        let no_boxes = document.getElementsByClassName('no_radio');
+                        let na_boxes = document.getElementsByClassName('na_radio');
+                        let yes_count = 0;
+                        let no_count = 0;
+                        // Main Counts
+                        for(let i=0; i < yes_boxes.length; i++){
+                            if(yes_boxes[i].checked){
+                                yes_count++;
+                            }
+                        }
+                        for(let i=0; i < no_boxes.length; i++){
+                            if(no_boxes[i].checked){
+                                no_count++;
+                            }
+                        }
+                        for(let i=0; i < na_boxes.length; i++){
+                            if(na_boxes[i].checked){
+                                yes_count++;
+                            }
+                        }
+                        // Auto Fail Counts
+                        let auto_yes_boxes =  document.getElementsByClassName('auto_yes_radio');
+                        let auto_no_boxes  =  document.getElementsByClassName('auto_no_radio');
+                        let auto_na_boxes  =  document.getElementsByClassName('auto_na_radio');
+                        let auto_yes_count =  0;
+                        let auto_no_count  =  0;
+                        for(let i=0; i < auto_yes_boxes.length; i++){
+                            if(auto_yes_boxes[i].checked){
+                                auto_yes_count++;
+                            }
+                        }
+                        for(let i=0; i < auto_no_boxes.length; i++){
+                            if(auto_no_boxes[i].checked){
+                                auto_no_count++;
+                            }
+                        }
+                        for(let i=0; i < auto_na_boxes.length; i++){
+                            if(auto_na_boxes[i].checked){
+                                auto_no_count++;
+                            }
+                        }
+                        // calculating percentage
+                        let percentage = (yes_count/yes_boxes.length) * 100;
+                        // applying values
+                        document.getElementById('yes_responses').value = yes_count;
+                        document.getElementById('no_responses').value = no_count;
+                        document.getElementById('auto_fails').value = auto_yes_count;
+                        if(auto_yes_count > 0){
+                            percentage = 0;
+                        }
+                        document.getElementById('monitor_percent').value = percentage.toFixed(2);
+                        if(percentage >= 90) {
+                            document.getElementById('grade').innerText = "Outstanding";
+                            document.getElementById('grade_color').style.backgroundColor = "#2e7d32";
+                        } else if(percentage >= 80 && percentage < 90) {
+                            document.getElementById('grade').innerText = "Excellent";
+                            document.getElementById('grade_color').style.backgroundColor = "#50f450";
+                        } else if(percentage >= 75 && percentage < 80) {
+                            document.getElementById('grade').innerText = "Good";
+                            document.getElementById('grade_color').style.backgroundColor = "#cfff95";
+                        } else if(percentage >= 70 && percentage < 75) {
+                            document.getElementById('grade').innerText = "Average";
+                            document.getElementById('grade_color').style.backgroundColor = "#ffb04c";
+                        } else if(percentage >= 60 && percentage < 70) {
+                            document.getElementById('grade').innerText = "Needs Improvement";
+                            document.getElementById('grade_color').style.backgroundColor = "#ffff6b";
+                        } else {
+                            document.getElementById('grade').innerText = "Poor";
+                            document.getElementById('grade_color').style.backgroundColor = "#d32f2f";
+                        }
                     }
-                }
-                // Auto Fail Counts
-                let auto_yes_boxes =  document.getElementsByClassName('auto_yes_radio');
-                let auto_no_boxes  =  document.getElementsByClassName('auto_no_radio');
-                let auto_na_boxes  =  document.getElementsByClassName('auto_na_radio');
-                let auto_yes_count =  0;
-                let auto_no_count  =  0;
-                for(let i=0; i < auto_yes_boxes.length; i++){
-                    if(auto_yes_boxes[i].checked){
-                        auto_yes_count++;
-                    }
-                }
-                for(let i=0; i < auto_no_boxes.length; i++){
-                    if(auto_no_boxes[i].checked){
-                        auto_no_count++;
-                    }
-                }
-                for(let i=0; i < auto_na_boxes.length; i++){
-                    if(auto_na_boxes[i].checked){
-                        auto_no_count++;
-                    }
-                }
-                // calculating percentage
-                let percentage = (yes_count/yes_boxes.length) * 100;
-                // applying values
-                document.getElementById('yes_responses').value = yes_count;
-                document.getElementById('no_responses').value = no_count;
-                document.getElementById('auto_fails').value = auto_yes_count;
-                if(auto_yes_count > 0){
-                    percentage = 0;
-                }
-                document.getElementById('monitor_percent').value = percentage.toFixed(2);
-                if(percentage >= 90) {
-                    document.getElementById('grade').innerText = "Outstanding";
-                    document.getElementById('grade_color').style.backgroundColor = "#2e7d32";
-                } else if(percentage >= 80 && percentage < 90) {
-                    document.getElementById('grade').innerText = "Excellent";
-                    document.getElementById('grade_color').style.backgroundColor = "#50f450";
-                } else if(percentage >= 75 && percentage < 80) {
-                    document.getElementById('grade').innerText = "Good";
-                    document.getElementById('grade_color').style.backgroundColor = "#cfff95";
-                } else if(percentage >= 70 && percentage < 75) {
-                    document.getElementById('grade').innerText = "Average";
-                    document.getElementById('grade_color').style.backgroundColor = "#ffb04c";
-                } else if(percentage >= 60 && percentage < 70) {
-                    document.getElementById('grade').innerText = "Needs Improvement";
-                    document.getElementById('grade_color').style.backgroundColor = "#ffff6b";
-                } else {
-                    document.getElementById('grade').innerText = "Poor";
-                    document.getElementById('grade_color').style.backgroundColor = "#d32f2f";
-                }
-            }
-        });
-    </script>
+                });
+            </script>
 @endsection
 

@@ -12,7 +12,7 @@ class LeaveApplication extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $table = 'leave_applications';
-    protected $primaryKey = 'id';
+    protected $primaryKey = 'leave_id';
     const CREATED_AT = 'added_on';
     const UPDATED_AT = 'modified_on';
 
@@ -47,6 +47,11 @@ class LeaveApplication extends Authenticatable
     public  function leaveType()
     {
         return $this->belongsTo(LeaveType::class , 'leave_type_id' , 'leave_type_id');
+    }
+
+    public  function user()
+    {
+        return $this->belongsTo(User::class , 'added_by' , 'user_id');
     }
 
 

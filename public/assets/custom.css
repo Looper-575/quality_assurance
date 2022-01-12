@@ -1,0 +1,245 @@
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px grey;
+    border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #2c2e3f;
+    border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #000;
+}
+#DataTables_Table_0_wrapper{
+    overflow-x: scroll;
+}
+.sp_checks, .att_checks, .dt_checks, .el_checks, .mc_checks, .v_checks, .h_checks, .sl_checks, .o_checks, .c_checks, .other_checks {
+    display: none;
+}
+input#spectrum:checked + .sp_checks, input#att:checked + .att_checks, input#direct_tv:checked + .dt_checks, input#earth_link:checked + .el_checks,
+input#mediacom:checked + .mc_checks, input#viasat:checked + .v_checks, input#hughesnet:checked + .h_checks, input#sudden_link:checked + .sl_checks,
+input#optimum:checked + .o_checks, input#cox:checked + .c_checks, input#others:checked + .other_checks {
+    display: block !important;
+    margin-top: 5px;
+}
+.m-brand.m-brand--skin-dark {
+    background: #fff;
+}
+table td, table th {
+    font-size: 12px !important;
+}
+
+.sale_boxes {
+    background-color: #F2F2F2;
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+.sale_boxe_row1 {
+    margin-left: 15px;
+    margin-bottom: 15px;
+    margin-right: 15px;
+}
+.s_b_col1 {
+    background-color: #FFFFFF;
+    border-color: #E9E9E9;
+    border-bottom-left-radius: 25px;
+    border-top-right-radius: 25px;
+    padding-left: 15px;
+    position: relative;
+    height: 150px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 10px;
+}
+.sale_boxe_row1 > div > div > div > div.s_box_icons {
+    position: absolute;
+    color: #E6E6E6;
+    bottom: 0px;
+    right: 25px;
+    font-size: 75px;
+}
+.sale_boxe_row1 > div > div > div > div.dice_icons {
+    position: absolute;
+    color: #E6E6E6;
+    bottom: 0px;
+    right: 14px;
+    font-size: 75px;
+    transform: rotate(250deg);
+    width:70px;
+}
+.sale_boxe_row1 > div > div > div > div.box_icons {
+    position: absolute;
+    color: #4D4D4D;
+    bottom: 0px;
+    right: 25px;
+    font-size: 75px;
+    width:60px;
+}
+.sale_boxe_row1 > div > div > div > div.phone_icons {
+    position: absolute;
+    color: #4D4D4D;
+    bottom: 0px;
+    right: 25px;
+    font-size: 75px;
+    -webkit-transform: scaleX(-1);
+    width:70px;
+}
+.phone_icons .fa-phone-volume {
+    transform: rotate(
+        -20deg);
+}
+.sale_boxe_row1 > div > div > div > div.red_b_circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    text-align: center;
+    /*padding-left: 10px;*/
+    padding-top: 10px;
+    position: absolute;
+    background-color: #BA2423;
+    top: 15px;
+    right: 15px;
+    /*z-index: 100;*/
+
+}
+.s_b_col2 {
+    background-color: #CCC6B6;
+    border-color: #E9E9E9;
+    border-bottom-left-radius: 25px;
+    border-top-right-radius: 25px;
+    padding-left: 15px;
+    position: relative;
+    height: 150px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 10px;
+}
+.sale_boxe_row1 > div > div > div > div.dual_clr_circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    text-align: center;
+    /*padding-left: 10px;*/
+    padding-top: 10px;
+    position: absolute;
+    background: linear-gradient(135deg,  #ba141a 0%,#e2791b 100%);
+    top: 15px;
+    right: 15px;
+    /*z-index: 100;*/
+
+}
+.s_b_col3 {
+    background-color: #333333;
+    border-color: #E9E9E9;
+    border-bottom-left-radius: 25px;
+    border-top-right-radius: 25px;
+    padding-left: 15px;
+    position: relative;
+    height: 150px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 10px 10px;
+}
+
+.p_nums {
+    color: #FFFFFF;
+    font-size: 17px;
+}
+.white_text {
+    font-family : Nunito;
+    font-size : 17px;
+    line-height : 25px;
+    text-transform : uppercase;
+    padding-top: 15px;
+    margin-bottom: 0;
+    color: #ffffff;
+}
+.yellow_text {
+    font-family : Nunito;
+    font-size : 17px;
+    line-height : 25px;
+    text-transform : uppercase;
+    color : #FEFF57;
+}
+
+
+.NormalCharacterStyle {
+    font-family : Nunito;
+    font-size : 17px;
+    line-height : 25px;
+    text-transform : uppercase;
+    color : #BA141A;
+    color : rgb(186, 20, 26);
+}
+.black_text {
+    font-family : Nunito;
+    font-size : 17px;
+    line-height : 25px;
+    text-transform : uppercase;
+    padding-top: 15px;
+    margin-bottom: 0;
+}
+.red_text {
+    font-family : Nunito;
+    font-size : 17px;
+    line-height : 25px;
+    text-transform : uppercase;
+    color : #BA141A;
+}
+
+/*NOTES_____________________________________________*/
+#reports_table_wrapper > div.dt-buttons.btn-group > button.btn.btn-secondary{
+    background: #b9b9b9 !important;
+}
+.w-340px{
+    width: 340px;
+}
+.add-todo-btn{
+    width: 40px !important;
+    height: 40px !important;
+}
+#todo_list_id, #done_todo_list_id {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 29vh;
+}
+.todo_detele_btn{
+    height: 21px !important;
+    width: 21px !important;
+}
+.note_btns{
+    width: 29px !important;
+    height: 27px !important;
+}
+.font-19{
+    font-size: 19px !important;
+}
+.note-shadow{
+    box-shadow: 0 2px 4px 0px rgb(173 157 157 / 30%) !important;
+}
+.todo_card{
+    background-color: #c8c7c721;
+    padding: 7px 39px 5px 10px;
+    font-size: 17px;
+    box-shadow: 0 2px 4px 0px rgb(173 157 157 / 30%) !important;
+    width: 353px;
+}
+.font-17{
+    font-size: 17px !important;
+}
+.remove-scroll{
+    overflow: hidden !important;
+    height: 100% !important;
+    position: initial !important;
+}
+.of-hide{
+    overflow: hidden;
+}
+.dice-img-dashboard{
+    height: 16px !important;
+    filter: brightness(0.5) !important;
+}

@@ -3,6 +3,9 @@
     position: absolute;
     bottom: 0;
 }
+.m-brand.m-brand--skin-dark {
+    background: #fff;
+}
 /* Bllock Loader CSS */
 #block_loader{
     position: relative;
@@ -701,6 +704,6 @@ input#optimum:checked + .o_checks, input#cox:checked + .c_checks, input#others:c
 }
 .select2-container{
     clear: both !important;
-
     /*/width: 100%;*/
 }
+

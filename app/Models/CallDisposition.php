@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Controllers\QAController;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -26,7 +27,7 @@ class CallDisposition extends Authenticatable
          'customer_name', 'service_address' , 'phone_number', 'email',
          'installation_date', 'installation_type', 'order_confirmation_number', 'order_number', 'pre_payment',
          'account_number', 'services_sold' , 'new_phone_number', 'mobile_lines', 'comments',
-         'added_by' , '	modified_by',
+         'added_by' , '	modified_by', 'mobile_work_order_number',
     ];
 
     /**
@@ -66,6 +67,10 @@ class CallDisposition extends Authenticatable
         return $this->belongsTo(User::class, 'added_by' , 'user_id');
     }
 
-
-
+    public function qa_status(){
+        return $this->hasOne(QAWithColorBadge::class, 'call_id' , 'call_id');
+    }
+    public function qa_assessment(){
+        return $this->belongsTo(QualityAssurance::class, 'call_id' , 'call_id');
+    }
 }

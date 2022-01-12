@@ -1,25 +1,28 @@
-@extends('admin_layout.template')
+@extends('layout.template')
 @section('header_scripts')
-    <link rel="stylesheet" href="{{ asset('assets/bundles/select2/dist/css/select2.min.css') }}">
-    <link rel="stylesheet"
-          href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
 @endsection
 @section('content')
-    <div class="card">
-        <div class="card-header" style="justify-content: space-between;">
-            <h4>Disposition Form</h4>
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__head">
+            <div class="m-portlet__head-caption">
+                <div class="m-portlet__head-title">
+                    <h3 class="m-portlet__head-text">Disposition Form</h3>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            <form method="post" id="lead_form" enctype="multipart/form-data">
+
+        <div class="m-portlet__body">
+            <form class="m-form m-form--fit m-form--label-align-right" id="lead_form">
+                {{--                <form method="post" id="lead_form" enctype="multipart/form-data">--}}
                 @csrf
                 <div class="row">
                     <div class="col-6">
                         <div class="form-group">
                             <label class="form-check-label" for="disposition_type"> Disposition Type </label>
-                            <select required name="disposition_type" id="disposition_type" class="form-control">
+                            <select required name="disposition_type" id="disposition_type" class="form-control" value="1" readonly>
                                 <option disabled selected>Select</option>
                                 @foreach($disposition_types as $disposition_type)
-                                <option value="{{$disposition_type->disposition_type_id}}">{{$disposition_type->title}}</option>
+                                    <option value="{{$disposition_type->disposition_type_id}}">{{$disposition_type->title}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -28,7 +31,6 @@
                 <div class="row">
                     <div class="col-12">
                         <div id="main_form">
-
                         </div>
                     </div>
                     <div class="col-12">
@@ -43,19 +45,57 @@
     </div>
 @endsection
 @section('footer_scripts')
-    <script src="{{ asset('assets/bundles/select2/dist/js/select2.full.min.js') }}"></script>
     <script>
-
         $('#lead_form').submit(function (e) {
             e.preventDefault();
-            let data = new FormData(this);
-            let a = function () {
-                window.location.href = "{{route('lead_list')}}";
-            };
-            let arr = [a];
-            call_ajax_with_functions('', '{{route('lead_save')}}', data, arr);
+            let anyerror = false;
+            if($('#disposition_type').val()==1) {
+                let checks = $('.m-checkbox-list').find('input[type=checkbox]');
+                anyerror = false;
+                let msg="";
+                $('.provider_chk').each(function(){
+                    if($(this).prop('checked')) {
+                        // console.log($(this).siblings('div').find('input[type=checkbox]:checked').length);
+                        if ($(this).siblings('div').find('input[type=checkbox]:checked')) {
+                            if ($(this).siblings('div').find('input[type=checkbox]:checked').length >= 1) {
+                            } else {
+                                anyerror = true;
+                                msg = msg + 'Please check ' + $(this).attr('name') + ' Services.' + '</br>';
+                            }
+                            if (anyerror == true) {
+                                Swal.fire(
+                                    'Services Check!<br>',
+                                    'Error : <br>' + msg,
+                                    'question'
+                                )
+                                return;
+                            }
+                        }
+                    } else if($(this).prop('checked' , false)){
+                        if($(this).siblings('div').find('input[type=checkbox]:checked').length >=1){
+                            anyerror = true;
+                            msg = msg + 'Please uncheck ' + $(this).attr('name') + ' Services.'+'</br>';
+                        }
+                        if(anyerror == true){
+                            Swal.fire(
+                                'Services Check!<br>',
+                                'Error : <br>' + msg,
+                                'question'
+                            )
+                            return;
+                        }
+                    }
+                });
+            }
+            if(anyerror == false){
+                let data = new FormData(this);
+                let a = function () {
+                    window.location.href = "{{route('lead_list')}}";
+                };
+                let arr = [a];
+                call_ajax_with_functions('', '{{route('lead_save')}}', data, arr);
+            }
         });
-
         $('#disposition_type').change(function (){
             let call_type = $(this).val();
             let data = new FormData();
@@ -109,6 +149,8 @@
                 if (this.checked) {
                     $('#new_lines_div').fadeIn();
                     $('#new_lines').attr('required', true);
+                    $('#mobile_work_order_number_div').fadeIn();
+                    $('#mobile_work_order_number').attr('required', true);
                 } else {
                     blnChck = false;
                     $('.mobile_check').each(function (index, obj) {
@@ -120,7 +162,17 @@
                         $('#new_lines_div').fadeOut();
                         $('#new_lines').val('');
                         $('#new_lines')[0].removeAttribute('required');
+                        $('#mobile_work_order_number_div').fadeOut();
+                        $('#mobile_work_order_number').val('');
+                        $('#mobile_work_order_number')[0].removeAttribute('required');
                     }
+                }
+            });
+            $('#others').change(function () {
+                if (this.checked) {
+                    $('#other_specify').attr('required', true);
+                } else {
+                    $('#other_specify').attr('required', false);
                 }
             });
         }

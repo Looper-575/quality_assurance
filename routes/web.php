@@ -18,17 +18,19 @@ Route::get('/route-cache', function() {
     return 'Routes cache cleared';
 });
 
-    Route::get('/', 'App\Http\Controllers\DashboardController@default');
-    Route::get('/logout', 'App\Http\Controllers\UserController@logout')->name('logout');
-    Route::get('/login', 'App\Http\Controllers\UserController@index')->name('login');
-    Route::post('/do_login', 'App\Http\Controllers\UserController@login')->name('do_login');
+Route::get('/logout', 'App\Http\Controllers\UserController@logout')->name('logout');
+Route::get('/login', 'App\Http\Controllers\UserController@index')->name('login');
+Route::post('/do_login', 'App\Http\Controllers\UserController@login')->name('do_login');
+
 
 Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
-    // Routes for dashboard
-    Route::get('/home', 'App\Http\Controllers\DashboardController@index')->name('dashboard');
-    Route::get('/sale_dashboard' , 'App\Http\Controllers\DashboardController@sale_made_count')->name('sale_dashboard');
-
     //Routes for Users ///////////////////////
+    Route::get('', 'App\Http\Controllers\DashboardController@index')->name('dashboard');
+    Route::get('/', 'App\Http\Controllers\DashboardController@index')->name('dashboard');
+//    Route::get('/team_dashboard' , 'App\Http\Controllers\DashboardController@team_dashboard')->name('team_dashboard');
+//    Route::get('/agent_dashboard' , 'App\Http\Controllers\DashboardController@csr_dashboard')->name('agent_dashboard');
+
+
     Route::get('/users', 'App\Http\Controllers\UserController@list')->name('users');
     Route::post('/user_form', 'App\Http\Controllers\UserController@user_form')->name('user_form');
     Route::post('/user_save', 'App\Http\Controllers\UserController@save')->name('user_save');
@@ -41,8 +43,18 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     // Routes for Quality Assurance /////////////////
     Route::get('/qa_form' ,'App\Http\Controllers\QAController@form')->name('qa_form');
     Route::post('/qa_save', 'App\Http\Controllers\QAController@save')->name('qa_save');
-    Route::get('/qa_list', 'App\Http\Controllers\QAController@list')->name('qa_list');
+    Route::get('/qa_list', 'App\Http\Controllers\QAController@qa_queue')->name('qa_list');
     Route::post('/qa_single_data', 'App\Http\Controllers\QAController@show')->name('qa_single_data');
+    Route::get('/qa_edit/{id}' , 'App\Http\Controllers\QAController@edit')->name('qa_edit');
+    Route::post('/filter_nums' , 'App\Http\Controllers\CallDispositionController@filter_nums')->name('filter_nums');
+    Route::get('/qa_queue','App\Http\Controllers\QAController@qa_queue')->name('qa_queue');
+    Route::get('/qa_add/{id}','App\Http\Controllers\QAController@qa_add')->name('qa_add');
+    Route::post('/qa_report_single_data' , 'App\Http\Controllers\QAController@show_single_qa')->name('qa_report_single_data');
+
+    //Routes for qa report
+    Route::get('/qa_report_form' , 'App\Http\Controllers\ReportController@qa_report_form')->name('qa_report_form');
+    Route::post('/generate_qa_report' , 'App\Http\Controllers\ReportController@generate_qa_report')->name('generate_qa_report');
+
     //  Routes for Lead ///////////////////////////
     Route::get('/lead_form', 'App\Http\Controllers\CallDispositionController@form')->name('lead_form');
     Route::post('/lead_save', 'App\Http\Controllers\CallDispositionController@save')->name('lead_save');
@@ -66,11 +78,71 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     // Routes for Lead Report
     Route::get('/lead_report' , 'App\Http\Controllers\ReportController@disposition_report_form')->name('lead_report');
     Route::post('/generate_disposition_report' , 'App\Http\Controllers\ReportController@generate_disposition_report')->name('generate_disposition_report');
-
     // Routes for leave application //////////////////////////////////
     Route::get('/leave_form' , 'App\Http\Controllers\LeaveApplicationController@index')->name('leave_form');
     Route::post('/leave_save' , 'App\Http\Controllers\LeaveApplicationController@save')->name('leave_save');
     Route::get('/leave_list' , 'App\Http\Controllers\LeaveApplicationController@list')->name('leave_list');
+    Route::post('/leave_reject','App\Http\Controllers\LeaveApplicationController@reject')->name('leave_reject');
+    Route::post('/leave_approve','App\Http\Controllers\LeaveApplicationController@approve')->name('leave_approve');
+    Route::post('/leave_delete', 'App\Http\Controllers\LeaveApplicationController@delete')->name('leave_delete');
+    Route::get('/leave_form_edit/{id}' , 'App\Http\Controllers\LeaveApplicationController@edit')->name('leave_form_edit');
+    //Routes For Sales Transfer
+    Route::get('/sales_transfer_list' , 'App\Http\Controllers\SalesTransferController@list')->name('sales_transfer_list');
+    Route::get('/sales_transfer_form' , 'App\Http\Controllers\SalesTransferController@index')->name('sales_transfer_form');
+    Route::post('/sales_made' , 'App\Http\Controllers\SalesTransferController@sales_made')->name('salesmade');
+    Route::post('/transfer_save','App\Http\Controllers\SalesTransferController@transfer_save')->name('transfersave');
+    Route::post('/sales_transfer_reject','App\Http\Controllers\SalesTransferController@reject')->name('sales_transfer_reject');
+    Route::post('/sales_transfer_approve','App\Http\Controllers\SalesTransferController@approve')->name('sales_transfer_approve');
+
+    Route::get('/attendance','App\Http\Controllers\AttendanceController@attendance')->name('attendance');
+    Route::get('/attendance_list','App\Http\Controllers\AttendanceController@list')->name('attendance_list');
+    Route::post('/mark_attendance' , 'App\Http\Controllers\AttendanceController@mark_attendance')->name('mark_attendance');
+    Route::post('/generate_attendance_report' , 'App\Http\Controllers\AttendanceController@generate_attendance_report')->name('generate_attendance_report');
+    Route::get('/attendance_single_list','App\Http\Controllers\AttendanceController@single_list')->name('attendance_single_list');
+    Route::post('/generate_signle_attendance_report' , 'App\Http\Controllers\AttendanceController@generate_signle_attendance_report')->name('generate_signle_attendance_report');
+    Route::get('/get_manager_attendance/{id}','App\Http\Controllers\AttendanceController@get_manager_attendance')->name('get_manager_attendance');
+
+    //    shift route
+    Route::get('/shift','App\Http\Controllers\ShiftController@shift')->name('shift');
+    Route::post('/save_shift_form','App\Http\Controllers\ShiftController@save_shift')->name('save_shift_form');
+    Route::get('/shift_list','App\Http\Controllers\ShiftController@shift_list')->name('shift_list');
+    Route::post('/shift_single_data', 'App\Http\Controllers\ShiftController@show')->name('shift_single_data');
+    Route::get('/shift_edit/{id}' , 'App\Http\Controllers\ShiftController@edit')->name('shift_edit');
+    Route::post('/shift_delete', 'App\Http\Controllers\ShiftController@shift_delete')->name('shift_delete');
+
+    //    Note route
+    Route::post('/save_todo_form', 'App\Http\Controllers\NoteController@save_todo_form')->name('save_todo_form');
+    Route::get('/get_pending_todos', 'App\Http\Controllers\NoteController@get_pending_todos')->name('get_pending_todos');
+    Route::get('/get_done_todos', 'App\Http\Controllers\NoteController@get_done_todos')->name('get_done_todos');
+    Route::post('/delete_todo_form', 'App\Http\Controllers\NoteController@delete_todo_form')->name('delete_todo_form');
+    Route::post('/make_done_todo', 'App\Http\Controllers\NoteController@make_done_todo')->name('make_done_todo');
+    Route::post('/save_note_form', 'App\Http\Controllers\NoteController@save_note_form')->name('save_note_form');
+    Route::get('/get_note_data', 'App\Http\Controllers\NoteController@get_note_data')->name('get_note_data');
+    Route::post('/delete_note_form', 'App\Http\Controllers\NoteController@delete_note_form')->name('delete_note_form');
+    Route::get('/single_note_data/{id}', 'App\Http\Controllers\NoteController@single_note_data')->name('single_note_data');
+
+    //      Team route
+    Route::get('/department', 'App\Http\Controllers\TeamController@team_type')->name('department');
+    Route::post('/team_type_save', 'App\Http\Controllers\TeamController@team_type_save')->name('team_type_save');
+    Route::post('/team_type_delete', 'App\Http\Controllers\TeamController@team_type_delete')->name('team_type_delete');
+    Route::get('/team_list', 'App\Http\Controllers\TeamController@team_list')->name('team_list');
+    Route::get('/team_create', 'App\Http\Controllers\TeamController@team_create')->name('team_create');
+    Route::post('/team_save', 'App\Http\Controllers\TeamController@team_save')->name('team_save');
+    Route::post('/team_delete', 'App\Http\Controllers\TeamController@team_delete')->name('team_delete');
+    Route::get('/add_member_in_team/{id}' , 'App\Http\Controllers\TeamController@add_member')->name('add_member_in_team');
+    Route::post('/save_add_member_form', 'App\Http\Controllers\TeamController@save_add_member_form')->name('save_add_member_form');
+    Route::get('/get_manager_agents/{id}' , 'App\Http\Controllers\TeamController@get_manager_agents')->name('get_manager_agents');
+    // company policy
+    Route::get('/policies' , 'App\Http\Controllers\SettingsController@policies')->name('policies');
+    Route::post('/policies_file_upload' , 'App\Http\Controllers\SettingsController@policies_file_upload')->name('policies_file_upload');
+    Route::post('/policy_delete' , 'App\Http\Controllers\SettingsController@policy_delete')->name('policy_delete');
+
+    Route::get('/holiday','App\Http\Controllers\HolidayController@index')->name('holiday');
+    Route::get('/holiday_form','App\Http\Controllers\HolidayController@holiday_form')->name('holiday_form');
+    Route::post('/save_holiday' , 'App\Http\Controllers\HolidayController@save_holiday')->name('save_holiday');
+    Route::get('/holiday_edit/{id}','App\Http\Controllers\HolidayController@holiday_edit')->name('holiday_edit');
+    Route::post('/holiday_delete', 'App\Http\Controllers\HolidayController@holiday_delete')->name('holiday_delete');
+
 });
 
 

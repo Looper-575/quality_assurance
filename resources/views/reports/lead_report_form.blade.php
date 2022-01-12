@@ -1,14 +1,20 @@
-@extends('admin_layout.template')
+@extends('layout.template')
 @section('header_scripts')
     <link rel="stylesheet" href="{{ asset('assets/bundles/select2/dist/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
 @endsection
 @section('content')
-    <div class="card">
-        <div class="card-header" style="justify-content: space-between;">
-            <h4>Lead Report Form</h4>
+
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__head">
+            <div class="m-portlet__head-caption">
+                <div class="m-portlet__head-title">
+                    <h3 class="m-portlet__head-text">Disposition Report Form</h3>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
+        <div class="m-portlet__body">
+
             <form method="post" id="report_form" enctype="multipart/form-data">
                 @csrf
                 <div class="row">
@@ -27,7 +33,6 @@
                     <div class="col-3">
                         <label class="form-check-label" for="agent">Agent</label><br>
                         <select class="form-control select2" name="agent[]" id="agent" multiple="multiple">
-                            <option value="">N/A</option>
                             @foreach($agents as $agent)
                                 <option value="{{$agent->user_id}}"> {{$agent->full_name}} </option>
                             @endforeach
@@ -36,7 +41,6 @@
                     <div class="col-3">
                         <label class="form-check-label" for="agent">Dispoistion Type</label>
                         <select class="form-control" name="disposition_type" id=disposition_type">
-                            <option value="" selected>N/A</option>
                             @foreach($disposition_types as $disposition_type)
                                 <option value="{{$disposition_type->disposition_type_id}}">{{$disposition_type->title}}</option>
                             @endforeach
@@ -53,8 +57,61 @@
                     </div>
                 </div>
             </form>
+
         </div>
     </div>
+
+{{--    <div class="card">--}}
+{{--        <div class="card-header" style="justify-content: space-between;">--}}
+{{--            <h4>Lead Report Form</h4>--}}
+{{--        </div>--}}
+{{--        <div class="card-body">--}}
+{{--            <form method="post" id="report_form" enctype="multipart/form-data">--}}
+{{--                @csrf--}}
+{{--                <div class="row">--}}
+{{--                    <div class="col-3">--}}
+{{--                        <div class="form-group">--}}
+{{--                            <label class="form-check-label" for="from">From</label>--}}
+{{--                            <input class="form-control" type="date" name="from" id="from" required>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                    <div class="col-3">--}}
+{{--                        <div class="form-group">--}}
+{{--                            <label class="form-check-label" for="to" >To</label>--}}
+{{--                            <input class="form-control" type="date" name="to" id="to" required>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                    <div class="col-3">--}}
+{{--                        <label class="form-check-label" for="agent">Agent</label><br>--}}
+{{--                        <select class="form-control select2" name="agent[]" id="agent" multiple="multiple">--}}
+{{--                            <option value="">N/A</option>--}}
+{{--                            @foreach($agents as $agent)--}}
+{{--                                <option value="{{$agent->user_id}}"> {{$agent->full_name}} </option>--}}
+{{--                            @endforeach--}}
+{{--                        </select>--}}
+{{--                    </div>--}}
+{{--                    <div class="col-3">--}}
+{{--                        <label class="form-check-label" for="agent">Dispoistion Type</label>--}}
+{{--                        <select class="form-control" name="disposition_type" id=disposition_type">--}}
+{{--                            <option value="" selected>N/A</option>--}}
+{{--                            @foreach($disposition_types as $disposition_type)--}}
+{{--                                <option value="{{$disposition_type->disposition_type_id}}">{{$disposition_type->title}}</option>--}}
+{{--                            @endforeach--}}
+{{--                        </select>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--                <div class="row">--}}
+{{--                    <div class="col-12">--}}
+{{--                        <button type="submit"  class="btn btn-primary float-right"> Generate</button>--}}
+{{--                    </div>--}}
+{{--                    <br>--}}
+{{--                    <div class="col-12">--}}
+{{--                        <div id="report_data"></div>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--            </form>--}}
+{{--        </div>--}}
+{{--    </div>--}}
 @endsection
 @section('footer_scripts')
     <script src="{{ asset('assets/bundles/select2/dist/js/select2.full.min.js') }}"></script>

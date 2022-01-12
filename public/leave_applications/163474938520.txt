@@ -1,0 +1,4 @@
+value="{{$o2_lists[0]->order_id, $o2_lists[count($o2_lists)-1]->order_id}}"
+
+
+value="{{$o2_lists[0]->order_id, $o2_lists[count($o2_lists)-1]->order_id}}"

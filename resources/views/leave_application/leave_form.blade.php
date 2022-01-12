@@ -1,39 +1,32 @@
-@extends('admin_layout.template')
+@extends('layout.template')
 @section('header_scripts')
-    <link rel="stylesheet" href="{{ asset('assets/bundles/select2/dist/css/select2.min.css') }}">
-    <link rel="stylesheet"
-          href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
+    <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
 @endsection
 @section('content')
-    <form method="post" action="{{route('leave_save')}}" enctype="multipart/form-data">
-        @csrf
-        <div class="card">
-            <div class="card-header" style="justify-content: space-between;">
-                <h4>leave Application form</h4>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-6">
-                        <div class="form-group ">
-                            <label class="form-check-label" for="from">From </label>
-                            <input required type="date"  class="form-control" name="from" id="from" >
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="form-group ">
-                            <label class="form-check-label" for="to">To </label>
-                            <input required type="date"  class="form-control" name="to"  id="to" >
-                        </div>
-                    </div>
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__head">
+            <div class="m-portlet__head-caption">
+                <div class="m-portlet__head-title">
+                    <h3 class="m-portlet__head-text">leave Application form</h3>
                 </div>
+            </div>
+        </div>
+        <div class="m-portlet__body">
+            <form class="m-form m-form--fit m-form--label-align-right" enctype="multipart/form-data" method="post" id="leave_form" action="{{route('leave_save')}}">
+                @csrf
                 <div class="row">
                     <div class="col-6">
                         <div class="form-group">
+                            @if($leave)
+                                <input type="hidden" value="{{$leave->leave_id}}" name="leave_id">
+                            @endif
                             <label class="form-check-label" for="leave_type">Leave Type</label>
                             <select class="form-control" name="leave_type"  id="leave_type" required >
                                 <option value="" selected disabled >Select</option>
                                 @foreach($leave_types as $leave_type)
-                                    <option value="{{$leave_type->leave_type_id}}">{{$leave_type->title}}</option>
+                                    <option {{$leave ? ($leave->leave_type_id == $leave_type->leave_type_id ? 'selected' : '' ): ''}}
+                                            value="{{$leave_type->leave_type_id}}">{{$leave_type->title}}</option>
+
                                 @endforeach
                             </select>
                         </div>
@@ -41,9 +34,24 @@
                             <label for="half_day" class="form-check-label">Select Half Day</label>
                             <select class="form-control" name="half" id="half_day_option">
                                 <option value="" selected disabled>Select</option>
-                                <option value="first_half">First Half</option>
-                                <option value="second_half">Second Half</option>
+                                <option value="first_half" {{$leave?($leave->half_type == 'first_half' ? 'selected':''):''}}>First Half</option>
+                                <option value="second_half" {{$leave?($leave->half_type == 'second_half' ? 'selected':''):''}}>Second Half</option>
                             </select>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group ">
+                            <label class="form-check-label" for="from">From </label>
+                            <input value="{{$leave ? $leave->from:''}}" required  type="date"  class="form-control" name="from" id="from" >
+                        </div>
+                    </div>
+                    <div class="col-6" id="to_date">
+                        <div class="form-group ">
+                            <label class="form-check-label" for="to">To </label>
+                            <input value="{{$leave ? $leave->to:''}}" required  type="date"  class="form-control" name="to"  id="to" >
                         </div>
                     </div>
                     <div class="col-6">
@@ -55,15 +63,15 @@
                 </div>
                 <div class="row">
                     <div class="col-6">
-                        <div class="form-group">
+                        <div class="form-group" id="no_of_leaves">
                             <label  class="form-check-label" for="no_leaves">No of Leaves</label>
-                            <input type="number" class="form-control" name="no_leaves"  id="no_leaves" readonly>
+                            <input value="{{$leave ? $leave->no_leaves:''}}"  type="number" class="form-control" name="no_leaves"  id="no_leaves" readonly>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="form-group">
                             <label class="form-check-label" for="reason"> Reason </label>
-                            <textarea class="form-control " required name="reason" id="reason"  rows="3"></textarea>
+                            <textarea   class="form-control " required name="reason" id="reason"  rows="3">{{$leave ? $leave->reason:''}}</textarea>
                         </div>
                     </div>
                 </div>
@@ -71,13 +79,47 @@
                     <button type="submit" class="btn btn-primary"> Submit </button>
                     <button type="reset" class="btn btn-danger"> Reset </button>
                 </div>
-            </div>
+            </form>
         </div>
-    </form>
+    </div>
 @endsection
 @section('footer_scripts')
     <script src="{{ asset('assets/bundles/select2/dist/js/select2.full.min.js') }}"></script>
+    <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
+    <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script>
+
+        if($('#leave_type').val() == 3 && $('#no_leaves').val() > 2 ) {
+            $("#medical_report").attr("required", true);
+        }
+        else{
+            $("#medical_report").removeAttr('required');
+        }
+
+        if($('#leave_type').val() == 4) {
+            $("#medical_report").removeAttr("required");
+            $('#half_day').fadeIn();
+            $('#half_day_option').attr('required', true);
+            $('#no_leaves').removeAttr('required');
+            $('#to_date').fadeOut();
+            $("#to").removeAttr("required");
+            $('#to').val('');
+            $('#no_leaves').val(" ");
+            @if($leave && $leave->half_type != NULL)
+            $('#half_day_option').val('{{$leave->half_type}}').attr("selected", "selected");
+            @endif
+        }
+        else {
+            $('#to').attr('required', true);
+        }
+
+        // if($('#leave_type').val() == 3 && $('#no_leaves').val() > 2 ) {
+        //     $("#medical_report").attr("required", true);
+        // }
+        // else{
+        //     $("#medical_report").removeAttr("required");
+        // }
+
 
         // show current and future dates
         $(function(){
@@ -92,29 +134,90 @@
             var maxDate = year + '-' + month + '-' + day;
             $('#from').attr('min', maxDate);
             $('#to').attr('min', maxDate);
+
+
+
         });
 
+        $('#from').change(function(){
+            var date = new Date($('#from').val());
+            let day = date.getDate();
+            let month = date.getMonth()+1;
+            let year = date.getFullYear();
+            if(month < 10)
+                month = '0' + month.toString();
+            if(day < 10)
+                day = '0' + day.toString();
+            var maxDate = year + '-' + month + '-' + day;
+            $('#to').attr('min', maxDate);
+
+            if($("#to").val() !=="" && $("#to").val() <= $("#from").val() )
+            {
+                $("#to").val(maxDate);
+            }
+            if($('#leave_type').val() == 3 && $('#no_leaves').val() > 2 ) {
+                $("#medical_report").attr("required", true);
+            }
+            else{
+                $("#medical_report").removeAttr('required');
+            }
+
+            dateDifference();
+
+        });
         $('#leave_type').change(function (){
+
+
             if($(this).val() == 3 && $('#no_leaves').val() > 2 ) {
                 $("#medical_report").attr("required", true);
                 $('#half_day').fadeOut();
                 $('#half_day_option').removeAttr('required');
+                $('#half_day_option').val('');
+                $('#to_date').fadeIn();
+                $('#to').attr('required',true);
             } else if($(this).val() == 4) {
                 $("#medical_report").removeAttr("required");
                 $('#half_day').fadeIn();
                 $('#half_day_option').attr('required' , true);
                 $('#no_leaves').removeAttr('required');
-                $('#no_leaves').val(" ") ;
+                $('#no_leaves').val(" ");
+                $('#to_date').fadeOut();
+                $("#to").removeAttr("required");
+                $('#to').val('');
             }
-
             else {
-                $("#medical_report").removeAttr("required");
+                $("#medical_report").removeAttr('required');
                 $('#half_day').fadeOut();
                 $('#half_day_option').removeAttr('required');
+                $('#to_date').fadeIn();
+                $('#half_day_option').val('');
+                $('#to').attr('required',true);
+
             }
         });
 
+
         $('#to').change(function (){
+            dateDifference();
+            if($('#leave_type').val() == 3 && $('#no_leaves').val() > 2 ) {
+                $("#medical_report").attr("required", true);
+            }
+            else{
+                $("#medical_report").removeAttr('required');
+            }
+
+        });
+        $('#leave_form').submit(function (e){
+            e.preventDefault();
+            let data = new FormData(this);
+            let a = function () {
+                window.location.href = "{{route('leave_list')}}";
+            };
+            let arr = [a];
+            call_ajax_with_functions('','{{route('leave_save')}}',data,arr);
+        });
+
+        function dateDifference(){
             var from_date = $('#from').val();
             var to_date = $('#to').val();
             from_date = from_date.split('-');
@@ -127,6 +230,7 @@
             var timeDifferenceInHours = timeDifference / 60 / 60;
             var timeDifferenceInDays = timeDifferenceInHours  / 24;
             $('#no_leaves').val(timeDifferenceInDays + 1 );
-        });
+
+        }
     </script>
 @endsection

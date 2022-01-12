@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CallDisposition;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -22,6 +23,7 @@ class QAController extends Controller
     {
         //$this->middleware('auth');
     }
+
     public function form(){
 
         $data['page_title'] = "Atlantis BPO CRM - Roles";
@@ -36,9 +38,12 @@ class QAController extends Controller
     public function list()
     {
         $data['page_title'] = "Atlantis BPO CRM - Roles";
+        $data['small_nav'] = true;
         $data['qa_lists'] = QualityAssurance::where([
             'status'=> 1,
-            ])->with(['agent','call_type'])->get();
+            ])->with(['agent','call_type','qa_status'])->get();
+           // dd($data);
+        // $data['qa_single_data'] = QualityAssurance::find($id)->get();
         return view('qa.qa_list', $data);
     }
 
@@ -54,7 +59,6 @@ class QAController extends Controller
     {
         $validator = Validator::make($request->all(),[
                 'rep_name'=> 'required',
-                'call_date'=>'required|date',
                 'call_type'=> 'required',
                 'call_number'=> 'required',
                 'greetings_correct' => 'required',
@@ -141,14 +145,76 @@ class QAController extends Controller
             $qa->no_responses = $request->no_responses;
             $qa->automatic_fail_response = $request->automatic_fail_response;
             $qa->monitor_percentage = $request->monitor_percentage;
-            $qa->save();
-            $response['status'] = "Success";
-            $response['result'] = "Added Successfully";
+            $qa->call_id = $request->call_id;
+
+            $call_id = QualityAssurance::select('call_id')->where([
+                'call_id' => $request->call_id,
+            ])->get();
+
+
+            if(count($call_id)>0){
+
+                $response['status'] = "Failure!";
+                $response['result'] = "Quality Assessment for this call already exist";
+            }
+            else{
+                $qa->save();
+                $response['status'] = "Success";
+                $response['result'] = "Added Successfully";
+            }
+
+
         }
         else {
             $response['status'] = "Failure!";
             $response['result'] = $validator->errors()->toJson();
         }
         return response()->json($response);
+    }
+
+    public function edit($id)
+    {
+        $data['page_title'] = "Atlantis BPO CRM - Quality Assurance Edit Form";
+        $data['qa_edit'] = QualityAssurance::where('qa_id' , $id)->with('agent' , 'call_type')->get()[0];
+//        dd($data);
+        return view('qa.qa_edit' , $data);
+    }
+
+
+    public function qa_queue(){
+        $data['page_title'] = "Atlantis BPO CRM - Roles";
+        $data['qa_queue'] = CallDisposition::where([
+            'status' => 1,
+            'disposition_type' => 1
+        ])->with(['user','call_disposition_types','call_dispositions_services'])->doesntHave('qa_assessment')->whereRaw("date(added_on)>='2021-11-29 17:00:00'")->get();
+        $value='';
+        $data['qa_done'] = QualityAssurance::where([
+            'status'=> 1,
+            'call_type_id' => 1
+        ])->with(['agent','call_type','qa_status','call_disposition','call_disposition.call_dispositions_services'])->whereRaw("date(added_on)>='2021-11-29 17:00:00'")->get();
+        return view('qa.qa_list' , $data);
+
+    }
+
+    public function qa_add($id){
+        $data['page_title'] = "Atlantis BPO CRM - Roles";
+        $data['qa_data'] = CallDisposition::where([
+            'call_id'=> $id,
+            'status'=> 1,
+        ])->with(['call_disposition_types','user'])->get()[0];
+        $data['agents'] = User::where([
+            'role_id'=> 4,
+            'status'=> 1,
+        ])->get();
+        $data['call_types'] = CallType::get();
+        return view('qa.qa_form' , $data);
+    }
+
+    public function show_single_qa(Request $request)
+    {
+        $data['qa_data'] = QualityAssurance::where([
+            'qa_id' => $request->qa_id,
+        ])->with(['agent', 'call_type','call_disposition'])->get()[0];
+        return view('qa.qa_single_report' , $data);
     }
 }

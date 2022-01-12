@@ -1,8 +1,8 @@
 <?php /** @noinspection ALL */
 
 namespace App\Http\Controllers;
-
 use App\Models\Enquiry;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
@@ -16,6 +16,35 @@ use function Couchbase\defaultDecoder;
 
 class CallDispositionController extends Controller
 {
+    public function list()
+    {
+        $data['page_title'] = "Atlantis BPO CRM - Call Dispositions List";
+        $data['small_nav'] = true;
+        $role = Auth::user()->role->slug;
+        if($role === 'csr'){
+            $data['sale_made'] = CallDisposition::where([
+                'status' => 1,
+                'disposition_type' => 1,
+                'added_by' => Auth::user()->user_id
+            ])->with(['call_dispositions_services' , 'user','qa_status' ])->groupBy('call_id')->orderBy('call_id', 'DESC')->limit(500)->get();
+            $data['call_disp_lists'] = CallDisposition::where([
+                'status' => 1,
+                'added_by' => Auth::user()->user_id
+            ])->where('disposition_type', '!=', 1)->with(['call_dispositions_services' , 'user' ,'qa_status'])->groupBy('call_id')->orderBy('call_id', 'DESC')->limit(500)->get();
+        } else {
+            $date = get_date();
+            $date2 = date('Y-m-d', strtotime('-1 day', strtotime($date)));
+            $data['sale_made'] = CallDisposition::where([
+                'status' => 1,
+                'disposition_type' => 1,
+            ])->with(['call_dispositions_services'  ,'user','qa_status'])->groupBy('call_id')->orderBy('call_id', 'DESC')->limit(500)->get();
+            $data['call_disp_lists'] = CallDisposition::where([
+                'status' => 1,
+            ])->where('disposition_type', '!=', 1)->with(['call_dispositions_services'  ,'user'])->groupBy('call_id')->orderBy('call_id', 'DESC')->limit(500)->get();
+        }
+        return view('call_dipositions.dispositions_list' , $data);
+    }
+
     public function form()
     {
         $data['page_title'] = "Atlantis BPO CRM - Call Disposition Form";
@@ -30,6 +59,12 @@ class CallDispositionController extends Controller
         $data['lead_data'] = CallDisposition::where([
             'call_id' => $request->call_id,
         ])->with('call_dispositions_services')->get()[0];
+
+        if($data['lead_data']['sale_transferred'] == 1){
+
+            $data['transfer_from']= User::select('full_name')->join('sale_transfer','sale_transfer.added_by','=','users.user_id')->where('sale_transfer.call_id','=',$data['lead_data']['call_id'])->latest('sale_transfer.added_on')->get()[0];
+
+        }
         return view('call_dipositions.disposition_view' , $data);
     }
 
@@ -42,24 +77,15 @@ class CallDispositionController extends Controller
         return view('call_dipositions.partials.sale_form', $data);
     }
 
-    public function list()
+    public function filter_nums(Request $request)
     {
-        $data['page_title'] = "Atlantis BPO CRM - Call Dispositions List";
-        $role = Auth::user()->role->slug;
-        if($role === 'csr'){
-            $data['call_disp_lists'] = CallDisposition::where([
-                'status' => 1,
-                'added_by' => Auth::user()->user_id
-            ])->with(['call_dispositions_services' , 'user' ])->groupBy('call_id')->orderBy('call_id', 'DESC')->limit(500)->get();
+        if($request['type'] != 1){
+            $data['numbers'] = CallDisposition::select([ 'added_by' ,'call_id','order_confirmation_number','account_number','order_number','customer_name','phone_number'])->where(['status' => 1])->where('disposition_type', '!=', 1)->doesntHave('qa_assessment')->whereRaw("date(added_on)='$request->date'")->get();
         } else {
-            $date = get_date();
-            $date2 = date('Y-m-d', strtotime('-1 day', strtotime($date)));
-            $data['call_disp_lists'] = CallDisposition::where([
-                'status' => 1,
-            ])->whereDate('added_on', '>=', $date2)->whereDate('added_on', '<=', $date)->
-            with(['call_dispositions_services'  ,'user'])->groupBy('call_id')->get();
+            $data['numbers'] = CallDisposition::select([ 'added_by' ,'call_id','order_confirmation_number','account_number','order_number','customer_name','phone_number'])->where(['status' => 1])->where('disposition_type', '=', 1)->doesntHave('qa_assessment')->whereRaw("date(added_on)='$request->date'")->get();
         }
-        return view('call_dipositions.dispositions_list' , $data);
+        $data['type'] = $request['type'];
+        return view('qa.get_numbers' , $data);
     }
 
     public  function save(Request $request)
@@ -99,7 +125,9 @@ class CallDispositionController extends Controller
                     $call_disp->order_number = $request->order_number;
                     $call_disp->pre_payment = $request->pre_payment;
                     $call_disp->account_number = $request->account_number;
-
+                    if (isset($request->mobile_work_order_number)) {
+                        $call_disp->mobile_work_order_number = $request->mobile_work_order_number;
+                    }
                     if (isset($request->mobile_lines)) {
                         $call_disp->mobile_lines = $request->mobile_lines;
                     }
@@ -196,13 +224,13 @@ class CallDispositionController extends Controller
                         'installation_date' => $request->installation_date ? parse_datetime_store($request->installation_date) : null,
                         'order_confirmation_number' => $request->order_confirmation_number,
                         'order_number' => $request->order_number,
+                        'mobile_work_order_number' => $request->mobile_work_order_number,
                         'services_sold' => $services_sold,
                         'pre_payment' => $request->pre_payment,
                         'account_number' => $request->account_number,
                         'comments' => $request->comments,
                         'mobile_lines' => $request->mobile_lines,
                         'new_phone_number' => $request->new_phone_number,
-                        'modified_by' => Auth::user()->user_id,
                     ]);
                     DB::commit();
                     $response['status'] = 'success';

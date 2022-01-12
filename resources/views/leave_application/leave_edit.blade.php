@@ -1,11 +1,5 @@
-@extends('admin_layout.template')
-@section('header_scripts')
-    <link rel="stylesheet" href="{{ asset('assets/bundles/select2/dist/css/select2.min.css') }}">
-    <link rel="stylesheet"
-          href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
-@endsection
-@section('content')
-    <form method="post" action="{{route('leave_save')}}" enctype="multipart/form-data">
+
+    <form method="post"  id="leave_edit" action="{{route('leave_save')}}" enctype="multipart/form-data">
         @csrf
         <div class="card">
             <div class="card-header" style="justify-content: space-between;">
@@ -16,13 +10,13 @@
                     <div class="col-6">
                         <div class="form-group ">
                             <label class="form-check-label" for="from">From </label>
-                            <input required type="date" class="form-control" name="from" id="from" >
+                            <input value="{{$leave ? $leave->from:''}}" required type="date" class="form-control" name="from" id="from" >
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="form-group ">
                             <label class="form-check-label" for="to">To </label>
-                            <input required type="date" class="form-control" name="to" id="to" >
+                            <input {{$leave ? $leave->to:''}} required type="date" class="form-control" name="to" id="to" >
                         </div>
                     </div>
                 </div>
@@ -49,7 +43,7 @@
                     <div class="col-6">
                         <div class="form-group" id="sick_report" >
                             <label class="form-check-label" for="medical_report">Attachement / Mecdical Report</label>
-                            <input type="file" class="form-control" name="medical_report" id="medical_report">
+                            <input value="" type="file" class="form-control" name="medical_report" id="medical_report">
                         </div>
                     </div>
                 </div>
@@ -57,13 +51,13 @@
                     <div class="col-6">
                         <div class="form-group">
                             <label  class="form-check-label" for="no_leaves">No of Leaves</label>
-                            <input type="number" class="form-control" name="no_leaves"  id="no_leaves" readonly>
+                            <input {{$leave ? $leave->no_of_leaves:''}} type="number" class="form-control" name="no_leaves"  id="no_leaves" readonly>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="form-group">
                             <label class="form-check-label" for="reason"> Reason </label>
-                            <textarea class="form-control " required name="reason" id="reason"  rows="3"></textarea>
+                            <textarea {{$leave ? $leave->reason:''}} class="form-control " required name="reason" id="reason"  rows="3"></textarea>
                         </div>
                     </div>
                 </div>
@@ -74,7 +68,7 @@
             </div>
         </div>
     </form>
-@endsection
+
 @section('footer_scripts')
     <script src="{{ asset('assets/bundles/select2/dist/js/select2.full.min.js') }}"></script>
 

@@ -1,124 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
-
-
-<!-- auth-login.html  21 Nov 2019 03:49:32 GMT -->
+<html lang="en" >
+<!-- begin::Head -->
 <head>
-  <meta charset="UTF-8">
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-  <title>Atlantis BPO CRM - Login</title>
-  <!-- General CSS Files -->
-  <link rel="stylesheet" href="{{asset('assets/css/app.min.css')}}">
-  <link rel="stylesheet" href="{{asset('assets/bundles/bootstrap-social/bootstrap-social.css')}}">
-  <!-- Template CSS -->
-  <link rel="stylesheet" href="{{asset('assets/css/style.css')}}">
-  <link rel="stylesheet" href="{{asset('assets/css/components.css')}}">
-  <!-- Custom style CSS -->
-  <link rel="stylesheet" href="{{asset('assets/css/custom.css')}}">
-
-  <link rel='shortcut icon' type='image/x-icon' href="{{asset('assets/img/favicon.ico')}}"/>
+    <meta charset="utf-8" />
+    <title>Atlantis BPO CRM - Login</title>
+    <meta name="description" content="Latest updates and statistic charts">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!--begin::Web font -->
+    <script src="{{asset('assets/webfont.js')}}"></script>
+    <script>
+        WebFont.load({
+            google: {"families":["Poppins:300,400,500,600,700","Roboto:300,400,500,600,700"]},
+            active: function() {
+                sessionStorage.fonts = true;
+            }
+        });
+    </script>
+    <!--end::Web font -->
+    <!--begin::Base Styles -->
+    <link href="{{asset('assets/vendors/base/vendors.bundle.css')}}" rel="stylesheet" type="text/css" />
+    <link href="{{asset('assets/demo/default/base/style.bundle.css')}}" rel="stylesheet" type="text/css" />
+    <!--end::Base Styles -->
+    <link rel="shortcut icon" href="{{asset('favicon.ico')}}" />
 </head>
-
-<body>
-  <div class="loader"></div>
-  <div id="app">
-    <section class="section">
-      <div class="container mt-5">
-        <div class="row">
-          <div class="col-12 col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-6 offset-lg-3 col-xl-4 offset-xl-4">
-            <div class="card card-primary">
-              <div class="card-header">
-                <h4>Login</h4>
-              </div>
-              <div class="card-body">
-                <form method="POST" id="login_form" action="javascript:login();" class="needs-validation" novalidate="">
-                  @csrf
-                  <div class="form-group">
-                    <label for="email">Email</label>
-                    <input id="email" type="email" class="form-control" name="email" tabindex="1" required autofocus>
-                    <div class="invalid-feedback">
-                      Please fill in your email
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <div class="d-block">
-                      <label for="password" class="control-label">Password</label>
-                      <div class="float-right">
-                        <a href="auth-forgot-password.html" class="text-small">
-                          Forgot Password?
-                        </a>
-                      </div>
-                    </div>
-                    <input id="password" type="password" class="form-control" name="password" tabindex="2" required>
-                    <div class="invalid-feedback">
-                      please fill in your password
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <div class="custom-control custom-checkbox">
-                      <input type="checkbox" name="remember" class="custom-control-input" tabindex="3" id="remember-me">
-                      <label class="custom-control-label" for="remember-me">Remember Me</label>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-lg btn-block" tabindex="4">
-                      Login
-                    </button>
-                  </div>
-                </form>
-                <div class="text-center mt-4 mb-3">
-                  <div class="text-job text-muted">Login With Social</div>
-                </div>
-                <div class="row sm-gutters">
-                  <div class="col-6">
-                    <a class="btn btn-block btn-social btn-facebook">
-                      <span class="fab fa-facebook"></span> Facebook
+<!-- end::Head -->
+<!-- end::Body -->
+<body  class="m--skin- m-header--fixed m-header--fixed-mobile m-aside-left--enabled m-aside-left--skin-dark m-aside-left--offcanvas m-footer--push m-aside--offcanvas-default"  >
+<!-- begin:: Page -->
+<div class="m-grid m-grid--hor m-grid--root m-page">
+    <div class="m-grid__item m-grid__item--fluid m-grid m-grid--hor m-login m-login--signin m-login--2 m-login-2--skin-1" id="m_login" style="background-image: url({{asset('assets/img/bg/bg-6.jpg')}});">
+        <div class="m-grid__item m-grid__item--fluid m-login__wrapper">
+            <div class="m-login__container">
+                <div class="m-login__logo">
+                    <a href="#">
+                        <img src="{{asset('assets/img/logo-full.png')}}">
                     </a>
-                  </div>
-                  <div class="col-6">
-                    <a class="btn btn-block btn-social btn-twitter">
-                      <span class="fab fa-twitter"></span> Twitter
-                    </a>
-                  </div>
                 </div>
-              </div>
+                <div class="m-login__signin">
+                    <div class="m-login__head">
+                        <h3 class="m-login__title">Sign In</h3>
+                    </div>
+                    <form class="m-login__form m-form"  id="login_form" action="javascript:login();">
+                        @csrf
+                        <div class="form-group m-form__group">
+                            <input class="form-control m-input"   type="text" placeholder="Email" name="email" autocomplete="off">
+                        </div>
+                        <div class="form-group m-form__group">
+                            <input class="form-control m-input m-login__form-input--last" type="password" placeholder="Password" name="password">
+                        </div>
+                        <div class="m-login__form-action">
+                            <button id="m_login_signin_submit" class="btn btn-focus m-btn m-btn--pill m-btn--custom m-btn--air  m-login__btn m-login__btn--primary">
+                                Sign In
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="mt-5 text-muted text-center">
-              Don't have an account? <a href="auth-register.html">Create One</a>
-            </div>
-          </div>
         </div>
-      </div>
-    </section>
-  </div>
-
-
-  <script>
-  
-  function login() {
-    let data = new FormData($('#login_form')[0]);
-    let a = function () { window.location.reload(); };
-    let arr = [a];
-    call_ajax_with_functions('', '{{route('do_login')}}', data, arr);
-  }
-  </script>
-
-  <!-- General JS Scripts -->
-  <script src="{{asset('assets/js/app.min.js')}}"></script>
-  <!-- JS Libraies -->
-  <!-- Page Specific JS File -->
-  <!-- Template JS File -->
-  <script src="{{asset('assets/js/scripts.js')}}"></script>
-
-  <script src="{{asset('assets/bundles/sweetalert/sweetalert.min.js')}}"></script>
-
-  <!-- Custom JS File -->
-  <script src="{{asset('assets/js/custom.js')}}"></script>
-   <!-- Ajax  File -->
-  <script src="{{asset('assets/js/ajax.js')}}"></script>
-
+    </div>
+</div>
+<!-- end:: Page -->
+<!--begin::Base Scripts -->
+<script src="{{asset('assets/vendors/base/vendors.bundle.js')}}" type="text/javascript"></script>
+<script src="{{asset('assets/demo/default/base/scripts.bundle.js')}}" type="text/javascript"></script>
+<!--end::Base Scripts -->
+<script>
+    function login() {
+        let data = new FormData($('#login_form')[0]);
+        let a = function () { window.location.reload(); };
+        let arr = [a];
+        call_ajax_with_functions('', '{{route('do_login')}}', data, arr);
+    }
+</script>
+<script src="{{asset('assets/js/ajax.js')}}"></script>
 </body>
-
-
-<!-- auth-login.html  21 Nov 2019 03:49:32 GMT -->
+<!-- end::Body -->
 </html>

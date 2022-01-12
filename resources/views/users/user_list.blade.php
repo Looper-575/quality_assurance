@@ -1,58 +1,65 @@
-@extends('admin_layout.template')
+@extends('layout.template')
 @section('header_scripts')
-    <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/datatables.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
+    <link href="{{asset('assets/css/datatables.min.css')}}" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header" style="justify-content: space-between;">
-                    <h4>User List</h4>
-                    <a class="btn btn-icon icon-left btn-primary" href="javascript:show_form();"><i class="fas fa-plus"></i> Add new</a>
+    <div class="m-portlet m-portlet--mobile">
+        <div class="m-portlet__head">
+            <div class="m-portlet__head-caption">
+                <div class="m-portlet__head-title float-left">
+                    <h3 class="m-portlet__head-text">Users List</h3>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped" id="chkbox_table">
-                            <thead>
-                            <tr>
-                                <th>S.No</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>Gender</th>
-                                <th>Address</th>
-                                <th>Contact</th>
-                                <th>Manager</th>
-                                <th>Action</th>
-                            </tr>
-                            </thead>
-                            <?php $i=1 ?>
-                            <tbody>
-                            @foreach ($user_lists as $user_list)
-                                <tr>
-                                    <td>{{ $i++ }}</td>
-                                    <td>{{ $user_list->full_name }}</td>
-                                    <td>{{ $user_list->email }}</td>
-                                    <td>{{ $user_list->role->title }}</td>
-                                    <td>{{ $user_list->gender }}</td>
-                                    <td>{{ $user_list->postal_address }}</td>
-                                    <td>{{ $user_list->contact_number }}</td>
-                                    <td>{{ isset($user_list->manager->full_name) ? $user_list->manager->full_name : '' }}</td>
-                                    <td>
-                                        <button title="Edit" class="btn btn-primary edit_user" id="{{$user_list->user_id}}"><i class="fa fa-edit"></i></button>
-                                        <button title="Delete" class="btn btn-danger" onclick="delete_user(this);" value="{{$user_list->user_id}}"><i class="fa fa-trash"></i></button>
-                                        <button title="Change Password" class="btn btn-info" onclick="change_password(this);" value="{{$user_list->user_id}}"><i class="fa fa-key"></i></button>
-                                    </td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="float-right mt-3">
+                    <a href="javascript:show_form();" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill">
+                        <span><i class="la la-phone-square"></i><span>Add New</span></span>
+                    </a>
+                    <div class="m-separator m-separator--dashed d-xl-none"></div>
                 </div>
             </div>
         </div>
+        <div class="m-portlet__body">
+            <table class="datatable table table-bordered" style="">
+                <thead>
+                <tr>
+                    <th title="Field #1">S.No</th>
+                    <th title="Field #2">Name</th>
+                    <th title="Field #3">Email</th>
+                    <th title="Field #4">Role</th>
+                    <th title="Field #5">Gender</th>
+                    <th title="Field #6">Address</th>
+                    <th title="Field #7">Contact</th>
+                    <th title="Field #8">Manager</th>
+                    <th title="Field #9">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach ($user_lists as $user_list)
+                    <tr>
+                        <td>{{ $loop->index+1 }}</td>
+                        <td>{{ $user_list->full_name }}</td>
+                        <td>{{ $user_list->email }}</td>
+                        <td>{{ $user_list->role->title }}</td>
+                        <td>{{ $user_list->gender }}</td>
+                        <td>{{ $user_list->postal_address }}</td>
+                        <td>{{ $user_list->contact_number }}</td>
+                        <td>{{ isset($user_list->manager->full_name) ? $user_list->manager->full_name : '' }}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button title="Edit" class="btn btn-primary edit_user" id="{{$user_list->user_id}}"><i class="fa fa-edit"></i></button>
+                                <button title="Delete" class="btn btn-danger" onclick="delete_user(this);" value="{{$user_list->user_id}}"><i class="fa fa-trash"></i></button>
+                                <button title="Change Password" class="btn btn-info" onclick="change_password(this);" value="{{$user_list->user_id}}"><i class="fa fa-key"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
+
+
+
+
 @endsection
 @section('footer_scripts')
     <div id="change_pass_modal" style="z-index:9999999; height: 100% !important; min-height: 100%; width: 100%; position: fixed; top: 0; background-color: rgba(0, 0, 0, 0.7);display:none;">
@@ -83,10 +90,8 @@
             </div>
         </div>
     </div>
-    <script src="{{ asset('assets/bundles/jquery-ui/jquery-ui.min.js') }}"></script>
-    <script src="{{ asset('assets/bundles/datatables/datatables.min.js') }}"></script>
-    <script src="{{ asset('assets/bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js') }}"></script>
-    <script src="{{ asset('assets/js/page/datatables.js') }}"></script>
+    <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
+    <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script>
         function show_form(){
             let data = new FormData();
