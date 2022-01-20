@@ -34,7 +34,7 @@
                 </div>
                 <div class="pt-4">
                     <div class="m-list-settings__heading pb-2">
-                        PENDDING
+                        PENDING
                     </div>
                     <div id="todo_list_id">
                     </div>
@@ -170,7 +170,6 @@
     }
     function remove_scroller() {
         $('.mCSB_container').removeAttr('id');
-        console.log('hide scroll');
     }
     function get_note_data() {
         $.ajax({
@@ -229,7 +228,6 @@
         get_done_todos();
         remove_scroller();
         get_note_data();
-
         $('#todo_form').submit(function (e) {
             e.preventDefault();
             let type = 'todo';

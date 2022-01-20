@@ -20,7 +20,7 @@
                 </a>
             </li>
             @if($role === 'Admin' || $role === 'Manager' || $role === 'Team Lead' || $role === 'Customer Services Representative')
-                <li class="m-menu__item m-menu__item--submenu {{ @request()->is('lead_form') || @request()->is('lead_list')  ? 'm-menu__item--open' : '' }}" aria-haspopup="true" m-menu-submenu-toggle="hover">
+                <li class="m-menu__item m-menu__item--submenu {{ @request()->is('lead_form') || @request()->is('lead_list') || @request()->is('recordings')  ? 'm-menu__item--open' : '' }}" aria-haspopup="true" m-menu-submenu-toggle="hover">
                     <a href="javascript:" class="m-menu__link m-menu__toggle">
                         <i class="m-menu__link-icon fa fa-phone"></i>
                         <span class="m-menu__link-text">Call Dispositions</span>
@@ -43,6 +43,14 @@
                                         <span></span>
                                     </i>
                                     <span class="m-menu__link-text">List</span>
+                                </a>
+                            </li>
+                            <li class="m-menu__item {{ @request()->is('recordings') ? 'm-menu__item--active' : '' }}" aria-haspopup="true">
+                                <a href="{{route('recordings')}}" class="m-menu__link ">
+                                    <i class="m-menu__link-bullet flaticon-list-1">
+                                        <span></span>
+                                    </i>
+                                    <span class="m-menu__link-text">Call Queue</span>
                                 </a>
                             </li>
                         </ul>
@@ -138,38 +146,22 @@
                     </div>
                 </li>
             @endif
-            @if($role === 'Admin' || $role === 'Manager')
-                <li class="m-menu__item m-menu__item--submenu {{ @request()->is('shift') || @request()->is('shift_list') ? 'm-menu__item--open' : '' }}" aria-haspopup="true" m-menu-submenu-toggle="hover">
-                    <a href="javascript:" class="m-menu__link m-menu__toggle">
+            @if($role === 'Admin' || $role === 'HR')
+                <li class="m-menu__item  m-menu__item--{{ @request()->is('shift') ? 'active' : '' }}" aria-haspopup="true">
+                    <a href="{{route('shift')}}" class="m-menu__link ">
                         <i class="m-menu__link-icon flaticon-cogwheel-1"></i>
-                        <span class="m-menu__link-text">Shift</span>
-                        <i class="m-menu__ver-arrow la la-angle-right"></i>
+                        <span class="m-menu__link-title">
+                        <span class="m-menu__link-wrap">
+                            <span class="m-menu__link-text">
+                               Shifts
+                            </span>
+                        </span>
+                    </span>
                     </a>
-                    <div class="m-menu__submenu ">
-                        <span class="m-menu__arrow"></span>
-                        <ul class="m-menu__subnav">
-                            <li class="m-menu__item {{ @request()->is('shift')  ? 'm-menu__item--active' : '' }}" aria-haspopup="true">
-                                <a href="{{route('shift')}}" class="m-menu__link ">
-                                    <i class="m-menu__link-bullet flaticon-interface-6">
-                                        <span></span>
-                                    </i>
-                                    <span class="m-menu__link-text">Create Shift</span>
-                                </a>
-                            </li>
-                            <li class="m-menu__item {{ @request()->is('shift_list')  ? 'm-menu__item--active' : '' }}" aria-haspopup="true">
-                                <a href="{{route('shift_list')}}" class="m-menu__link ">
-                                    <i class="m-menu__link-bullet flaticon-interface-6">
-                                        <span></span>
-                                    </i>
-                                    <span class="m-menu__link-text">Shift List</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
                 </li>
             @endif
             @if($role === 'Admin' || $role === 'Manager' || $role === 'Team Lead')
-                <li class="m-menu__item m-menu__item--submenu {{ @request()->is('attendance') || @request()->is('holiday') ? 'm-menu__item--open' : '' }}" aria-haspopup="true" m-menu-submenu-toggle="hover">
+                <li class="m-menu__item m-menu__item--submenu {{ @request()->is('attendance') ? 'm-menu__item--open' : '' }}" aria-haspopup="true" m-menu-submenu-toggle="hover">
                     <a href="javascript:" class="m-menu__link m-menu__toggle">
                         <i class="m-menu__link-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-check" viewBox="0 0 16 16">
@@ -189,14 +181,6 @@
                                         <span></span>
                                     </i>
                                     <span class="m-menu__link-text">Mark Attendance</span>
-                                </a>
-                            </li>
-                            <li class="m-menu__item {{ @request()->is('holiday') ? 'm-menu__item--active' : '' }}" aria-haspopup="true">
-                                <a href="{{route('holiday')}}" class="m-menu__link ">
-                                    <i class="m-menu__link-bullet fa fa-calendar-times" style="font-size:20px">
-                                        <span></span>
-                                    </i>
-                                    <span class="m-menu__link-text">Holidays</span>
                                 </a>
                             </li>
                         </ul>
@@ -252,7 +236,7 @@
                 </li>
             @endif
             @if($role === 'Admin' || $role === 'Manager' || $role === 'Team Lead')
-                <li class="m-menu__item m-menu__item--submenu {{ @request()->is('lead_report')|| @request()->is('attendance_single_list') || @request()->is('attendance_list') || @request()->is('qa_report_form')  ? 'm-menu__item--open' : '' }}" aria-haspopup="true" m-menu-submenu-toggle="hover">
+                <li class="m-menu__item m-menu__item--submenu {{ @request()->is('lead_report')|| @request()->is('attendance_report_single') || @request()->is('attendance_report_monthly') || @request()->is('qa_report_form')  ? 'm-menu__item--open' : '' }}" aria-haspopup="true" m-menu-submenu-toggle="hover">
                     <a href="javascript:" class="m-menu__link m-menu__toggle">
                         <i class="m-menu__link-icon flaticon-graph"></i>
                         <span class="m-menu__link-text">Reports</span>
@@ -269,6 +253,14 @@
                                     <span class="m-menu__link-text">Disposition Report</span>
                                 </a>
                             </li>
+                            <li class="m-menu__item {{ @request()->is('did_report') ? 'm-menu__item--active' : '' }}" aria-haspopup="true">
+                                <a href="{{route('did_report')}}" class="m-menu__link ">
+                                    <i class="m-menu__link-bullet flaticon-interface-6">
+                                        <span></span>
+                                    </i>
+                                    <span class="m-menu__link-text">DID Report</span>
+                                </a>
+                            </li>
                             <li class="m-menu__item {{ @request()->is('qa_report_form') ? 'm-menu__item--active' : '' }}" aria-haspopup="true">
                                 <a href="{{route('qa_report_form')}}" class="m-menu__link ">
                                     <i class="m-menu__link-bullet flaticon-interface-6">
@@ -277,16 +269,16 @@
                                     <span class="m-menu__link-text">QA Report</span>
                                 </a>
                             </li>
-                            <li class="m-menu__item {{ @request()->is('attendance_list') ? 'm-menu__item--active' : '' }}" aria-haspopup="true">
-                                <a href="{{route('attendance_list')}}" class="m-menu__link ">
+                            <li class="m-menu__item {{ @request()->is('attendance_report_monthly') ? 'm-menu__item--active' : '' }}" aria-haspopup="true">
+                                <a href="{{route('attendance_report_monthly')}}" class="m-menu__link ">
                                     <i class="m-menu__link-bullet flaticon-list-1">
                                         <span></span>
                                     </i>
                                     <span class="m-menu__link-text">Monthly Attendance</span>
                                 </a>
                             </li>
-                            <li class="m-menu__item {{ @request()->is('attendance_single_list') ? 'm-menu__item--active' : '' }}" aria-haspopup="true">
-                                <a href="{{route('attendance_single_list')}}" class="m-menu__link ">
+                            <li class="m-menu__item {{ @request()->is('attendance_report_single') ? 'm-menu__item--active' : '' }}" aria-haspopup="true">
+                                <a href="{{route('attendance_report_single')}}" class="m-menu__link ">
                                     <i class="m-menu__link-bullet flaticon-list-1">
                                         <span></span>
                                     </i>

@@ -46,6 +46,10 @@
 @endsection
 @section('footer_scripts')
     <script>
+        let phone_num = {{isset($call_data[0]['from_number']) ? $call_data[0]['from_number'] : 0}};
+
+
+
         $('#lead_form').submit(function (e) {
             e.preventDefault();
             let anyerror = false;
@@ -90,7 +94,7 @@
             if(anyerror == false){
                 let data = new FormData(this);
                 let a = function () {
-                    window.location.href = "{{route('lead_list')}}";
+                    window.history.go(-1);
                 };
                 let arr = [a];
                 call_ajax_with_functions('', '{{route('lead_save')}}', data, arr);
@@ -104,6 +108,17 @@
             if(call_type == '1') {
                 let a = function (){
                     init_form_functions();
+                    $('#phone_number').val(phone_num);
+                    @if(isset($call_data[0]['from_number']))
+                    $('#phone_number').attr('readonly',true);
+                    @endif
+                    let element = document.getElementById('did');
+                    @if(isset($call_data[0]->did_numbers))
+                        element.value = {{$call_data[0]->did_numbers->did_id}};
+                        $('#rec_id').val({{$call_data[0]->rec_id}});
+                    @endif
+
+
                 }
                 let b = function () {
                     $(".select2").select2();
@@ -112,6 +127,16 @@
                 call_ajax_with_functions('main_form', '{{route('sale_made')}}', data, arr, true);
             } else {
                 call_ajax('main_form', '{{ route('non_sale') }}', data);
+                setTimeout(function(){
+                    $('#phone_number').val(phone_num);
+                    @if(isset($call_data[0]['from_number']))
+                    $('#phone_number').attr('readonly',true);
+                    @endif
+                    let ele = document.getElementById('rec_id');
+                    @if(isset($call_data[0]->rec_id))
+                        ele.value ={{$call_data[0]->rec_id}};
+                    @endif
+                }, 1000);
             }
         });
 

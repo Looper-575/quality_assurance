@@ -1,6 +1,6 @@
 <?php /** @noinspection ALL */
-
 namespace App\Http\Controllers;
+use App\Models\CallRecording;
 use App\Models\Enquiry;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -13,12 +13,11 @@ use App\Models\CallDispositionsDid;
 use App\Models\CallDispositionsTypes;
 use function Couchbase\defaultDecoder;
 
-
 class CallDispositionController extends Controller
 {
     public function list()
     {
-        $data['page_title'] = "Atlantis BPO CRM - Call Dispositions List";
+        $data['page_title'] = "Call Dispositions List - Atlantis BPO CRM";
         $data['small_nav'] = true;
         $role = Auth::user()->role->slug;
         if($role === 'csr'){
@@ -44,39 +43,31 @@ class CallDispositionController extends Controller
         }
         return view('call_dipositions.dispositions_list' , $data);
     }
-
     public function form()
     {
-        $data['page_title'] = "Atlantis BPO CRM - Call Disposition Form";
+        $data['page_title'] = "Call Disposition Form - Atlantis BPO";
         $data['disposition_types'] = CallDispositionsTypes::where([
             'status' => 1,
         ])->get();
         return view('call_dipositions.disposition_form',$data);
     }
-
     public function show(Request $request)
     {
         $data['lead_data'] = CallDisposition::where([
             'call_id' => $request->call_id,
         ])->with('call_dispositions_services')->get()[0];
-
         if($data['lead_data']['sale_transferred'] == 1){
-
             $data['transfer_from']= User::select('full_name')->join('sale_transfer','sale_transfer.added_by','=','users.user_id')->where('sale_transfer.call_id','=',$data['lead_data']['call_id'])->latest('sale_transfer.added_on')->get()[0];
-
         }
         return view('call_dipositions.disposition_view' , $data);
     }
-
     public function call_disposition_did()
     {
-
         $data['lead_did_data'] = CallDispositionsDid::where([
             'status' => 1,
         ])->get();
         return view('call_dipositions.partials.sale_form', $data);
     }
-
     public function filter_nums(Request $request)
     {
         if($request['type'] != 1){
@@ -87,113 +78,125 @@ class CallDispositionController extends Controller
         $data['type'] = $request['type'];
         return view('qa.get_numbers' , $data);
     }
-
-    public  function save(Request $request)
+    public function save(Request $request)
     {
-        if($request->disposition_type == 1)
-        {
-            $validator = Validator::make($request->all(), [
-                'did_id' => 'required',
-                'disposition_type' => 'required',
-                'was_mobile_pitched' => 'required',
-                'customer_name' => 'required',
-                'service_address' => 'required',
-                'phone_number' => 'required',
-                'email' => 'required',
-                'installation_type' => 'required',
-                'order_confirmation_number' => 'required',
-//                'order_number' => 'required',
-                'pre_payment' => 'required',
-//                'account_number' => 'required',
-            ]);
-            if ($validator->passes()) {
-
-                DB::beginTransaction();
-                try {
-                    $call_disp = new CallDisposition;
-                    $call_disp->added_by = Auth::user()->user_id;
-                    $call_disp->did_id = $request->did_id;
-                    $call_disp->disposition_type = $request->disposition_type ;
-                    $call_disp->was_mobile_pitched = $request->was_mobile_pitched;
-                    $call_disp->customer_name = $request->customer_name;
-                    $call_disp->service_address = $request->service_address;
-                    $call_disp->phone_number = $request->phone_number;
-                    $call_disp->email = $request->email;
-                    $call_disp->installation_type = $request->installation_type;
-                    $call_disp->installation_date = $request->installation_date ? parse_datetime_store($request->installation_date) : null;
-                    $call_disp->order_confirmation_number = $request->order_confirmation_number;
-                    $call_disp->order_number = $request->order_number;
-                    $call_disp->pre_payment = $request->pre_payment;
-                    $call_disp->account_number = $request->account_number;
-                    if (isset($request->mobile_work_order_number)) {
-                        $call_disp->mobile_work_order_number = $request->mobile_work_order_number;
+        $recording_id = CallDisposition::where('recording_id', $request->rec_id)->doesntExist();
+        if ($recording_id) {
+            if($request->disposition_type == 1)
+            {
+                $validator = Validator::make($request->all(), [
+                    'did_id' => 'required',
+                    'disposition_type' => 'required',
+                    'was_mobile_pitched' => 'required',
+                    'customer_name' => 'required',
+                    'service_address' => 'required',
+                    'phone_number' => 'required',
+                    'email' => 'required',
+                    'installation_type' => 'required',
+                    'order_confirmation_number' => 'required',
+                    'pre_payment' => 'required',
+                ]);
+                if ($validator->passes()) {
+                    DB::beginTransaction();
+                    try {
+                        if(isset($request->rec_id)){
+                            CallRecording::where('rec_id', $request->rec_id)->update([
+                                'disposed' => 1,
+                            ]);
+                        }
+                        $call_disp = new CallDisposition;
+                        $call_disp->added_by = Auth::user()->user_id;
+                        $call_disp->did_id = $request->did_id;
+                        $call_disp->recording_id = $request->rec_id;
+                        $call_disp->disposition_type = $request->disposition_type ;
+                        $call_disp->was_mobile_pitched = $request->was_mobile_pitched;
+                        $call_disp->customer_name = $request->customer_name;
+                        $call_disp->service_address = $request->service_address;
+                        $call_disp->phone_number = $request->phone_number;
+                        $call_disp->email = $request->email;
+                        $call_disp->installation_type = $request->installation_type;
+                        $call_disp->installation_date = $request->installation_date ? parse_datetime_store($request->installation_date) : null;
+                        $call_disp->order_confirmation_number = $request->order_confirmation_number;
+                        $call_disp->order_number = $request->order_number;
+                        $call_disp->pre_payment = $request->pre_payment;
+                        $call_disp->account_number = $request->account_number;
+                        if (isset($request->mobile_work_order_number)) {
+                            $call_disp->mobile_work_order_number = $request->mobile_work_order_number;
+                        }
+                        if (isset($request->mobile_lines)) {
+                            $call_disp->mobile_lines = $request->mobile_lines;
+                        }
+                        if (isset($request->new_phone_number)) {
+                            $call_disp->new_phone_number = $request->new_phone_number;
+                        }
+                        $call_disp->save();
+                        $call_disp->fresh();
+                        $call_id = $call_disp->call_id;
+                        $services_sold = $this->add_services($call_id, $request);
+                        $call_disp->services_sold = $services_sold;
+                        $call_disp->save();
+                        DB::commit();
+                        $response['status'] = 'success';
+                        $response['result'] = "Added Successfully";
+                    } catch (Exception $ex) {
+                        DB::rollback();
+                        $response['status'] = 'failure';
+                        $response['result'] = "Unexpected Db Error";
                     }
-                    if (isset($request->mobile_lines)) {
-                        $call_disp->mobile_lines = $request->mobile_lines;
-                    }
-                    if (isset($request->new_phone_number)) {
-                        $call_disp->new_phone_number = $request->new_phone_number;
-                    }
-                    $call_disp->save();
-                    $call_disp->fresh();
-                    $call_id = $call_disp->call_id;
-                    $services_sold = $this->add_services($call_id, $request);
-                    $call_disp->services_sold = $services_sold;
-                    $call_disp->save();
-                    DB::commit();
-                    $response['status'] = 'success';
-                    $response['result'] = "Added Successfully";
-                } catch (Exception $ex) {
-                    DB::rollback();
+                } else {
                     $response['status'] = 'failure';
-                    $response['result'] = "Unexpected Db Error";
+                    $response['result'] = $validator->errors()->toJson();
                 }
-            }
-            else {
-                $response['status'] = 'failure';
-                $response['result'] = $validator->errors()->toJson();
-            }
-            return response()->json($response);
-        } else  {
-            $validator = Validator::make($request->all(),[
-                'phone_number' => 'required',
-//                'customer_name' => 'required',
-                'comments' => 'required',
-            ]);
-            if ($validator->passes()) {
-                DB::beginTransaction();
-                try {
-                    $call_disp = new CallDisposition;
-                    $call_disp->added_by = Auth::user()->user_id;
-                    $call_disp->disposition_type =$request->disposition_type ;
-                    $call_disp->customer_name = $request->customer_name;
-                    $call_disp->phone_number = $request->phone_number;
-                    $call_disp->comments = $request->comments;
-                    $call_disp->save();
-                    DB::commit();
-                    $response['status'] = 'success';
-                    $response['result'] = "Added Successfully";
-                } catch (Exception $e){
-                    DB::rollback();
+                return response()->json($response);
+            } else  {
+                $validator = Validator::make($request->all(),[
+                    'phone_number' => 'required',
+                    'comments' => 'required',
+                ]);
+                if ($validator->passes()) {
+                    DB::beginTransaction();
+                    try {
+                        if(isset($request->rec_id)){
+                            CallRecording::where('rec_id', $request->rec_id)->update([
+                                'disposed' => 1,
+                            ]);
+                        }
+                        $call_disp = new CallDisposition;
+                        $call_disp->added_by = Auth::user()->user_id;
+                        $call_disp->disposition_type =$request->disposition_type ;
+                        $call_disp->recording_id = $request->rec_id;
+                        $call_disp->did_id = $request->did_id;
+                        $call_disp->customer_name = $request->customer_name;
+                        $call_disp->phone_number = $request->phone_number;
+                        $call_disp->comments = $request->comments;
+                        $call_disp->save();
+                        DB::commit();
+                        $response['status'] = 'success';
+                        $response['result'] = "Added Successfully";
+                    } catch (Exception $e){
+                        DB::rollback();
+                        $response['status'] = 'failure';
+                        $response['result'] = "Unexpected Db Error";
+                    }
+                }
+                else{
                     $response['status'] = 'failure';
-                    $response['result'] = "Unexpected Db Error";
+                    $response['result'] = $validator->errors()->toJson();
                 }
+                return response()->json($response);
             }
-            else{
-                $response['status'] = 'failure';
-                $response['result'] = $validator->errors()->toJson();
-            }
+        } else {
+            $response['status'] = 'failure';
+            $response['result'] = "Already Disposed";
             return response()->json($response);
         }
     }
-
     public function edit($id)
     {
-        $data['page_title'] = "Atlantis BPO CRM - Call Disposition Form";
+        $data['page_title'] = "Call Disposition Form - Atlantis BPO CRM";
         $data['lead_edit'] = CallDisposition::where('call_id',$id)->with(['call_dispositions_services'])->get()[0];
         return view('call_dipositions.disposition_edit' , $data);
     }
-
     public  function update(Request $request ,$call_id)
     {
         if($request->disposition_type == 1) {
@@ -274,7 +277,6 @@ class CallDispositionController extends Controller
         }
         return response()->json($response);
     }
-
     public function delete(Request $request)
     {
         $data = CallDisposition::where('call_id', $request->call_id)->update([
@@ -285,7 +287,6 @@ class CallDispositionController extends Controller
         $response['result'] = "Deleted Successfully";
         return response()->json($response);
     }
-
     protected function add_services($call_id, $request)
     {
         $services_sold = 0; // new column for this and update
@@ -315,7 +316,6 @@ class CallDispositionController extends Controller
             isset($request->att_phone) ? $services_sold++ : 0;
             $call_disp_service->mobile = 0;
             $call_disp_service->save();
-
         }
         if(isset($request->direct_tv)) {
             $call_disp_service = new CallDispositionsService;

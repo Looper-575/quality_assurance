@@ -19,8 +19,8 @@
     </script>
     <!--end::Web font -->
     <!--begin::Base Styles -->
-    <link href="{{asset('assets/vendors/base/vendors.bundle.css')}}" rel="stylesheet" type="text/css" />
-    <link href="{{asset('assets/demo/default/base/style.bundle.css')}}" rel="stylesheet" type="text/css" />
+    <link href="{{asset('assets/css/vendors.bundle.css')}}" rel="stylesheet" type="text/css" />
+    <link href="{{asset('assets/css/style.bundle.css')}}" rel="stylesheet" type="text/css" />
     <!--end::Base Styles -->
     <link rel="shortcut icon" href="{{asset('favicon.ico')}}" />
 </head>
@@ -62,8 +62,8 @@
 </div>
 <!-- end:: Page -->
 <!--begin::Base Scripts -->
-<script src="{{asset('assets/vendors/base/vendors.bundle.js')}}" type="text/javascript"></script>
-<script src="{{asset('assets/demo/default/base/scripts.bundle.js')}}" type="text/javascript"></script>
+<script src="{{asset('assets/js/vendors.bundle.js')}}" type="text/javascript"></script>
+<script src="{{asset('assets/js/scripts.bundle.js')}}" type="text/javascript"></script>
 <!--end::Base Scripts -->
 <script>
     function login() {

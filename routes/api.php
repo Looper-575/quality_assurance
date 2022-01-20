@@ -18,5 +18,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::middleware(\App\Http\Middleware\ValidateApi::class)->group(function () {
-    Route::post('/call_connect', 'App\Http\Controllers\ApiController@call_connect')->name('call_connect_api');
+    Route::get('/call_connect', 'App\Http\Controllers\ApiController@call_connect')->name('call_connect_api');
+    //Route::post('/call_connect', 'App\Http\Controllers\ApiController@call_connect')->name('call_connect_api');
+    Route::get('/call_end', 'App\Http\Controllers\ApiController@call_end')->name('call_end_api');
+    //Route::post('/call_end', 'App\Http\Controllers\ApiController@call_end')->name('call_end_api');
 });

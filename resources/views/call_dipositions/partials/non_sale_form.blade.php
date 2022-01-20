@@ -15,4 +15,5 @@
             <input required type="text" class="form-control" name="comments" id="comments">
         </div>
     </div>
+    <input type="hidden" class="form-control" name="rec_id" id="rec_id" value="0">
 </div>

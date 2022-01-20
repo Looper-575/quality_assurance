@@ -1,12 +1,14 @@
 <?php
 namespace App\Http\Controllers;
-
+use App\Models\RolePermission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use App\Models\UserRole;
 use App\Models\User;
+
 class UserController extends Controller
 {
     public function __construct()
@@ -18,19 +20,18 @@ class UserController extends Controller
         if(Auth::user() && Auth::user()->user_id){
             return redirect('/');
         }
-        $data['page_title'] = "Atlantis BPO CRM";
+        $data['page_title'] = "Login - Atlantis BPO CRM";
         return view('Auth.login_form',$data);
     }
-
     public function list()
     {
-        $data['page_title'] = "Atlantis BPO CRM - Users List";
+        $data['page_title'] = "Users List - Atlantis BPO CRM";
         $data['user_lists'] = User::where('status' , 1)->with(['role', 'manager'])->get();
         return view('users.user_list', $data);
     }
     public function user_form(Request $request)
     {
-        $data['page_title'] = "Atlantis BPO CRM - Users Form";
+        $data['page_title'] = "User List - Atlantis BPO CRM";
         $data['user_roles'] = UserRole::where('status',1)->get();
         DB::enableQueryLog();
         $data['managers'] = User::where([
@@ -42,7 +43,6 @@ class UserController extends Controller
         ])->orWhere([
             'role_id' => 1,
         ])->get();
-
         if(isset($request->user_id)){
             $data['user'] = User::where('user_id',$request->user_id)->get()[0];
         } else {
@@ -61,9 +61,11 @@ class UserController extends Controller
                 'email'=>$request->input('email'),
                 'password'=>encrypt_password($request->input('password')),
                 'status'=>1
-            ])->with(['role'])->get();
-            if(count($user)>0) {
-                Auth::login($user[0]);
+            ])->with(['role'])->first();
+            if($user) {
+//                $permission = RolePermission::where('role_id',$user->role_id)->get();
+//                Session::put('permissions', $permission);
+                Auth::login($user);
                 $response['status'] = "Success";
                 $response['result'] = "Logged In";
             } else {
@@ -75,29 +77,6 @@ class UserController extends Controller
             $response['result'] = $validator->errors()->toJson();
         }
         return response()->json($response);
-    }
-    public function verify_account($verification_token)
-    {
-        $data['page_title'] = "Marcha Marlo - Account Verification";
-        $data['meta_keywords'] = "";
-        $data['meta_description'] = "";
-        $data['meta_title'] = "";
-        $data['categories'] = Category::where('status', 1)->get();
-        $user = User::where([
-            'remember_token' => $verification_token
-        ])->get();
-        if(count($user)>0) {
-            User::where([
-                'remember_token' => $verification_token
-            ])->update([
-                'status' => 1,
-                //'remember_token' => '',
-            ]);
-            $data['status'] = true;
-        } else {
-            $data['status'] = false;
-        }
-        return view('public_pages.verify_account', $data);
     }
     public function save(Request $request){
         if($request->user_id){
@@ -171,6 +150,7 @@ class UserController extends Controller
     public function logout()
     {
         Auth::logout();
+        Session::put('permissions', false);
         return redirect('login');
     }
     public function change_password(Request $request)

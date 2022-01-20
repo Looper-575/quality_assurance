@@ -3,7 +3,6 @@
 @section('header_scripts')
 @endsection
 @section('content')
-
     <div class="sale_boxes">
         <div class="sale_boxe_row1">
             <div class="row">
@@ -79,13 +78,8 @@
                         </div>
                     </div>
                 </div>
-
-
             </div>
         </div>
-
-
-
         <div class="sale_boxe_row1">
             <div class="row">
                 <div class="col-2">
@@ -160,11 +154,8 @@
                         </div>
                     </div>
                 </div>
-
-
             </div>
         </div>
-
         <div class="sale_boxe_row1">
             <div class="row">
                 <div class="col-2">
@@ -239,422 +230,9 @@
                         </div>
                     </div>
                 </div>
-
-
             </div>
         </div>
-
     </div>
-{{--    --}}
-{{--    <div class="m-portlet__body">--}}
-{{--        <div class="m-widget17">--}}
-{{--            <div class="m-widget17__stats">--}}
-{{--                <div class="m-widget17__items m-widget17__items-col">--}}
-{{--                    <div class="m-widget17__item col_2_items_1 items_row_3">--}}
-{{--                      <span class="m-widget17__icon">--}}
-{{--                        <i--}}
-{{--                            class="fa fa-cart-arrow-down color_white_1"--}}
-{{--                            style="font-size: 3rem"--}}
-{{--                        ></i>--}}
-{{--                      </span>--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__subtitle"--}}
-{{--                            style="color: white; font-size: 1.5rem"--}}
-{{--                        >--}}
-{{--                        {{$daily_counts['total_rgu']}}--}}
-{{--                      </span>--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__desc"--}}
-{{--                            style="color: white; font-size: 1rem"--}}
-{{--                        ><b>Daily Total RGU's</b></span--}}
-{{--                        >--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--                <div class="m-widget17__items m-widget17__items-col">--}}
-{{--                    <div class="m-widget17__item col_2_items_2 items_row_3">--}}
-{{--                      <span class="m-widget17__icon">--}}
-{{--                        <i--}}
-{{--                            class="fa fa-shopping-cart color_white_1"--}}
-{{--                            style="font-size: 3rem"--}}
-{{--                        ></i>--}}
-{{--                      </span>--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__subtitle"--}}
-{{--                            style="color: white; font-size: 1.5rem"--}}
-{{--                        >{{$daily_counts['total_sales']}}</span--}}
-{{--                        >--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__desc"--}}
-{{--                            style="color: white; font-size: 1rem"--}}
-{{--                        ><b>Daily Sale</b></span--}}
-{{--                        >--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--                <div class="m-widget17__items m-widget17__items-col">--}}
-{{--                    <div class="m-widget17__item col_2_items_3 items_row_3">--}}
-{{--                      <span class="m-widget17__icon">--}}
-{{--                        <i--}}
-{{--                            class="fa fa-play color_white_1"--}}
-{{--                            style="font-size: 3rem"--}}
-{{--                        ></i>--}}
-{{--                      </span>--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__subtitle"--}}
-{{--                            style="color: white; font-size: 1.5rem"--}}
-{{--                        >{{$daily_counts['single_play']}}</span--}}
-{{--                        >--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__desc"--}}
-{{--                            style="color: white; font-size: 1rem"--}}
-{{--                        ><b>Daily Single Play</b></span--}}
-{{--                        >--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--                <div class="m-widget17__items m-widget17__items-col">--}}
-{{--                    <div class="m-widget17__item col_2_items_4 items_row_3">--}}
-{{--                      <span class="m-widget17__icon">--}}
-{{--                        <i--}}
-{{--                            class="fa fa-forward color_black"--}}
-{{--                            style="font-size: 3rem"--}}
-{{--                        ></i>--}}
-{{--                      </span>--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__subtitle"--}}
-{{--                            style="color: black; font-size: 1.5rem"--}}
-{{--                        >{{$daily_counts['double_play']}}</span--}}
-{{--                        >--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__desc"--}}
-{{--                            style="color: black; font-size: 1rem"--}}
-{{--                        ><b>Daily Double Play</b></span--}}
-{{--                        >--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--                <div class="m-widget17__items m-widget17__items-col">--}}
-{{--                    <div class="m-widget17__item col_2_items_5 items_row_3">--}}
-{{--                      <span class="m-widget17__icon">--}}
-{{--                        <i--}}
-{{--                            class="fa fa-forward color_black"--}}
-{{--                            style="font-size: 3rem"--}}
-{{--                        >--}}
-{{--                        <i--}}
-{{--                            class="fa fa-play color_white"--}}
-{{--                            style="font-size: 2pc;position: absolute;margin-top: 5px;"--}}
-{{--                        ></i>--}}
-{{--                      </i>--}}
-{{--                      </span>--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__subtitle"--}}
-{{--                            style="color: black; font-size: 1.5rem"--}}
-{{--                        >{{$daily_counts['triple_play']}}</span--}}
-{{--                        >--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__desc"--}}
-{{--                            style="color: black; font-size: 1rem"--}}
-{{--                        ><b>Daily Triple Play</b></span--}}
-{{--                        >--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--                <div class="m-widget17__items m-widget17__items-col">--}}
-{{--                    <div class="m-widget17__item col_2_items_6 items_row_3">--}}
-{{--                      <span class="m-widget17__icon">--}}
-{{--                        <i--}}
-{{--                            class="fa fa-forward color_black"--}}
-{{--                            style="font-size: 3rem"--}}
-{{--                        > <i--}}
-{{--                                class="fa fa-forward color_black"--}}
-{{--                                style="font-size: 3rem;position: absolute;"--}}
-{{--                            ></i>--}}
-{{--                        </i>--}}
-{{--                      </span>--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__subtitle"--}}
-{{--                            style="color: black; font-size: 1.5rem"--}}
-{{--                        >{{$daily_counts['quad_play']}}</span--}}
-{{--                        >--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__desc"--}}
-{{--                            style="color: black; font-size: 1rem"--}}
-{{--                        ><b>Daily Quad Play</b></span--}}
-{{--                        >--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-
-{{--            <!-- <div class="pt-4"></div> -->--}}
-{{--            <div class="m-widget17__stats">--}}
-{{--                <div class="m-widget17__items m-widget17__items-col">--}}
-{{--                    <div class="m-widget17__item col_3_items_1 items_row_2">--}}
-{{--                      <span class="m-widget17__icon">--}}
-{{--                        <i--}}
-{{--                            class="fa fa-cart-arrow-down color_white_1"--}}
-{{--                            style="font-size: 3rem"--}}
-{{--                        ></i>--}}
-{{--                      </span>--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__subtitle"--}}
-{{--                            style="color: white; font-size: 1.5rem"--}}
-{{--                        >--}}
-{{--                        {{$six_months_sales_count['one_month']['total_rgu']}}--}}
-{{--                      </span>--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__desc"--}}
-{{--                            style="color: white; font-size: 1rem"--}}
-{{--                        ><b>Monthly Total RGU's</b></span--}}
-{{--                        >--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--                <div class="m-widget17__items m-widget17__items-col">--}}
-{{--                    <div class="m-widget17__item col_3_items_2 items_row_2">--}}
-{{--                      <span class="m-widget17__icon">--}}
-{{--                        <i--}}
-{{--                            class="fa fa-shopping-cart color_white_1"--}}
-{{--                            style="font-size: 3rem"--}}
-{{--                        ></i>--}}
-{{--                      </span>--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__subtitle"--}}
-{{--                            style="color: white; font-size: 1.5rem"--}}
-{{--                        >{{$six_months_sales_count['one_month']['total_sales']}}</span--}}
-{{--                        >--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__desc"--}}
-{{--                            style="color: white; font-size: 1rem"--}}
-{{--                        ><b>Monthly Sale</b></span--}}
-{{--                        >--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--                <div class="m-widget17__items m-widget17__items-col">--}}
-{{--                    <div class="m-widget17__item col_3_items_3 items_row_2">--}}
-{{--                      <span class="m-widget17__icon">--}}
-{{--                        <i--}}
-{{--                            class="fa fa-play color_white_1"--}}
-{{--                            style="font-size: 3rem"--}}
-{{--                        ></i>--}}
-{{--                      </span>--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__subtitle"--}}
-{{--                            style="color: white; font-size: 1.5rem"--}}
-{{--                        >{{$six_months_sales_count['one_month']['single_play']}}</span--}}
-{{--                        >--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__desc"--}}
-{{--                            style="color: white; font-size: 1rem"--}}
-{{--                        ><b>Monthly Single Play</b></span--}}
-{{--                        >--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--                <div class="m-widget17__items m-widget17__items-col">--}}
-{{--                    <div class="m-widget17__item col_3_items_4 items_row_2">--}}
-{{--                      <span class="m-widget17__icon">--}}
-{{--                        <i--}}
-{{--                            class="fa fa-forward color_black"--}}
-{{--                            style="font-size: 3rem"--}}
-{{--                        ></i>--}}
-{{--                      </span>--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__subtitle"--}}
-{{--                            style="color: black; font-size: 1.5rem"--}}
-{{--                        >{{$six_months_sales_count['one_month']['double_play']}}</span--}}
-{{--                        >--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__desc"--}}
-{{--                            style="color: black; font-size: 1rem"--}}
-{{--                        ><b>Monthly Double Play</b></span--}}
-{{--                        >--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--                <div class="m-widget17__items m-widget17__items-col">--}}
-{{--                    <div class="m-widget17__item col_3_items_5 items_row_2">--}}
-{{--                      <span class="m-widget17__icon">--}}
-{{--                        <i--}}
-{{--                            class="fa fa-forward color_black"--}}
-{{--                            style="font-size: 3rem"--}}
-{{--                        >--}}
-{{--                          <i--}}
-{{--                              class="fa fa-play color_black"--}}
-{{--                              style="font-size: 2pc;position: absolute;margin-top: 5px;"--}}
-{{--                          ></i>--}}
-{{--                        </i>--}}
-
-{{--                      </span>--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__subtitle"--}}
-{{--                            style="color: black; font-size: 1.5rem"--}}
-{{--                        >{{$six_months_sales_count['one_month']['triple_play']}}</span--}}
-{{--                        >--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__desc"--}}
-{{--                            style="color: black; font-size: 1rem"--}}
-{{--                        ><b>Monthly Triple Play</b></span--}}
-{{--                        >--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--                <div class="m-widget17__items m-widget17__items-col">--}}
-{{--                    <div class="m-widget17__item col_3_items_6 items_row_2">--}}
-{{--                      <span class="m-widget17__icon">--}}
-{{--                        <i--}}
-{{--                            class="fa fa-forward color_black"--}}
-{{--                            style="font-size: 3rem"--}}
-{{--                        > <i--}}
-{{--                                class="fa fa-forward color_black"--}}
-{{--                                style="font-size: 3rem;position: absolute;"--}}
-{{--                            ></i>--}}
-{{--                        </i>--}}
-{{--                      </span>--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__subtitle"--}}
-{{--                            style="color: black; font-size: 1.5rem"--}}
-{{--                        >{{$six_months_sales_count['one_month']['quad_play']}}</span--}}
-{{--                        >--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__desc"--}}
-{{--                            style="color: black; font-size: 1rem"--}}
-{{--                        ><b>Monthly Quad Play</b></span--}}
-{{--                        >--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-
-{{--            <div class="m-widget17__stats">--}}
-{{--                <div class="m-widget17__items m-widget17__items-col">--}}
-{{--                    <div class="m-widget17__item items_1 items_row_1">--}}
-{{--                        <span class="m-widget17__icon">--}}
-{{--                          <i--}}
-{{--                              class="fa fa-phone color_white_1"--}}
-{{--                              style="font-size: 3rem"--}}
-{{--                          ></i>--}}
-{{--                        </span>--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__subtitle"--}}
-{{--                            style="color: white; font-size: 1.5rem"--}}
-{{--                        >--}}
-{{--                          {{$six_months_dispositions_count['one_month']}}--}}
-{{--                        </span>--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__desc"--}}
-{{--                            style="color: white; font-size: 1rem"--}}
-{{--                        ><b>Monthly Dispositions</b></span--}}
-{{--                        >--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--                <div class="m-widget17__items m-widget17__items-col">--}}
-{{--                    <div class="m-widget17__item items_2 items_row_1">--}}
-{{--                      <span class="m-widget17__icon">--}}
-{{--                        <i--}}
-{{--                            class="fa fa-cart-plus color_white_1"--}}
-{{--                            style="font-size: 3rem"--}}
-{{--                        ></i>--}}
-{{--                      </span>--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__subtitle"--}}
-{{--                            style="color: white; font-size: 1.5rem"--}}
-{{--                        >{{$sale_made}}</span--}}
-{{--                        >--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__desc"--}}
-{{--                            style="color: white; font-size: 1rem"--}}
-{{--                        ><b>Monthly Sale Made</b></span--}}
-{{--                        >--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--                <div class="m-widget17__items m-widget17__items-col">--}}
-{{--                    <div class="m-widget17__item items_3 items_row_1">--}}
-{{--                      <span class="m-widget17__icon">--}}
-{{--                        <i--}}
-{{--                            class="fa fa-phone color_white_1"--}}
-{{--                            style="font-size: 3rem"--}}
-{{--                        >--}}
-{{--                        <i--}}
-{{--                            class="fa fa-level-down fa-rotate-90 color_white_1"--}}
-{{--                            style="font-size: 2rem; position: absolute;"--}}
-{{--                        ></i>--}}
-{{--                      </i>--}}
-
-{{--                      </span>--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__subtitle"--}}
-{{--                            style="color: white; font-size: 1.5rem"--}}
-{{--                        >{{$call_back}}</span--}}
-{{--                        >--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__desc"--}}
-{{--                            style="color: white; font-size: 1rem"--}}
-{{--                        ><b>Monthly Call Back</b></span--}}
-{{--                        >--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--                <div class="m-widget17__items m-widget17__items-col">--}}
-{{--                    <div class="m-widget17__item items_4 items_row_1">--}}
-{{--                      <span class="m-widget17__icon">--}}
-{{--                        <i--}}
-{{--                            class="fa fa-user-secret color_black"--}}
-{{--                            style="font-size: 3rem"--}}
-{{--                        ></i>--}}
-{{--                      </span>--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__subtitle"--}}
-{{--                            style="color: black; font-size: 1.5rem"--}}
-{{--                        >{{$customer_service}}</span--}}
-{{--                        >--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__desc"--}}
-{{--                            style="color: black; font-size: 1rem"--}}
-{{--                        ><b>Monthly Customer Service</b></span--}}
-{{--                        >--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--                <div class="m-widget17__items m-widget17__items-col">--}}
-{{--                    <div class="m-widget17__item items_5 items_row_1">--}}
-{{--                      <span class="m-widget17__icon">--}}
-{{--                        <i--}}
-{{--                            class="fa fa-tty  color_black"--}}
-{{--                            style="font-size: 3rem"--}}
-{{--                        ></i>--}}
-{{--                      </span>--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__subtitle"--}}
-{{--                            style="color: black; font-size: 1.5rem"--}}
-{{--                        >{{$no_answer}}</span--}}
-{{--                        >--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__desc"--}}
-{{--                            style="color: black; font-size: 1rem"--}}
-{{--                        ><b>Monthly No Answer</b></span--}}
-{{--                        >--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--                <div class="m-widget17__items m-widget17__items-col">--}}
-{{--                    <div class="m-widget17__item items_6 items_row_1">--}}
-{{--                      <span class="m-widget17__icon">--}}
-{{--                        <i--}}
-{{--                            class="fa fa-phone color_black"--}}
-{{--                            style="font-size: 3rem"--}}
-{{--                        >--}}
-{{--                      <i--}}
-{{--                          class="fa fa-level-up fa-rotate-90  color_black"--}}
-{{--                          style="font-size: 2rem;margin-left: -10px; position: absolute;"--}}
-{{--                      ></i>--}}
-{{--                    </i>--}}
-{{--                      </span>--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__subtitle"--}}
-{{--                            style="color: black; font-size: 1.5rem"--}}
-{{--                        >{{$call_transferred}}</span--}}
-{{--                        >--}}
-{{--                        <span--}}
-{{--                            class="m-widget17__desc"--}}
-{{--                            style="color: black; font-size: 1rem"--}}
-{{--                        ><b>Monthly Call Transfered</b></span--}}
-{{--                        >--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-
-{{--        </div>--}}
-{{--    </div>--}}
-
-
     <!--Begin::Section-->
     <div class="row">
         <div class="col-12">
@@ -813,7 +391,6 @@
                             </tbody>
                         </table>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -1007,15 +584,9 @@
         </div>
     </div>
     <!--End::Section-->
-
 @endsection
 @section('footer_scripts')
-    <!-- JS Libraies -->
-    <!-- Page Specific JS File -->
     <script src="{{asset('assets/js/page/index.js')}}"></script>
-    <!-- JS Libraies -->
-    <!-- Page Specific JS File -->
-    {{--    <script src="{{asset('assets/js/page/chart-amchart.js')}}"></script>--}}
     <script src="//www.google.com/jsapi" type="text/javascript"></script>
     <script>
         $(document).ready(function (){

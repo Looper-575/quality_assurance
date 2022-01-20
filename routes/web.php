@@ -24,20 +24,18 @@ Route::post('/do_login', 'App\Http\Controllers\UserController@login')->name('do_
 
 
 Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
-    //Routes for Users ///////////////////////
+    //Routes for dashboard ///
     Route::get('', 'App\Http\Controllers\DashboardController@index')->name('dashboard');
     Route::get('/', 'App\Http\Controllers\DashboardController@index')->name('dashboard');
-//    Route::get('/team_dashboard' , 'App\Http\Controllers\DashboardController@team_dashboard')->name('team_dashboard');
-//    Route::get('/agent_dashboard' , 'App\Http\Controllers\DashboardController@csr_dashboard')->name('agent_dashboard');
-
-
+    Route::get('/vendor_dashboard', 'App\Http\Controllers\DashboardController@vendor_dashboard')->name('vendor_dashboard');
+    // Users
     Route::get('/users', 'App\Http\Controllers\UserController@list')->name('users');
     Route::post('/user_form', 'App\Http\Controllers\UserController@user_form')->name('user_form');
     Route::post('/user_save', 'App\Http\Controllers\UserController@save')->name('user_save');
     Route::post('/user_delete', 'App\Http\Controllers\UserController@delete')->name('user_delete');
     Route::post('/change_password' , 'App\Http\Controllers\UserController@change_password')->name('change_password');
     //Routes for Roles //////////////////////
-    Route::get('/roles_list', 'App\Http\Controllers\SettingsController@user_roles_list')->name('roles_list');
+    Route::get('/user_roles', 'App\Http\Controllers\SettingsController@user_roles_list')->name('roles_list');
     Route::post('/save_role', 'App\Http\Controllers\SettingsController@user_roles_save')->name('roles_save');
     Route::post('/delete_role', 'App\Http\Controllers\SettingsController@user_roles_delete')->name('roles_delete');
     // Routes for Quality Assurance /////////////////
@@ -50,11 +48,6 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::get('/qa_queue','App\Http\Controllers\QAController@qa_queue')->name('qa_queue');
     Route::get('/qa_add/{id}','App\Http\Controllers\QAController@qa_add')->name('qa_add');
     Route::post('/qa_report_single_data' , 'App\Http\Controllers\QAController@show_single_qa')->name('qa_report_single_data');
-
-    //Routes for qa report
-    Route::get('/qa_report_form' , 'App\Http\Controllers\ReportController@qa_report_form')->name('qa_report_form');
-    Route::post('/generate_qa_report' , 'App\Http\Controllers\ReportController@generate_qa_report')->name('generate_qa_report');
-
     //  Routes for Lead ///////////////////////////
     Route::get('/lead_form', 'App\Http\Controllers\CallDispositionController@form')->name('lead_form');
     Route::post('/lead_save', 'App\Http\Controllers\CallDispositionController@save')->name('lead_save');
@@ -67,6 +60,8 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::post('/non_sale' , function (){
         return view('call_dipositions.partials.non_sale_form');
     })->name('non_sale');
+    Route::get('/recordings' , 'App\Http\Controllers\RecordingController@recordings')->name('recordings');
+    Route::get('/dispose/{id}','App\Http\Controllers\RecordingController@dispose')->name('dispose');
     // routes for lead types form /////////////////////////////////
     Route::get('/lead_types_list' , 'App\Http\Controllers\SettingsController@disposition_type_list')->name('lead_types_list');
     Route::post('/lead_types_save' , 'App\Http\Controllers\SettingsController@disposition_type_save')->name('lead_types_save');
@@ -93,24 +88,15 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::post('/transfer_save','App\Http\Controllers\SalesTransferController@transfer_save')->name('transfersave');
     Route::post('/sales_transfer_reject','App\Http\Controllers\SalesTransferController@reject')->name('sales_transfer_reject');
     Route::post('/sales_transfer_approve','App\Http\Controllers\SalesTransferController@approve')->name('sales_transfer_approve');
-
+    // attendance
     Route::get('/attendance','App\Http\Controllers\AttendanceController@attendance')->name('attendance');
-    Route::get('/attendance_list','App\Http\Controllers\AttendanceController@list')->name('attendance_list');
     Route::post('/mark_attendance' , 'App\Http\Controllers\AttendanceController@mark_attendance')->name('mark_attendance');
-    Route::post('/generate_attendance_report' , 'App\Http\Controllers\AttendanceController@generate_attendance_report')->name('generate_attendance_report');
-    Route::get('/attendance_single_list','App\Http\Controllers\AttendanceController@single_list')->name('attendance_single_list');
-    Route::post('/generate_signle_attendance_report' , 'App\Http\Controllers\AttendanceController@generate_signle_attendance_report')->name('generate_signle_attendance_report');
     Route::get('/get_manager_attendance/{id}','App\Http\Controllers\AttendanceController@get_manager_attendance')->name('get_manager_attendance');
-
-    //    shift route
-    Route::get('/shift','App\Http\Controllers\ShiftController@shift')->name('shift');
+    // shift route
+    Route::get('/shift','App\Http\Controllers\ShiftController@index')->name('shift');
     Route::post('/save_shift_form','App\Http\Controllers\ShiftController@save_shift')->name('save_shift_form');
-    Route::get('/shift_list','App\Http\Controllers\ShiftController@shift_list')->name('shift_list');
-    Route::post('/shift_single_data', 'App\Http\Controllers\ShiftController@show')->name('shift_single_data');
-    Route::get('/shift_edit/{id}' , 'App\Http\Controllers\ShiftController@edit')->name('shift_edit');
     Route::post('/shift_delete', 'App\Http\Controllers\ShiftController@shift_delete')->name('shift_delete');
-
-    //    Note route
+    // Note route
     Route::post('/save_todo_form', 'App\Http\Controllers\NoteController@save_todo_form')->name('save_todo_form');
     Route::get('/get_pending_todos', 'App\Http\Controllers\NoteController@get_pending_todos')->name('get_pending_todos');
     Route::get('/get_done_todos', 'App\Http\Controllers\NoteController@get_done_todos')->name('get_done_todos');
@@ -120,8 +106,7 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::get('/get_note_data', 'App\Http\Controllers\NoteController@get_note_data')->name('get_note_data');
     Route::post('/delete_note_form', 'App\Http\Controllers\NoteController@delete_note_form')->name('delete_note_form');
     Route::get('/single_note_data/{id}', 'App\Http\Controllers\NoteController@single_note_data')->name('single_note_data');
-
-    //      Team route
+    // Team route
     Route::get('/department', 'App\Http\Controllers\TeamController@team_type')->name('department');
     Route::post('/team_type_save', 'App\Http\Controllers\TeamController@team_type_save')->name('team_type_save');
     Route::post('/team_type_delete', 'App\Http\Controllers\TeamController@team_type_delete')->name('team_type_delete');
@@ -133,15 +118,22 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::post('/save_add_member_form', 'App\Http\Controllers\TeamController@save_add_member_form')->name('save_add_member_form');
     Route::get('/get_manager_agents/{id}' , 'App\Http\Controllers\TeamController@get_manager_agents')->name('get_manager_agents');
     // company policy
-    Route::get('/policies' , 'App\Http\Controllers\SettingsController@policies')->name('policies');
+    Route::get('/company_policies' , 'App\Http\Controllers\SettingsController@company_policies')->name('policies');
     Route::post('/policies_file_upload' , 'App\Http\Controllers\SettingsController@policies_file_upload')->name('policies_file_upload');
     Route::post('/policy_delete' , 'App\Http\Controllers\SettingsController@policy_delete')->name('policy_delete');
-
+    // holidays
     Route::get('/holiday','App\Http\Controllers\HolidayController@index')->name('holiday');
-    Route::get('/holiday_form','App\Http\Controllers\HolidayController@holiday_form')->name('holiday_form');
     Route::post('/save_holiday' , 'App\Http\Controllers\HolidayController@save_holiday')->name('save_holiday');
-    Route::get('/holiday_edit/{id}','App\Http\Controllers\HolidayController@holiday_edit')->name('holiday_edit');
     Route::post('/holiday_delete', 'App\Http\Controllers\HolidayController@holiday_delete')->name('holiday_delete');
+    //reports
+    Route::get('/qa_report_form' , 'App\Http\Controllers\ReportController@qa_report_form')->name('qa_report_form');
+    Route::post('/generate_qa_report' , 'App\Http\Controllers\ReportController@generate_qa_report')->name('generate_qa_report');
+    Route::get('/attendance_report_monthly','App\Http\Controllers\ReportController@attendance_report_monthly')->name('attendance_report_monthly');
+    Route::post('/generate_monthly_attendance_report' , 'App\Http\Controllers\ReportController@generate_monthly_attendance_report')->name('generate_monthly_attendance_report');
+    Route::get('/attendance_report_single','App\Http\Controllers\ReportController@attendance_report_single')->name('attendance_report_single');
+    Route::post('/generate_single_attendance_report' , 'App\Http\Controllers\ReportController@generate_single_attendance_report')->name('generate_single_attendance_report');
+    Route::get('/did_report','App\Http\Controllers\ReportController@did_report_form')->name('did_report');
+    Route::post('/generate_did_report','App\Http\Controllers\ReportController@generate_did_report')->name('generate_did_report');
 
 });
 

@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!--begin::Web font -->
-    <script src="{{asset('assets/webfont.js')}}"></script>
+    <script src="{{asset('assets/js/webfont.js')}}"></script>
     <script>
         WebFont.load({
             google: {"families":["Poppins:300,400,500,600,700","Roboto:300,400,500,600,700"]},
@@ -17,20 +17,15 @@
             }
         });
     </script>
-    <!--end::Web font -->
-    <!--begin::Base Styles -->
-    <!--begin::Page Vendors -->
-    <!--end::Page Vendors -->
     <link href="{{asset('assets/css/all.min.css')}}" rel="stylesheet" type="text/css"/>
-    <link href="{{asset('assets/vendors/base/vendors.bundle.css')}}" rel="stylesheet" type="text/css" />
-    <link href="{{asset('assets/demo/default/base/style.bundle.css')}}" rel="stylesheet" type="text/css" />
+    <link href="{{asset('assets/css/vendors.bundle.css')}}" rel="stylesheet" type="text/css" />
+    <link href="{{asset('assets/css/style.bundle.css')}}" rel="stylesheet" type="text/css" />
     <!--end::Base Styles -->
-    <link href="{{asset('assets/custom.css')}}" rel="stylesheet" type="text/css" />
-    <link href="{{asset('assets/vendors.bundle.css')}}" rel="stylesheet" type="text/css"/>
-    <link href="{{asset('assets/css/box_style.css')}}" rel="stylesheet" type="text/css"/>
-    <link rel="shortcut icon" href="{{asset('favicon.ico')}}" />
     <link rel="stylesheet" href="{{asset('assets/css/style.css')}}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link href="{{asset('assets/css/box_style.css')}}" rel="stylesheet" type="text/css"/>
+    <link href="{{asset('assets/css/custom.css')}}" rel="stylesheet" type="text/css" />
+    <link href="{{asset('assets/css/custom_2.css')}}" rel="stylesheet" type="text/css" />
+    <link rel="shortcut icon" href="{{asset('favicon.ico')}}" />
     @yield('header_scripts')
 </head>
 <!-- end::Head -->
@@ -56,7 +51,7 @@
     </div>
     <!-- end:: Body -->
     <!-- begin::Footer -->
-    <footer class="m-grid__item		m-footer ">
+    <footer class="m-grid__item	m-footer ">
         <div class="m-container m-container--fluid m-container--full-height m-page__container">
             <div class="m-stack m-stack--flex-tablet-and-mobile m-stack--ver m-stack--desktop">
                 <div class="m-stack__item m-stack__item--left m-stack__item--middle m-stack__item--last">
@@ -82,8 +77,8 @@
 </div>
 <!-- end::Scroll Top -->
 <!--begin::Base Scripts -->
-<script src="{{asset('assets/vendors/base/vendors.bundle.js')}}" type="text/javascript"></script>
-<script src="{{asset('assets/demo/default/base/scripts.bundle.js')}}" type="text/javascript"></script>
+<script src="{{asset('assets/js/vendors.bundle.js')}}" type="text/javascript"></script>
+<script src="{{asset('assets/js/scripts.bundle.js')}}" type="text/javascript"></script>
 <!--end::Base Scripts -->
 
 <script src="{{ asset('assets/bundles/sweetalert/sweetalert.min.js') }}"></script>

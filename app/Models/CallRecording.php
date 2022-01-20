@@ -16,6 +16,14 @@ class CallRecording extends Model
 
 
     protected $fillable = [
-        'from', 'to' , 'uid', 'agent_id'
+        'from', 'to' , 'uid', 'agent_id','disposed'
     ];
+
+
+    public function did_numbers(){
+        return $this->hasOne(DidNumbers::class,'number_id','to_number');
+    }
+    public function user(){
+        return $this->hasOne(User::class, 'vicidialer_id' , 'agent_id');
+    }
 }

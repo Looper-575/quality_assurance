@@ -1,16 +1,9 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\Note;
-use App\Models\Shift;
-use App\Models\ShiftUser;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Auth;
-use Mockery\Exception;
-use DB;
+use Illuminate\Support\Facades\Auth;
 
 class NoteController extends Controller
 {
@@ -24,7 +17,6 @@ class NoteController extends Controller
     {
         //$this->middleware('auth');
     }
-
     public function save_note_form(Request $request)
     {
         $validator = Validator::make($request->all(),[
@@ -43,9 +35,7 @@ class NoteController extends Controller
             ]);
             $response['status'] = "Success";
             $response['result'] = "Saved Successfully";
-
             $data['notes'] = Note::where('type', 'note')->where('added_by', Auth::user()->user_id)->where('status', 1)->orderBy('note_id', 'desc')->get();
-
             return view('notes.note_data' , $data);
         }
         else {
@@ -54,13 +44,10 @@ class NoteController extends Controller
         }
         return response()->json($response);
     }
-
     public function get_note_data(){
         $data['notes'] = Note::where('type', 'note')->where('added_by', Auth::user()->user_id)->where('status', 1)->orderBy('note_id', 'desc')->get();
-
         return view('notes.note_data' , $data);
     }
-
     public function delete_note_form(Request $request)
     {
         Note::where([
@@ -69,17 +56,13 @@ class NoteController extends Controller
             'status' => 0,
         ]);
         $data['notes'] = Note::where('type', 'note')->where('added_by', Auth::user()->user_id)->where('status', 1)->orderBy('note_id', 'desc')->get();
-
         return view('notes.note_data' , $data);
     }
-
     public function single_note_data($id)
     {
         $response['data'] = Note::where('note_id', $id)->first();
-
         return response()->json($response);
     }
-
     public function save_todo_form(Request $request)
     {
         $validator = Validator::make($request->all(),[
@@ -97,7 +80,6 @@ class NoteController extends Controller
             $response['status'] = "Success";
             $response['result'] = "Saved Successfully";
             $data['pending_todos'] = Note::where('type', 'todo')->where('added_by', Auth::user()->user_id)->where('status', 2)->orderBy('note_id', 'desc')->get();
-
             return view('notes.pending_todo_data' , $data);
         }
         else {
@@ -106,19 +88,14 @@ class NoteController extends Controller
         }
         return response()->json($response);
     }
-
     public function get_pending_todos(){
         $data['pending_todos'] = Note::where('type', 'todo')->where('added_by', Auth::user()->user_id)->where('status', 2)->orderBy('note_id', 'desc')->get();
-
         return view('notes.pending_todo_data' , $data);
     }
-
     public function get_done_todos(){
         $data['done_todos'] = Note::where('type', 'todo')->where('added_by', Auth::user()->user_id)->where('status', 1)->orderBy('note_id', 'desc')->take(10)->get();
-
         return view('notes.done_todo_data' , $data);
     }
-
     public function delete_todo_form(Request $request)
     {
         Note::where([
@@ -127,10 +104,8 @@ class NoteController extends Controller
             'status' => 0,
         ]);
         $data['done_todos'] = Note::where('type', 'todo')->where('added_by', Auth::user()->user_id)->where('status', 1)->orderBy('note_id', 'desc')->get();
-
         return view('notes.done_todo_data' , $data);
     }
-
     public function make_done_todo(Request $request)
     {
         Note::where([
@@ -139,8 +114,6 @@ class NoteController extends Controller
             'status' => 1,
         ]);
         $data['pending_todos'] = Note::where('type', 'todo')->where('added_by', Auth::user()->user_id)->where('status', 2)->orderBy('note_id', 'desc')->get();
-
         return view('notes.pending_todo_data' , $data);
     }
-
 }

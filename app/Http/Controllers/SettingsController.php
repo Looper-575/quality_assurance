@@ -1,9 +1,9 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\CallDisposition;
 use App\Models\Enquiry;
+use App\Models\Policy;
+use App\Models\PolicyFile;
 use App\Models\UserRole;
 //use http\Client\Curl\User;
 use Illuminate\Http\Request;
@@ -13,17 +13,16 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\CallDispositionsTypes;
 use App\Models\CallDispositionsDid;
 use App\Models\User;
-
+use Mockery\Exception;
 class SettingsController extends Controller
 {
     public function __construct()
     {
     }
-
     //    Functions for Call Disposition types  ///////////////////////////////////////////////////
     public function disposition_type_list()
     {
-        $data['page_title'] = "Atlantis BPO CRM - Call Disposition Types List";
+        $data['page_title'] = "Call Disposition Types - Atlantis BPO CRM";
         $data['call_disposition_types'] = CallDispositionsTypes::where([
             'status' => 1,
         ])->get() ;
@@ -63,13 +62,11 @@ class SettingsController extends Controller
         $response['status'] = "Success";
         $response['result'] = "Deleted Successfully";
         return response()->json($response);
-
     }
-
     // functions for Disposistion Lead DID
     public function did_list()
     {
-        $data['page_title'] = "Atlantis BPO CRM - Call Disposition Types List";
+        $data['page_title'] = "DID List - Atlantis BPO CRM";
         $data['did_lists'] = CallDispositionsDid::where([
             'status' => 1,
         ])->get() ;
@@ -114,11 +111,10 @@ class SettingsController extends Controller
         $response['result'] = "Deleted Successfully";
         return response()->json($response);
     }
-
     ////////  User Roles Functions //////////////////////////////////////////////////////////////////
     public function user_roles_list()
     {
-        $data['page_title'] = "Atlantis BPO CRM - Roles";
+        $data['page_title'] = "User Roles - Atlantis BPO CRM";
         $data['roles'] = UserRole::where('status',1)->with(['added_by_user'])->get();
         return view('users.user_role_list' , $data);
     }
@@ -136,11 +132,10 @@ class SettingsController extends Controller
                     $response['result'] = "Record Already Exists";
                 } else{
                     $role = UserRole::where('role_id', $request->role_id)->update([
-                    'modified_by' => Auth::user()->user_id,
-                    'title' => $request->title,
-                    'slug' => slugify($request->title),
-
-                ]);
+                        'modified_by' => Auth::user()->user_id,
+                        'title' => $request->title,
+                        'slug' => slugify($request->title),
+                    ]);
                     $response['status'] = "Success";
                     $response['result'] = "Added Successfully";
                 }
@@ -159,11 +154,11 @@ class SettingsController extends Controller
                     $response['result'] = "Added Successfully";
                 }
             }
-                    return response()->json($response);
+            return response()->json($response);
         } else {
-                    $response['status'] = "Failure!";
-                    $response['result'] = $validator->errors()->toJson();
-                    return response()->json($response);
+            $response['status'] = "Failure!";
+            $response['result'] = $validator->errors()->toJson();
+            return response()->json($response);
         }
     }
     public function user_roles_delete(Request $request)
@@ -175,9 +170,61 @@ class SettingsController extends Controller
         $response['result'] = "Deleted Successfully";
         return response()->json($response);
     }
+    //////// HR Policies Functions /////////////////////////////////////////////////////////////////
+    public function company_policies()
+    {
+        $data['page_title'] = "Company Policies - Atlantis BPO CRM";
+        $data['policies'] = Policy::with('policy_files')
+            ->orderBy('policy_id', 'desc')
+            ->where('status', 1)->get();
+        return view('settings.policies', $data);
+    }
+    public function policies_file_upload(Request $request)
+    {
+        $validator = Validator::make($request->all(),[
+            'uploadFile' => 'required',
+            'title' => 'required',
+        ]);
+        if($validator->passes()) {
+            DB::beginTransaction();
+            try {
+                $policy = new Policy;
+                $policy->title = $request->title;
+                $policy->added_by = Auth::user()->user_id;
+                $policy->save();
+                $policy_id = $policy->policy_id;
+                foreach ($request->file('uploadFile') as $key => $value) {
+                    $filename = time() . '.' . $value->extension();
+                    $value->move(public_path("files"), $filename);
+                    $path = '/files/' . $filename;
+                    $policy_file = new PolicyFile;
+                    $policy_file->policy_id = $policy_id;
+                    $policy_file->file = $path;
+                    $policy_file->added_by = Auth::user()->user_id;
+                    $policy_file->save();
+                }
+            } catch (\Exception $ex) {
+                DB::rollBack();
+                $response['status'] = "Failure";
+                $response['result'] = "Unexpected error occurred";
+            } finally {
+                DB::commit();
+                $response['status'] = "Success";
+                $response['result'] = "File Uploaded Successfully";
+            }
+        } else {
+            $response['status'] = "Failure!";
+            $response['result'] = $validator->errors()->toJson();
+        }
+        return response()->json($response);
+    }
+    public function policy_delete(Request $request)
+    {
+        Policy::where('policy_id', $request->policy_id)->update(['status' => 2]);
+        $response['status'] = "Success";
+        $response['result'] = "Deleted Successfully";
+        return response()->json($response);
+    }
 }
-
-
-
 
 

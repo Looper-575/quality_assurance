@@ -9,12 +9,11 @@
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
                 <div class="m-portlet__head-title">
-                    <h3 class="m-portlet__head-text">Disposition Report Form</h3>
+                    <h3 class="m-portlet__head-text">Disposition Reports</h3>
                 </div>
             </div>
         </div>
         <div class="m-portlet__body">
-
             <form method="post" id="report_form" enctype="multipart/form-data">
                 @csrf
                 <div class="row">
@@ -31,10 +30,10 @@
                         </div>
                     </div>
                     <div class="col-3">
-                        <label class="form-check-label" for="agent">Agent</label><br>
-                        <select class="form-control select2" name="agent[]" id="agent" multiple="multiple">
-                            @foreach($agents as $agent)
-                                <option value="{{$agent->user_id}}"> {{$agent->full_name}} </option>
+                        <label class="form-check-label" for="agent">DID</label><br>
+                        <select class="form-control select2" required name="did_id[]" id="agent" multiple="multiple">
+                            @foreach($dids as $did)
+                                <option value="{{$did->did_id}}"> {{$did->title}} </option>
                             @endforeach
                         </select>
                     </div>
@@ -58,7 +57,6 @@
                     </div>
                 </div>
             </form>
-
         </div>
     </div>
 @endsection
@@ -81,7 +79,7 @@
                 });
             };
             let arr = [a];
-            call_ajax_with_functions('report_data', '{{route('generate_disposition_report')}}', data, arr);
+            call_ajax_with_functions('report_data', '{{route('generate_did_report')}}', data, arr);
         });
 
         function view_lead(me) {

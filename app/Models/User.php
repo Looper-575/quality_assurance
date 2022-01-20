@@ -63,10 +63,6 @@ class User extends Authenticatable
         return $this->belongsTo(User::class, 'manager_id', 'user_id');
     }
 
-    public function shift()
-    {
-        return $this->belongsTo(ShiftUser::class, 'user_id', 'user_id');
-    }
     public function manager_users()
     {
         return $this->hasMany(User::class, 'manager_id', 'user_id');

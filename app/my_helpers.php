@@ -7,6 +7,7 @@
 
 // date time helpers
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
 
 if (!function_exists('get_date_time')) {
     function get_date_time()
@@ -76,7 +77,7 @@ if (!function_exists('parse_date_get')) {
 if (!function_exists('encrypt_password')) {
     function encrypt_password($password)
     {
-        return sha1(md5($password.'Looper$alt'));
+        return sha1(md5($password . 'Looper$alt'));
     }
 }
 // slugify
@@ -101,7 +102,6 @@ if (!function_exists('slugify')) {
         return $text;
     }
 }
-
 if (!function_exists('send_email')) {
     function send_email($email_body, $email_address, $subject)
     {
@@ -119,6 +119,68 @@ if (!function_exists('send_email')) {
 
     }
 }
+if (!function_exists('working_days')) {
+    function working_days($startDate, $endDate)
+    {
+        if (strtotime($endDate) >= strtotime($startDate)) {
+            $holidays = array();
+            $date = $startDate;
+            $days = 0;
+            while ($date != $endDate) {
+                $date = date("Y-m-d", strtotime("+1 day", strtotime($date)));
+                $weekday = date("w", strtotime($date));
+                if ($weekday != 6 and $weekday != 0 and !in_array($date, $holidays)) $days++;
+            }
+            return $days;
+        } else {
+            return "Please check the dates.";
+        }
+    }
+}
 
+if(!function_exists('has_permission_from_db')) {
+    function has_permission_from_db($role_id, $menu_id, $permission)
+    {
+        $role_permission = \App\Models\RolePermission::where([
+            'role_id' => $role_id,
+            'menu_id' => $menu_id,
+        ])->first();
+        if($role_permission){
+            return $role_permission->$permission;
+        } else {
+            return false;
+        }
+    }
+}
+
+if(!function_exists('has_permission')){
+    function has_permission($menu_id, $permission)
+    {
+        foreach (Session::get('permissions') as $permission_granted){
+            if($permission_granted->menu_id==$menu_id){
+                return $permission_granted->$permission;
+            }
+        }
+        return false;
+    }
+}
+
+if(!function_exists('get_route_permissions')){
+    function get_route_permissions($role_id, $url)
+    {
+        $role_permission = \App\Models\SideMenu::with('menu_permission')->where([
+            'status' => 1,
+            'url' => $url,
+        ])->whereHas('menu_permission', function ($query) use ($role_id) {
+            $query->where('role_id', $role_id);
+        })->first();
+
+        if($role_permission){
+            return $role_permission;
+        } else {
+            return false;
+        }
+    }
+}
 /* End of file custom_helpers.php */
 /* Location: ./application/helpers/custom_helpers.php */

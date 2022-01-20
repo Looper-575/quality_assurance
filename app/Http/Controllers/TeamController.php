@@ -58,7 +58,7 @@ class TeamController extends Controller
     public function team_create()
     {
         $data['page_title'] = "Atlantis BPO CRM - Create Team";
-        $data['agents'] = User::doesnthave('shift')->doesnthave('team_member')->whereNotIn('role_id', [1, 2, 3])->where('status', 1)->get();
+        $data['agents'] = User::doesnthave('team_member')->whereNotIn('role_id', [1, 2, 3])->where('status', 1)->get();
         $data['team_leads'] = User::doesnthave('user_team')->where('status',1)->whereIn('role_id', [1, 2, 3])->get();
         $data['types'] = Department::where('status',1)->orderBy('department_id', 'DESC')->get();
         $data['shifts'] = Shift::where('status',1)->orderBy('shift_id', 'DESC')->get();
