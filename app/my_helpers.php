@@ -220,5 +220,38 @@ if(!function_exists('get_route_permissions')){
         }
     }
 }
+
+//Dashboard Date Function
+if(!function_exists('get_date_interval')){
+    function get_date_interval()
+    {
+        $today = get_date();
+        //$today = Date('2022-01-31');
+        $datetime = new DateTime($today);
+        $date_today = date("d", strtotime($today));
+        $hour = date("H", strtotime(get_date_time()));
+        //$hour = 5;
+        if($date_today == 29 && $hour < 7) {
+            $from_date = date("Y-m"  ,strtotime("-1 Month" , strtotime($today)));
+            $to_date = date("Y-m", strtotime($today));
+            $to_date = $to_date . '-' . $date_today . ' 17:00:00';
+        } else if ($date_today > 28 && $date_today <= 31) {
+            $from_date = date("Y-m", strtotime($today));
+            $to_date = date("Y-m-d", strtotime("+1 Day", strtotime($today))) . ' 17:00:00';
+        } else {
+            $from_date = date("Y-m", strtotime("-1 Month", strtotime($today)));
+            $to_date = date("Y-m", strtotime($today));
+            $date_today = date("d", strtotime("+1 Day", strtotime($today)));
+            $to_date = $to_date . '-' . $date_today . ' 17:00:00';
+        }
+        $from_date = $from_date . '-29 17:00:00';
+        $dates = [
+            'to_date' => $to_date,
+            'from_date'=>  $from_date
+        ];
+        //dd($dates);
+        return $dates;
+    }
+}
 /* End of file custom_helpers.php */
 /* Location: ./application/helpers/custom_helpers.php */

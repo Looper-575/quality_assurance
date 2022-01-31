@@ -67,16 +67,9 @@ class DashboardController extends Controller
         $data['daily_counts'] = $this->get_rgo_counts($from_date, $to_date);
         // 6 months sales/calls graph data
         // sales
-        if ($date_today > 28) {
-            $from_date = date("Y-m", strtotime($today));
-            $to_date = $from_date . '-' . $date_today . ' 17:00:00';
-        } else {
-            $from_date = date("Y-m", strtotime("-1 Month", strtotime($today)));
-            $to_date = date("Y-m", strtotime($today));
-            $date_today = date("d", strtotime("+1 Day", strtotime($today)));
-            $to_date = $to_date . '-' . $date_today . ' 17:00:00';
-        }
-        $from_date = $from_date . '-29 17:00:00';
+        $dates[] = get_date_interval();
+        $to_date = $dates[0]['to_date'];
+        $from_date = $dates[0]['from_date'];
 
         $data['sale_made'] = CallDisposition::where(['status' => 1, 'disposition_type' => 1])->whereBetween('added_on', [$from_date, $to_date])->count();
         $data['call_back'] = CallDisposition::where(['status' => 1, 'disposition_type' => 2])->whereBetween('added_on', [$from_date, $to_date])->count();
@@ -133,16 +126,9 @@ class DashboardController extends Controller
         }
         $data['daily_counts'] = $this->get_rgo_counts($from_date,$to_date);
         // 6 months sales/calls graph data
-        if($date_today>28){
-            $from_date = date("Y-m"  ,strtotime($today));
-            $to_date = $from_date.'-'.$date_today.' 17:00:00';
-        } else {
-            $from_date = date("Y-m"  ,strtotime("-1 Month" , strtotime($today)));
-            $to_date = date("Y-m"  ,strtotime($today));
-            $date_today = date("d"  ,strtotime("+1 Day" , strtotime($today)));
-            $to_date = $to_date.'-'.$date_today.' 17:00:00';
-        }
-        $from_date = $from_date.'-29 17:00:00';
+        $dates[] = get_date_interval();
+        $to_date = $dates[0]['to_date'];
+        $from_date = $dates[0]['from_date'];
         $data['sale_made'] = CallDisposition::where(['status' => 1,'disposition_type' => 1])->whereBetween('added_on', [$from_date, $to_date])->count();
         $data['call_back'] = CallDisposition::where(['status' => 1,'disposition_type' => 2])->whereBetween('added_on', [$from_date, $to_date])->count();
         $data['customer_service'] = CallDisposition::where(['status' => 1,'disposition_type' => 3])->whereBetween('added_on', [$from_date, $to_date])->count();
@@ -211,16 +197,9 @@ class DashboardController extends Controller
         $uid = Auth::user()->user_id;
         $data['daily_counts'] = $this->get_agent_rgo_counts($from_date,$to_date, $uid);
         // sales
-        if($date_today>28){
-            $from_date = date("Y-m"  ,strtotime($today));
-            $to_date = $from_date.'-'.$date_today.' 17:00:00';
-        } else {
-            $from_date = date("Y-m"  ,strtotime("-1 Month" , strtotime($today)));
-            $to_date = date("Y-m"  ,strtotime($today));
-            $date_today = date("d"  ,strtotime("+1 Day" , strtotime($today)));
-            $to_date = $to_date.'-'.$date_today.' 17:00:00';
-        }
-        $from_date = $from_date.'-29 17:00:00';
+        $dates[] = get_date_interval();
+        $to_date = $dates[0]['to_date'];
+        $from_date = $dates[0]['from_date'];
         $data['monthly_counts'] = $this->get_agent_rgo_counts($from_date,$to_date, $uid);
         $data['status'] = DB::select("SELECT * FROM (SELECT AVG(monitor_percentage) AS average FROM qa_with_color_badge WHERE(added_on >= '".$from_date."' AND added_on <= '".$to_date."' AND agent_id = '".$uid."') ) as avg_table INNER JOIN qa_performance_badge ON (avg_table.average >= qa_performance_badge.min AND avg_table.average <= qa_performance_badge.max)");
         return view('dashboard.agent_dashboard' , $data);
@@ -236,8 +215,10 @@ class DashboardController extends Controller
         $data['page_title'] = "Vendor Dahsboard - Atlantis CRM";
         $data['small_nav'] = true;
         $did_id = Auth::user()->vendor_did_id;
+        $did_id = 36;
 
         $today = get_date();
+//        $today = Date('2022-01-29');
         $datetime = new DateTime($today);
         $date_today = date("d"  ,strtotime($today));
         // daily counts
@@ -268,18 +249,10 @@ class DashboardController extends Controller
 
         //$data['daily_disp'] = $this->get_did_wise_daily_dispositions_count($from_date, $to_date,$did_id);
 
-
-        if($date_today>28){
-            $from_date = date("Y-m"  ,strtotime($today));
-            $to_date = $from_date.'-'.$date_today.' 17:00:00';
-        } else {
-            $from_date = date("Y-m"  ,strtotime("-1 Month" , strtotime($today)));
-            $to_date = date("Y-m"  ,strtotime($today));
-            $date_today = date("d"  ,strtotime("+1 Day" , strtotime($today)));
-            $to_date = $to_date.'-'.$date_today.' 17:00:00';
-        }
-        $from_date = $from_date.'-29 17:00:00';
-
+        $dates[] = get_date_interval();
+        $to_date = $dates[0]['to_date'];
+        $from_date = $dates[0]['from_date'];
+//        dd($date_today,$from_date,$to_date);
         // STATS TABLE
         $data['monthly_sale_made'] = CallDisposition::where(['status' => 1,'disposition_type' => 1,'did_id'=>$did_id])
             ->whereDate('added_on', '>=', $from_date)
