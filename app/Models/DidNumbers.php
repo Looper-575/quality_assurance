@@ -9,7 +9,7 @@ class DidNumbers extends Model
 {
     use HasFactory;
 
-    protected $table = 'did_numbers';
+    protected $table = 'call_dispostions_did_numbers';
     protected $primaryKey = 'id';
     const CREATED_AT = 'added_on';
     const UPDATED_AT = 'modified_on';
