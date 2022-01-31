@@ -2,7 +2,9 @@
 @section('header_scripts')
 @endsection
 @section('content')
-
+    <?php
+    $has_permissions = get_route_permissions( Auth::user()->role->role_id, 'shift');
+    ?>
     <div class="m-portlet m-portlet--mobile">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
@@ -10,9 +12,11 @@
                     <h3 class="m-portlet__head-text">Shifts</h3>
                 </div>
                 <div class="float-right mt-3">
+                    @if($has_permissions->add == 1)
                     <a id="add_new_btn" href="javascript:;" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill">
                         <span><i class="la la-phone-square"></i><span>Add New</span></span>
                     </a>
+                    @endif
                     <div class="m-separator m-separator--dashed d-xl-none"></div>
                 </div>
             </div>
@@ -37,8 +41,12 @@
                         <td>{{$menu->check_out}}</td>
                         <td>
                             <div class="btn-group btn-group-sm">
+                                @if($has_permissions->update == 1)
                                 <button type="button" class="btn btn-primary edit_btn" title="Edit Menu" value="{{json_encode($menu)}}"><i class="fa fa-edit"></i></button>
+                                @endif
+                                @if(Auth::user()->role_id == 1)
                                 <button type="button" class="btn btn-danger detele_btn" title="Delete Menu" value="{{$menu->shift_id}}"><i class="fa fa-trash"></i></button>
+                                @endif
                             </div>
                         </td>
                     </tr>

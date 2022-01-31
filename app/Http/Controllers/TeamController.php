@@ -84,7 +84,6 @@ class TeamController extends Controller
     public function save_add_member_form(Request $request)
     {
         $ids = explode(",",$request->user_ids);
-//        dd($request->all());
         $validator = Validator::make($request->all(), [
             'title' => 'required',
             'team_lead_id' => 'required',
@@ -108,8 +107,6 @@ class TeamController extends Controller
                         'added_by' => Auth::user()->user_id,
                     ]);
 
-//                    User::where('manager_id', $request->team_lead_id)->update(['manager_id' => null]);
-//                    User::whereIn('user_id', $ids)->update(['manager_id' => $request->team_lead_id]);
                     TeamMember::where('team_id', $request->team_id)->delete();
                     if($request->user_ids != null) {
                         foreach ($ids as $user_id) {

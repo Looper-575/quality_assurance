@@ -14,7 +14,7 @@
             </div>
         </div>
         <div class="m-portlet__body">
-            <form class="m-form m-form--fit m-form--label-align-right" method="post" id="qa_form" action="">
+            <form class="m-form m-form--fit m-form--label-align-right" method="post" id="qa_form" action="" enctype="multipart/form-data">
                 @csrf
                 <div class="row mb-2">
                     <div class="col-6 mb-1">
@@ -86,6 +86,10 @@
                             <input class="form-control" type="text" name="call_number" id="call_number" readonly>
 
                         @endif
+                    </div>
+                    <div class="col-6 mb-1">
+                        <label for="recording"><strong> Rcording File  </strong> </label>
+                        <input class="form-control" type="file" name="recording[]" id="recording" multiple>
                     </div>
                 </div>
                 <hr>

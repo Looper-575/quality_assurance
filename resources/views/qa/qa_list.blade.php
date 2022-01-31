@@ -3,6 +3,9 @@
     <link href="{{asset('assets/css/datatables.min.css')}}" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
+<?php
+$has_permissions = get_route_permissions( Auth::user()->role->role_id, 'qa_list');
+?>
     <div class="m-portlet m-portlet--mobile">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
@@ -24,18 +27,19 @@
                             QA Done
                         </a>
                     </li>
+                    @if($has_permissions->add == 1)
                     <li class="nav-item m-tabs__item">
                         <a class="nav-link m-tabs__link" href="{{route('qa_form')}}">
                             <i class="fa fa-plus" aria-hidden="true"></i>
                             Add New
                         </a>
                     </li>
+                    @endif
                 </ul>
             </div>
         </div>
         <div class="m-portlet__body">
             <div class="tab-content">
-
                 <div class="tab-pane active" id="qa_queue" role="tabpanel">
                     <div style="width: 100%">
                         <table class="datatable table table-bordered" style="width:100%">
@@ -56,9 +60,11 @@
                                     <td>{{ $qa_list->phone_number }}</td>
                                     <td>{{$qa_list->call_disposition_types->title}}</td>
                                     <td>
+                                        @if($has_permissions->add == 1)
                                         <div class="btn-group btn-group-sm">
                                             <a href="{{route('qa_add' , $qa_list->call_id)}}"  class="btn btn-primary"><i class="fa fa-arrow-right"></i></a>
                                         </div>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -104,10 +110,14 @@
                                     <td>{{parse_datetime_get($qa_list->added_on)}}</td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
+                                            @if($has_permissions->view == 1)
                                             <a href="javascript:view_qa({{$qa_list->qa_id}});"  class="btn btn-primary"><i class="fa fa-eye"></i></a>
+                                            @endif
+                                            @if($has_permissions->update == 1)
                                             <a class="btn btn-info" href="{{route('qa_edit' , $qa_list->qa_id)}}" >
                                                 <i class="la la-edit"> </i>
                                             </a>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>

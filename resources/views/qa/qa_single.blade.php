@@ -110,13 +110,13 @@
 
             </td>
             <td>
-                Misquoting the Price: <strong>{{$status_arr[$qa_data->automatic_fail_misquoting]}}</strong><br>
-                Disconnected Call: <strong>{{$status_arr[$qa_data->automatic_fail_disconnected ]}}</strong><br>
-                Failure to Answer: <strong>{{$status_arr[$qa_data->automatic_fail_answer]}}</strong><br>
-                Repeating Confidential: <strong>{{$status_arr[$qa_data->automatic_fail_repeating_details]}}</strong><br>
-                Changing Customer Details: <strong>{{$status_arr[$qa_data->automatic_fail_changing_details]}}</strong><br>
-                Fabricating Information: <strong>{{$status_arr[$qa_data->automatic_fail_fabricating]}}</strong><br>
-                Other: <strong>{{$status_arr[$qa_data->automatic_fail_other]}}</strong><br>
+                Misquoting the Price: <strong class="{{$status_arr[$qa_data->automatic_fail_misquoting]=='Yes' ? 'text-danger' : ''}}">{{$status_arr[$qa_data->automatic_fail_misquoting]}}</strong><br>
+                Disconnected Call: <strong class="{{$status_arr[$qa_data->automatic_fail_disconnected]=='Yes' ? 'text-danger' : ''}}">{{$status_arr[$qa_data->automatic_fail_disconnected ]}}</strong><br>
+                Failure to Answer: <strong class="{{$status_arr[$qa_data->automatic_fail_answer]=='Yes' ? 'text-danger' : ''}}">{{$status_arr[$qa_data->automatic_fail_answer]}}</strong><br>
+                Repeating Confidential: <strong class="{{$status_arr[$qa_data->automatic_fail_repeating_details]=='Yes' ? 'text-danger' : ''}}">{{$status_arr[$qa_data->automatic_fail_repeating_details]}}</strong><br>
+                Changing Customer Details: <strong class="{{$status_arr[$qa_data->automatic_fail_changing_details]=='Yes' ? 'text-danger' : ''}}">{{$status_arr[$qa_data->automatic_fail_changing_details]}}</strong><br>
+                Fabricating Information: <strong class="{{$status_arr[$qa_data->automatic_fail_fabricating]=='Yes' ? 'text-danger' : ''}}">{{$status_arr[$qa_data->automatic_fail_fabricating]}}</strong><br>
+                Other: <strong class="{{$status_arr[$qa_data->automatic_fail_other]=='Yes' ? 'text-danger' : ''}}">{{$status_arr[$qa_data->automatic_fail_other]}}</strong><br>
                 <strong>Comments</strong><br>
                 {{$qa_data->automatic_fail_comment}}
             </td>

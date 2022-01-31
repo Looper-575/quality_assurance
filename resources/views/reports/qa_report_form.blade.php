@@ -139,7 +139,7 @@
             let data = new FormData();
             data.append('qa_id', me.id);
             data.append('_token', '{{ csrf_token() }}');
-            call_ajax_modal('POST', '{{route('qa_report_single_data')}}', data, 'QA View');
+            call_ajax_modal('POST', '{{route('qa_single_data')}}', data, 'QA View');
         }
 
         $(document).ready(function (){

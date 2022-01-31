@@ -32,9 +32,14 @@
                     <div class="col-3">
                         <label class="form-check-label" for="agent">DID</label><br>
                         <select class="form-control select2" required name="did_id[]" id="agent" multiple="multiple">
-                            @foreach($dids as $did)
-                                <option value="{{$did->did_id}}"> {{$did->title}} </option>
-                            @endforeach
+                            @if(Auth::user()->role_id == 13)
+                                <option value="{{Auth::user()->vendor_did_id}}">My DID</option>
+                            @else
+                                <option value="">All</option>
+                                @foreach($dids as $did)
+                                    <option value="{{$did->did_id}}">{{$did->title}}</option>
+                                @endforeach
+                            @endif
                         </select>
                     </div>
                     <div class="col-3">

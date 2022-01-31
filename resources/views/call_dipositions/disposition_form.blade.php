@@ -48,8 +48,6 @@
     <script>
         let phone_num = {{isset($call_data[0]['from_number']) ? $call_data[0]['from_number'] : 0}};
 
-
-
         $('#lead_form').submit(function (e) {
             e.preventDefault();
             let anyerror = false;
@@ -94,7 +92,7 @@
             if(anyerror == false){
                 let data = new FormData(this);
                 let a = function () {
-                    window.history.go(-1);
+                    window.location.href = '{{route('call_queue')}}';
                 };
                 let arr = [a];
                 call_ajax_with_functions('', '{{route('lead_save')}}', data, arr);
@@ -115,10 +113,10 @@
                     let element = document.getElementById('did');
                     @if(isset($call_data[0]->did_numbers))
                         element.value = {{$call_data[0]->did_numbers->did_id}};
+                    @endif
+                    @if(isset($call_data[0]->rec_id))
                         $('#rec_id').val({{$call_data[0]->rec_id}});
                     @endif
-
-
                 }
                 let b = function () {
                     $(".select2").select2();
@@ -133,8 +131,13 @@
                     $('#phone_number').attr('readonly',true);
                     @endif
                     let ele = document.getElementById('rec_id');
+
                     @if(isset($call_data[0]->rec_id))
                         ele.value ={{$call_data[0]->rec_id}};
+                    @endif
+                    @if(isset($call_data[0]->did_numbers))
+                        let did = document.getElementById('did');
+                        did.value = {{$call_data[0]->did_numbers->did_id}};
                     @endif
                 }, 1000);
             }

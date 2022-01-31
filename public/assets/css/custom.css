@@ -68,6 +68,7 @@ table td, table th {
 }
 .sale_boxe_row1 > div > div > div > div.s_box_icons i, .sale_boxe_row1 > div > div > div > div.box_icons i, .sale_boxe_row1 > div > div > div > div.phone_icons i {
     font-size: 75px;
+    z-index: 0;
 }
 .sale_boxe_row1 > div > div > div > div.dice_icons {
     position: absolute;
@@ -168,7 +169,10 @@ table td, table th {
     text-transform : uppercase;
     color : #FEFF57;
 }
-
+.yellow_text,.red_text,.white_text,.black_text{
+    position: relative;
+    z-index: 2;
+}
 
 .NormalCharacterStyle {
     font-family : Nunito;

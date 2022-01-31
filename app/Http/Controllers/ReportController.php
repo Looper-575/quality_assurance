@@ -54,7 +54,7 @@ class ReportController extends Controller
             $date_from = parse_datetime_store($request->from.'17:00:00');
             $date_to = parse_datetime_store($request->to. '7:00:00');
             if ($request->agent != "") {
-                $data['call_disp_lists'] = CallDisposition::select('*')->with('qa_status')
+                $data['call_disp_lists'] = CallDisposition::select('*')->with(['qa_status','qa_assessment'])
                     ->whereIn('added_by', $request->agent)->where($where)
                     ->whereDate('added_on', '>=', $date_from)
                     ->whereDate('added_on', '<=', $date_to)->get();
@@ -73,8 +73,8 @@ class ReportController extends Controller
     {
         $data['page_title'] = "Call Disposition Report - Atlantis BPO CRM";
         $data['small_nav'] = true;
-        if(Auth::user()->role_id == 1) {
-            $data['dids'] = CallDispositionsDid::where('status', 1)->get();
+        if(Auth::user()->role_id == 13) {
+            $data['dids'] = CallDispositionsDid::where('did_id', 36)->get();
         } else {
             $data['dids'] = CallDispositionsDid::where('status', 1)->get();
         }
@@ -92,15 +92,31 @@ class ReportController extends Controller
         ]);
         if ($validator->passes()) {
             $where = array();
+            $where['status'] = 1;
             if ($request->disposition_type != "") {
                 $where['disposition_type'] = $request->disposition_type;
             }
             $date_from = parse_datetime_store($request->from.'17:00:00');
             $date_to = parse_datetime_store($request->to. '7:00:00');
-            $data['call_disp_lists'] = CallDisposition::select('*')->with('qa_status')
-                ->whereIn('did_id', $request->did_id)->where($where)
-                ->whereDate('added_on', '>=', $date_from)
-                ->whereDate('added_on', '<=', $date_to)->get();
+            if(Auth::user()->role_id==13){
+                $request->did_id=36;
+                $data['call_disp_lists'] = CallDisposition::select('*')->with(['qa_status','qa_assessment'])
+                    ->where('did_id', $request->did_id)->where($where)
+                    ->whereDate('added_on', '>=', $date_from)
+                    ->whereDate('added_on', '<=', $date_to)->get();
+                return view('reports.partials.lead_report_list', $data);
+            }
+            if($request->did_id != ""){
+                $data['call_disp_lists'] = CallDisposition::select('*')->with(['qa_status','qa_assessment'])
+                    ->where($where)
+                    ->whereDate('added_on', '>=', $date_from)
+                    ->whereDate('added_on', '<=', $date_to)->get();
+            } else {
+                $data['call_disp_lists'] = CallDisposition::select('*')->with(['qa_status','qa_assessment'])
+                    ->whereIn('did_id', $request->did_id)->where($where)
+                    ->whereDate('added_on', '>=', $date_from)
+                    ->whereDate('added_on', '<=', $date_to)->get();
+            }
         } else {
             $response['status'] = "Failure!";
             $response['result'] = $validator->errors()->toJson();
@@ -167,17 +183,23 @@ class ReportController extends Controller
         if($validator->passes()) {
             $month = date("m",strtotime($request->year_month));
             $year = date("Y",strtotime($request->year_month));
-            $manager = $request->team;
+            if($request->team > 0){
+                $manager = $request->team;
+                $team_id = Team::where('team_lead_id', $manager)->first();
+                $team_id = $team_id->team_id;
+                $user_ids = TeamMember::where('team_id', $team_id)->get()->pluck('user_id')->toArray();
+                array_push($user_ids, $manager);
+            }
+            else{
+                $user_ids = User::get()->pluck('user_id')->toArray();
+                array_push($user_ids, 0);
+            }
             $form_date = date($year.'-'.$month.'-01');
             $to_date = date("Y-m-t", strtotime($request->year_month));
             $holiday_count = $this->check_holidays($form_date, $to_date);
             $endDate = $to_date;
             $startDate = $form_date;
             $working_days = working_days($startDate, $endDate);
-            $team_id = Team::where('team_lead_id', $manager)->first();
-            $team_id = $team_id->team_id;
-            $user_ids = TeamMember::where('team_id', $team_id)->get()->pluck('user_id')->toArray();
-            array_push($user_ids, $manager);
             $data['attendance_list'] = AttendanceLog::select(DB::raw('sum(late) as `lates`, sum(absent) as `absents`, sum(on_leave) as `leaves` , sum(half_leave) as `half_leaves` , count(user_id) as `attendance_marked` , MONTH(attendance_date) month'), 'user_id')
                 ->whereIn('user_id', $user_ids)
                 ->whereYear('attendance_date', $year)

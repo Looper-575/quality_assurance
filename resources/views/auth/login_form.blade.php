@@ -23,23 +23,60 @@
     <link href="{{asset('assets/css/style.bundle.css')}}" rel="stylesheet" type="text/css" />
     <!--end::Base Styles -->
     <link rel="shortcut icon" href="{{asset('favicon.ico')}}" />
+    <style>
+        #login_container{
+            display: block;
+            margin:0;
+            float: left;
+            width: fit-content;
+            margin-left: 100px;
+            height: fit-content;
+            vertical-align: center;
+            margin-top: 8vh;
+        }
+        #m_login_signin_submit:hover{
+            background: #1c1c1c;
+            border-color: #1c1c1c;
+            color:#fff !important;
+        }
+        .m-input{
+            background-color: #DDD !important;
+            color: #000 !important;
+        }
+        .m-input::placeholder {
+            color: #000 !important;
+        }
+        .m-login__container{
+            box-shadow: 0px 0px 11px 2px rgba(100, 100, 100, 0.75);
+            -webkit-box-shadow: 0px 0px 11px 2px rgba(100, 100, 100, 0.75);
+            -moz-box-shadow: 0px 0px 11px 2px rgba(100, 100, 100, 0.75);
+            padding: 25px;
+            border-radius: 10px;
+        }
+        #m_login_signin_submit{
+            color:#000;
+            border-color: #000;
+            box-shadow: 0 5px 10px 2px rgba(100, 100, 100,.19) !important;
+
+        }
+    </style>
 </head>
 <!-- end::Head -->
 <!-- end::Body -->
-<body  class="m--skin- m-header--fixed m-header--fixed-mobile m-aside-left--enabled m-aside-left--skin-dark m-aside-left--offcanvas m-footer--push m-aside--offcanvas-default"  >
+<body  class="m--skin- m-header--fixed m-header--fixed-mobile m-aside-left--enabled m-aside-left--skin-light m-aside-left--offcanvas m-footer--push m-aside--offcanvas-default"  >
 <!-- begin:: Page -->
 <div class="m-grid m-grid--hor m-grid--root m-page">
-    <div class="m-grid__item m-grid__item--fluid m-grid m-grid--hor m-login m-login--signin m-login--2 m-login-2--skin-1" id="m_login" style="background-image: url({{asset('assets/img/bg/bg-6.jpg')}});">
-        <div class="m-grid__item m-grid__item--fluid m-login__wrapper">
+    <div class="m-grid__item m-grid__item--fluid m-grid m-grid--hor m-login m-login--signin m-login--2 m-login-2--skin-1" id="m_login" style="background-image: url({{asset('assets/img/bg/login_bg.png')}});">
+        <div id="login_container" class="m-grid__item m-grid__item--fluid m-login__wrapper">
             <div class="m-login__container">
                 <div class="m-login__logo">
                     <a href="#">
-                        <img src="{{asset('assets/img/logo-full.png')}}">
+                        <img width="280px" src="{{asset('assets/img/logo-full.png')}}">
                     </a>
                 </div>
                 <div class="m-login__signin">
                     <div class="m-login__head">
-                        <h3 class="m-login__title">Sign In</h3>
+                        <h3 class="m-login__title text-dark">Sign In</h3>
                     </div>
                     <form class="m-login__form m-form"  id="login_form" action="javascript:login();">
                         @csrf

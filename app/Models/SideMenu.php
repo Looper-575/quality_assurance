@@ -56,6 +56,6 @@ class SideMenu extends Authenticatable
 
     public function menu_permission()
     {
-        return $this->belongsTo(RolePermission::class , 'id', 'menu_id');
+        return $this->hasOne(RolePermission::class , 'menu_id', 'id');
     }
 }

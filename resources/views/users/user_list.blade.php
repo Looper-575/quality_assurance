@@ -25,11 +25,12 @@
                     <th title="Field #2">Name</th>
                     <th title="Field #3">Email</th>
                     <th title="Field #4">Role</th>
-                    <th title="Field #5">Gender</th>
-                    <th title="Field #6">Address</th>
-                    <th title="Field #7">Contact</th>
-                    <th title="Field #8">Manager</th>
-                    <th title="Field #9">Action</th>
+                    <th title="Field #5">Vicidialer id</th>
+                    <th title="Field #6">Gender</th>
+                    <th title="Field #7">Address</th>
+                    <th title="Field #8">Contact</th>
+                    <th title="Field #9">Manager</th>
+                    <th title="Field #10">Action</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -39,6 +40,7 @@
                         <td>{{ $user_list->full_name }}</td>
                         <td>{{ $user_list->email }}</td>
                         <td>{{ $user_list->role->title }}</td>
+                        <td>{{ $user_list->vicidialer_id ? $user_list->vicidialer_id : 'N/A' }}</td>
                         <td>{{ $user_list->gender }}</td>
                         <td>{{ $user_list->postal_address }}</td>
                         <td>{{ $user_list->contact_number }}</td>
@@ -56,10 +58,6 @@
             </table>
         </div>
     </div>
-
-
-
-
 @endsection
 @section('footer_scripts')
     <div id="change_pass_modal" style="z-index:9999999; height: 100% !important; min-height: 100%; width: 100%; position: fixed; top: 0; background-color: rgba(0, 0, 0, 0.7);display:none;">
@@ -114,7 +112,6 @@
             let arr = [a,b];
             call_ajax_with_functions('', '{{route('user_save')}}', data, arr);
         }
-
         $('.edit_user').click(function () {
             let data = new FormData();
             data.append('user_id', this.id);

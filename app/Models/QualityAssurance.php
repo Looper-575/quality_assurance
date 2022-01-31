@@ -21,9 +21,8 @@ class QualityAssurance extends Authenticatable
      *
      * @var array
      */
-
         protected $fillable = [
-            'rep_name', 'call_date', 'call_type_id' , 'call_number',
+            'rep_name', 'call_date', 'call_type_id' , 'call_number','recording',
             'greetings_correct', 'greetings_assurity_statement', 'greetings_comment',
             'customer_name_call', 'customer_comment',
             'listening_skills', 'listening_comment',

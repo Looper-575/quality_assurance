@@ -1,5 +1,6 @@
 @extends('layout.template')
 @section('header_scripts')
+    <link href="{{asset('assets/css/datatables.min.css')}}" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
     <div class="m-portlet m-portlet--mobile">
@@ -61,11 +62,26 @@
                         <table class="table text-center" border="1">
                             <thead>
                             <tr>
+{{--                                <th scope="col">User ID</th>--}}
                                 <th scope="col">Name</th>
                                 <th scope="col">Action</th>
                             </tr>
                             </thead>
-                            <tbody id="added_users"></tbody>
+                            <tbody id="added_users">
+{{--                            @foreach($team_edit->team_member as $index => $data)--}}
+{{--                                <tr id="row_{{$data->user->user_id}}">--}}
+{{--                                    <td scope="row" class="nr">--}}
+{{--                                        {{$data->user_id}}--}}
+{{--                                    </td>--}}
+{{--                                    <td>--}}
+{{--                                        {{$data->user->full_name}}--}}
+{{--                                    </td>--}}
+{{--                                    <td class="remove-user">--}}
+{{--                                        <button type="button" onclick="reomve_user({{$data->user->user_id}}, '{{$data->user->full_name}}')" class="btn btn-danger">Remove form Team</button>--}}
+{{--                                    </td>--}}
+{{--                                </tr>--}}
+{{--                            @endforeach--}}
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -81,21 +97,32 @@
     </div>
 @endsection
 @section('footer_scripts')
+    <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
+    <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script>
-        let user_ids = new Array();
+        var user_ids = new Array();
+
+        $( document ).ready(function() {
+{{--            <?php $user_ids = array();--}}
+{{--            foreach ($team_edit->team_member as $data):--}}
+{{--                $user_ids = $data->user_id;--}}
+{{--                ?>;--}}
+{{--            user_ids.push(<?php echo $user_ids; ?>);--}}
+{{--            <?php endforeach; ?>--}}
+        });
         $('#team_lead_id').on('change', function() {
-            let manager_id = $(this).val();
-            let url = '{{ route("get_manager_agents",":id") }}';
+            var manager_id = $(this).val();
+            var url = '{{ route("get_manager_agents",":id") }}';
             url = url.replace(':id',manager_id);
             $.ajax({
                 type:'get',
                 url:url,
                 success: function( resp ) {
                     user_ids.length = 0;
-                    let html = '';
+                    var html = '';
 
-                    let tbody_start = '<tbody id="added_users">';
-                    let tbody_end = '</tbody>';
+                    var tbody_start = '<tbody id="added_users">';
+                    var tbody_end = '</tbody>';
 
                     $.each(resp.manager_agents, function(i,j) {
                         user_ids.push(j.user_id);
@@ -104,7 +131,7 @@
                     document.getElementById('added_users').innerHTML = tbody_start+html+tbody_end;
                     $('[name=user_ids]').val(user_ids);
 
-                    let all_user_html = '<option value="">Select User</option>';
+                    var all_user_html = '<option value="">Select User</option>';
                     $.each(resp.agents, function(i,k) {
                         all_user_html = all_user_html+'<option value="'+k.user_id+'">'+k.full_name+'</option>';
                      });
@@ -113,9 +140,10 @@
             });
         });
         $('#all_user').on('change', function() {
-            let user_id = $(this).val();
-            let user_name = $("#all_user option:selected").text();
+            var user_id = $(this).val();
+            var user_name = $("#all_user option:selected").text();
             $(this).children('option:selected').remove();
+
             user_ids.push(user_id);
             $('[name=user_ids]').val(user_ids);
             $("#added_users").append('<tr id="row_'+user_id+'"><td>'+user_name+'</td><td class="remove-user"><button type="button" onclick="reomve_user(\'' + user_id + '\',\'' + user_name + '\')" class="btn btn-danger">Remove form Team</button></td></tr>');
@@ -125,9 +153,10 @@
             $("#row_"+id+"").remove();
             user_ids = arrayRemoveVal(user_ids, id);
             $('[name=user_ids]').val(user_ids);
+            console.log(id, name, user_ids);
         }
         function arrayRemoveVal(array, removeValue){
-            let newArray = jQuery.grep(array, function(value) {return value != removeValue;});
+            var newArray = jQuery.grep(array, function(value) {return value != removeValue;});
             return newArray;
         }
         //form submission;
@@ -136,7 +165,7 @@
             let data = new FormData(this);
             data.append('user_ids', user_ids);
             let a = function(){
-                window.location.href = "{{route('team_list')}}"
+                window.location.reload();
             };
             let arr = [a];
             call_ajax_with_functions('','{{route('save_add_member_form')}}',data,arr);

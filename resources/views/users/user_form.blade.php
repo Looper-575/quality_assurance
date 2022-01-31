@@ -55,6 +55,12 @@
                                 <div id="pass_response" class="badge-danger p-1 mb-3" style="display: none">Password not matched</div>
                             </div>
                         @endif
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label class="form-check-label"> Vicidialer ID</label>
+                                    <input name="vicidialer_id" value="{{$user ? $user->vicidialer_id : 0}}" required type="number" class="form-control">
+                                </div>
+                            </div>
                         <div class="col-6">
                             <div class="form-group">
                                 <label class="form-check-label">Image</label>

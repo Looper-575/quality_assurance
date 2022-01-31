@@ -41,7 +41,7 @@
                             onclick="mark_half_leave({{@$agent_list->user->user_id}})"
                             id="half_leave_{{@$agent_list->user->user_id}}"
                             {{  ($agent_list->half_leave == 1 ? ' checked' : '') }}
-                        /><label class="form-check-label pr-4 mt-1" for="half_leave_{{@$agent_list->user->user_id}}"> Half Day</label>
+                        /><label class="form-check-label pr-4 mt-1" for="half_leave_{{@$agent_list->user->user_id}}"> Half Leave</label>
 
                         <input
                             class="form-check-input"

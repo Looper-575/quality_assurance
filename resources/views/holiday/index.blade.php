@@ -2,19 +2,23 @@
 @section('header_scripts')
 @endsection
 @section('content')
-
+    <?php
+    $has_permissions = get_route_permissions( Auth::user()->role->role_id, @request()->route()->getName());
+    ?>
     <div class="m-portlet m-portlet--mobile">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
                 <div class="m-portlet__head-title float-left">
                     <h3 class="m-portlet__head-text">Holidays</h3>
                 </div>
+                @if($has_permissions->add == 1)
                 <div class="float-right mt-3">
                     <a id="add_new_btn" href="javascript:;" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill">
                         <span><i class="la la-phone-square"></i><span>Add New</span></span>
                     </a>
                     <div class="m-separator m-separator--dashed d-xl-none"></div>
                 </div>
+                @endif
             </div>
         </div>
         <div class="m-portlet__body">
@@ -39,8 +43,12 @@
                         <td>{{$item->type}}</td>
                         <td>
                             <div class="btn-group btn-group-sm">
+                                @if($has_permissions->update == 1)
                                 <button type="button" class="btn btn-primary edit_btn" title="Edit Menu" value="{{json_encode($item)}}"><i class="fa fa-edit"></i></button>
+                                @endif
+                                @if(Auth::user()->role_id == 1)
                                 <button type="button" class="btn btn-danger detele_btn" title="Delete Menu" value="{{$item->holiday_id}}"><i class="fa fa-trash"></i></button>
+                                @endif
                             </div>
                         </td>
                     </tr>
@@ -76,6 +84,7 @@
                                         <option value="">Select Type </option>
                                         <option value="Muslim">Muslim </option>
                                         <option value="Christian">Christian </option>
+                                        <option value="All">All </option>
                                     </select>
                                 </div>
                             </div>

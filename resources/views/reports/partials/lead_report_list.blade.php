@@ -15,6 +15,7 @@
             <th title="Field #8">Services Sold</th>
             <th title="Field #8">Services</th>
             <th title="Field #8">QA Status</th>
+            <th title="Field #8">Call Recording</th>
             <th title="Field #9">Agent Name</th>
             <th title="Field #10">Added On</th>
         </tr>
@@ -61,6 +62,21 @@
                 @if(isset($call_disp_list->qa_status))
                     <td> <span class="badge text-white"  style="background-color:<?php echo $call_disp_list->qa_status->badge_color; ?>;">
                             {{ $call_disp_list->qa_status->monitor_percentage }} %</span>
+                    </td>
+                @else
+                    <td>NA</td>
+                @endif
+                @if(isset($call_disp_list->qa_assessment))
+                    <td>
+                        @if($call_disp_list->qa_assessment->recording )
+                            @foreach(explode(',',$call_disp_list->qa_assessment->recording) as $recording)
+                                <a href="asset{{'/../recordings/'.$recording}}" download class="mb-1 d-block">
+                                    <i class="fa fa-download"></i>
+                                </a>
+                            @endforeach
+                        @else
+                            NA
+                        @endif
                     </td>
                 @else
                     <td>NA</td>

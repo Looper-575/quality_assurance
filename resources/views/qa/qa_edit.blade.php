@@ -16,7 +16,10 @@
         <div class="m-portlet__body">
             <form class="m-form m-form--fit m-form--label-align-right" method="post" id="qa_form" action="">
                 @csrf
-
+                <input type="hidden" value="{{ $qa_edit->qa_id }}" name="qa_id">
+                <input type="hidden" value="{{ $qa_edit->call_type_id }}" name="call_type">
+                <input type="hidden" value="{{ $qa_edit->agent_id }}" name="rep_name">
+                <input type="hidden" value="{{ $qa_edit->call_number }}" name="call_number">
                 <div class="row mb-3">
                     <div class="col-6">
                         <strong CLASS="form-check-inline">Greetings</strong><br>

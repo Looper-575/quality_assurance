@@ -3,6 +3,9 @@
     <link href="{{asset('assets/css/datatables.min.css')}}" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
+    <?php
+    $has_permissions = get_route_permissions( Auth::user()->role->role_id, @request()->route()->getName());
+    ?>
     <div class="m-portlet m-portlet--mobile">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
@@ -80,9 +83,11 @@
                         <td>{{ $recording->recording_file_name }}</td>
                         <td>{{ $recording->added_on }}</td>
                         <td>
+                            @if($has_permissions->add == 1)
                             <div class="btn-group btn-group-sm">
                                 <a href="{{route('dispose' , $recording->rec_id)}}"  class="btn btn-primary"><i class="fa fa-arrow-right"></i></a>
                               </div>
+                            @endif
                         </td>
                     </tr>
                 @endforeach
@@ -113,7 +118,7 @@
                                 <th title="Field #1">U_ID</th>
 
                                 <th title="Field #4">From Number</th>
-                                <th title="Field #5">Agent ID</th>
+                                <th title="Field #5">Agent</th>
                                 <th title="Field #6">Call Length</th>
                                 <th title="Field #7">Recording File</th>
                                 <th title="Field #8">Added On</th>
@@ -126,14 +131,16 @@
                                     <td>{{ $loop->index+1 }}</td>
                                     <td>{{ $recording->uid }}</td>
                                     <td>{{ $recording->from_number }}</td>
-                                    <td>{{ isset($recording->did_numbers->disposition_did)?$recording->did_numbers->disposition_did->title:'' }}</td>
+                                    <td>{{ $recording->user->full_name??''}}</td>
                                     <td>{{ $recording->call_length }}</td>
                                     <td>{{ $recording->recording_file_name }}</td>
                                     <td>{{ $recording->added_on }}</td>
                                     <td>
+                                        @if($has_permissions->add == 1)
                                         <div class="btn-group btn-group-sm">
                                             <a href="{{route('dispose' , $recording->rec_id)}}"  class="btn btn-primary"><i class="fa fa-arrow-right"></i></a>
                                         </div>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -143,7 +150,7 @@
                                 <th title="Field #1">S.No</th>
                                 <th title="Field #1">U_ID</th>
                                 <th title="Field #4">From Number</th>
-                                <th title="Field #5">Agent ID</th>
+                                <th title="Field #5">Agent</th>
                                 <th title="Field #6">Call Length</th>
                                 <th title="Field #7">Recording File</th>
                                 <th title="Field #8">Added On</th>
@@ -184,9 +191,11 @@
                                     <td>{{ $recording->recording_file_name }}</td>
                                     <td>{{ $recording->added_on }}</td>
                                     <td>
+                                        @if($has_permissions->add == 1)
                                         <div class="btn-group btn-group-sm">
                                             <a href="{{route('dispose' , $recording->rec_id)}}"  class="btn btn-primary"><i class="fa fa-arrow-right"></i></a>
                                         </div>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -217,7 +226,7 @@
                                 <th title="Field #1">U_ID</th>
 
                                 <th title="Field #4">From Number</th>
-                                <th title="Field #5">Agent ID</th>
+                                <th title="Field #5">Agent</th>
                                 <th title="Field #6">Call Length</th>
                                 <th title="Field #7">Recording File</th>
                                 <th title="Field #8">Added On</th>
@@ -235,9 +244,11 @@
                                     <td>{{ $recording->recording_file_name }}</td>
                                     <td>{{ $recording->added_on }}</td>
                                     <td>
+                                        @if($has_permissions->add == 1)
                                         <div class="btn-group btn-group-sm">
                                             <a href="{{route('dispose' , $recording->rec_id)}}"  class="btn btn-primary"><i class="fa fa-arrow-right"></i></a>
                                         </div>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -247,7 +258,7 @@
                                 <th title="Field #1">S.No</th>
                                 <th title="Field #1">U_ID</th>
                                 <th title="Field #4">From Number</th>
-                                <th title="Field #5">Agent ID</th>
+                                <th title="Field #5">Agent</th>
                                 <th title="Field #6">Call Length</th>
                                 <th title="Field #7">Recording File</th>
                                 <th title="Field #8">Added On</th>
@@ -295,8 +306,5 @@
                 }
             })
         }
-        setInterval(function (){
-            window.location.reload();
-        }, 60000)
     </script>
 @endsection

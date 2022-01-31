@@ -66,7 +66,7 @@
             <label class="form-check-label" for="mobile_work_order_number">Mobile Work Order Number</label>
             <input type="text" class="form-control" name="mobile_work_order_number" id="mobile_work_order_number">
         </div>
-            <input type="hidden" class="form-control" name="rec_id" id="rec_id">
+            <input type="hidden" class="form-control" name="rec_id" id="rec_id" value="0">
     </div>
     <div class="col-6">
         <div class="form-group">

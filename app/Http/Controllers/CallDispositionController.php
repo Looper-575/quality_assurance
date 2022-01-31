@@ -1,4 +1,5 @@
 <?php /** @noinspection ALL */
+
 namespace App\Http\Controllers;
 use App\Models\CallRecording;
 use App\Models\Enquiry;
@@ -12,6 +13,7 @@ use App\Models\CallDispositionsService;
 use App\Models\CallDispositionsDid;
 use App\Models\CallDispositionsTypes;
 use function Couchbase\defaultDecoder;
+
 
 class CallDispositionController extends Controller
 {
@@ -43,6 +45,7 @@ class CallDispositionController extends Controller
         }
         return view('call_dipositions.dispositions_list' , $data);
     }
+
     public function form()
     {
         $data['page_title'] = "Call Disposition Form - Atlantis BPO";
@@ -51,16 +54,21 @@ class CallDispositionController extends Controller
         ])->get();
         return view('call_dipositions.disposition_form',$data);
     }
+
     public function show(Request $request)
     {
         $data['lead_data'] = CallDisposition::where([
             'call_id' => $request->call_id,
         ])->with('call_dispositions_services')->get()[0];
+
         if($data['lead_data']['sale_transferred'] == 1){
+
             $data['transfer_from']= User::select('full_name')->join('sale_transfer','sale_transfer.added_by','=','users.user_id')->where('sale_transfer.call_id','=',$data['lead_data']['call_id'])->latest('sale_transfer.added_on')->get()[0];
+
         }
         return view('call_dipositions.disposition_view' , $data);
     }
+
     public function call_disposition_did()
     {
         $data['lead_did_data'] = CallDispositionsDid::where([
@@ -68,6 +76,14 @@ class CallDispositionController extends Controller
         ])->get();
         return view('call_dipositions.partials.sale_form', $data);
     }
+    public function did_non_sale()
+    {
+        $data['lead_did_data'] = CallDispositionsDid::where([
+            'status' => 1,
+        ])->get();
+        return view('call_dipositions.partials.non_sale_form', $data);
+    }
+
     public function filter_nums(Request $request)
     {
         if($request['type'] != 1){
@@ -78,10 +94,9 @@ class CallDispositionController extends Controller
         $data['type'] = $request['type'];
         return view('qa.get_numbers' , $data);
     }
-    public function save(Request $request)
+
+    public  function save(Request $request)
     {
-        $recording_id = CallDisposition::where('recording_id', $request->rec_id)->doesntExist();
-        if ($recording_id) {
             if($request->disposition_type == 1)
             {
                 $validator = Validator::make($request->all(), [
@@ -94,9 +109,12 @@ class CallDispositionController extends Controller
                     'email' => 'required',
                     'installation_type' => 'required',
                     'order_confirmation_number' => 'required',
+//                'order_number' => 'required',
                     'pre_payment' => 'required',
+//                'account_number' => 'required',
                 ]);
                 if ($validator->passes()) {
+
                     DB::beginTransaction();
                     try {
                         if(isset($request->rec_id)){
@@ -143,7 +161,8 @@ class CallDispositionController extends Controller
                         $response['status'] = 'failure';
                         $response['result'] = "Unexpected Db Error";
                     }
-                } else {
+                }
+                else {
                     $response['status'] = 'failure';
                     $response['result'] = $validator->errors()->toJson();
                 }
@@ -151,6 +170,7 @@ class CallDispositionController extends Controller
             } else  {
                 $validator = Validator::make($request->all(),[
                     'phone_number' => 'required',
+//                'customer_name' => 'required',
                     'comments' => 'required',
                 ]);
                 if ($validator->passes()) {
@@ -184,19 +204,17 @@ class CallDispositionController extends Controller
                     $response['result'] = $validator->errors()->toJson();
                 }
                 return response()->json($response);
-            }
-        } else {
-            $response['status'] = 'failure';
-            $response['result'] = "Already Disposed";
-            return response()->json($response);
+
         }
     }
+
     public function edit($id)
     {
         $data['page_title'] = "Call Disposition Form - Atlantis BPO CRM";
         $data['lead_edit'] = CallDisposition::where('call_id',$id)->with(['call_dispositions_services'])->get()[0];
         return view('call_dipositions.disposition_edit' , $data);
     }
+
     public  function update(Request $request ,$call_id)
     {
         if($request->disposition_type == 1) {
@@ -277,6 +295,7 @@ class CallDispositionController extends Controller
         }
         return response()->json($response);
     }
+
     public function delete(Request $request)
     {
         $data = CallDisposition::where('call_id', $request->call_id)->update([
@@ -287,6 +306,7 @@ class CallDispositionController extends Controller
         $response['result'] = "Deleted Successfully";
         return response()->json($response);
     }
+
     protected function add_services($call_id, $request)
     {
         $services_sold = 0; // new column for this and update
@@ -316,6 +336,7 @@ class CallDispositionController extends Controller
             isset($request->att_phone) ? $services_sold++ : 0;
             $call_disp_service->mobile = 0;
             $call_disp_service->save();
+
         }
         if(isset($request->direct_tv)) {
             $call_disp_service = new CallDispositionsService;

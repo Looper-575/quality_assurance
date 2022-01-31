@@ -47,6 +47,7 @@ class DashboardController extends Controller
     public function admin_dashboard()
     {
         $data['page_title'] = "Admin Dahsboard - Atlantis CRM";
+        $data['small_nav'] = true;
         $today = get_date();
         $datetime = new DateTime($today);
         $date_today = date("d", strtotime($today));
@@ -113,6 +114,7 @@ class DashboardController extends Controller
     public function team_dashboard()
     {
         $data['page_title'] = "Lead Dahsboard - Atlantis CRM";
+        $data['small_nav'] = true;
         $today = get_date();
         $datetime = new DateTime($today);
         $date_today = date("d"  ,strtotime($today));
@@ -189,6 +191,7 @@ class DashboardController extends Controller
     public function csr_dashboard()
     {
         $data['page_title'] = "CSR Dahsboard - Atlantis CRM";
+        $data['small_nav'] = true;
         $today = get_date();
         $datetime = new DateTime($today);
         $date_today = date("d"  ,strtotime($today));
@@ -226,12 +229,13 @@ class DashboardController extends Controller
     public function qa_dashboard()
     {
         $data['page_title'] = "QA Dahsboard - Atlantis CRM";
+        $data['small_nav'] = true;
         return view('dashboard.qa_dashboard' , $data);
     }
     public function vendor_dashboard(){
         $data['page_title'] = "Vendor Dahsboard - Atlantis CRM";
-
-        $did_id = 4;
+        $data['small_nav'] = true;
+        $did_id = Auth::user()->vendor_did_id;
 
         $today = get_date();
         $datetime = new DateTime($today);
@@ -247,7 +251,7 @@ class DashboardController extends Controller
             $from_date = date("Y-m-d"  ,strtotime("-1 Day" , strtotime($today)));
             $to_date = date("Y-m-d"  ,strtotime($today));
             $from_date = $from_date.' 17:00:00';
-            $to_date = $to_date.' 07:00:00';
+            $to_date = $to_date.' 17:00:00';
         }
 
 
@@ -287,36 +291,10 @@ class DashboardController extends Controller
         $data['six_months_dispositions_count'] = $this->get_did_wise_6_months_dipositions_count($from_date,$to_date,$did_id);
         $data['six_months_sales_count'] =  $this->get_did_wise_6_months_rgo_counts($from_date, $to_date,$did_id);
 
-
-
         return view('dashboard.vendor_dashboard' , $data);
 
     }
 
-    public function provider_dashboard(){
-        $data['page_title'] = 'ajdsad';
-        $data['spectrum'] = DB::select('SELECT call_dispositions_services.provider_name, SUM(call_dispositions_services.internet) as internet, SUM(call_dispositions_services.mobile) as mobile, SUM(call_dispositions_services.cable) as cable, SUM(call_dispositions_services.phone) as phone,
-count(case when internet = "1" AND phone = "1" AND mobile = "0" AND cable = "0" then 1 else null end) as ip,
-count(case when internet = "1" AND cable = "1" AND mobile = "0" AND phone = "0" then 1 else null end) as ic,
-count(case when phone = "1" AND cable = "1" AND mobile = "0" AND internet = "0" then 1 else null end) as pc,
-count(case when mobile = "1" AND cable = "1" AND phone = "0" AND internet = "0" then 1 else null end) as mc,
-count(case when phone = "0" AND cable = "0" AND mobile = "1" AND internet = "1" then 1 else null end) as im,
-count(case when phone = "1" AND cable = "0" AND mobile = "1" AND internet = "0" then 1 else null end) as mp,
-count(case when mobile = "1"AND internet = "0" AND phone = "0" AND cable = "0" then 1 else null end) as mobile,
-SUM(call_dispositions.services_sold) As total_sales,
-count(case when services_sold = "1" then 1 else null end) as single_play, count(case when services_sold = "2" then 1 else null end) as double_play, count(case when services_sold = "3" then 1 else null end) as triple_play, count(case when services_sold = "4" then 1 else null end) as quad_play
-FROM call_dispositions INNER JOIN call_dispositions_services ON call_dispositions_services.call_id = call_dispositions.call_id WHERE call_dispositions.status=1 AND call_dispositions_services.provider_name = "spectrum"');
-
-        $data['others'] = DB::select('SELECT call_dispositions_services.provider_name, SUM(call_dispositions_services.internet) as internet, SUM(call_dispositions_services.mobile) as mobile, SUM(call_dispositions_services.cable) as cable, SUM(call_dispositions_services.phone) as phone,
-count(case when services_sold = "1" then 1 else null end) as single_play,
-count(case when services_sold = "2" then 1 else null end) as double_play,
-count(case when services_sold = "3" then 1 else null end) as triple_play,
-count(case when services_sold = "4" then 1 else null end) as quad_play,
-SUM(call_dispositions.services_sold) As total_sales
-FROM call_dispositions INNER JOIN call_dispositions_services ON call_dispositions_services.call_id = call_dispositions.call_id WHERE call_dispositions.status=1 AND call_dispositions_services.provider_name IS NOT NULL  GROUP BY call_dispositions_services.provider_name ORDER BY total_sales DESC');
-
-        return view('dashboard.provider_dashboard' , $data);
-    }
     private function get_rgo_counts($from_date, $to_date)
     {
         $single_play = DB::table('all_sales')->where('services_sold', 1)->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
@@ -435,21 +413,17 @@ FROM call_dispositions INNER JOIN call_dispositions_services ON call_disposition
         $others = DB::table('all_sales')->select('full_name', DB::raw('"others" as provider_name'), DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile'))->orWhere(['manager_id'=>$manager_id, 'added_by'=>$manager_id])->whereNotIn('provider_name',['spectrum','cox','suddenlink','att','directtv','earthlink','frontier','mediacom','optimum','hughesnet'])->whereBetween('added_on', [$from_date, $to_date])->where('added_by','!=', $exclude)->groupBy('added_by')->get();
         return [$data , $others];
     }
-
-
-
     private function get_did_wise_rgo_counts($from_date, $to_date,$did_id)
     {
-
         $single_play = DB::table('all_sales')->where(['services_sold' => 1,'did_id'=>$did_id,'provider_name'=>'spectrum'])->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
         $double_play = DB::table('all_sales')->where(['services_sold' => 2,'did_id'=>$did_id,'provider_name'=>'spectrum'])->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
         $triple_play = DB::table('all_sales')->where(['services_sold' => 3,'did_id'=>$did_id,'provider_name'=>'spectrum'])->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
         $quad_play = DB::table('all_sales')->where(['services_sold' => 4,'did_id'=>$did_id,'provider_name'=>'spectrum'])->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
         $services = DB::table('all_sales')->select('provider_name', DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile, count(case when services_sold = "1" then 1 else null end) as single_play, count(case when services_sold = "2" then 1 else null end) as double_play, count(case when services_sold = "3" then 1 else null end) as triple_play, count(case when services_sold = "4" then 1 else null end) as quad_play'))
-        ->whereIn('provider_name',['spectrum'])
+            ->whereIn('provider_name',['spectrum'])
             ->whereBetween('added_on', [$from_date, $to_date])
             ->groupBy('provider_name')->limit(5)->get();
-      //dd($from_date, $to_date);
+        //dd($from_date, $to_date);
         $total_rgu = ($single_play+($double_play*2)+($triple_play*3)+($quad_play*4));
         $total_sales = ($single_play+$double_play+$triple_play+$quad_play);
         return [
@@ -462,15 +436,14 @@ FROM call_dispositions INNER JOIN call_dispositions_services ON call_disposition
             'total_sales' => $total_sales
         ];
     }
-
     private function get_did_wise_6_months_dipositions_count($from_date, $to_date,$did_id){
-
-        $data['one_month'] = CallDisposition::where(['status' => 1,'did_id'=>$did_id])->whereBetween('added_on', [$from_date, $to_date])->count();
+        $data['one_month'] = CallDisposition::where(['status' => 1,'did_id'=>$did_id])
+            ->whereDate('added_on', '>=', $from_date)
+            ->whereDate('added_on', '<=', $to_date)->count();
         return $data;
     }
     private function get_did_wise_6_months_rgo_counts($from_date, $to_date,$did_id)
     {
-
         $data['one_month'] = $this->get_did_wise_rgo_counts($from_date, $to_date,$did_id);
         $to_date = date("Y-m"  ,strtotime($from_date));
         $from_date = date("Y-m"  ,strtotime("-1 Month" , strtotime($from_date)));
@@ -499,6 +472,4 @@ FROM call_dispositions INNER JOIN call_dispositions_services ON call_disposition
         $data['six_month'] = $this->get_did_wise_rgo_counts($from_date, $to_date,$did_id);
         return $data;
     }
-
-
 }

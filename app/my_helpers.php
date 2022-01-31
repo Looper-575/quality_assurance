@@ -165,16 +165,54 @@ if(!function_exists('has_permission')){
     }
 }
 
-if(!function_exists('get_route_permissions')){
-    function get_route_permissions($role_id, $url)
+if(!function_exists('get_parent_menus')){
+    function get_parent_menus($role_id)
+    {
+        $role_permission = \App\Models\SideMenu::with('menu_permission', 'children.menu_permission')->where([
+            'status' => 1,
+            'parent_id' => 0,
+        ])
+            ->whereHas('menu_permission', function ($query) use ($role_id)
+            {
+                $query->where('role_id', $role_id);
+            })
+            ->orderBy('sort_order', 'ASC')
+            ->get();
+        if($role_permission){
+            return $role_permission;
+        } else {
+            return false;
+        }
+    }
+}
+
+if(!function_exists('get_child_menus')){
+    function get_child_menus($parent_id)
     {
         $role_permission = \App\Models\SideMenu::with('menu_permission')->where([
             'status' => 1,
-            'url' => $url,
-        ])->whereHas('menu_permission', function ($query) use ($role_id) {
-            $query->where('role_id', $role_id);
-        })->first();
+            'parent_id' => $parent_id,
+        ])
+            ->orderBy('sort_order', 'ASC')
+            ->get();
+        if($role_permission){
+            return $role_permission;
+        } else {
+            return false;
+        }
+    }
+}
 
+if(!function_exists('get_route_permissions')){
+    function get_route_permissions($role_id, $url)
+    {
+        $role_permission = DB::table('side_menus')
+        ->join('role_permissions', 'side_menus.id', '=', 'role_permissions.menu_id')
+        ->where('side_menus.status', '=', 1)
+        ->where('side_menus.url', '=', $url)
+        ->where('role_permissions.role_id', '=', $role_id)
+        ->select('side_menus.*', 'role_permissions.*')
+        ->first();
         if($role_permission){
             return $role_permission;
         } else {

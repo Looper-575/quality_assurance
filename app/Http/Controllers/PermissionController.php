@@ -13,14 +13,15 @@ class PermissionController extends Controller
     {
         $data['page_title'] = "Permissions - Atlantis BPO CRM";
         $data['roles'] = UserRole::where('status', 1)->orderBy('role_id', 'ASC')->get();
-        $data['menus'] = SideMenu::with('parent', 'children.parent')->where('parent_id', 0)->where('status', 1)->get();
+        $data['menus'] = SideMenu::with('parent', 'children.parent')->where('parent_id', 0)->where('status', 1)->orderBy('sort_order', 'ASC')->get();
         $data['permissions'] = UserRole::has('role_permission')->with('role_permission')->orderBy('role_id', 'DESC')->get();
         return view('permissions.index' , $data);
     }
+
     public function form(Request $request){
         $data['page_title'] = "Permissions Form - Atlantis BPO CRM";
         $data['roles'] = UserRole::doesntHave('role_permission')->where('status', 1)->orderBy('role_id', 'ASC')->get();
-        $menus = SideMenu::without('menu_permission')->with( 'parent', 'children.parent')->where('parent_id', 0)->where('status', 1)->get();
+        $menus = SideMenu::without('menu_permission')->with( 'parent', 'children.parent')->where('parent_id', 0)->where('status', 1)->orderBy('sort_order', 'ASC')->get();
         $filtered_menus = [];
         foreach ($menus as $menu){
             $menu->menu_permission = false;
@@ -35,6 +36,7 @@ class PermissionController extends Controller
         $data['role_id'] = 0;
         return view('permissions.form' , $data);
     }
+
     public function save(Request $request)
     {
         $validator = Validator::make($request->all(),[
@@ -67,12 +69,13 @@ class PermissionController extends Controller
         }
         return response()->json($response);
     }
+
     public function edit($id)
     {
         $data['page_title'] = "Permissions Form - Atlantis BPO CRM";
         $data['edit'] = RolePermission::where('role_id', $id)->get();
         $data['roles'] = UserRole::where('role_id', $id)->ordoesntHave('role_permission')->where('status', 1)->orderBy('role_id', 'ASC')->get();
-        $menus = SideMenu::without('menu_permission')->with( 'parent', 'children.parent')->where('parent_id', 0)->where('status', 1)->get();
+        $menus = SideMenu::without('menu_permission')->with( 'parent', 'children.parent')->where('parent_id', 0)->where('status', 1)->orderBy('sort_order', 'ASC')->get();
         $filtered_menus = [];
         foreach ($menus as $menu){
             $menu->menu_permission = false;
@@ -87,11 +90,18 @@ class PermissionController extends Controller
         $data['role_id'] = $id;
         return view('permissions.form' , $data);
     }
+
     public function holiday_delete(Request $request)
     {
         Holiday::destroy($request->id);
         $response['status'] = "Success";
         $response['result'] = "Deleted Successfully";
         return response()->json($response);
+    }
+
+    public function access_denied()
+    {
+        $data['page_title'] = "Permissions Denied - Atlantis BPO CRM";
+        return view('permissions.access_denied', $data);
     }
 }

@@ -74,10 +74,12 @@
                             <textarea   class="form-control " required name="reason" id="reason"  rows="3">{{$leave ? $leave->reason:''}}</textarea>
                         </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary"> Submit </button>
-                    <button type="reset" class="btn btn-danger"> Reset </button>
+                    <div class="col-12">
+                        <div class="form-group float-right">
+                            <button type="submit" class="btn btn-primary"> Submit </button>
+                            <button type="reset" class="btn btn-danger"> Reset </button>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
@@ -218,19 +220,47 @@
         });
 
         function dateDifference(){
-            var from_date = $('#from').val();
-            var to_date = $('#to').val();
-            from_date = from_date.split('-');
-            to_date = to_date.split('-');
-            from_date = new Date(from_date[0], from_date[1], from_date[2]);
-            to_date = new Date(to_date[0], to_date[1], to_date[2]);
-            from_date_unixtime = parseInt(from_date.getTime() / 1000);
-            to_date_unixtime = parseInt(to_date.getTime() / 1000);
-            var timeDifference =    to_date_unixtime - from_date_unixtime;
-            var timeDifferenceInHours = timeDifference / 60 / 60;
-            var timeDifferenceInDays = timeDifferenceInHours  / 24;
-            $('#no_leaves').val(timeDifferenceInDays + 1 );
+            var from_date = new Date($('#from').val());
+            var to_date = new Date($('#to').val());
+            let days = DaysBetween(from_date,to_date);
+            $('#no_leaves').val(days);
+
 
         }
+
+        function DaysBetween(dDate1, dDate2) {
+            if(dDate1.getDate()===dDate2.getDate()){
+                return 1;
+            }
+            var iWeeks, iDateDiff, iAdjust = 0;
+            if (dDate2 < dDate1) return -1; // error code if dates transposed
+            var iWeekday1 = dDate1.getDay(); // day of week
+            var iWeekday2 = dDate2.getDay();
+            iWeekday1 = (iWeekday1 == 0) ? 7 : iWeekday1; // change Sunday from 0 to 7
+            iWeekday2 = (iWeekday2 == 0) ? 7 : iWeekday2;
+            if ((iWeekday1 > 5) && (iWeekday2 > 5)) iAdjust = 1; // adjustment if both days on weekend
+            iWeekday1 = (iWeekday1 > 5) ? 5 : iWeekday1; // only count weekdays
+            iWeekday2 = (iWeekday2 > 5) ? 5 : iWeekday2;
+            // calculate differnece in weeks (1000mS * 60sec * 60min * 24hrs * 7 days = 604800000)
+            iWeeks = Math.floor((dDate2.getTime() - dDate1.getTime()) / 604800000)
+            if (iWeekday1 <= iWeekday2) { //Equal to makes it reduce 5 days
+                iDateDiff = (iWeeks * 5) + (iWeekday2 - iWeekday1)
+            } else {
+                iDateDiff = ((iWeeks + 1) * 5) - (iWeekday1 - iWeekday2)
+            }
+            iDateDiff -= iAdjust // take into account both days on weekend
+            return (iDateDiff + 1); // add 1 because dates are inclusive
+        }
+        // function DaysBetween(StartDate, EndDate) {
+        //     // The number of milliseconds in all UTC days (no DST)
+        //     const oneDay = 1000 * 60 * 60 * 24;
+        //
+        //     // A day in UTC always lasts 24 hours (unlike in other time formats)
+        //     const start = Date.UTC(EndDate.getFullYear(), EndDate.getMonth(), EndDate.getDate());
+        //     const end = Date.UTC(StartDate.getFullYear(), StartDate.getMonth(), StartDate.getDate());
+        //
+        //     // so it's safe to divide by 24 hours
+        //     return (start - end) / oneDay;
+        // }
     </script>
 @endsection

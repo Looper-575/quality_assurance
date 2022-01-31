@@ -3,7 +3,10 @@
     <link href="{{asset('assets/css/datatables.min.css')}}" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
-    <?php $role = Auth::user()->role->title ?>
+    <?php
+    $role = Auth::user()->role->title;
+    $has_permissions = get_route_permissions( Auth::user()->role->role_id, @request()->route()->getName());
+    ?>
     <div class="m-portlet m-portlet--tabs">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
@@ -25,12 +28,14 @@
                             Non Sale
                         </a>
                     </li>
-                    <li class="nav-item m-tabs__item">
-                        <a class="nav-link m-tabs__link" href="{{route('lead_form')}}">
-                            <i class="fa fa-plus" aria-hidden="true"></i>
-                            Add New
-                        </a>
-                    </li>
+                    @if($has_permissions->add == 1)
+                        <li class="nav-item m-tabs__item">
+                            <a class="nav-link m-tabs__link" href="{{route('lead_form')}}">
+                                <i class="fa fa-plus" aria-hidden="true"></i>
+                                Add New
+                            </a>
+                        </li>
+                    @endif
                 </ul>
 
             </div>
@@ -108,10 +113,12 @@
                                     <td>{{ parse_datetime_store($call_disp_list->added_on) }}</td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
+                                            @if($has_permissions->view == 1)
                                             <a onclick="view_lead(this)" id="{{$call_disp_list->call_id}}" class="btn btn-primary" href="javascript:;" data-toggle="m-tooltip" data-placement="right" data-skin="dark" data-container="body">
                                                 <i class="la la-eye"></i>
                                             </a>
-                                            @if($role === 'Admin' || $role === 'Manager' || $role === 'Team Lead')
+                                            @endif
+                                            @if($has_permissions->update == 1)
                                                 <a class="btn btn-info"  href="{{route('lead_edit' , $call_disp_list->call_id)}}">
                                                     <i class="la la-edit"></i>
                                                 </a>
@@ -171,10 +178,12 @@
                                     <td>{{ parse_datetime_store($call_disp_list->added_on) }}</td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
+                                            @if($has_permissions->view == 1)
                                             <a onclick="view_lead(this)" id="{{$call_disp_list->call_id}}" class="btn btn-primary" href="javascript:;" data-toggle="m-tooltip" data-placement="right" data-skin="dark" data-container="body">
                                                 <i class="la la-eye"></i>
                                             </a>
-                                            @if($role === 'Admin' || $role === 'Manager' || $role === 'Team Lead')
+                                            @endif
+                                            @if($has_permissions->update == 1)
                                                 <a class="btn btn-info"  href="{{route('lead_edit' , $call_disp_list->call_id)}}">
                                                     <i class="la la-edit"></i>
                                                 </a>

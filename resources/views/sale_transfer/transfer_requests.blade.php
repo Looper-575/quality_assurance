@@ -16,7 +16,7 @@
                 @csrf
                 <div class="row">
                     <div class="col-6">
-                        <div class="form-group ">
+                        <div class="form-group">
                             <label class="form-check-label" for="sale_date">Sale Date </label>
                             <input  required  type="date"  class="form-control" name="sale_date" id="sale_date">
 
@@ -34,7 +34,7 @@
 
                         <div class="col-6">
                             <label for="agents" class="form-check-label">Transfer From</label>
-                            <select class="form-control" name="agents_from" id="agents_from" readonly disabled>
+                            <select class="form-control" name="agents_from" id="agents_from" disabled>
                                 <option value="0">Agents</option>
                                 @foreach($agents as $agent)
                                     <option value="{{ $agent->user_id }}"> {{ $agent->full_name  }}</option>
@@ -71,7 +71,9 @@
 
         $('#sales_list').change(function (e) {
             let agent_id = this.options[this.selectedIndex].getAttribute('data-id');
-            $('#agents_from').val(agent_id );
+            $('#agents_from').attr('disabled',false);
+            $('#agents_from').val(agent_id);
+            $('#agents_from').attr('disabled',true);
         });
         $('#sale_date').change(function (e){
             e.preventDefault();
@@ -96,12 +98,7 @@
            data.append('user_id', user_id);
            data.append('sales_list', sales_list);
            data.append('sales_date', sales_date);
-
-
-
             let a = function () {
-
-
                window.location.href = "{{route('sales_transfer_list')}}";
             };
             let arr = [a];

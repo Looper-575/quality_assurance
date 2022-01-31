@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 use App\Models\CallDisposition;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -53,6 +54,7 @@ class QAController extends Controller
                 'rep_name'=> 'required',
                 'call_type'=> 'required',
                 'call_number'=> 'required',
+                'recording.*' =>'nullable|file|mimes:audio/mpeg,mpga,mp3,wav,aac',
                 'greetings_correct' => 'required',
                 'greetings_assurity_statement'=> 'required',
                 'customer_name_call' => 'required',
@@ -85,69 +87,147 @@ class QAController extends Controller
                 'additional_comment' => 'required',
         ]);
         if($validator->passes()) {
-            $qa = new QualityAssurance;
-            $qa->added_by = Auth::user()->user_id;
-            $qa->agent_id	= $request->rep_name;
-            $qa->call_date = $request->call_date;
-            $qa->call_type_id = $request->call_type;
-            $qa->call_number = $request->call_number;
-            $qa->greetings_correct = $request->greetings_correct;
-            $qa->greetings_assurity_statement  = $request->greetings_assurity_statement;
-            $qa->greetings_comment = $request->greetings_comment;
-            $qa->customer_name_call = $request->customer_name_call;
-            $qa->customer_comment = $request->customer_comment;
-            $qa->listening_skills = $request->listening_skills;
-            $qa->listening_comment= $request-> listening_comment;
-            $qa->courtesy_please = $request->courtesy_please;
-            $qa->courtesy_thank_you = $request->courtesy_thank_you;
-            $qa->courtesy_interest = $request->courtesy_interest;
-            $qa->courtesy_empathy = $request-> courtesy_empathy;
-            $qa->courtesy_Apologized = $request->courtesy_Apologized;
-            $qa->courtesy_comment = $request->courtesy_comment;
-            $qa->equipment_system = $request-> equipment_system;
-            $qa->equipment_comment = $request->equipment_comment;
-            $qa->soft_skills_energy = $request->soft_skills_energy;
-            $qa->soft_skill_avoided_silence  = $request-> soft_skill_avoided_silence;
-            $qa->soft_skill_polite = $request->soft_skill_polite;
-            $qa->soft_skill_grammar = $request->soft_skill_grammar;
-            $qa->soft_skill_refrained_company= $request->soft_skill_refrained_company;
-            $qa->soft_skill_positive_words = $request->soft_skill_positive_words;
-            $qa->soft_skills_comment = $request->soft_skills_comment;
-            $qa->using_hold_informed_customer = $request->using_hold_informed_customer;
-            $qa->using_hold_touch = $request->using_hold_touch;
-            $qa->using_hold_thanked = $request->using_hold_thanked;
-            $qa->using_hold_comment = $request->using_hold_comment;
-            $qa->connecting_calls_department = $request->connecting_calls_department;
-            $qa->connecting_calls_customer = $request->connecting_calls_customer;
-            $qa->connecting_calls_comment = $request->connecting_calls_comment;
-            $qa->closing_recap = $request->closing_recap;
-            $qa->clossing_assistance = $request->clossing_assistance;
-            $qa->closing_comment= $request->closing_comment;
-            $qa->automatic_fail_misquoting= $request->automatic_fail_misquoting;
-            $qa->automatic_fail_disconnected = $request->automatic_fail_disconnected;
-            $qa->automatic_fail_answer = $request->automatic_fail_answer;
-            $qa->automatic_fail_repeating_details = $request->automatic_fail_repeating_details;
-            $qa->automatic_fail_changing_details = $request->automatic_fail_changing_details;
-            $qa->automatic_fail_fabricating = $request->automatic_fail_fabricating;
-            $qa->automatic_fail_other = $request->automatic_fail_other;
-            $qa-> automatic_fail_comment = $request->automatic_fail_comment;
-            $qa->additional_comment = $request->additional_comment;
-            $qa->yes_responses = $request->yes_responses;
-            $qa->no_responses = $request->no_responses;
-            $qa->automatic_fail_response = $request->automatic_fail_response;
-            $qa->monitor_percentage = $request->monitor_percentage;
-            $qa->call_id = $request->call_id;
-            $call_id = QualityAssurance::select('call_id')->where([
-                'call_id' => $request->call_id,
-            ])->get();
 
-            if(count($call_id)>0){
-                $response['status'] = "Failure!";
-                $response['result'] = "Quality Assessment for this call already exist";
-            } else {
-                $qa->save();
-                $response['status'] = "Success";
-                $response['result'] = "Added Successfully";
+            if($request->qa_id){
+                try {
+                    $qa_data = QualityAssurance::where('qa_id', $request->qa_id)->update([
+                        'agent_id'	=> $request->rep_name,
+                        'call_date' => $request->call_date,
+                        'call_type_id'=> $request->call_type,
+                        'call_number'=>$request->call_number,
+                        'greetings_correct'=>$request->greetings_correct,
+                        'greetings_assurity_statement'=>$request->greetings_assurity_statement,
+                        'greetings_comment'=>$request->greetings_comment,
+                        'customer_name_call'=>$request->customer_name_call,
+                        'customer_comment'=>$request->customer_comment,
+                        'listening_skills'=>$request->listening_skills,
+                        'listening_comment' => $request-> listening_comment,
+                        'courtesy_please'=> $request->courtesy_please,
+                        'courtesy_thank_you'=>$request->courtesy_thank_you,
+                        'courtesy_interest'=>$request->courtesy_interest,
+                        'courtesy_empathy'=>$request-> courtesy_empathy,
+                        'courtesy_Apologized'=>$request->courtesy_Apologized,
+                        'courtesy_comment'=>$request->courtesy_comment,
+                        'equipment_system'=>$request-> equipment_system,
+                        'equipment_comment'=>$request->equipment_comment,
+                        'soft_skills_energy'=>$request->soft_skills_energy,
+                        'soft_skill_avoided_silence'=>$request-> soft_skill_avoided_silence,
+                        'soft_skill_polite'=>$request->soft_skill_polite,
+                        'soft_skill_grammar'=>$request->soft_skill_grammar,
+                        'soft_skill_refrained_company'=> $request->soft_skill_refrained_company,
+                        'soft_skill_positive_words'=> $request->soft_skill_positive_words,
+                        'soft_skills_comment'=> $request->soft_skills_comment,
+                        'using_hold_informed_customer' => $request->using_hold_informed_customer,
+                        'using_hold_touch'=> $request->using_hold_touch,
+                        'using_hold_thanked' => $request->using_hold_thanked,
+                        'using_hold_comment'=> $request->using_hold_comment,
+                        'connecting_calls_department' => $request->connecting_calls_department,
+                        'connecting_calls_customer'=> $request->connecting_calls_customer,
+                        'connecting_calls_comment'=> $request->connecting_calls_comment,
+                        'closing_recap'=> $request->closing_recap,
+                        'clossing_assistance' => $request->clossing_assistance,
+                        'closing_comment' => $request->closing_comment,
+                        'automatic_fail_misquoting'=> $request->automatic_fail_misquoting,
+                        'automatic_fail_disconnected'=> $request->automatic_fail_disconnected,
+                        'automatic_fail_answer' => $request->automatic_fail_answer,
+                        'automatic_fail_repeating_details'=> $request->automatic_fail_repeating_details,
+                        'automatic_fail_changing_details' => $request->automatic_fail_changing_details,
+                        'automatic_fail_fabricating'=> $request->automatic_fail_fabricating,
+                        'automatic_fail_other' => $request->automatic_fail_other,
+                        'automatic_fail_comment'=> $request->automatic_fail_comment,
+                        'additional_comment' => $request->additional_comment,
+                        'yes_responses'=> $request->yes_responses,
+                        'no_responses' => $request->no_responses,
+                        'automatic_fail_response'=> $request->automatic_fail_response,
+                        'monitor_percentage' => $request->monitor_percentage,
+                        'call_id' => $request->call_id,
+                    ]);
+                    $response['status'] = 'success';
+                    $response['result']= "Updated Successfully";
+                } catch(Exception $e) {
+                    $response['status'] = 'failure';
+                    $response['result'] = "Unexpected Db Error";
+                }
+            }
+            else{
+                $qa = new QualityAssurance;
+                $qa->added_by = Auth::user()->user_id;
+                $qa->agent_id	= $request->rep_name;
+                $qa->call_date = $request->call_date;
+                $qa->call_type_id = $request->call_type;
+                $qa->call_number = $request->call_number;
+                $current = Carbon::now()->format('YmdHms');
+                $files = [];
+                if($request->hasfile('recording'))
+                {
+                    $i =1;
+                    foreach($request->file('recording') as $file)
+                    {
+                        $name= $current.'_'.$i.'.'.$file->getClientOriginalExtension();
+                        $file->move(public_path('recordings'), $name);
+                        $files[] = $name;
+                        $i++;
+                    }
+                }
+                $qa->recording = implode(',',$files);
+                $qa->greetings_correct = $request->greetings_correct;
+                $qa->greetings_assurity_statement  = $request->greetings_assurity_statement;
+                $qa->greetings_comment = $request->greetings_comment;
+                $qa->customer_name_call = $request->customer_name_call;
+                $qa->customer_comment = $request->customer_comment;
+                $qa->listening_skills = $request->listening_skills;
+                $qa->listening_comment= $request-> listening_comment;
+                $qa->courtesy_please = $request->courtesy_please;
+                $qa->courtesy_thank_you = $request->courtesy_thank_you;
+                $qa->courtesy_interest = $request->courtesy_interest;
+                $qa->courtesy_empathy = $request-> courtesy_empathy;
+                $qa->courtesy_Apologized = $request->courtesy_Apologized;
+                $qa->courtesy_comment = $request->courtesy_comment;
+                $qa->equipment_system = $request-> equipment_system;
+                $qa->equipment_comment = $request->equipment_comment;
+                $qa->soft_skills_energy = $request->soft_skills_energy;
+                $qa->soft_skill_avoided_silence  = $request-> soft_skill_avoided_silence;
+                $qa->soft_skill_polite = $request->soft_skill_polite;
+                $qa->soft_skill_grammar = $request->soft_skill_grammar;
+                $qa->soft_skill_refrained_company= $request->soft_skill_refrained_company;
+                $qa->soft_skill_positive_words = $request->soft_skill_positive_words;
+                $qa->soft_skills_comment = $request->soft_skills_comment;
+                $qa->using_hold_informed_customer = $request->using_hold_informed_customer;
+                $qa->using_hold_touch = $request->using_hold_touch;
+                $qa->using_hold_thanked = $request->using_hold_thanked;
+                $qa->using_hold_comment = $request->using_hold_comment;
+                $qa->connecting_calls_department = $request->connecting_calls_department;
+                $qa->connecting_calls_customer = $request->connecting_calls_customer;
+                $qa->connecting_calls_comment = $request->connecting_calls_comment;
+                $qa->closing_recap = $request->closing_recap;
+                $qa->clossing_assistance = $request->clossing_assistance;
+                $qa->closing_comment= $request->closing_comment;
+                $qa->automatic_fail_misquoting= $request->automatic_fail_misquoting;
+                $qa->automatic_fail_disconnected = $request->automatic_fail_disconnected;
+                $qa->automatic_fail_answer = $request->automatic_fail_answer;
+                $qa->automatic_fail_repeating_details = $request->automatic_fail_repeating_details;
+                $qa->automatic_fail_changing_details = $request->automatic_fail_changing_details;
+                $qa->automatic_fail_fabricating = $request->automatic_fail_fabricating;
+                $qa->automatic_fail_other = $request->automatic_fail_other;
+                $qa-> automatic_fail_comment = $request->automatic_fail_comment;
+                $qa->additional_comment = $request->additional_comment;
+                $qa->yes_responses = $request->yes_responses;
+                $qa->no_responses = $request->no_responses;
+                $qa->automatic_fail_response = $request->automatic_fail_response;
+                $qa->monitor_percentage = $request->monitor_percentage;
+                $qa->call_id = $request->call_id;
+                $call_id = QualityAssurance::select('call_id')->where([
+                    'call_id' => $request->call_id,
+                ])->get();
+
+                if(count($call_id)>0){
+                    $response['status'] = "Failure!";
+                    $response['result'] = "Quality Assessment for this call already exist";
+                } else {
+                    $qa->save();
+                    $response['status'] = "Success";
+                    $response['result'] = "Added Successfully";
+                }
             }
         } else {
             $response['status'] = "Failure!";

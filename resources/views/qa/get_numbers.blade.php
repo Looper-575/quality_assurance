@@ -1,13 +1,3 @@
-<?php
-//echo '<pre>';
-//print_r($numbers);
-//die();
-?>
-
-
-
-
-
 @if ($type == 2)
     @if (count($numbers)>0)
         <option value="">Please Select</option>

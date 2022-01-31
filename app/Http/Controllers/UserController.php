@@ -63,8 +63,6 @@ class UserController extends Controller
                 'status'=>1
             ])->with(['role'])->first();
             if($user) {
-//                $permission = RolePermission::where('role_id',$user->role_id)->get();
-//                Session::put('permissions', $permission);
                 Auth::login($user);
                 $response['status'] = "Success";
                 $response['result'] = "Logged In";
@@ -155,9 +153,7 @@ class UserController extends Controller
     }
     public function change_password(Request $request)
     {
-        User::where([
-            'user_id' => $request->user_id,
-        ])->update([
+        User::where('user_id', $request->user_id)->update([
             'password' => encrypt_password($request->password)
         ]);
         $response['status'] = "Success";

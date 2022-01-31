@@ -29,6 +29,7 @@ class User extends Authenticatable
         'city',
         'contact_number',
         'remember_token',
+        'vicidialer_id',
         'role_id',
     ];
 
@@ -75,6 +76,6 @@ class User extends Authenticatable
 
     public function team_member()
     {
-        return $this->hasOne(TeamMember::class, 'user_id', 'user_id')->where('status',1);
+        return $this->hasOne(TeamMember::class, 'user_id', 'user_id');
     }
 }

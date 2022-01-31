@@ -59,4 +59,9 @@ class UserRole extends Authenticatable
     {
         return $this->belongsTo(User::class, 'modified_by', 'user_id');
     }
+
+    public function role_permission()
+    {
+        return $this->hasMany(RolePermission::class, 'role_id', 'role_id');
+    }
 }

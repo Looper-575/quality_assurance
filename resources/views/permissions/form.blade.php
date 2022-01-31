@@ -24,8 +24,9 @@
                 <div class="row">
                     <div class="col-4">
                         <div class="form-group">
-                            <label class="form-check-label font-17" for="role">User Role:</label>
-                            <select class="form-control select2" name="role_id" id="role" required>
+                            <label class="form-check-label font-17 mb-4" for="role">User Role:</label>
+                            <input type="hidden" name="role_id" value="{{$role_id}}" {{ $role_id == 0 ? 'disabled' : '' }}>
+                            <select class="form-control select2" name="role_id" id="role" required {{ $role_id != 0 ? 'disabled' : '' }}>
                                 <option value="">Select Role </option>
                                 @foreach($roles as $role)
                                     <option {{ $role_id == $role->role_id ? 'selected' : '' }} value="{{$role->role_id}}">{{$role->title}} </option>
@@ -35,7 +36,7 @@
                     </div>
                     <div class="col-12">
                         <div class="form-group">
-                            <label class="form-check-label font-17">Menus:</label>
+                            <label class="form-check-label font-17 mb-4">Menus:</label>
                             <div class="ml-5">
                                 <div class="m-accordion m-accordion--section m-accordion--padding-lg mb-5">
                                     @foreach($menus as $menu)
@@ -79,8 +80,7 @@
                                             <span class="m-accordion__item-mode mr-3"></span>
                                             </div>
                                             @if(count($menu->children) > 0)
-
-                                                <div class="m-accordion__item-body collapse {{ $menu->menu_permission && $menu->menu_permission->view == 1 ? 'show' : '' }}" id="m_section_1_content_2_body{{$menu->id}}" role="tabpanel" aria-labelledby="m_section_1_content_2_head{{$menu->id}}" data-parent="#m_section_1_content{{$menu->id}}">
+                                                <div class="m-accordion__item-body collapse {{ has_permission_from_db($role_id, $menu->id, 'view') == 1 ? 'show' : '' }}" id="m_section_1_content_2_body{{$menu->id}}" role="tabpanel" aria-labelledby="m_section_1_content_2_head{{$menu->id}}" data-parent="#m_section_1_content{{$menu->id}}">
                                                     <div class="m-accordion__item-content">
                                                         @foreach($menu->children as $indx => $child)
                                                             <div class="form-check ml-5">
@@ -135,7 +135,6 @@
 @section('footer_scripts')
     <script>
         function open_accordion(id, e){
-            console.log(e.checked);
             if(e.checked){
                 $("#m_section_1_content_2_body"+id).addClass('show');
             }
@@ -167,21 +166,13 @@
                 }
             })
         });
-        $('#add_new_btn').click(function () {
-            $('#permission_id').val(null);
-            $('#title').val(null);
-            $('#type').val(null);
-            $('#date_from').val(null);
-            $('#date_to').val(null);
-            $('#add_new_modal').modal('toggle');
-        });
 
         $('#add_data_form_id').submit(function (e) {
             e.preventDefault();
             let form = document.getElementById('add_data_form_id');
             let data = new FormData(form);
             let a = function() {
-                // window.location.reload();
+                window.location.reload();
             }
             let arr = [a];
             call_ajax_with_functions('', '{{route('save_permissions')}}', data, arr);

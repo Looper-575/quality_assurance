@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 use App\Models\AttendanceLog;
 use App\Models\Holiday;
 use App\Models\LeaveApplication;
+use App\Models\ShiftUser;
 use App\Models\Team;
 use App\Models\TeamMember;
 use App\Models\User;
@@ -54,7 +55,7 @@ class AttendanceController extends Controller
             AttendanceLog::where('attendance_id', $request->attendance_id)->update(['modified_by' => Auth::user()->user_id, 'half_leave' => $request->half_leave, 'on_leave' => 0]);
         }
         if($request->has('on_leave')) {
-            AttendanceLog::where('attendance_id', $request->attendance_id)->update(['modified_by' => Auth::user()->user_id, 'on_leave' => $request->on_leave, 'half_leave' => 0]);
+            AttendanceLog::where('attendance_id', $request->attendance_id)->update(['modified_by' => Auth::user()->user_id, 'on_leave' => $request->on_leave, 'half_leave' => 0, 'time_out' => null]);
         }
 
         return response()->json(['success' => true], 200);
@@ -95,6 +96,7 @@ class AttendanceController extends Controller
                                     $attendance_log->on_leave = 1;
                                 }
                             }
+                            $attendance_log->time_out = $team->shift->check_out;
                             $attendance_log->user_id = $user_id;
                             $attendance_log->attendance_date = $date_today;
                             $attendance_log->added_by = $manager_id;
@@ -115,5 +117,95 @@ class AttendanceController extends Controller
             $last_date = AttendanceLog::where('added_by', $manager_id)->orderBy('added_on', 'desc')->first();
             return AttendanceLog::with('user')->where('attendance_date', $last_date->attendance_date)->whereIn('user_id',$users_id)->get();
         }
+    }
+
+    public function check_attendance()
+    {
+        $data['page_title'] = "Check Attendance - Atlantis BPO CRM";
+        $data['managers'] = User::whereIn('role_id', [1,2, 3])->whereHas('user_team')->get();
+        $data['agents'] = null;
+        return view('attendance.check_attendance' , $data);
+    }
+
+    public function check_back_date_attendance(Request $request)
+    {
+        $date_today = date("Y-m-d"  ,strtotime($request->attendance_date));
+        $check_holiday = Holiday::where('date_from','<=', $date_today)->where('date_to','>=', $date_today)->get();
+        $data['not_marked'] = false;
+        $data['holiday'] = false;
+        if(date('N', strtotime($date_today)) < 6 && $check_holiday->count() == 0){
+            $data['agents'] =  AttendanceLog::with('user')->where('attendance_date', $date_today)->where('added_by', $request->manager_id)->get();
+            if(count($data['agents']) == 0){
+                $data['not_marked'] = true;
+            }
+        } else {
+            $data['agents'] = null;
+            $data['holiday'] = true;
+        }
+        return view('attendance.partials.back_date_attendance' , $data);
+    }
+
+    public function creat_back_date_attendance(Request $request)
+    {
+        $manager_id = $request->manager_id;
+        $date_today = date("Y-m-d"  ,strtotime($request->attendance_date));
+        $team = Team::with('shift')->where('team_lead_id', $manager_id)->where('status', 1)->first();
+        if(!$team){
+            return null;
+        }
+        $users_id = TeamMember::where('team_id', $team->team_id)->pluck('user_id')->toArray();
+        array_push($users_id, $manager_id);
+        DB::beginTransaction();
+        try {
+            foreach ($users_id as $user_id) {
+                $attendance_log_check = AttendanceLog::where(['user_id' => $user_id, 'attendance_date' => $date_today])->get();
+                if (count($attendance_log_check) > 0) {
+                } else {
+                    $leave = LeaveApplication::where('added_by', $user_id)
+                        ->where(['approved_by_manager' => 1, 'approved_by_hr' => 1])
+                        ->where('from', '<=', $date_today)
+                        ->where('to', '>=', $date_today)
+                        ->first();
+                    $attendance_log = new AttendanceLog;
+                    if ($leave) {
+                        if ($leave->leave_type_id) {
+                            $attendance_log->half_leave = 1;
+                        } else {
+                            $attendance_log->on_leave = 1;
+                        }
+                    }
+                    $attendance_log->time_out = $team->shift->check_out;
+                    $attendance_log->user_id = $user_id;
+                    $attendance_log->attendance_date = $date_today;
+                    $attendance_log->added_by = $manager_id;
+                    $attendance_log->save();
+                }
+            }
+        } catch (\Exception $ex){
+            DB::rollBack();
+        } finally {
+            DB::commit();
+        }
+        $data['agents'] =  AttendanceLog::with('user')->where('attendance_date', $date_today)->where('added_by', $manager_id)->get();
+        $data['not_marked'] = false;
+        $data['holiday'] = false;
+        return view('attendance.partials.back_date_attendance' , $data);
+    }
+
+    public function fill_attendance_time_out()
+    {
+        $attendance_log_check = AttendanceLog::where('time_out', null)->get();
+        foreach ($attendance_log_check as $log){
+            $user_shift_time_out = TeamMember::has('team.shift')->where('user_id', $log->user_id)->first();
+            if(isset($user_shift_time_out->team)){
+                AttendanceLog::where('attendance_id', $log->attendance_id)->update(['time_out' => $user_shift_time_out->team->shift->check_out]);
+            } else {
+                $user_shift_time_out = Team::where('team_lead_id', $log->user_id)->first();
+                if(isset($user_shift_time_out)){
+                    AttendanceLog::where('attendance_id', $log->attendance_id)->update(['time_out' => $user_shift_time_out->shift->check_out]);
+                }
+            }
+        }
+        return 'Success';
     }
 }

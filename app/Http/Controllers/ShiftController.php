@@ -41,8 +41,6 @@ class ShiftController extends Controller
             'check_out'=> 'required',
         ]);
         if($validator->passes()) {
-            DB::beginTransaction();
-            try{
                 $shift = Shift::updateOrCreate([
                     'shift_id' => $request->shift_id,
                 ], [
@@ -51,20 +49,6 @@ class ShiftController extends Controller
                     'check_out' => $request->check_out,
                     'added_by' => Auth::user()->user_id,
                 ]);
-                ShiftUser::where('shift_id',$shift->shift_id)->delete();
-                if($request->user_ids != null){
-                    foreach ($ids as $id) {
-                        $shift_user = new ShiftUser;
-                        $shift_user->shift_id = $shift->shift_id;
-                        $shift_user->user_id = $id;
-                        $shift_user->added_by = Auth::user()->user_id;
-                        $shift_user->save();
-                    }
-                }
-                DB::commit();
-            } catch(Exception $ex) {
-                DB::rollback();
-            }
             $response['status'] = "Success";
             $response['result'] = "Saved Successfully";
         }
@@ -96,7 +80,6 @@ class ShiftController extends Controller
     }
     public function shift_delete(Request $request)
     {
-        ShiftUser::where('shift_id', $request->id)->delete();
         Shift::find($request->id)->delete();
         $response['status'] = "Success";
         $response['result'] = "Deleted Successfully";
