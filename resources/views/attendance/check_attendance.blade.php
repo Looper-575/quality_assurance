@@ -27,10 +27,11 @@
                     <div class="col-5">
                         <div class="form-group">
                             <label class="form-check-label" for="manager_id">Team Lead</label>
-                            <select class="form-control select2 mt-3" name="manager_id" id="manager_id" required>
+                            <input type="hidden" name="manager_id" value="{{Auth::user()->user_id}}" id="manager_id" {{ Auth::user()->role->role_id == 1 ? 'disabled' : '' }}>
+                            <select class="form-control select2 mt-3" name="manager_id" id="manager_id" required {{ Auth::user()->role->role_id != 1 ? 'disabled' : '' }}>
                                 <option value="">Select Team</option>
                                 @foreach($managers as $agent)
-                                    <option value="{{$agent->user_id}}">{{@$agent->full_name}}</option>
+                                    <option {{ Auth::user()->user_id == $agent->user_id ? 'selected' : '' }} value="{{$agent->user_id}}">{{$agent->full_name}}</option>
                                 @endforeach
                             </select>
                         </div>
