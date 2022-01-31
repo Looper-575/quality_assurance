@@ -49,5 +49,9 @@ class CallDispositionsDid extends Authenticatable
         return $this->hasMany(CallDisposition::class , 'did_id' , 'did_id');
     }
 
+    public function did_numbers()
+    {
+        return $this->hasMany(DidNumbers::class , 'did_id' , 'did_id');
+    }
 
 }

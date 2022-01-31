@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 use App\Models\CallDisposition;
+use App\Models\DidNumbers;
 use App\Models\Enquiry;
 use App\Models\Policy;
 use App\Models\PolicyFile;
@@ -67,9 +68,9 @@ class SettingsController extends Controller
     public function did_list()
     {
         $data['page_title'] = "DID List - Atlantis BPO CRM";
-        $data['did_lists'] = CallDispositionsDid::where([
+        $data['did_lists'] = CallDispositionsDid::with('did_numbers')->where([
             'status' => 1,
-        ])->get() ;
+        ])->get();
         return view('settings.did_list', $data);
     }
     public function did_save(Request $request){
@@ -79,23 +80,36 @@ class SettingsController extends Controller
         ]);
         if($validator->passes())
         {
-            if($request->type_id != '' && $request->number != '')
-            {
-                CallDispositionsDid::where('did_id'  , $request->type_id)->update([
-                    'modified_by' => Auth::user()->user_id,
-                    'title' => $request->title,
-                    'number' => $request->number,
-                ]);
+            DB::beginTransaction();
+            try {
+            $did = CallDispositionsDid::updateOrCreate([
+                'did_id' => $request->type_id,
+            ], [
+                'title' => $request->title,
+                'added_by' => Auth::user()->user_id,
+            ]);
+            if($request->type_id != ''){
+                $did_id = $request->type_id;
+            } else {
+                $did_id = $did->did_id;
             }
-            else {
-                $did = new CallDispositionsDid;
-                $did->added_by = Auth::user()->user_id;
-                $did->title = $request->title;
-                $did->number = $request->number;
-                $did->save();
+            DidNumbers::where('did_id',$did_id)->delete();
+            foreach ($request->number as $key => $number){
+                $did_number = new DidNumbers;
+                $did_number->did_id = $did_id;
+                $did_number->number = $number;
+                $did_number->number_id = $request->vicci_number_id[$key];
+                $did_number->save();
             }
             $response['status'] = 'success';
             $response['result'] = "Added Successfully";
+            } catch (\Exception $ex){
+                DB::rollBack();
+                $response['status'] = 'failure';
+                $response['result'] = 'Bad server response!';
+            } finally {
+                DB::commit();
+            }
         } else {
             $response['status'] = 'failure';
             $response['result'] = $validator->errors()->toJson();
