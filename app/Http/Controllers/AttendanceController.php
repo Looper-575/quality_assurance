@@ -10,7 +10,6 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
 class AttendanceController extends Controller
 {
     /**
@@ -26,17 +25,15 @@ class AttendanceController extends Controller
     public function attendance()
     {
         $data['page_title'] = "Attendance - Atlantis BPO CRM";
-        $data['managers'] = User::whereIn('role_id', [1,2, 3])->whereHas('user_team')->get();
+        $data['managers'] = User::whereHas('user_team')->get();
         $data['agents'] = $this->get_attendance_sheet(Auth::user()->user_id);
         return view('attendance.mark' , $data);
     }
-
     public function get_manager_attendance($id)
     {
         $data['agents'] = $this->get_attendance_sheet($id);
         return view('attendance.partials.manager_mark' , $data);
     }
-
     public function mark_attendance(Request $request)
     {
         if($request->has('absent')) {
@@ -57,10 +54,8 @@ class AttendanceController extends Controller
         if($request->has('on_leave')) {
             AttendanceLog::where('attendance_id', $request->attendance_id)->update(['modified_by' => Auth::user()->user_id, 'on_leave' => $request->on_leave, 'half_leave' => 0, 'time_out' => null]);
         }
-
         return response()->json(['success' => true], 200);
     }
-
     protected function get_attendance_sheet($manager_id)
     {
         $today = get_date();
@@ -118,15 +113,13 @@ class AttendanceController extends Controller
             return AttendanceLog::with('user')->where('attendance_date', $last_date->attendance_date)->whereIn('user_id',$users_id)->get();
         }
     }
-
     public function check_attendance()
     {
         $data['page_title'] = "Check Attendance - Atlantis BPO CRM";
-        $data['managers'] = User::whereIn('role_id', [1,2, 3])->whereHas('user_team')->get();
+        $data['managers'] = User::whereHas('user_team')->get();
         $data['agents'] = null;
         return view('attendance.check_attendance' , $data);
     }
-
     public function check_back_date_attendance(Request $request)
     {
         $date_today = date("Y-m-d"  ,strtotime($request->attendance_date));
@@ -144,7 +137,6 @@ class AttendanceController extends Controller
         }
         return view('attendance.partials.back_date_attendance' , $data);
     }
-
     public function creat_back_date_attendance(Request $request)
     {
         $manager_id = $request->manager_id;
@@ -191,7 +183,6 @@ class AttendanceController extends Controller
         $data['holiday'] = false;
         return view('attendance.partials.back_date_attendance' , $data);
     }
-
     public function fill_attendance_time_out()
     {
         $attendance_log_check = AttendanceLog::where('time_out', null)->get();
