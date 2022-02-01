@@ -26,7 +26,7 @@ class AttendanceController extends Controller
     public function attendance()
     {
         $data['page_title'] = "Attendance - Atlantis BPO CRM";
-        $data['managers'] = User::whereIn('role_id', [1,2, 3])->whereHas('user_team')->get();
+        $data['managers'] = User::whereHas('user_team')->get();
         $data['agents'] = $this->get_attendance_sheet(Auth::user()->user_id);
         return view('attendance.mark' , $data);
     }
@@ -122,7 +122,7 @@ class AttendanceController extends Controller
     public function check_attendance()
     {
         $data['page_title'] = "Check Attendance - Atlantis BPO CRM";
-        $data['managers'] = User::whereIn('role_id', [1,2, 3])->whereHas('user_team')->get();
+        $data['managers'] = User::whereHas('user_team')->get();
         $data['agents'] = null;
         return view('attendance.check_attendance' , $data);
     }

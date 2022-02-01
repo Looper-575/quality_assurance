@@ -3,16 +3,13 @@
     <link href="{{asset('assets/css/datatables.min.css')}}" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
-    <?php
-    $has_permissions = get_route_permissions( Auth::user()->role->role_id, @request()->route()->getName());
-    ?>
     <div class="m-portlet m-portlet--mobile">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
                 <div class="m-portlet__head-title float-left">
                     <h3 class="m-portlet__head-text">Mark Attendance</h3>
                 </div>
-                @if($has_permissions->add == 1)
+                @if(Auth::user()->role->role_id == 1)
                 <div class="m-portlet__head-title float-right">
                     <select class="form-control select2 mt-3" name="manager_id" id="manager_id">
                         <option value="">Select Manager</option>
