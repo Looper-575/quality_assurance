@@ -2,8 +2,8 @@
     <div class="col-12">
         <form method="post" id="user_form" action="javascript:save_user();" enctype="multipart/form-data">
             @csrf
-            <div class="card">
-                <div class="card-body" id="add_more_cats_data">
+            <div class="">
+                <div class="" id="add_more_cats_data">
                     <div class="row">
                         @if($user)
                             <input type="hidden" value="{{$user->user_id}}" name="user_id">
@@ -13,6 +13,16 @@
                                 <label class="form-check-label"> Full Name</label>
                                 <input name="full_name" value="{{$user ? $user->full_name : ''}}" required type="text" class="form-control">
                             </div>
+                        </div>
+                        <div class="col-6">
+                            <label  for="department_id">Department</label>
+                            <select class="form-control" name="department_id" id="department_id" required>
+                                <option class="form-control" value="" selected disabled>Plese Select</option>
+                                @foreach($departments as $department)
+                                    <option {{$user ? ($user->department_id == $department->department_id ? 'selected' : '' ): ''}}
+                                            value="{{$department->department_id}}">{{$department->title}}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="col-6">
                             <label  for="agent_id">Role</label>
@@ -90,7 +100,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="card-footer text-right">
+                <div class="text-right">
                     <button class="btn btn-primary mr-1" type="submit">Submit</button>
                     <button class="btn btn-danger" type="reset">Reset</button>
                 </div>

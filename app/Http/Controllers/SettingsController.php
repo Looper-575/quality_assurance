@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 use App\Models\CallDisposition;
 use App\Models\DidNumbers;
 use App\Models\Enquiry;
+use App\Models\ManagerialRole;
 use App\Models\Policy;
 use App\Models\PolicyFile;
 use App\Models\UserRole;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\CallDispositionsTypes;
 use App\Models\CallDispositionsDid;
 use App\Models\User;
+use Illuminate\Validation\Rule;
 use Mockery\Exception;
 class SettingsController extends Controller
 {
@@ -238,6 +240,42 @@ class SettingsController extends Controller
         $response['status'] = "Success";
         $response['result'] = "Deleted Successfully";
         return response()->json($response);
+    }
+    public function managerial_role()
+    {
+        $data['page_title'] = "Managerial Roles - Atlantis BPO CRM";
+        $data['managerial_roles'] = ManagerialRole::where([
+            'status' => 1,
+        ])->get() ;
+        $data['user_roles'] = UserRole::where([
+            'status' => 1,
+        ])->get() ;
+        return view('settings.managerial_role', $data);
+    }
+    public function managerial_role_save(Request $request)
+    {
+        ManagerialRole::updateOrCreate([
+            'managerial_role_id' => $request->managerial_role_id,
+        ], [
+            'role_id' => $request->role_id,
+            'type' => $request->type,
+            'added_by' => Auth::user()->user_id,
+        ]);
+        $response['status'] = "Success";
+        $response['result'] = "Added Successfully";
+        return response()->json($response);
+    }
+    public function managerial_role_delete(Request $request)
+    {
+        ManagerialRole::where('managerial_role_id', $request->managerial_role_id)->update(['status' => 2]);
+        $response['status'] = "Success";
+        $response['result'] = "Deleted Successfully";
+        return response()->json($response);
+    }
+    public function check_managerial_role(Request $request)
+    {
+        $data = ManagerialRole::where('role_id', $request->role_id)->where('status', 1)->get();
+        return response()->json($data);
     }
 }
 

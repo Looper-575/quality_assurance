@@ -25,9 +25,9 @@
                         <div class="form-group">
                             <label class="form-check-label" for="team">Team</label>
                             <select class="form-control select2 mt-2" name="team" id="team">
-                                <option value="">Select Manager</option>
+                                <option value="0">Select Manager</option>
                                 @foreach($managers as $agent)
-                                    <option value="{{$agent->user_id}}">{{@$agent->full_name}}</option>
+                                    <option value="{{$agent->team_lead_id}}">{{$agent->title}}</option>
                                 @endforeach
                             </select>
                         </div>

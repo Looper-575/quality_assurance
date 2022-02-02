@@ -9,12 +9,12 @@
                 <div class="m-portlet__head-title float-left">
                     <h3 class="m-portlet__head-text">Mark Attendance</h3>
                 </div>
-                @if(Auth::user()->role->role_id == 1)
+                @if(count($teams)>0)
                 <div class="m-portlet__head-title float-right">
                     <select class="form-control select2 mt-3" name="manager_id" id="manager_id">
                         <option value="">Select Manager</option>
-                        @foreach($managers as $agent)
-                            <option value="{{$agent->user_id}}">{{@$agent->full_name}}</option>
+                        @foreach($teams as $team)
+                            <option value="{{$team->team_lead_id}}">{{$team->title}}</option>
                         @endforeach
                     </select>
                 </div>

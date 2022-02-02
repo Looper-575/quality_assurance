@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ManagerialRole;
 use App\Models\Shift;
 use App\Models\Team;
 use App\Models\TeamMember;
@@ -31,7 +32,8 @@ class TeamController extends Controller
     public function team_list()
     {
         $data['page_title'] = "Atlantis BPO CRM - Roles";
-        $data['team_leads'] = User::where('status',1)->whereIn('role_id', [1, 2, 3])->get();
+        $manager_ids = ManagerialRole::where('type', 'Team Lead')->where('status', 1)->pluck('role_id')->toArray();
+        $data['team_leads'] = User::where('status',1)->whereIn('role_id', $manager_ids)->get();
         $data['types'] = Department::where('status',1)->orderBy('department_id', 'DESC')->get();
         $data['shifts'] = Shift::where('status',1)->orderBy('shift_id', 'DESC')->get();
         $data['teams'] = Team::where('status',1)->orderBy('team_id', 'DESC')->get();
@@ -50,6 +52,7 @@ class TeamController extends Controller
         Team::where('team_id', $request->team_id)->update([
             'status' => 0,
         ]);
+        TeamMember::where('team_id', $request->team_id)->delete();
         $response['status'] = "Success";
         $response['result'] = "Deleted Successfully";
         return response()->json($response);
@@ -58,8 +61,9 @@ class TeamController extends Controller
     public function team_create()
     {
         $data['page_title'] = "Atlantis BPO CRM - Create Team";
-        $data['agents'] = User::doesnthave('team_member')->whereNotIn('role_id', [1, 2, 3])->where('status', 1)->get();
-        $data['team_leads'] = User::doesnthave('user_team')->where('status',1)->whereIn('role_id', [1, 2, 3])->get();
+        $manager_ids = ManagerialRole::whereIn('type', ['Team Lead', 'Manager'])->where('status', 1)->pluck('role_id')->toArray();
+        $data['agents'] = User::doesnthave('team_member')->doesnthave('user_team')->whereNotIn('role_id', $manager_ids)->where('status', 1)->get();
+        $data['team_leads'] = User::doesnthave('user_team')->where('status',1)->whereIn('role_id', $manager_ids)->get();
         $data['types'] = Department::where('status',1)->orderBy('department_id', 'DESC')->get();
         $data['shifts'] = Shift::where('status',1)->orderBy('shift_id', 'DESC')->get();
         $data['teams'] = Team::where('status',1)->orderBy('team_id', 'DESC')->get();
@@ -72,8 +76,9 @@ class TeamController extends Controller
         $data['page_title'] = "Atlantis BPO CRM - Add Member In Team";
         $data['team_edit'] = Team::with('team_member')->where('team_id' , $id)->with('team_lead.manager_users')->get()[0];
         $manager_id = $data['team_edit']['team_lead_id'];
-        $data['agents'] = User::doesnthave('team_member')->whereNotIn('role_id', [1, 2, 3])->where('status', 1)->get();
-        $data['team_leads'] = User::where('user_id', $manager_id)->ordoesnthave('user_team')->where('status',1)->whereIn('role_id', [1, 2, 3])->get();
+        $manager_ids = ManagerialRole::whereIn('type', ['Team Lead', 'Manager'])->where('status', 1)->pluck('role_id')->toArray();
+        $data['agents'] = User::doesnthave('team_member')->doesnthave('user_team')->whereNotIn('role_id', $manager_ids)->where('status', 1)->get();
+        $data['team_leads'] = User::where('user_id', $manager_id)->ordoesnthave('user_team')->where('status',1)->whereIn('role_id', $manager_ids)->get();
         $data['types'] = Department::where('status',1)->orderBy('department_id', 'DESC')->get();
         $data['shifts'] = Shift::where('status',1)->orderBy('shift_id', 'DESC')->get();
         $data['teams'] = Team::where('status',1)->orderBy('team_id', 'DESC')->get();
@@ -134,8 +139,9 @@ class TeamController extends Controller
 
     public function get_manager_agents($id)
     {
-        $response['manager_agents'] = User::where('manager_id', $id)->where('status', 1)->get();
-        $response['agents'] = User::where('manager_id', '!=', $id)->doesnthave('team_member')->whereNotIn('role_id', [1, 2, 3])->where('status', 1)->get();
+        $manager_ids = ManagerialRole::whereIn('type', ['Team Lead', 'Manager'])->where('status', 1)->pluck('role_id')->toArray();
+        $response['manager_agents'] = User::where('manager_id', $id)->doesnthave('team_member')->whereNotIn('role_id', $manager_ids)->where('status', 1)->get();
+        $response['agents'] = User::where('manager_id', '!=', $id)->doesnthave('team_member')->whereNotIn('role_id', $manager_ids)->where('status', 1)->get();
         return response()->json($response);
     }
 

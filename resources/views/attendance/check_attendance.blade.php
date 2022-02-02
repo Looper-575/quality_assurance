@@ -50,8 +50,13 @@
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script>
         $(document).ready(function (){
-            var today = new Date().toISOString().split("T")[0];
+            let today = new Date().toISOString().split("T")[0];
+            three_day_ago = new Date();
+            days = 86400000; //number of milliseconds in a day
+            var last_three_day = new Date(three_day_ago - (3*days));
+            last_three_day = last_three_day.toISOString().split("T")[0];
             $('#attendance_date').attr('max', today);
+            $('#attendance_date').attr('min', last_three_day);
 
         });
         $('#check_attendance_form').submit(function (e) {

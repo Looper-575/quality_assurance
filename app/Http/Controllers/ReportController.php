@@ -106,7 +106,7 @@ class ReportController extends Controller
                     ->whereDate('added_on', '<=', $date_to)->get();
                 return view('reports.partials.lead_report_list', $data);
             }
-            if($request->did_id != ""){
+            if($request->did_id[0] == ""){
                 $data['call_disp_lists'] = CallDisposition::select('*')->with(['qa_status','qa_assessment'])
                     ->where($where)
                     ->whereDate('added_on', '>=', $date_from)
@@ -171,7 +171,11 @@ class ReportController extends Controller
     public function attendance_report_monthly()
     {
         $data['page_title'] = "Attendance Report - Atlantis BPO CRM";
-        $data['managers'] = User::whereIn('role_id', [1, 2, 3])->get();
+        if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5){
+            $data['managers'] = Team::where('status', 1)->get();
+        } else {
+            $data['managers'] = Team::where('department_id', Auth::user()->department_id)->where('status', 1)->get();
+        }
         return view('reports.attendance_report_monthly', $data);
     }
     public function generate_monthly_attendance_report(Request $request)

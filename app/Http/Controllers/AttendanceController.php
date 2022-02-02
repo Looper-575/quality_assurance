@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 use App\Models\AttendanceLog;
 use App\Models\Holiday;
 use App\Models\LeaveApplication;
+use App\Models\ManagerialRole;
 use App\Models\ShiftUser;
 use App\Models\Team;
 use App\Models\TeamMember;
@@ -25,7 +26,11 @@ class AttendanceController extends Controller
     public function attendance()
     {
         $data['page_title'] = "Attendance - Atlantis BPO CRM";
-        $data['managers'] = User::whereHas('user_team')->get();
+        if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5){
+            $data['teams'] = Team::where('status', 1)->get();
+        } else {
+            $data['teams'] = Team::where('department_id', Auth::user()->department_id)->where('status', 1)->get();
+        }
         $data['agents'] = $this->get_attendance_sheet(Auth::user()->user_id);
         return view('attendance.mark' , $data);
     }
@@ -116,7 +121,11 @@ class AttendanceController extends Controller
     public function check_attendance()
     {
         $data['page_title'] = "Check Attendance - Atlantis BPO CRM";
-        $data['managers'] = User::whereHas('user_team')->get();
+        if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5){
+            $data['teams'] = Team::where('status', 1)->get();
+        } else {
+            $data['teams'] = Team::where('department_id', Auth::user()->department_id)->where('status', 1)->get();
+        }
         $data['agents'] = null;
         return view('attendance.check_attendance' , $data);
     }

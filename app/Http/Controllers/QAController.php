@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 use App\Models\CallDisposition;
+use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -9,6 +10,8 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\QualityAssurance;
 use App\Models\User;
 use App\Models\CallType;
+use ZipArchive;
+
 class QAController extends Controller
 {
     /**
@@ -54,7 +57,6 @@ class QAController extends Controller
                 'rep_name'=> 'required',
                 'call_type'=> 'required',
                 'call_number'=> 'required',
-                'recording.*' =>'nullable|file|mimes:audio/mpeg,mpga,mp3,wav,aac',
                 'greetings_correct' => 'required',
                 'greetings_assurity_statement'=> 'required',
                 'customer_name_call' => 'required',
@@ -273,4 +275,30 @@ class QAController extends Controller
         ])->with(['agent', 'call_type','call_disposition'])->get()[0];
         return view('qa.qa_single_report' , $data);
     }
+
+    public function rec_download($rec)
+    {
+        if($rec) {
+
+            if(File::exists(public_path('temporary_zip/Recordings.zip'))) {
+                File::delete(public_path('temporary_zip/Recordings.zip'));
+            }
+            $zip = new ZipArchive;
+            $fileName = 'Recordings.zip';
+            if ($zip->open(public_path('temporary_zip/'.$fileName), ZipArchive::CREATE) === TRUE) {
+                $files = explode(',',$rec);
+//                $files = File::files(public_path('uploads/file'));
+                foreach ($files as $recording) {
+                    $relativeName = File::files(public_path('recordings/'));
+                    $zip->addFile(public_path('recordings/'.$recording), $recording);
+                }
+                $zip->close();
+            }
+            return response()->download(public_path('temporary_zip/'.$fileName));
+        }
+    }
+
+
+
+
 }

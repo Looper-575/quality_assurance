@@ -1,5 +1,7 @@
 <?php
 namespace App\Http\Controllers;
+use App\Models\Department;
+use App\Models\ManagerialRole;
 use App\Models\RolePermission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,23 +28,17 @@ class UserController extends Controller
     public function list()
     {
         $data['page_title'] = "Users List - Atlantis BPO CRM";
+        $data['departments'] = Department::where('status', 1)->get();
         $data['user_lists'] = User::where('status' , 1)->with(['role', 'manager'])->get();
         return view('users.user_list', $data);
     }
     public function user_form(Request $request)
     {
         $data['page_title'] = "User List - Atlantis BPO CRM";
+        $data['departments'] = Department::where('status', 1)->get();
         $data['user_roles'] = UserRole::where('status',1)->get();
-        DB::enableQueryLog();
-        $data['managers'] = User::where([
-            'status' => 1,
-        ])->Where([
-            'role_id' => 3,
-        ])->orWhere([
-            'role_id' => 2,
-        ])->orWhere([
-            'role_id' => 1,
-        ])->get();
+        $manager_ids = ManagerialRole::whereIn('type', ['Manager'])->where('status', 1)->pluck('role_id')->toArray();
+        $data['managers'] = User::where('status', 1)->whereIn('role_id', $manager_ids)->get();
         if(isset($request->user_id)){
             $data['user'] = User::where('user_id',$request->user_id)->get()[0];
         } else {
@@ -103,9 +99,11 @@ class UserController extends Controller
                 User::where('user_id', $request->user_id)->update([
                     'full_name' => $request->full_name,
                     'role_id' => $request->role_id,
+                    'department_id' => $request->department_id,
                     'manager_id' => $request->manager_id,
                     'gender' => $request->gender,
                     'contact_number' => $request->contact_number,
+                    'vicidialer_id' => $request->vicidialer_id,
                     'postal_address' => $request->postal_address,
                 ]);
             } else {
@@ -125,7 +123,9 @@ class UserController extends Controller
                 $user->gender = $request->gender;
                 $user->postal_address = $request->postal_address;
                 $user->contact_number = $request->contact_number;
+                $user->vicidialer_id = $request->vicidialer_id;
                 $user->role_id = $request->role_id;
+                $user->department_id = $request->department_id;
                 $user->save();
             }
             $response['status'] = 'Success';

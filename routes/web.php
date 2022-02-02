@@ -260,6 +260,11 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
         Route::get('/chat','App\Http\Controllers\ChatController@chat')->name('chat');
     });
     Route::get('/access_denied','App\Http\Controllers\PermissionController@access_denied')->name('access_denied');
+
+    Route::get('/managerial_role','App\Http\Controllers\SettingsController@managerial_role')->name('managerial_role');
+    Route::post('/managerial_role_save','App\Http\Controllers\SettingsController@managerial_role_save')->name('managerial_role_save');
+    Route::post('/managerial_role_delete','App\Http\Controllers\SettingsController@managerial_role_delete')->name('managerial_role_delete');
+    Route::get('/check_managerial_role','App\Http\Controllers\SettingsController@check_managerial_role')->name('check_managerial_role');
 });
 
 
