@@ -145,7 +145,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label" for="courtesy_please3" > NA </label>
-                                    <input class="form-check-input na_radio" type="radio" name="courtesy_please" id="courtesy_please3" value="2" {{ ($qa_edit->courtesy_please=="1")? "checked" : "" }}>
+                                    <input class="form-check-input na_radio" type="radio" name="courtesy_please" id="courtesy_please3" value="2" {{ ($qa_edit->courtesy_please=="2")? "checked" : "" }}>
                                 </div>
                             </div>
                         </div>
