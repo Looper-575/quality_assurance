@@ -69,11 +69,9 @@
                 @if(isset($call_disp_list->qa_assessment))
                     <td>
                         @if($call_disp_list->qa_assessment->recording )
-                            @foreach(explode(',',$call_disp_list->qa_assessment->recording) as $recording)
-                                <a href="asset{{'/../recordings/'.$recording}}" download class="mb-1 d-block">
-                                    <i class="fa fa-download"></i>
-                                </a>
-                            @endforeach
+                            <a class="btn btn-success" href="{{route('rec_download',$call_disp_list->qa_assessment->recording)}}" data-id22="{{$call_disp_list->qa_assessment->recording}}">
+                                Get Audio <i class="fa fa-download"></i>
+                            </a>
                         @else
                             NA
                         @endif

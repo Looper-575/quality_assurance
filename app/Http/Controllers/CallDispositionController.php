@@ -211,6 +211,9 @@ class CallDispositionController extends Controller
     public function edit($id)
     {
         $data['page_title'] = "Call Disposition Form - Atlantis BPO CRM";
+        $data['lead_did_data'] = CallDispositionsDid::where([
+            'status' => 1,
+        ])->get();
         $data['lead_edit'] = CallDisposition::where('call_id',$id)->with(['call_dispositions_services'])->get()[0];
         return view('call_dipositions.disposition_edit' , $data);
     }

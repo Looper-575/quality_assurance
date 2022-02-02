@@ -34,7 +34,11 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-check-label" for="did"> DID</label>
-                                <input type="text" readonly class="form-control" name="did_id" value="{{$lead_edit->did_id}}" id="did">
+                                <select required class="form-control select2" name="did_id" id="did">
+                                    @foreach($lead_did_data as $did_data)
+                                        <option value="{{ $did_data->did_id }}"> {{ $did_data->title }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label class="form-check-label" for="customer_name">Customer Name </label>
@@ -440,6 +444,14 @@
                                 <label class="form-check-label" for="comments">Comments</label>
                                 <input required type="text" class="form-control" name="comments" id="comments" value="{{$lead_edit->comments}}" >
                             </div>
+                            <div class="form-group">
+                                <label class="form-check-label" for="did"> DID</label>
+                                <select required class="form-control select2" name="did_id" id="did">
+                                    @foreach($lead_did_data as $did_data)
+                                        <option value="{{ $did_data->did_id }}"> {{ $did_data->title }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
                     </div>
                 @endif
@@ -557,6 +569,15 @@
                     }
                 }
             });
+
+            setTimeout(function(){
+                @if(isset($lead_edit->did_id))
+                let did = document.getElementById('did');
+                did.value = {{$lead_edit->did_id}};
+                @endif
+            }, 1000);
+
+
         });
     </script>
 @endsection

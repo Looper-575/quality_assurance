@@ -28,7 +28,6 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::get('', 'App\Http\Controllers\DashboardController@index')->name('dashboard');
     Route::get('/', 'App\Http\Controllers\DashboardController@index')->name('dashboard');
     Route::get('/vendor_dashboard', 'App\Http\Controllers\DashboardController@vendor_dashboard')->name('vendor_dashboard');
-
     // Users
     Route::group(['middleware' => ['check-permission:users,view,0,0']], function() {
         Route::get('/users', 'App\Http\Controllers\UserController@list')->name('users');
@@ -64,6 +63,7 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::group(['middleware' => ['check-permission:roles_list,0,0,update']], function() {
         Route::get('/qa_edit/{id}' , 'App\Http\Controllers\QAController@edit')->name('qa_edit');
     });
+    Route::get('rec_download/{recordings}', 'App\Http\Controllers\QAController@rec_download')->name('rec_download');
     Route::post('/filter_nums' , 'App\Http\Controllers\CallDispositionController@filter_nums')->name('filter_nums');
     //  Routes for Lead ///////////////////////////
     Route::group(['middleware' => ['check-permission:lead_list,view,0,0']], function() {
@@ -265,6 +265,9 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::post('/managerial_role_save','App\Http\Controllers\SettingsController@managerial_role_save')->name('managerial_role_save');
     Route::post('/managerial_role_delete','App\Http\Controllers\SettingsController@managerial_role_delete')->name('managerial_role_delete');
     Route::get('/check_managerial_role','App\Http\Controllers\SettingsController@check_managerial_role')->name('check_managerial_role');
+
+    Route::get('rec_download/{recordings}', 'App\Http\Controllers\QAController@rec_download')->name('rec_download');
+
 });
 
 
