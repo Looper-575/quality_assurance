@@ -1,6 +1,12 @@
 @extends('layout.template')
 @section('header_scripts')
     <link href="{{asset('assets/css/datatables.min.css')}}" rel="stylesheet" type="text/css" />
+    <style>
+        .check-size{
+            height: 15px;
+            width: 15px;
+        }
+    </style>
 @endsection
 @section('content')
     <div class="m-portlet m-portlet--mobile">
@@ -24,7 +30,6 @@
                     <th>S.No.</th>
                     <th>Role</th>
                     <th>Type</th>
-                    <th>Added On</th>
                     <th>Action</th>
                 </tr>
                 </thead>
@@ -32,13 +37,12 @@
                 @foreach ($managerial_roles as $managerial_role)
                     <tr>
                         <td>{{$loop->index+1}}</td>
-                        <td>{{$managerial_role->role->title}}</td>
+                        <td>{{$managerial_role->title}}</td>
                         <td>{{$managerial_role->type}}</td>
-                        <td>{{parse_datetime_get($managerial_role->added_on)}}</td>
                         <td>
                             <div class="btn-group btn-group-sm">
                                 <button type="button" class="btn btn-primary edit_btn" value="{{json_encode($managerial_role)}}">Edit</button>
-                                <button type="button" class="btn btn-danger delete_btn" value="{{$managerial_role->managerial_role_id}}"> Delete </button>
+                                <button type="button" class="btn btn-danger detele_btn" value="{{$managerial_role->role_id}}"> Delete </button>
                             </div>
                         </td>
                     </tr>
@@ -70,17 +74,25 @@
                                                 <option value="{{$user_role->role_id}}">{{$user_role->title}}</option>
                                             @endforeach
                                         </select>
-                                        <input class="form-control" type="hidden" name="managerial_role_id" id="managerial_role_id" required>
                                     </div>
                                 </div>
                                 <div class="col-12">
-                                    <div class="form-group">
-                                        <label for="type">Type</label>
-                                        <select class="form-control" name="type" id="type" required>
-                                            <option class="form-control" value="" selected disabled>Plese Select</option>
-                                            <option value="Team Lead">Team Lead</option>
-                                            <option value="Manager">Manager</option>
-                                        </select>
+                                    <label for="type">Type</label>
+                                    <div class="form-group ml-4">
+                                        <input
+                                            class="form-check-input check-size"
+                                            type="checkbox"
+                                            name="type[]"
+                                            id="type_team_lead"
+                                            value="Team Lead"
+                                        /><label class="form-check-label pr-4 mt-1 font-14" for="type_team_lead">Team Lead</label>
+                                        <input
+                                            class="form-check-input check-size"
+                                            type="checkbox"
+                                            name="type[]"
+                                            value="Manager"
+                                            id="type_manager"
+                                        /><label class="form-check-label pr-4 mt-1 font-14" for="type_manager">Manager</label>
                                     </div>
                                 </div>
                             </div>
@@ -103,25 +115,20 @@
         function check_managerial_role(e){
             $.get("{{route('check_managerial_role')}}", { role_id: e.value} )
                 .done(function( data ) {
-                    if(data.length == 0){
-                        $("#type option[value='Team Lead']").prop('disabled', false);
-                        $("#type option[value='Manager']").prop('disabled', false);
+                    $(".check-size").prop('checked', false);
+                    if(data.length>0){
+                        let types = data[0].type.split(',');
+                        $.each(types, function(i, val){
+                            $("input[value='" + val + "']").prop('checked', true);
+                        });
                     }
-                    $.each(data, function( index, value ) {
-                        if(value.type == 'Manager'){
-                            $("#type option[value='Manager']").prop('disabled', true);
-                        }
-                        if(value.type == 'Team Lead'){
-                            $("#type option[value='Team Lead']").prop('disabled', true);
-                        }
-                    });
                 });
         }
-        $('.delete_btn').click( function () {
+        $('.detele_btn').click( function () {
             let id = this.value;
             let me = this;
             let data = new FormData();
-            data.append('managerial_role_id', id);
+            data.append('role_id', id);
             data.append('_token', "{{csrf_token()}}");
             swal({
                 title: "Are you sure?",
@@ -142,13 +149,11 @@
             })
         });
         $('#add_new_btn').click(function () {
-            $('#managerial_role_id').val(null);
-            $('#type').val(null);
+            $(".check-size").prop('checked', false);
             $('#role_id').val(null);
-            $("#type option[value='Team Lead']").prop('disabled', false);
-            $("#type option[value='Manager']").prop('disabled', false);
             $('#managerial_role_form_modal').fadeIn();
         });
+
         $('#managerial_role_form').submit(function (e) {
             e.preventDefault();
             let form = document.getElementById('managerial_role_form');
@@ -160,11 +165,12 @@
             call_ajax_with_functions('', '{{route('managerial_role_save')}}', data, arr);
         });
         $('.edit_btn').click( function () {
-            $("#type option[value='Team Lead']").prop('disabled', false);
-            $("#type option[value='Manager']").prop('disabled', false);
+            $(".check-size").prop('checked', false);
             let data = JSON.parse(this.value);
-            $('#managerial_role_id').val(data.managerial_role_id);
-            $('#type').val(data.type);
+            let types = data.type.split(',');
+            $.each(types, function(i, val){
+                $("input[value='" + val + "']").prop('checked', true);
+            });
             $('#role_id').val(data.role_id);
             $('#managerial_role_form_modal').fadeIn();
         });

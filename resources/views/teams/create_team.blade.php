@@ -62,25 +62,11 @@
                         <table class="table text-center" border="1">
                             <thead>
                             <tr>
-{{--                                <th scope="col">User ID</th>--}}
                                 <th scope="col">Name</th>
                                 <th scope="col">Action</th>
                             </tr>
                             </thead>
                             <tbody id="added_users">
-{{--                            @foreach($team_edit->team_member as $index => $data)--}}
-{{--                                <tr id="row_{{$data->user->user_id}}">--}}
-{{--                                    <td scope="row" class="nr">--}}
-{{--                                        {{$data->user_id}}--}}
-{{--                                    </td>--}}
-{{--                                    <td>--}}
-{{--                                        {{$data->user->full_name}}--}}
-{{--                                    </td>--}}
-{{--                                    <td class="remove-user">--}}
-{{--                                        <button type="button" onclick="reomve_user({{$data->user->user_id}}, '{{$data->user->full_name}}')" class="btn btn-danger">Remove form Team</button>--}}
-{{--                                    </td>--}}
-{{--                                </tr>--}}
-{{--                            @endforeach--}}
                             </tbody>
                         </table>
                     </div>
@@ -101,15 +87,6 @@
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script>
         var user_ids = new Array();
-
-        $( document ).ready(function() {
-{{--            <?php $user_ids = array();--}}
-{{--            foreach ($team_edit->team_member as $data):--}}
-{{--                $user_ids = $data->user_id;--}}
-{{--                ?>;--}}
-{{--            user_ids.push(<?php echo $user_ids; ?>);--}}
-{{--            <?php endforeach; ?>--}}
-        });
         $('#team_lead_id').on('change', function() {
             var manager_id = $(this).val();
             var url = '{{ route("get_manager_agents",":id") }}';
@@ -165,7 +142,7 @@
             let data = new FormData(this);
             data.append('user_ids', user_ids);
             let a = function(){
-                window.location.reload();
+                window.location.href = "{{route('team_list')}}";
             };
             let arr = [a];
             call_ajax_with_functions('','{{route('save_add_member_form')}}',data,arr);

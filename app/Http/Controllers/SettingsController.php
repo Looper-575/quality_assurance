@@ -244,9 +244,10 @@ class SettingsController extends Controller
     public function managerial_role()
     {
         $data['page_title'] = "Managerial Roles - Atlantis BPO CRM";
-        $data['managerial_roles'] = ManagerialRole::where([
-            'status' => 1,
-        ])->get() ;
+        $data['managerial_roles'] = DB::table('managerial_roles')
+            ->join('user_roles', 'managerial_roles.role_id', '=', 'user_roles.role_id')
+            ->where('managerial_roles.status', '=', 1)
+            ->select('managerial_roles.role_id', 'user_roles.*', DB::raw('group_concat(managerial_roles.type) as type'))->groupBy('managerial_roles.role_id')->get() ;
         $data['user_roles'] = UserRole::where([
             'status' => 1,
         ])->get() ;
@@ -254,27 +255,32 @@ class SettingsController extends Controller
     }
     public function managerial_role_save(Request $request)
     {
-        ManagerialRole::updateOrCreate([
-            'managerial_role_id' => $request->managerial_role_id,
-        ], [
-            'role_id' => $request->role_id,
-            'type' => $request->type,
-            'added_by' => Auth::user()->user_id,
-        ]);
+        ManagerialRole::where('role_id', $request->role_id)->where('status', 1)->delete();
+        foreach ($request->type as $type){
+            $model = new ManagerialRole;
+            $model->role_id = $request->role_id;
+            $model->type = $type;
+            $model->added_by = Auth::user()->user_id;
+            $model->save();
+        }
         $response['status'] = "Success";
         $response['result'] = "Added Successfully";
         return response()->json($response);
     }
     public function managerial_role_delete(Request $request)
     {
-        ManagerialRole::where('managerial_role_id', $request->managerial_role_id)->update(['status' => 2]);
+        ManagerialRole::where('role_id', $request->role_id)->update(['status' => 0]);
         $response['status'] = "Success";
         $response['result'] = "Deleted Successfully";
         return response()->json($response);
     }
     public function check_managerial_role(Request $request)
     {
-        $data = ManagerialRole::where('role_id', $request->role_id)->where('status', 1)->get();
+        $data = DB::table('managerial_roles')
+            ->join('user_roles', 'managerial_roles.role_id', '=', 'user_roles.role_id')
+            ->where('managerial_roles.status', '=', 1)
+            ->where('managerial_roles.role_id', '=', $request->role_id)
+            ->select('managerial_roles.role_id', 'user_roles.*', DB::raw('group_concat(managerial_roles.type) as type'))->groupBy('managerial_roles.role_id')->get() ;
         return response()->json($data);
     }
 }

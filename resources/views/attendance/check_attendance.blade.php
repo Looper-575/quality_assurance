@@ -26,12 +26,12 @@
                     </div>
                     <div class="col-5">
                         <div class="form-group">
-                            <label class="form-check-label" for="manager_id">Team Lead</label>
+                            <label class="form-check-label" for="manager_id">Team</label>
                             <input type="hidden" name="manager_id" value="{{Auth::user()->user_id}}" id="manager_id" {{ Auth::user()->role->role_id == 1 ? 'disabled' : '' }}>
                             <select class="form-control select2 mt-3" name="manager_id" id="manager_id" required {{ Auth::user()->role->role_id != 1 ? 'disabled' : '' }}>
                                 <option value="">Select Team</option>
-                                @foreach($managers as $agent)
-                                    <option {{ Auth::user()->user_id == $agent->user_id ? 'selected' : '' }} value="{{$agent->user_id}}">{{$agent->full_name}}</option>
+                                @foreach($teams as $team)
+                                    <option {{ Auth::user()->user_id == $team->team_lead_id ? 'selected' : '' }} value="{{$team->team_lead_id}}">{{$team->title}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -50,7 +50,7 @@
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script>
         $(document).ready(function (){
-            let today = new Date().toISOString().split("T")[0];
+            var today = new Date().toISOString().split("T")[0];
             three_day_ago = new Date();
             days = 86400000; //number of milliseconds in a day
             var last_three_day = new Date(three_day_ago - (3*days));
