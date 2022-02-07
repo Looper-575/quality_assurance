@@ -253,5 +253,35 @@ if(!function_exists('get_date_interval')){
         return $dates;
     }
 }
+// Auth user time with time zone
+if(!function_exists('parse_time_zone')){
+    function parse_time_zone($time)
+    {
+        $tz_object = new DateTimeZone(Auth::user()->time_zone);
+        $datetime = new DateTime($time);
+        $datetime->setTimezone($tz_object);
+        return $datetime->format('g:i A');
+    }
+}
+
+if(!function_exists('parse_date_time_zone')){
+    function parse_date_time_zone($time)
+    {
+        $tz_object = new DateTimeZone(Auth::user()->time_zone);
+        $datetime = new DateTime($time);
+        $datetime->setTimezone($tz_object);
+        return $datetime->format('m-d-Y g:i A');
+    }
+}
+
+if(!function_exists('parse_only_date_time_zone')){
+    function parse_only_date_time_zone($time)
+    {
+        $tz_object = new DateTimeZone(Auth::user()->time_zone);
+        $datetime = new DateTime($time);
+        $datetime->setTimezone($tz_object);
+        return $datetime->format('m-d-Y');
+    }
+}
 /* End of file custom_helpers.php */
 /* Location: ./application/helpers/custom_helpers.php */

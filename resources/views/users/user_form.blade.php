@@ -92,6 +92,18 @@
                                 <input  class="form-control" value="{{$user ? $user->contact_number : ''}}" type="number" name="contact_number" id="">
                             </div>
                         </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="form-check-label" for="time_zone">Time Zone</label>
+                                <select name="time_zone" required class="form-control select2">
+                                    <option class="form-control" value="">Plese Select</option>
+                                    @foreach($time_zones as $time_zone)
+                                        <option {{$user ? ($user->time_zone == $time_zone->time_zone ? 'selected' : '' ): ''}} value="{{$time_zone->time_zone}}">
+                                        {{$time_zone->time_zone}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
                         <div class="col-12">
                             <div class="form-group">
                                 <label class="form-check-label" for="">Postal Address</label>

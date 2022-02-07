@@ -36,6 +36,7 @@ class UserController extends Controller
     {
         $data['page_title'] = "User List - Atlantis BPO CRM";
         $data['departments'] = Department::where('status', 1)->get();
+        $data['time_zones'] = DB::table('time_zones')->where('status', 1)->get();
         $data['user_roles'] = UserRole::where('status',1)->get();
         $manager_ids = ManagerialRole::whereIn('type', ['Manager'])->where('status', 1)->pluck('role_id')->toArray();
         $data['managers'] = User::where('status', 1)->whereIn('role_id', $manager_ids)->get();
@@ -100,11 +101,12 @@ class UserController extends Controller
                     'full_name' => $request->full_name,
                     'role_id' => $request->role_id,
                     'department_id' => $request->department_id,
+                    'vicidialer_id' => $request->vicidialer_id,
                     'manager_id' => $request->manager_id,
                     'gender' => $request->gender,
                     'contact_number' => $request->contact_number,
-                    'vicidialer_id' => $request->vicidialer_id,
                     'postal_address' => $request->postal_address,
+                    'time_zone' => $request->time_zone,
                 ]);
             } else {
                 $user = new User;
@@ -123,9 +125,10 @@ class UserController extends Controller
                 $user->gender = $request->gender;
                 $user->postal_address = $request->postal_address;
                 $user->contact_number = $request->contact_number;
-                $user->vicidialer_id = $request->vicidialer_id;
                 $user->role_id = $request->role_id;
+                $user->vicidialer_id = $request->vicidialer_id;
                 $user->department_id = $request->department_id;
+                $user->time_zone = $request->time_zone;
                 $user->save();
             }
             $response['status'] = 'Success';

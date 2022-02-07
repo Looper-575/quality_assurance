@@ -1,6 +1,11 @@
 @extends('layout.template')
 @section('header_scripts')
     <link href="{{asset('assets/css/datatables.min.css')}}" rel="stylesheet" type="text/css" />
+    <style>
+        .select2-container{
+            z-index: 99999999 !important;
+        }
+    </style>
 @endsection
 @section('content')
     <?php
@@ -101,7 +106,14 @@
         function show_form(){
             let data = new FormData();
             data.append('_token', '{{csrf_token()}}');
-            call_ajax_modal('post', '{{route('user_form')}}', data, 'Add New User');
+            let a = function (){
+                $(".ajax_modal").removeClass('modal-sm').addClass('modal-lg');
+            }
+            let b = function (){
+                $(".select2").select2();
+            }
+            let arr = [a,b];
+            call_ajax_modal_with_functions('{{route('user_form')}}', data, 'Add New User', arr);
         }
         function save_user() {
             if($('#pass').val() !== $('#c_pass').val()){
@@ -123,7 +135,14 @@
             let data = new FormData();
             data.append('user_id', this.id);
             data.append('_token', '{{csrf_token()}}');
-            call_ajax_modal('post', '{{route('user_form')}}', data, 'Edit User');
+            let a = function (){
+                $(".ajax_modal").removeClass('modal-sm').addClass('modal-lg');
+            }
+            let b = function (){
+                $(".select2").select2();
+            }
+            let arr = [a,b];
+            call_ajax_modal_with_functions('{{route('user_form')}}', data, 'Add New User', arr);
         });
         function delete_user (me) {
             let id = me.value;

@@ -19,9 +19,9 @@
         <tbody>
         @foreach ($attendance_list as $list)
             <tr>
-                <td>{{ $list->attendance_date }}</td>
-                <td>{{ $list->time_in == '' ? 'NA' : $list->time_in}}</td>
-                <td>{{ $list->time_out == '' ? 'NA' : $list->time_out}}</td>
+                <td>{{ parse_only_date_time_zone($list->attendance_date) }}</td>
+                <td>{{ $list->time_in == '' ? 'NA' : parse_time_zone($list->time_in)}}</td>
+                <td>{{ $list->time_out == '' ? 'NA' : parse_time_zone($list->time_out)}}</td>
                 <td>{{ $list->late == 0 ? 'No' : 'Yes'}}</td>
                 <td>{{ $list->absent == 0 ? 'No' : 'Yes'}}</td>
                 <td>{{ $list->on_leave == 0 ? 'No' : 'Yes'}}</td>
