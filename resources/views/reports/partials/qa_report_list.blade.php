@@ -25,7 +25,7 @@
                 <td>{{ $qa_list->agent->full_name }}</td>
                 <td>{{ $qa_list->call_type->title }}</td>
                 <td>{{ $qa_list->call_number }}</td>
-                <td>{{ parse_date_store($qa_list->call_date) }}</td>
+                <td>{{ parse_only_date_time_zone($qa_list->call_date) }}</td>
                 @if($qa_list->call_type->call_type_id == 1 )
                     <td>{{$qa_list->call_disposition->order_number}}</td>
                     <td>{{$qa_list->call_disposition->order_confirmation_number}}</td>

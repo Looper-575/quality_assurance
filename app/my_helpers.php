@@ -6,7 +6,7 @@
  **/
 
 // date time helpers
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
 if (!function_exists('get_date_time')) {

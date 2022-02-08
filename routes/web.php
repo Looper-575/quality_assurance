@@ -268,6 +268,25 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
 
     Route::get('rec_download/{recordings}', 'App\Http\Controllers\QAController@rec_download')->name('rec_download');
 
+    //    Employee Routes
+    Route::get('/employees', 'App\Http\Controllers\EmployeeController@index')->name('employees');
+    Route::get('/employee_form_wizard', 'App\Http\Controllers\EmployeeController@employee_form')->name('employee_form');
+    Route::post('/employee_save', 'App\Http\Controllers\EmployeeController@employee_info_save')->name('employee_save');
+    Route::post('/employee_delete', 'App\Http\Controllers\EmployeeController@delete')->name('employee_delete');
+    Route::post('/employee_education_save', 'App\Http\Controllers\EmployeeController@employee_education_save')->name('employee_education_save');
+    Route::post('/employee_experience_save', 'App\Http\Controllers\EmployeeController@employee_experience_save')->name('employee_experience_save');
+    Route::post('/employee_family_save', 'App\Http\Controllers\EmployeeController@employee_family_save')->name('employee_family_save');
+    Route::post('/employee_emergency_contact_save', 'App\Http\Controllers\EmployeeController@employee_emergency_contact_save')->name('employee_emergency_contact_save');
+    Route::post('/employee_company_reference_save', 'App\Http\Controllers\EmployeeController@employee_company_reference_save')->name('employee_company_reference_save');
+    Route::get('/get_employee_data', 'App\Http\Controllers\EmployeeController@get_employee_data')->name('get_employee_data');
+    Route::get('/employee_data_view', 'App\Http\Controllers\EmployeeController@employee_data_view')->name('employee_data_view');
+    Route::post('/employees_personal_info_edit', 'App\Http\Controllers\EmployeeController@employees_personal_info_edit')->name('employees_personal_info_edit');
+    Route::post('/employees_education_info_edit', 'App\Http\Controllers\EmployeeController@employees_education_info_edit')->name('employees_education_info_edit');
+    Route::post('/employees_experience_info_edit', 'App\Http\Controllers\EmployeeController@employees_experience_info_edit')->name('employees_experience_info_edit');
+    Route::post('/employees_family_info_edit', 'App\Http\Controllers\EmployeeController@employees_family_info_edit')->name('employees_family_info_edit');
+    Route::post('/employees_emergency_contact_info_edit', 'App\Http\Controllers\EmployeeController@employees_emergency_contact_info_edit')->name('employees_emergency_contact_info_edit');
+    Route::post('/employees_company_reference_info_edit', 'App\Http\Controllers\EmployeeController@employees_company_reference_info_edit')->name('employees_company_reference_info_edit');
+
 });
 
 

@@ -80,7 +80,7 @@
                     <td>NA</td>
                 @endif
                 <td>{{ $call_disp_list->user->full_name }}</td>
-                <td>{{ parse_datetime_store($call_disp_list->added_on) }}</td>
+                <td>{{ parse_date_time_zone($call_disp_list->added_on) }}</td>
             </tr>
         @endforeach
         </tbody>
