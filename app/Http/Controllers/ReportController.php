@@ -51,17 +51,15 @@ class ReportController extends Controller
             if ($request->disposition_type != "") {
                 $where['disposition_type'] = $request->disposition_type;
             }
-            $date_from = parse_datetime_store($request->from.'17:00:00');
-            $date_to = parse_datetime_store($request->to. '7:00:00');
+            $date_from = parse_datetime_store($request->from.' 17:00:00');
+            $date_to = parse_datetime_store($request->to.' 12:00:00');
             if ($request->agent != "") {
                 $data['call_disp_lists'] = CallDisposition::select('*')->with(['qa_status','qa_assessment'])
                     ->whereIn('added_by', $request->agent)->where($where)
-                    ->whereDate('added_on', '>=', $date_from)
-                    ->whereDate('added_on', '<=', $date_to)->get();
+                    ->where([['added_on', '>=', $date_from],['added_on', '<=', $date_to]])->get();
             } else {
                 $data['call_disp_lists'] = CallDisposition::select('*')->with('qa_status')->where($where)
-                    ->whereDate('added_on', '>=', $date_from)
-                    ->whereDate('added_on', '<=', $date_to)->get();
+                    ->where([['added_on', '>=', $date_from],['added_on', '<=', $date_to]])->get();
             }
         } else {
             $response['status'] = "Failure!";
@@ -97,25 +95,22 @@ class ReportController extends Controller
                 $where['disposition_type'] = $request->disposition_type;
             }
             $date_from = parse_datetime_store($request->from.'17:00:00');
-            $date_to = parse_datetime_store($request->to. '7:00:00');
+            $date_to = parse_datetime_store($request->to. '12:00:00');
             if(Auth::user()->role_id==13){
                 $request->did_id=36;
                 $data['call_disp_lists'] = CallDisposition::select('*')->with(['qa_status','qa_assessment'])
                     ->where('did_id', $request->did_id)->where($where)
-                    ->whereDate('added_on', '>=', $date_from)
-                    ->whereDate('added_on', '<=', $date_to)->get();
+                    ->where([['added_on', '>=', $date_from],['added_on', '<=', $date_to]])->get();
                 return view('reports.partials.lead_report_list', $data);
             }
             if($request->did_id[0] == ""){
                 $data['call_disp_lists'] = CallDisposition::select('*')->with(['qa_status','qa_assessment'])
                     ->where($where)
-                    ->whereDate('added_on', '>=', $date_from)
-                    ->whereDate('added_on', '<=', $date_to)->get();
+                    ->where([['added_on', '>=', $date_from],['added_on', '<=', $date_to]])->get();
             } else {
                 $data['call_disp_lists'] = CallDisposition::select('*')->with(['qa_status','qa_assessment'])
                     ->whereIn('did_id', $request->did_id)->where($where)
-                    ->whereDate('added_on', '>=', $date_from)
-                    ->whereDate('added_on', '<=', $date_to)->get();
+                    ->where([['added_on', '>=', $date_from],['added_on', '<=', $date_to]])->get();
             }
         } else {
             $response['status'] = "Failure!";
@@ -149,17 +144,15 @@ class ReportController extends Controller
                 $disposition_type = 2;
             }
             $date_from = parse_datetime_store($request->from.'17:00:00');
-            $date_to = parse_datetime_store($request->to. '7:00:00');
+            $date_to = parse_datetime_store($request->to. '12:00:00');
             if ($request->agent != "") {
                 $data['qa_lists'] = QualityAssurance::select('*')->with(['qa_status', 'call_type', 'call_disposition'])
                     ->whereIn('agent_id', $request->agent)->where('call_type_id', $disposition_type)
-                    ->whereDate('added_on', '>=', $date_from)
-                    ->whereDate('added_on', '<=', $date_to)->get();
+                    ->where([['added_on', '>=', $date_from],['added_on', '<=', $date_to]])->get();
             } else {
                 $data['qa_lists'] = QualityAssurance::select('*')->with(['qa_status', 'call_type', 'call_disposition'])
                     ->where('call_type_id', $disposition_type)
-                    ->whereDate('added_on', '>=', $date_from)
-                    ->whereDate('added_on', '<=', $date_to)->get();
+                    ->where([['added_on', '>=', $date_from],['added_on', '<=', $date_to]])->get();
             }
             $data['call_type'] = $request->disposition_type;
         } else {
