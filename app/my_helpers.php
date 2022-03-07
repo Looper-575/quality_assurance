@@ -244,7 +244,16 @@ if(!function_exists('get_date_interval')){
             $date_today = date("d", strtotime("+1 Day", strtotime($today)));
             $to_date = $to_date . '-' . $date_today . ' 17:00:00';
         }
-        $from_date = $from_date . '-29 17:00:00';
+        if(date("m"  ,strtotime("-1 Month" , strtotime($today)))==2){
+            if(DateTime::createFromFormat('Y', date("Y"  ,strtotime($today)))->format('L') === "1"){
+                $from_date = $from_date . '-29 17:00:00';
+            } else {
+                $from_date = $from_date . '-28 17:00:00';
+            }
+        } else {
+            $from_date = $from_date . '-29 17:00:00';
+        }
+
         $dates = [
             'to_date' => $to_date,
             'from_date'=>  $from_date

@@ -78,4 +78,13 @@ class User extends Authenticatable
     {
         return $this->hasOne(TeamMember::class, 'user_id', 'user_id');
     }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class, 'department_id', 'department_id');
+    }
+    public function employee()
+    {
+        return $this->hasOne(Employee::class, 'user_id', 'user_id');
+    }
 }

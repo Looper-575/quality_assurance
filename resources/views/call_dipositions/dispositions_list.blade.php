@@ -44,7 +44,7 @@
             <div class="tab-content">
                 <div class="tab-pane active" id="sale_made_list" role="tabpanel">
                     <div style="width: 100%">
-                        <table class="datatable table table-bordered" style="width:100%">
+                        <table class="datatable table table-bordered" id="sale_made_table" style="width:100%">
                             <thead>
                             <tr>
                                 <th>DID Name </th>
@@ -157,10 +157,11 @@
                 </div>
                 <div class="tab-pane" id="non_sale_list" role="tabpanel">
                     <div style="width: 100%">
-                        <table class="datatable table table-bordered" style="width:100%">
+                        <table class="datatable table table-bordered" id="non_sale_table" style="width:100%">
                             <thead>
                             <tr>
                                 <th>Disposition Type</th>
+                                <th>Did</th>
                                 <th>Customer Name</th>
                                 <th>Phone  Number</th>
                                 <th>Agent Name</th>
@@ -172,6 +173,7 @@
                             @foreach ($call_disp_lists as $call_disp_list)
                                 <tr>
                                     <td>{{ $call_disp_list->call_disposition_types->title}}</td>
+                                    <td>{{ isset($call_disp_list->call_disposition_did->title) ? $call_disp_list->call_disposition_did->title : ' ' }}</td>
                                     <td>{{ $call_disp_list->customer_name }}</td>
                                     <td>{{ $call_disp_list->phone_number }}</td>
                                     <td>{{ $call_disp_list->user->full_name }}</td>
@@ -201,6 +203,7 @@
                             <tfoot>
                             <tr>
                                 <th>Disposition Type</th>
+                                <th>Did</th>
                                 <th>Customer Name</th>
                                 <th>Phone  Number</th>
                                 <th>Agent Name</th>

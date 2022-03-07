@@ -44,7 +44,7 @@
         <div class="m-grid__item m-grid__item--fluid m-wrapper">
             <!-- BEGIN: Subheader -->
             <!-- END: Subheader -->
-            <div class="m-content" style="{{Route::currentRouteName() == 'chat' ? 'min-height: 100%' : ''}}">
+            <div class="m-content">
                 @yield('content')
             </div>
         </div>

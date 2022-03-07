@@ -74,7 +74,7 @@
                                     <td>{{$leave_list->half_type }}</td>
                                     <td>{{$leave_list->no_leaves}}</td>
                                     <td>{{$leave_list->reason }}</td>
-                                    @if(Auth::user()->role_id == 2)
+                                    @if(Auth::user()->role_id == $manager_id)
                                         @if($leave_list->approved_by_manager == NULL)
                                             <td>
                                                 @if($leave_list->added_by != Auth::user()->user_id)
@@ -109,7 +109,7 @@
                                     @endif
                                     <td>
                                         <div class="btn-group btn-group-sm">
-                                            @if(Auth::user()->role_id == 3 && $leave_list->approved_by_manager != 1)
+                                            @if(Auth::user()->role_id == $manager_id && $leave_list->approved_by_manager != 1)
                                                 <button title="Reject" class="btn btn-danger mr-2 p-3" onclick="reject_application(this);" value="{{$leave_list->leave_id}}"><i class="fa fa-times"></i></button>
                                                 <button title="Approve" class="btn btn-success p-3" onclick="approve_application(this);" value="{{$leave_list->leave_id}}"><i class="fa fa-check"></i></button>
                                             @endif

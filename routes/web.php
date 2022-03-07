@@ -259,6 +259,14 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::group(['middleware' => ['check-permission:chat,view,0,0']], function() {
         Route::get('/chat','App\Http\Controllers\ChatController@chat')->name('chat');
     });
+    // atlantis routes
+    Route::group(['middleware' => ['check-permission:chat_atlantis,view,0,0']], function() {
+        Route::get('/chat_atlantis','App\Http\Controllers\AtlantisController@chat_atlantis')->name('chat_atlantis');
+    });
+    Route::get('/atlantis_leads','App\Http\Controllers\AtlantisController@leads')->name('atlantis_leads');
+    Route::get('/atlantis_chat_settings','App\Http\Controllers\AtlantisController@chat_settings')->name('atlantis_chat_settings');
+
+
     Route::get('/access_denied','App\Http\Controllers\PermissionController@access_denied')->name('access_denied');
 
     Route::get('/managerial_role','App\Http\Controllers\SettingsController@managerial_role')->name('managerial_role');

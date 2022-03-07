@@ -101,7 +101,8 @@
     <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script>
-        let user_ids = new Array();
+        var user_ids = new Array();
+
         $( document ).ready(function() {
             <?php $user_ids = array();
             foreach ($team_edit->team_member as $data):

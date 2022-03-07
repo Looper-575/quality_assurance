@@ -194,12 +194,14 @@ class DashboardController extends Controller
             $from_date = $from_date.' 17:00:00';
             $to_date = $to_date.' 17:00:00';
         }
+
         $uid = Auth::user()->user_id;
         $data['daily_counts'] = $this->get_agent_rgo_counts($from_date,$to_date, $uid);
         // sales
         $dates[] = get_date_interval();
         $to_date = $dates[0]['to_date'];
         $from_date = $dates[0]['from_date'];
+
         $data['monthly_counts'] = $this->get_agent_rgo_counts($from_date,$to_date, $uid);
         $data['status'] = DB::select("SELECT * FROM (SELECT AVG(monitor_percentage) AS average FROM qa_with_color_badge WHERE(added_on >= '".$from_date."' AND added_on <= '".$to_date."' AND agent_id = '".$uid."') ) as avg_table INNER JOIN qa_performance_badge ON (avg_table.average >= qa_performance_badge.min AND avg_table.average <= qa_performance_badge.max)");
         return view('dashboard.agent_dashboard' , $data);
@@ -267,7 +269,6 @@ class DashboardController extends Controller
         return view('dashboard.vendor_dashboard' , $data);
 
     }
-
     private function get_rgo_counts($from_date, $to_date)
     {
         $single_play = DB::table('all_sales')->where('services_sold', 1)->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
@@ -291,7 +292,6 @@ class DashboardController extends Controller
             'total_sales' => $total_sales
         ];
     }
-
     private function get_agent_rgo_counts($from_date, $to_date, $user_id)
     {
         $single_play = DB::table('all_sales')->where(['services_sold'=> 1, 'added_by'=>$user_id])->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
@@ -310,7 +310,6 @@ class DashboardController extends Controller
             'total_sales' => $total_sales
         ];
     }
-
     private  function get_6_months_dipositions_count($from_date, $to_date) {
         $data['one_month'] = CallDisposition::where(['status' => 1])->whereBetween('added_on', [$from_date, $to_date])->count();
         $to_date = date("Y-m"  ,strtotime($from_date));
@@ -340,7 +339,6 @@ class DashboardController extends Controller
         $data['six_month'] = CallDisposition::where(['status' => 1])->whereBetween('added_on', [$from_date, $to_date])->count();
         return $data;
     }
-
     private function get_6_months_rgo_counts($from_date, $to_date)
     {
         $data['one_month'] = $this->get_rgo_counts($from_date, $to_date);
@@ -371,7 +369,6 @@ class DashboardController extends Controller
         $data['six_month'] = $this->get_rgo_counts($from_date, $to_date);
         return $data;
     }
-
     private function get_team_counts($from_date, $to_date, $manager_id, $exclude)
     {
         $data = DB::table('all_sales')->select('provider_name', DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile'))->orWhere(['manager_id'=>$manager_id, 'added_by'=>$manager_id])->whereIn('provider_name',['spectrum','cox','suddenlink','att','directtv','earthlink','frontier','mediacom','optimum','hughesnet'])->whereBetween('added_on', [$from_date, $to_date])->where('added_by','!=', $exclude)->groupBy('provider_name')->get();
@@ -379,7 +376,6 @@ class DashboardController extends Controller
         $others = DB::table('all_sales')->select(DB::raw('"others" as provider_name'), DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile'))->orWhere(['manager_id'=>$manager_id, 'added_by'=>$manager_id])->whereNotIn('provider_name',['spectrum','cox','suddenlink','att','directtv','earthlink','frontier','mediacom','optimum','hughesnet'])->whereBetween('added_on', [$from_date, $to_date])->where('added_by','!=', $exclude)->get();
         return [$data , $others];
     }
-
     private function get_team_detailed_counts($from_date, $to_date, $manager_id, $exclude)
     {
         $data = DB::table('all_sales')->select('full_name', 'provider_name', DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile'))->orWhere(['manager_id'=>$manager_id, 'added_by'=>$manager_id])->whereIn('provider_name',['spectrum','cox','suddenlink','att','directtv','earthlink','frontier','mediacom','optimum','hughesnet'])->whereBetween('added_on', [$from_date, $to_date])->where('added_by','!=', $exclude)->groupBy('provider_name','added_by')->get();

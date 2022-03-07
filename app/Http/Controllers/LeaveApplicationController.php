@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers;
+use App\Models\ManagerialRole;
 use App\Models\Team;
 use App\Models\TeamMember;
 use Illuminate\Http\Request;
@@ -91,7 +92,10 @@ class LeaveApplicationController extends Controller
     public function list()
     {
         $data['page_title'] = "Leave Applications - Atlantis BPO CRM";
-        if(Auth::user()->role_id == 2){
+        $manager_id = ManagerialRole::where('role_id', Auth::user()->role_id)->whereType('Manager')->first();
+        $team_lead_id = ManagerialRole::where('role_id', Auth::user()->role_id)->whereType('Team Lead')->first();
+
+        if(Auth::user()->role_id == $manager_id->role_id){
             $data['leave_lists'] = LeaveApplication::where([
                 ['status','=',1],
                 ['approved_by_manager' ,'=',1],
@@ -111,7 +115,8 @@ class LeaveApplicationController extends Controller
                     return $query->where('manager_id', '=', Auth::user()->user_id);
                 })->orWhere('added_by','=',Auth::user()->user_id);
             })->get();
-        } else if(Auth::user()->role_id == 3){
+        } else if(Auth::user()->role_id == $team_lead_id->role_id){
+            $data['team_lead_id'] = $team_lead_id->role_id;
             $team = Team::where('team_lead_id', Auth::user()->user_id)->first();
             $users_id = TeamMember::where('team_id', $team->team_id)->pluck('user_id')->toArray();
             array_push($users_id, Auth::user()->user_id);
@@ -158,6 +163,7 @@ class LeaveApplicationController extends Controller
                     ->orWhere('approved_by_hr','=',NULL);
             })->with('user')->get();
         }
+        $data['manager_id'] = $manager_id->role_id;
         return view('leave_application.leave_list' , $data);
     }
     Public function reject(Request $request)
@@ -179,14 +185,14 @@ class LeaveApplicationController extends Controller
     }
     Public function approve(Request $request)
     {
-        if(Auth::user()->role_id == 3){
-            LeaveApplication::where('leave_id', $request->id)->update([
-                'approved_by_manager' => 1,
-            ]);
-        }
-        elseif (Auth::user()->role_id==5){
+        if (Auth::user()->role_id==5) {
             LeaveApplication::where('leave_id', $request->id)->update([
                 'approved_by_hr' => 1,
+            ]);
+        }
+        else {
+            LeaveApplication::where('leave_id', $request->id)->update([
+                'approved_by_manager' => 1,
             ]);
         }
         $response['status'] = "Success";
