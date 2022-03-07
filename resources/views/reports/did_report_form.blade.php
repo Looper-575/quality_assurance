@@ -20,20 +20,31 @@
                     <div class="col-3">
                         <div class="form-group">
                             <label class="form-check-label" for="from">From</label>
-                            <input class="form-control" type="date" name="from" id="from" required>
+                            @if(Auth::user()->role_id == 13)
+                                <input class="form-control" min="{{parse_date_store(\Illuminate\Support\Facades\Auth::user()->added_on)}}" type="date" name="from" id="from" required>
+                            @else
+                                <input class="form-control" type="date" name="from" id="from" required>
+                            @endif
                         </div>
                     </div>
                     <div class="col-3">
                         <div class="form-group">
                             <label class="form-check-label" for="to" >To</label>
-                            <input class="form-control" type="date" name="to" id="to" required>
+                            @if(Auth::user()->role_id == 13)
+                                <input class="form-control" type="date" name="to" min="{{parse_date_store(\Illuminate\Support\Facades\Auth::user()->added_on)}}" id="to" required>
+                            @else
+                                <input class="form-control" type="date" name="to" id="to" required>
+                            @endif
                         </div>
                     </div>
                     <div class="col-3">
                         <label class="form-check-label" for="agent">DID</label><br>
                         <select class="form-control select2" required name="did_id[]" id="agent" multiple="multiple">
                             @if(Auth::user()->role_id == 13)
-                                <option value="{{Auth::user()->vendor_did_id}}">My DID</option>
+                                <option value="">All</option>
+                                @foreach($dids as $did)
+                                    <option value="{{$did->did_id}}">{{$did->title}}</option>
+                                @endforeach
                             @else
                                 <option value="">All</option>
                                 @foreach($dids as $did)

@@ -72,7 +72,7 @@ class ReportController extends Controller
         $data['page_title'] = "Call Disposition Report - Atlantis BPO CRM";
         $data['small_nav'] = true;
         if(Auth::user()->role_id == 13) {
-            $data['dids'] = CallDispositionsDid::where('did_id', 36)->get();
+            $data['dids'] = CallDispositionsDid::whereIn('did_id', explode(',',Auth::user()->vendor_did_id))->get();
         } else {
             $data['dids'] = CallDispositionsDid::where('status', 1)->get();
         }
@@ -83,6 +83,7 @@ class ReportController extends Controller
     }
     public function generate_did_report(Request $request)
     {
+
         $validator = Validator::make($request->all(), [
             'from' => 'required',
             'to' => 'required',
@@ -97,10 +98,15 @@ class ReportController extends Controller
             $date_from = parse_datetime_store($request->from.'17:00:00');
             $date_to = parse_datetime_store($request->to. '12:00:00');
             if(Auth::user()->role_id==13){
-                $request->did_id=36;
-                $data['call_disp_lists'] = CallDisposition::select('*')->with(['qa_status','qa_assessment'])
-                    ->where('did_id', $request->did_id)->where($where)
-                    ->where([['added_on', '>=', $date_from],['added_on', '<=', $date_to]])->get();
+                if($request->did_id[0]==""){
+                    $data['call_disp_lists'] = CallDisposition::select('*')->with(['qa_status','qa_assessment'])
+                        ->whereIn('did_id', explode(',',Auth::user()->vendor_did_id))->where($where)
+                        ->where([['added_on', '>=', $date_from],['added_on', '<=', $date_to]])->get();
+                } else {
+                    $data['call_disp_lists'] = CallDisposition::select('*')->with(['qa_status','qa_assessment'])
+                        ->whereIn('did_id', $request->did_id)->where($where)
+                        ->where([['added_on', '>=', $date_from],['added_on', '<=', $date_to]])->get();
+                }
                 return view('reports.partials.lead_report_list', $data);
             }
             if($request->did_id[0] == ""){
