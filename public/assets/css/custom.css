@@ -197,3 +197,29 @@ table td, table th {
     text-transform : uppercase;
     color : #BA141A;
 }
+button.buttons-copy{
+    background-color: #000 !important;
+}
+button.buttons-csv{
+    background: #2a5bb3 !important;
+}
+button.buttons-excel{
+    background: #3e994a !important;
+}
+button.buttons-pdf{
+    background: #b33636 !important;
+}
+.no_transform{
+    transform: none !important;
+    bottom: -15px !important;
+}
+.no_transform > i{
+    font-size: 60px;
+}
+#sale_made_table_wrapper > div:nth-child(2) > div.col-sm-12{
+    transform: rotateX(180deg);
+    overflow: auto;
+}
+#sale_made_table_wrapper > div:nth-child(2) > div.col-sm-12 >  table{
+    transform: rotateX(180deg);
+}

@@ -37,7 +37,7 @@
                 @foreach ($managerial_roles as $managerial_role)
                     <tr>
                         <td>{{$loop->index+1}}</td>
-                        <td>{{$managerial_role->title}}</td>
+                        <td>{{$managerial_role->role->title}}</td>
                         <td>{{$managerial_role->type}}</td>
                         <td>
                             <div class="btn-group btn-group-sm">

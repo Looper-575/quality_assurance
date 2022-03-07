@@ -22,4 +22,8 @@ $(document).ready(function () {
             } );
         }
     } );
+
+        // $('#sale_made_table').DataTable( {
+        //     "order": [[ 14, "desc" ]]
+        // } );
 });

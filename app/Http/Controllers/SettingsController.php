@@ -246,10 +246,10 @@ class SettingsController extends Controller
         $data['page_title'] = "Managerial Roles - Atlantis BPO CRM";
         $data['managerial_roles'] = ManagerialRole::where([
             'status' => 1,
-        ])->get() ;
+        ])->with('role')->get();
         $data['user_roles'] = UserRole::where([
             'status' => 1,
-        ])->get() ;
+        ])->get();
         return view('settings.managerial_role', $data);
     }
     public function managerial_role_save(Request $request)
