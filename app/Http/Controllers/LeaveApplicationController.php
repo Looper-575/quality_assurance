@@ -94,8 +94,19 @@ class LeaveApplicationController extends Controller
         $data['page_title'] = "Leave Applications - Atlantis BPO CRM";
         $manager_id = ManagerialRole::where('role_id', Auth::user()->role_id)->whereType('Manager')->first();
         $team_lead_id = ManagerialRole::where('role_id', Auth::user()->role_id)->whereType('Team Lead')->first();
-
-        if(Auth::user()->role_id == $manager_id->role_id){
+        if(isset($manager_id)){
+            $manager_role_id = $manager_id->role_id;
+        }
+        else{
+            $manager_role_id = 0;
+        }
+        if(isset($team_lead_id)){
+            $lead_id = $team_lead_id;
+        }
+        else{
+            $lead_id = 0;
+        }
+        if(Auth::user()->role_id == $manager_role_id){
             $data['leave_lists'] = LeaveApplication::where([
                 ['status','=',1],
                 ['approved_by_manager' ,'=',1],
@@ -115,7 +126,7 @@ class LeaveApplicationController extends Controller
                     return $query->where('manager_id', '=', Auth::user()->user_id);
                 })->orWhere('added_by','=',Auth::user()->user_id);
             })->get();
-        } else if(Auth::user()->role_id == $team_lead_id->role_id){
+        } else if(Auth::user()->role_id == $lead_id){
             $data['team_lead_id'] = $team_lead_id->role_id;
             $team = Team::where('team_lead_id', Auth::user()->user_id)->first();
             $users_id = TeamMember::where('team_id', $team->team_id)->pluck('user_id')->toArray();
@@ -163,7 +174,7 @@ class LeaveApplicationController extends Controller
                     ->orWhere('approved_by_hr','=',NULL);
             })->with('user')->get();
         }
-        $data['manager_id'] = $manager_id->role_id;
+        $data['manager_id'] = $manager_role_id;
         return view('leave_application.leave_list' , $data);
     }
     Public function reject(Request $request)

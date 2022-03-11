@@ -28,6 +28,7 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::get('', 'App\Http\Controllers\DashboardController@index')->name('dashboard');
     Route::get('/', 'App\Http\Controllers\DashboardController@index')->name('dashboard');
     Route::get('/vendor_dashboard', 'App\Http\Controllers\DashboardController@vendor_dashboard')->name('vendor_dashboard');
+    Route::get('/provider_dashboard', 'App\Http\Controllers\DashboardController@provider_dashboard')->name('provider_dashboard');
     // Users
     Route::group(['middleware' => ['check-permission:users,view,0,0']], function() {
         Route::get('/users', 'App\Http\Controllers\UserController@list')->name('users');

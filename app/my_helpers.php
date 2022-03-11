@@ -73,6 +73,13 @@ if (!function_exists('parse_date_get')) {
         return date('d-m-Y', strtotime($date));
     }
 }
+//
+if (!function_exists('parse_date_picker')) {
+    function parse_date_picker($date)
+    {
+        return date('d-m-Y', strtotime($date));
+    }
+}
 // encrypt password
 if (!function_exists('encrypt_password')) {
     function encrypt_password($password)
