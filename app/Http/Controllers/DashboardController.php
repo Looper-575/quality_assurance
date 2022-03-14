@@ -229,23 +229,35 @@ class DashboardController extends Controller
             $from_date = $from_date.' 17:00:00';
             $to_date = $to_date.' 17:00:00';
         }
-        $data['daily_disp'] = CallDisposition::whereIn('did_id', $did_id)->where('status', 1)->whereBetween('added_on', [$from_date, $to_date])->count();
-        $data['sale_made'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 1])->whereBetween('added_on', [$from_date, $to_date])->count();
-        $data['call_back'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 2])->whereBetween('added_on', [$from_date, $to_date])->count();
-        $data['customer_service'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 3])->whereBetween('added_on', [$from_date, $to_date])->count();
-        $data['no_answer'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 4])->whereBetween('added_on', [$from_date, $to_date])->count();
-        $data['call_transferred'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 5])->whereBetween('added_on', [$from_date, $to_date])->count();
-        $data['daily_counts'] = $this->get_did_wise_rgo_counts($from_date, $to_date,$did_id);
+
+        $data['providers_daily'] = $this->get_did_wise_providers_sale($from_date,$to_date,$did_id);
+        $data['rgu_daily'] = $this->get_did_wise_provider_rgo($from_date,$to_date,$did_id);
+
+//        $data['daily_disp'] = CallDisposition::whereIn('did_id', $did_id)->where('status', 1)->whereBetween('added_on', [$from_date, $to_date])->count();
+//        $data['sale_made'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 1])->whereBetween('added_on', [$from_date, $to_date])->count();
+//        $data['call_back'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 2])->whereBetween('added_on', [$from_date, $to_date])->count();
+//        $data['customer_service'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 3])->whereBetween('added_on', [$from_date, $to_date])->count();
+//        $data['no_answer'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 4])->whereBetween('added_on', [$from_date, $to_date])->count();
+//        $data['call_transferred'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 5])->whereBetween('added_on', [$from_date, $to_date])->count();
+//        $data['daily_counts'] = $this->get_did_wise_rgo_counts($from_date, $to_date,$did_id);
+
         $dates[] = get_date_interval();
         $to_date = $dates[0]['to_date'];
         $from_date = $dates[0]['from_date'];
-        $data['monthly_sale_made'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 1])->whereDate('added_on', '>=', $from_date)->whereDate('added_on', '<=', $to_date)->count();
-        $data['monthly_call_back'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 2])->whereBetween('added_on', [$from_date, $to_date])->count();
-        $data['monthly_customer_service'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 3])->whereBetween('added_on', [$from_date, $to_date])->count();
-        $data['monthly_no_answer'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 4])->whereBetween('added_on', [$from_date, $to_date])->count();
-        $data['monthly_call_transferred'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 5])->whereBetween('added_on', [$from_date, $to_date])->count();
-        $data['six_months_dispositions_count'] = $this->get_did_wise_6_months_dipositions_count($from_date,$to_date,$did_id);
-        $data['six_months_sales_count'] =  $this->get_did_wise_6_months_rgo_counts($from_date, $to_date,$did_id);
+
+        $data['providers_monthly'] = $this->get_did_wise_providers_sale($from_date,$to_date,$did_id);
+        $data['rgu_monthly'] = $this->get_did_wise_provider_rgo($from_date,$to_date,$did_id);
+
+//        $data['monthly_sale_made'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 1])->whereDate('added_on', '>=', $from_date)->whereDate('added_on', '<=', $to_date)->count();
+//        $data['monthly_call_back'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 2])->whereBetween('added_on', [$from_date, $to_date])->count();
+//        $data['monthly_customer_service'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 3])->whereBetween('added_on', [$from_date, $to_date])->count();
+//        $data['monthly_no_answer'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 4])->whereBetween('added_on', [$from_date, $to_date])->count();
+//        $data['monthly_call_transferred'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 5])->whereBetween('added_on', [$from_date, $to_date])->count();
+//        $data['six_months_dispositions_count'] = $this->get_did_wise_6_months_dipositions_count($from_date,$to_date,$did_id);
+//        $data['six_months_sales_count'] =  $this->get_did_wise_6_months_rgo_counts($from_date, $to_date,$did_id);
+
+//
+
         return view('dashboard.vendor_dashboard' , $data);
     }
     public function provider_dashboard(){
@@ -474,6 +486,41 @@ FROM all_sales  WHERE added_on>="'.$from_date.'" AND added_on<="'.$to_date.'" AN
         $internet = DB::table('all_sales')->where('internet', 1)->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
         $phone = DB::table('all_sales')->where('phone', 1)->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
         $mobile = DB::table('all_sales')->where('mobile', 1)->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
+        $total_rgu = ($single_play+($double_play*2)+($triple_play*3)+($quad_play*4));
+        return [
+            'total_rgu' => $total_rgu,
+            'cable' => $cable,
+            'internet' => $internet,
+            'phone' => $phone,
+            'mobile' => $mobile,
+
+        ];
+    }
+    private function get_did_wise_providers_sale($from_date,$to_date,$did){
+        $data = DB::select('SELECT provider_name, SUM(internet) as internet, SUM(mobile) as mobile, SUM(cable) as cable, SUM(phone) as phone,
+count(case when services_sold = "1" then 1 else null end) as single_play,
+count(case when services_sold = "2" then 1 else null end) as double_play,
+count(case when services_sold = "3" then 1 else null end) as triple_play,
+count(case when services_sold = "4" then 1 else null end) as quad_play,
+count(case when internet = "1" AND phone = "1" AND mobile = "0" AND cable = "0" then 1 else null end) as ip,
+count(case when internet = "1" AND cable = "1" AND mobile = "0" AND phone = "0" then 1 else null end) as ic,
+count(case when phone = "1" AND cable = "1" AND mobile = "0" AND internet = "0" then 1 else null end) as pc,
+SUM(services_sold) As total_sales
+FROM all_sales  WHERE added_on>="'.$from_date.'" AND added_on<="'.$to_date.'" AND  did_id IN ('.implode(",", $did).')  AND provider_name IS NOT NULL  GROUP BY provider_name ORDER BY total_sales DESC');
+
+        return $data;
+
+    }
+    private function get_did_wise_provider_rgo($from_date, $to_date,$did)
+    {
+        $single_play = DB::table('all_sales')->where('services_sold', 1) ->whereIn('did_id', $did)->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
+        $double_play = DB::table('all_sales')->where('services_sold', 2)->whereIn('did_id', $did)->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
+        $triple_play = DB::table('all_sales')->where('services_sold', 3)->whereIn('did_id', $did)->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
+        $quad_play = DB::table('all_sales')->where('services_sold', 4)->whereIn('did_id', $did)->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
+        $cable = DB::table('all_sales')->where('cable', 1)->whereIn('did_id', $did)->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
+        $internet = DB::table('all_sales')->where('internet', 1)->whereIn('did_id', $did)->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
+        $phone = DB::table('all_sales')->where('phone', 1)->whereIn('did_id', $did)->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
+        $mobile = DB::table('all_sales')->where('mobile', 1)->whereIn('did_id', $did)->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
         $total_rgu = ($single_play+($double_play*2)+($triple_play*3)+($quad_play*4));
         return [
             'total_rgu' => $total_rgu,

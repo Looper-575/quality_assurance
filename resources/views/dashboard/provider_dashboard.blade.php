@@ -1083,24 +1083,28 @@
     <script>
 
         $('#sales_type').change(function() {
-
-
             if($(this).val() == "all"){
+                window.localStorage.setItem("reports_state", "all");
                 $('.sales_container').hide();
                 $('.all').show();
             }
             else if($(this).val() == "daily"){
+                window.localStorage.setItem("reports_state", "daily");
                 $('.sales_container').hide();
                 $('.daily').show();
             }
             else{
+                window.localStorage.setItem("reports_state", "monthly");
                 $('.sales_container').hide();
                 $('.monthly').show();
             }
         });
 
-
-
+        $(document).ready(function(){
+            var reports_state = localStorage.getItem("reports_state");
+            $('#sales_type').val(reports_state);
+            $('#sales_type').trigger('change');
+        });
     </script>
 
 @endsection
