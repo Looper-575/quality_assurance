@@ -29,13 +29,13 @@ class RecordingController extends Controller
 
 
     public function dispose($id){
-
+        $data['page_title'] = "Atlantis BPO CRM - Roles";
         $recording_id = CallDisposition::where('recording_id', $id)->doesntExist();
         if ($recording_id) {
             // Updating anonymous numbers and alphabetical number to zero
-            CallRecording::where([['rec_id','=', $id],['from_number', 'regexp', '^[A-z]+']])->update([
-                'from_number' => '00000000',]);
-            $data['page_title'] = "Atlantis BPO CRM - Roles";
+//            CallRecording::where([['rec_id','=', $id],['from_number', 'regexp', '^[A-z]+']])->update([
+//                'from_number' => '00000000',]);
+
 
             $current = CallRecording::where([
                 'rec_id'=> $id,

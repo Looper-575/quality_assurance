@@ -46,7 +46,7 @@
 @endsection
 @section('footer_scripts')
     <script>
-        let phone_num = {{isset($call_data[0]['from_number']) ? $call_data[0]['from_number'] : 0}};
+        let phone_num = '{{isset($call_data[0]['from_number']) ? $call_data[0]['from_number'] : 0}}';
 
         $('#lead_form').submit(function (e) {
             e.preventDefault();
