@@ -171,7 +171,7 @@
             let form = document.getElementById('policy_form');
             let data = new FormData(form);
             let a = function() {
-                // window.location.reload();
+                window.location.reload();
             }
             let arr = [a];
             call_ajax_with_functions('', '{{route('policies_file_upload')}}', data, arr);
