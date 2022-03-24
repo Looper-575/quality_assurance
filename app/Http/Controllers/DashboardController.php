@@ -161,13 +161,48 @@ class DashboardController extends Controller
             $total += $item->cable+$item->phone+$item->internet+$item->mobile;
         }
         foreach ($team_stats[1] as $item) {
+            $data['my_team_stats'][$item->full_name]['total'][] = [];
             $data['my_team_stats'][$item->full_name]['others'] = $item;
             $data['my_team_stats'][$item->full_name]['total'][] += $item->cable+$item->phone+$item->internet+$item->mobile;
             $total += $item->cable+$item->phone+$item->internet+$item->mobile;
         }
         $data['my_team_stats']['total'] = $total;
 
-//        dd($data);
+        $all_sales = $this->get_all_sales_stats_counts($from_date, $to_date);
+        $total = 0;
+        foreach ($all_sales[0] as $item) {
+            $data['all_sales_stats'][$item->full_name][$item->provider_name] = $item;
+            $data['all_sales_stats'][$item->full_name]['total'][] = $item->cable+$item->phone+$item->internet+$item->mobile;
+            $total += $item->cable+$item->phone+$item->internet+$item->mobile;
+        }
+        foreach ($all_sales[1] as $item) {
+            $data['all_sales_stats'][$item->full_name]['others'] = $item;
+            $data['all_sales_stats'][$item->full_name]['total'][] += $item->cable+$item->phone+$item->internet+$item->mobile;
+            $total += $item->cable+$item->phone+$item->internet+$item->mobile;
+        }
+        $data['all_sales_stats']['misc'] = [];
+        foreach ($all_sales[2] as $item) {
+
+            if (array_key_exists($item->provider_name,$data['all_sales_stats']['misc']))
+            {
+                $data['all_sales_stats']['misc'][$item->provider_name]->cable += $item->cable;
+                $data['all_sales_stats']['misc'][$item->provider_name]->phone += $item->phone;
+                $data['all_sales_stats']['misc'][$item->provider_name]->internet += $item->internet;
+                $data['all_sales_stats']['misc'][$item->provider_name]->mobile += $item->mobile;
+            } else {
+                $data['all_sales_stats']['misc'][$item->provider_name] = $item;
+            }
+            $data['all_sales_stats']['misc']['total'][] = $item->cable+$item->phone+$item->internet+$item->mobile;
+            $total += $item->cable+$item->phone+$item->internet+$item->mobile;
+        }
+        $data['all_sales_stats']['misc']['others'] = [];
+        $data['all_sales_stats']['misc']['total'][] = [];
+        foreach ($all_sales[3] as $item) {
+            $data['all_sales_stats']['misc']['others'] = $item;
+            $data['all_sales_stats']['misc']['total'][] += $item->cable+$item->phone+$item->internet+$item->mobile;
+            $total += $item->cable+$item->phone+$item->internet+$item->mobile;
+        }
+        $data['all_sales_stats']['total'] = $total;
         return view('dashboard.team_dashboard' , $data);
     }
     public function csr_dashboard()
@@ -399,6 +434,31 @@ class DashboardController extends Controller
 
         $others = DB::table('all_sales')->select(DB::raw('"others" as provider_name'), DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile'))->orWhere(['manager_id'=>$manager_id, 'added_by'=>$manager_id])->whereNotIn('provider_name',['spectrum','cox','suddenlink','att','directtv','earthlink','frontier','mediacom','optimum','hughesnet'])->whereBetween('added_on', [$from_date, $to_date])->where('added_by','!=', $exclude)->get();
         return [$data , $others];
+    }
+    private function get_all_sales_stats_counts($from_date, $to_date)
+    {
+
+        $csr_provider = DB::table('all_sales')->select('full_name', 'provider_name', DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile'))
+            ->whereIn('provider_name',['spectrum','cox','suddenlink','att','directtv','earthlink','frontier','mediacom','optimum','hughesnet'])
+            ->where('role_id', 4)
+            ->whereBetween('added_on', [$from_date, $to_date])
+            ->groupBy('provider_name','added_by')->get();
+        $csr_others_provider = DB::table('all_sales')->select('full_name', DB::raw('"others" as provider_name'), DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile'))
+            ->where('role_id', 4)
+            ->whereNotIn('provider_name',['spectrum','cox','suddenlink','att','directtv','earthlink','frontier','mediacom','optimum','hughesnet'])
+            ->whereBetween('added_on', [$from_date, $to_date])
+            ->groupBy('added_by')->get();
+        $misc_provider = DB::table('all_sales')->select('provider_name', DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile'))
+            ->whereIn('provider_name',['spectrum','cox','suddenlink','att','directtv','earthlink','frontier','mediacom','optimum','hughesnet'])
+            ->where('role_id','!=', 4)
+            ->whereBetween('added_on', [$from_date, $to_date])
+            ->groupBy('provider_name','added_by')->get();
+        $misc_others_provider = DB::table('all_sales')->select( DB::raw('"others" as provider_name'), DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile'))
+            ->where('role_id','!=', 4)
+            ->whereNotIn('provider_name',['spectrum','cox','suddenlink','att','directtv','earthlink','frontier','mediacom','optimum','hughesnet'])
+            ->whereBetween('added_on', [$from_date, $to_date])
+            ->groupBy('added_by')->get();
+        return [$csr_provider , $csr_others_provider, $misc_provider, $misc_others_provider];
     }
     private function get_team_detailed_counts($from_date, $to_date, $manager_id, $exclude)
     {

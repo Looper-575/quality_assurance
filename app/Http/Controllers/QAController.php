@@ -26,10 +26,7 @@ class QAController extends Controller
     }
     public function form(){
         $data['page_title'] = "QA From - Atlantis BPO CRM";
-        $data['agents'] = User::where([
-            'role_id'=> 4,
-            'status'=> 1,
-            ])->get();
+        $data['agents'] = User::whereIn('role_id', [1,2,3,4] )->where('status', 1)->get();
         $data['call_types'] = CallType::get();
         return view('qa.qa_form' , $data);
     }

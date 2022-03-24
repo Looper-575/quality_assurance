@@ -247,7 +247,7 @@
                             <tr style="border-top:2px solid #000;">
                                 <th rowspan="2" style="border-right:2px solid #000;border-left:2px solid #000;">Teams</th>
                                 <th rowspan="2" style="border-right:2px solid #000;">Total</th>
-                                <th colspan="4" class="text-center" style="border-right:2px solid #000;">Spectrum</th>
+                                <th colspan="5" class="text-center" style="border-right:2px solid #000;">Spectrum</th>
                                 <th colspan="3" class="text-center" style="border-right:2px solid #000;">Cox</th>
                                 <th colspan="3" class="text-center" style="border-right:2px solid #000;">Suddenlink</th>
                                 <th colspan="3" class="text-center" style="border-right:2px solid #000;">AT&T</th>
@@ -263,7 +263,8 @@
                                 <th><i class="fa fa-television" aria-hidden="true"></i></th>
                                 <th><i class="fa fa-phone" aria-hidden="true"></i></th>
                                 <th><i class="fa fa-wifi" aria-hidden="true"></i></th>
-                                <th style="border-right:2px solid #000;"><i class="fa fa-mobile" style="font-size: 16px"></i></th>
+                                <th ><i class="fa fa-mobile"></i></th>
+                                <th style="border-right:2px solid #000;"><i class="fa fa-dollar"></i></th>
                                 <th><i class="fa fa-television" aria-hidden="true"></i></th>
                                 <th><i class="fa fa-phone" aria-hidden="true"></i></th>
                                 <th style="border-right:2px solid #000;"><i class="fa fa-wifi" aria-hidden="true"></i></th>
@@ -296,6 +297,10 @@
                             <tbody>
                             <?php
                             $spectrum_sum=0;
+                            $spectrum_sum_phone=0;
+                            $spectrum_sum_cable=0;
+                            $spectrum_sum_internet=0;
+                            $spectrum_sum_mobile=0;
                             $cox_sum=0;
                             $suddenlink_sum=0;
                             $att_sum=0;
@@ -310,26 +315,43 @@
                             @foreach($my_team_stats as $key => $team_stat)
                                 <?php
                                 if($key=='total'){
+                                $spectrum_sum_phone +=($team_stat['spectrum']->phone  ??  0);
+                                $spectrum_sum_cable +=($team_stat['spectrum']->cable  ??  0);
+                                $spectrum_sum_internet +=($team_stat['spectrum']->internet  ??  0);
+                                $spectrum_sum_mobile +=($team_stat['spectrum']->mobile  ??  0);
                                 ?>
                                 <tr style="border-top:2px solid #000;border-bottom:2px solid #000;">
                                     <th rowspan="2" style="border-right:2px solid #000;border-left:2px solid #000;">Grand Total</th>
                                     <th rowspan="2" style="border-right:2px solid #000;">{{$team_stat}}</th>
-                                    <th colspan="4" class="text-center" style="border-right:2px solid #000;">{{$spectrum_sum}}</th>
-                                    <th colspan="3" class="text-center" style="border-right:2px solid #000;">{{$cox_sum}}</th>
-                                    <th colspan="3" class="text-center" style="border-right:2px solid #000;">{{$suddenlink_sum}}</th>
-                                    <th colspan="3" class="text-center" style="border-right:2px solid #000;">{{$att_sum}}</th>
-                                    <th colspan="3" class="text-center" style="border-right:2px solid #000;">{{$earth_sum}}</th>
-                                    <th colspan="3" class="text-center" style="border-right:2px solid #000;">{{$frontier_sum}}</th>
-                                    <th colspan="3" class="text-center" style="border-right:2px solid #000;">{{$media_sum}}</th>
-                                    <th colspan="3" class="text-center" style="border-right:2px solid #000;">{{$optimum_sum}}</th>
-                                    <th class="text-center" style="border-right:2px solid #000;">{{$direct_sum}}</th>
-                                    <th class="text-center" style="border-right:2px solid #000;">{{$hughes_sum}}</th>
-                                    <th colspan="4" class="text-center" style="border-right:2px solid #000;">{{$others_sum}}</th>
+                                    <th class="text-center" style="border-right:2px solid #000;">{{$spectrum_sum_cable}}</th>
+                                    <th class="text-center" style="border-right:2px solid #000;">{{$spectrum_sum_phone}}</th>
+                                    <th class="text-center" style="border-right:2px solid #000;">{{$spectrum_sum_internet}}</th>
+                                    <th  class="text-center">{{$spectrum_sum_mobile}}</th>
+                                    <th class="text-center" style="border-right:2px solid #000;"></th>
+                                    <th rowspan="2" colspan="3" class="text-center" style="border-right:2px solid #000;">{{$cox_sum}}</th>
+                                    <th rowspan="2" colspan="3" class="text-center" style="border-right:2px solid #000;">{{$suddenlink_sum}}</th>
+                                    <th rowspan="2" colspan="3" class="text-center" style="border-right:2px solid #000;">{{$att_sum}}</th>
+                                    <th rowspan="2" colspan="3" class="text-center" style="border-right:2px solid #000;">{{$earth_sum}}</th>
+                                    <th rowspan="2" colspan="3" class="text-center" style="border-right:2px solid #000;">{{$frontier_sum}}</th>
+                                    <th rowspan="2" colspan="3" class="text-center" style="border-right:2px solid #000;">{{$media_sum}}</th>
+                                    <th rowspan="2" colspan="3" class="text-center" style="border-right:2px solid #000;">{{$optimum_sum}}</th>
+                                    <th rowspan="2" class="text-center" style="border-right:2px solid #000;">{{$direct_sum}}</th>
+                                    <th rowspan="2" class="text-center" style="border-right:2px solid #000;">{{$hughes_sum}}</th>
+                                    <th rowspan="2" colspan="4" class="text-center" style="border-right:2px solid #000;">{{$others_sum}}</th>
+                                </tr>
+                                <tr>
+                                    <td class="text-center" style="border-right:2px solid #000;" colspan="5">
+                                        {{$spectrum_sum}}
+                                    </td>
                                 </tr>
                                 <?php
                                 break;
                                 } else {
                                     $sum = array_sum($team_stat['total']);
+                                    $spectrum_sum_phone +=($team_stat['spectrum']->phone  ??  0);
+                                    $spectrum_sum_cable +=($team_stat['spectrum']->cable  ??  0);
+                                    $spectrum_sum_internet +=($team_stat['spectrum']->internet  ??  0);
+                                    $spectrum_sum_mobile +=($team_stat['spectrum']->mobile  ??  0);
                                     $spectrum_sum += ($team_stat['spectrum']->cable  ??  0) + ($team_stat['spectrum']->phone  ??  0)
                                         + ($team_stat['spectrum']->internet  ??  0) + ($team_stat['spectrum']->mobile  ??  0);
                                     $cox_sum += ($team_stat['cox']->cable  ??  0) + ($team_stat['cox']->phone  ??  0)
@@ -358,7 +380,8 @@
                                     <td>{{ $team_stat['spectrum']->cable  ??  0 }}</td>
                                     <td>{{ $team_stat['spectrum']->phone  ??  0 }}</td>
                                     <td>{{ $team_stat['spectrum']->internet  ??  0 }}</td>
-                                    <td style="border-right:2px solid #000;">{{$team_stat['spectrum']->mobile  ??  0}}</td>
+                                    <td>{{$team_stat['spectrum']->mobile  ??  0}}</td>
+                                    <th style="border-right:2px solid #000;">{{($team_stat['spectrum']->mobile  ??  0)+($team_stat['spectrum']->phone  ??  0)+($team_stat['spectrum']->internet  ??  0)+($team_stat['spectrum']->cable  ??  0)}}</th>
                                     <td>{{ $team_stat['cox']->cable  ??  0 }}</td>
                                     <td>{{ $team_stat['cox']->phone  ??  0 }}</td>
                                     <td style="border-right:2px solid #000;">{{ $team_stat['cox']->internet  ??  0 }}</td>
@@ -576,6 +599,192 @@
                                 <th class="hn_c_sum" style="border-right:2px solid #000;"></th>
                                 <td colspan="4" class="ot_c_sum" style="border-right:2px solid #000;"></td>
                             </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--End::Section-->
+    <!--Begin::Section-->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>All Providers Agent Report</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered table-striped mb-0">
+                            <thead>
+                            <tr style="border-top:2px solid #000;">
+                                <th rowspan="2" style="border-right:2px solid #000;border-left:2px solid #000;">Teams</th>
+                                <th rowspan="2" style="border-right:2px solid #000;">Total</th>
+                                <th colspan="5" class="text-center" style="border-right:2px solid #000;">Spectrum</th>
+                                <th colspan="3" class="text-center" style="border-right:2px solid #000;">Cox</th>
+                                <th colspan="3" class="text-center" style="border-right:2px solid #000;">Suddenlink</th>
+                                <th colspan="3" class="text-center" style="border-right:2px solid #000;">AT&T</th>
+                                <th colspan="3" class="text-center" style="border-right:2px solid #000;">EarthLink</th>
+                                <th colspan="3" class="text-center" style="border-right:2px solid #000;">Frontier</th>
+                                <th colspan="3" class="text-center" style="border-right:2px solid #000;">MediaCom</th>
+                                <th colspan="3" class="text-center" style="border-right:2px solid #000;">Optimum</th>
+                                <th class="text-center" style="border-right:2px solid #000;">Dirct TV</th>
+                                <th class="text-center" style="border-right:2px solid #000;">Hughesnet</th>
+                                <th colspan="4" class="text-center" style="border-right:2px solid #000;">Others</th>
+                            </tr>
+                            <tr style="border-bottom:2px solid #000;">
+                                <th><i class="fa fa-television" aria-hidden="true"></i></th>
+                                <th><i class="fa fa-phone" aria-hidden="true"></i></th>
+                                <th><i class="fa fa-wifi" aria-hidden="true"></i></th>
+                                <th ><i class="fa fa-mobile"></i></th>
+                                <th style="border-right:2px solid #000;"><i class="fa fa-dollar"></i></th>
+                                <th><i class="fa fa-television" aria-hidden="true"></i></th>
+                                <th><i class="fa fa-phone" aria-hidden="true"></i></th>
+                                <th style="border-right:2px solid #000;"><i class="fa fa-wifi" aria-hidden="true"></i></th>
+                                <th><i class="fa fa-television" aria-hidden="true"></i></th>
+                                <th><i class="fa fa-phone" aria-hidden="true"></i></th>
+                                <th style="border-right:2px solid #000;"><i class="fa fa-wifi" aria-hidden="true"></i></th>
+                                <th><i class="fa fa-television" aria-hidden="true"></i></th>
+                                <th><i class="fa fa-phone" aria-hidden="true"></i></th>
+                                <th style="border-right:2px solid #000;"><i class="fa fa-wifi" aria-hidden="true"></i></th>
+                                <th><i class="fa fa-television" aria-hidden="true"></i></th>
+                                <th><i class="fa fa-phone" aria-hidden="true"></i></th>
+                                <th style="border-right:2px solid #000;"><i class="fa fa-wifi" aria-hidden="true"></i></th>
+                                <th><i class="fa fa-television" aria-hidden="true"></i></th>
+                                <th><i class="fa fa-phone" aria-hidden="true"></i></th>
+                                <th style="border-right:2px solid #000;"><i class="fa fa-wifi" aria-hidden="true"></i></th>
+                                <th><i class="fa fa-television" aria-hidden="true"></i></th>
+                                <th><i class="fa fa-phone" aria-hidden="true"></i></th>
+                                <th style="border-right:2px solid #000;"><i class="fa fa-wifi" aria-hidden="true"></i></th>
+                                <th><i class="fa fa-television" aria-hidden="true"></i></th>
+                                <th><i class="fa fa-phone" aria-hidden="true"></i></th>
+                                <th style="border-right:2px solid #000;"><i class="fa fa-wifi" aria-hidden="true"></i></th>
+                                <th style="border-right:2px solid #000;"><i class="fa fa-television" aria-hidden="true"></i></th>
+                                <th style="border-right:2px solid #000;"><i class="fa fa-wifi" aria-hidden="true"></i></th>
+                                <th><i class="fa fa-television" aria-hidden="true"></i></th>
+                                <th><i class="fa fa-phone" aria-hidden="true"></i></th>
+                                <th><i class="fa fa-wifi" aria-hidden="true"></i></th>
+                                <th style="border-right:2px solid #000;"><i class="fa fa-mobile" style="font-size: 16px"></i></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <?php
+                            $spectrum_sum=0;
+                            $spectrum_sum_phone=0;
+                            $spectrum_sum_cable=0;
+                            $spectrum_sum_internet=0;
+                            $spectrum_sum_mobile=0;
+                            $cox_sum=0;
+                            $suddenlink_sum=0;
+                            $att_sum=0;
+                            $direct_sum=0;
+                            $earth_sum=0;
+                            $frontier_sum=0;
+                            $media_sum=0;
+                            $optimum_sum=0;
+                            $hughes_sum=0;
+                            $others_sum=0;
+                            ?>
+                            @foreach($all_sales_stats as $key => $team_stat)
+                                <?php
+                                if($key=='total'){
+                                $spectrum_sum_phone +=($team_stat['spectrum']->phone  ??  0);
+                                $spectrum_sum_cable +=($team_stat['spectrum']->cable  ??  0);
+                                $spectrum_sum_internet +=($team_stat['spectrum']->internet  ??  0);
+                                $spectrum_sum_mobile +=($team_stat['spectrum']->mobile  ??  0);
+                                ?>
+                                <tr style="border-top:2px solid #000;border-bottom:2px solid #000;">
+                                    <th rowspan="2" style="border-right:2px solid #000;border-left:2px solid #000;">Grand Total</th>
+                                    <th rowspan="2" style="border-right:2px solid #000;">{{$team_stat}}</th>
+                                    <th class="text-center" style="border-right:2px solid #000;">{{$spectrum_sum_cable}}</th>
+                                    <th class="text-center" style="border-right:2px solid #000;">{{$spectrum_sum_phone}}</th>
+                                    <th class="text-center" style="border-right:2px solid #000;">{{$spectrum_sum_internet}}</th>
+                                    <th  class="text-center">{{$spectrum_sum_mobile}}</th>
+                                    <th class="text-center" style="border-right:2px solid #000;"></th>
+                                    <th rowspan="2" colspan="3" class="text-center" style="border-right:2px solid #000;">{{$cox_sum}}</th>
+                                    <th rowspan="2" colspan="3" class="text-center" style="border-right:2px solid #000;">{{$suddenlink_sum}}</th>
+                                    <th rowspan="2" colspan="3" class="text-center" style="border-right:2px solid #000;">{{$att_sum}}</th>
+                                    <th rowspan="2" colspan="3" class="text-center" style="border-right:2px solid #000;">{{$earth_sum}}</th>
+                                    <th rowspan="2" colspan="3" class="text-center" style="border-right:2px solid #000;">{{$frontier_sum}}</th>
+                                    <th rowspan="2" colspan="3" class="text-center" style="border-right:2px solid #000;">{{$media_sum}}</th>
+                                    <th rowspan="2" colspan="3" class="text-center" style="border-right:2px solid #000;">{{$optimum_sum}}</th>
+                                    <th rowspan="2" class="text-center" style="border-right:2px solid #000;">{{$direct_sum}}</th>
+                                    <th rowspan="2" class="text-center" style="border-right:2px solid #000;">{{$hughes_sum}}</th>
+                                    <th rowspan="2" colspan="4" class="text-center" style="border-right:2px solid #000;">{{$others_sum}}</th>
+                                </tr>
+                                <tr>
+                                    <td class="text-center" style="border-right:2px solid #000;" colspan="5">
+                                        {{$spectrum_sum}}
+                                    </td>
+                                </tr>
+                                <?php
+                                break;
+                                } else {
+                                    $sum = array_sum($team_stat['total']);
+                                    $spectrum_sum_phone +=($team_stat['spectrum']->phone  ??  0);
+                                    $spectrum_sum_cable +=($team_stat['spectrum']->cable  ??  0);
+                                    $spectrum_sum_internet +=($team_stat['spectrum']->internet  ??  0);
+                                    $spectrum_sum_mobile +=($team_stat['spectrum']->mobile  ??  0);
+                                    $spectrum_sum += ($team_stat['spectrum']->cable  ??  0) + ($team_stat['spectrum']->phone  ??  0)
+                                        + ($team_stat['spectrum']->internet  ??  0) + ($team_stat['spectrum']->mobile  ??  0);
+                                    $cox_sum += ($team_stat['cox']->cable  ??  0) + ($team_stat['cox']->phone  ??  0)
+                                        + ($team_stat['cox']->internet  ??  0);
+                                    $suddenlink_sum += ($team_stat['suddenlink']->cable  ??  0) + ($team_stat['suddenlink']->phone  ??  0)
+                                        + ($team_stat['suddenlink']->internet  ??  0);
+                                    $att_sum += ($team_stat['att']->cable  ??  0) + ($team_stat['att']->phone  ??  0)
+                                        + ($team_stat['att']->internet  ??  0);
+                                    $direct_sum += ($team_stat['directtv']->cable  ??  0);
+                                    $earth_sum += ($team_stat['earthlink']->cable  ??  0) + ($team_stat['earthlink']->phone  ??  0)
+                                        + ($team_stat['earthlink']->internet  ??  0);
+                                    $frontier_sum += ($team_stat['frontier']->cable  ??  0) + ($team_stat['frontier']->phone  ??  0)
+                                        + ($team_stat['frontier']->internet  ??  0);
+                                    $media_sum += ($team_stat['mediacom']->cable  ??  0) + ($team_stat['mediacom']->phone  ??  0)
+                                        + ($team_stat['mediacom']->internet  ??  0);
+                                    $optimum_sum += ($team_stat['optimum']->cable  ??  0) + ($team_stat['optimum']->phone  ??  0)
+                                        + ($team_stat['optimum']->internet  ??  0);
+                                    $hughes_sum += ($team_stat['hughesnet']->cable  ??  0);
+                                    $others_sum += ($team_stat['others']->cable  ??  0) + ($team_stat['others']->phone  ??  0)
+                                        + ($team_stat['others']->internet  ??  0) + ($team_stat['others']->mobile  ??  0);
+                                }
+                                ?>
+                                <tr>
+                                    <th style="border-right:2px solid #000; border-left:2px solid #000;">{{$key}}</th>
+                                    <th style="border-right:2px solid #000;">{{$sum}}</th>
+                                    <td>{{ $team_stat['spectrum']->cable  ??  0 }}</td>
+                                    <td>{{ $team_stat['spectrum']->phone  ??  0 }}</td>
+                                    <td>{{ $team_stat['spectrum']->internet  ??  0 }}</td>
+                                    <td>{{$team_stat['spectrum']->mobile  ??  0}}</td>
+                                    <th style="border-right:2px solid #000;">{{($team_stat['spectrum']->mobile  ??  0)+($team_stat['spectrum']->phone  ??  0)+($team_stat['spectrum']->internet  ??  0)+($team_stat['spectrum']->cable  ??  0)}}</th>
+                                    <td>{{ $team_stat['cox']->cable  ??  0 }}</td>
+                                    <td>{{ $team_stat['cox']->phone  ??  0 }}</td>
+                                    <td style="border-right:2px solid #000;">{{ $team_stat['cox']->internet  ??  0 }}</td>
+                                    <td>{{ $team_stat['suddenlink']->cable  ??  0 }}</td>
+                                    <td>{{ $team_stat['suddenlink']->phone  ??  0 }}</td>
+                                    <td style="border-right:2px solid #000;">{{ $team_stat['suddenlink']->internet  ??  0 }}</td>
+                                    <td>{{ $team_stat['att']->cable  ??  0 }}</td>
+                                    <td>{{ $team_stat['att']->phone  ??  0 }}</td>
+                                    <td style="border-right:2px solid #000;">{{ $team_stat['att']->internet  ??  0 }}</td>
+                                    <td>{{ $team_stat['earthlink']->cable  ??  0 }}</td>
+                                    <td>{{ $team_stat['earthlink']->phone  ??  0 }}</td>
+                                    <td style="border-right:2px solid #000;">{{ $team_stat['earthlink']->internet  ??  0 }}</td>
+                                    <td>{{ $team_stat['frontier']->cable  ??  0 }}</td>
+                                    <td>{{ $team_stat['frontier']->phone  ??  0 }}</td>
+                                    <td style="border-right:2px solid #000;">{{ $team_stat['frontier']->internet  ??  0 }}</td>
+                                    <td>{{ $team_stat['mediacom']->cable  ??  0 }}</td>
+                                    <td>{{ $team_stat['mediacom']->phone  ??  0 }}</td>
+                                    <td style="border-right:2px solid #000;">{{ $team_stat['mediacom']->internet  ??  0 }}</td>
+                                    <td>{{ $team_stat['optimum']->cable  ??  0 }}</td>
+                                    <td>{{ $team_stat['optimum']->phone  ??  0 }}</td>
+                                    <td style="border-right:2px solid #000;">{{ $team_stat['optimum']->internet  ??  0 }}</td>
+                                    <td style="border-right:2px solid #000;">{{ $team_stat['directtv']->cable  ??  0 }}</td>
+                                    <td style="border-right:2px solid #000;">{{ $team_stat['hughesnet']->cable  ??  0 }}</td>
+                                    <td>{{ $team_stat['others']->cable  ??  0 }}</td>
+                                    <td>{{ $team_stat['others']->phone  ??  0 }}</td>
+                                    <td>{{ $team_stat['others']->internet  ??  0 }}</td>
+                                    <td style="border-right:2px solid #000;">{{$team_stat['others']->mobile  ??  0}}</td>
+                                </tr>
+                            @endforeach
                             </tbody>
                         </table>
                     </div>
