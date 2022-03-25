@@ -99,7 +99,6 @@
             </div>
         </div>
     </div>
-
     <!-- View Modal -->
     <div class="modal fade" id="preview_files_modal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="preview_files_modalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
@@ -119,8 +118,6 @@
             </div>
         </div>
     </div>
-
-
     <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script src="{{ asset('assets/bundles/select2/dist/js/select2.full.min.js') }}"></script>
@@ -134,7 +131,6 @@
                 $('#filePreview').append("<iframe src='"+URL.createObjectURL(event.target.files[i])+"'></iframe>");
             }
         });
-
         $('.detele_btn').click( function () {
             let id = this.value;
             let me = this;
@@ -165,7 +161,6 @@
             $('#number').val(null);
             $('#did_form_modal').fadeIn();
         });
-
         $('#policy_form').submit(function (e) {
             e.preventDefault();
             let form = document.getElementById('policy_form');
@@ -176,7 +171,6 @@
             let arr = [a];
             call_ajax_with_functions('', '{{route('policies_file_upload')}}', data, arr);
         });
-
         $('.edit_btn').click( function () {
             let data = JSON.parse(this.value);
             $('#type_id').val(data.did_id);
@@ -184,17 +178,14 @@
             $('#number').val(data.number);
             $('#did_form_modal').fadeIn();
         });
-
         $('.view_btn').click( function () {
             let data = JSON.parse(this.value);
-            $('#title').val(data.title);
-
-            var APP_URL = {!! json_encode(url('/')) !!}
-
+            let APP_URL = {!! json_encode(url('/')) !!}
             $('#filesPreview').html("");
-            var total_file=data.policy_files.length;
+            $('#title').val(data.title);
+            let total_file=data.policy_files.length;
             files.length = 0;
-            for(var i=0;i<total_file;i++)
+            for(let i=0; i<total_file; i++)
             {
                 files.push(APP_URL+data.policy_files[i]["file"]);
                 $('#filesPreview').append("<iframe class='preview_files' src='"+APP_URL+data.policy_files[i]["file"]+"'></iframe>");
