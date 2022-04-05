@@ -70,6 +70,7 @@
 <!-- end:: Page -->
 <!-- begin::Quick Sidebar -->
 @include('layout.quick_sidebar')
+@include('layout.chat_sidebar')
 <!-- end::Quick Sidebar -->
 <!-- begin::Scroll Top -->
 <div id="m_scroll_top" class="m-scroll-top">

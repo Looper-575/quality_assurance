@@ -58,7 +58,7 @@ class UserController extends Controller
                 'email'=>$request->input('email'),
                 'password'=>encrypt_password($request->input('password')),
                 'status'=>1
-            ])->with(['role'])->first();
+            ])->first();
             if($user) {
                 Auth::login($user);
                 $response['status'] = "Success";
