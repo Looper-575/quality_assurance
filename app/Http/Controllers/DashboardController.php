@@ -44,7 +44,7 @@ class DashboardController extends Controller
     }
     public function admin_dashboard()
     {
-        $data['page_title'] = "Admin Dahsboard - Atlantis CRM";
+        $data['page_title'] = "Admin Dashboard - Atlantis CRM";
         $data['small_nav'] = true;
         $today = get_date();
         $datetime = new DateTime($today);
@@ -103,7 +103,7 @@ class DashboardController extends Controller
     }
     public function team_dashboard()
     {
-        $data['page_title'] = "Lead Dahsboard - Atlantis CRM";
+        $data['page_title'] = "Lead Dashboard - Atlantis CRM";
         $data['small_nav'] = true;
         $today = get_date();
         $datetime = new DateTime($today);
@@ -207,7 +207,7 @@ class DashboardController extends Controller
     }
     public function csr_dashboard()
     {
-        $data['page_title'] = "CSR Dahsboard - Atlantis CRM";
+        $data['page_title'] = "CSR Dashboard - Atlantis CRM";
         $data['small_nav'] = true;
         $today = get_date();
         $datetime = new DateTime($today);
@@ -239,12 +239,12 @@ class DashboardController extends Controller
     }
     public function qa_dashboard()
     {
-        $data['page_title'] = "QA Dahsboard - Atlantis CRM";
+        $data['page_title'] = "QA Dashboard - Atlantis CRM";
         $data['small_nav'] = true;
         return view('dashboard.qa_dashboard' , $data);
     }
     public function vendor_dashboard(){
-        $data['page_title'] = "Vendor Dahsboard - Atlantis CRM";
+        $data['page_title'] = "Vendor Dashboard - Atlantis CRM";
         $data['small_nav'] = true;
         $did_id = explode(',',Auth::user()->vendor_did_id);
         $today = get_date();
@@ -296,7 +296,7 @@ class DashboardController extends Controller
         return view('dashboard.vendor_dashboard' , $data);
     }
     public function provider_dashboard(){
-        $data['page_title'] = 'Provider Dahsboard - Atlantis CRM';
+        $data['page_title'] = 'Provider Dashboard - Atlantis CRM';
         $data['small_nav'] = true;
         $today = get_date();
         $datetime = new DateTime($today);

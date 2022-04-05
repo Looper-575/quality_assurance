@@ -4,7 +4,7 @@
 @endsection
 @section('content')
     <?php
-    $has_permissions = get_route_permissions( Auth::user()->role->role_id, @request()->route()->getName());
+    $has_permissions = get_route_permissions( Auth::user()->role_id, @request()->route()->getName());
     ?>
     <div class="m-portlet m-portlet--mobile">
         <div class="m-portlet__head">
@@ -12,7 +12,7 @@
                 <div class="m-portlet__head-title float-left">
                     <h3 class="m-portlet__head-text">Employees List</h3>
                 </div>
-                @if($has_permissions->add == 1 && (Auth::user()->role->role_id == 1 || Auth::user()->role->role_id == 5))
+                @if( Auth::user()->role_id == 1 || Auth::user()->role_id == 5 || ($has_permissions->add == 1 && (Auth::user()->role_id != 1 && Auth::user()->role_id != 5 && count($employee_lists) == 0) ))
                 <div class="float-right mt-3">
                     <a href="{{route('employee_form')}}" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill">
                         <span><i class="la la-phone-square"></i><span>Add New Employee</span></span>
@@ -51,10 +51,15 @@
                                 <a href="{{route('employee_data_view',['employee_id' => $employee_list->employee_id])}}" id="{{$employee_list->employee_id}}" class="btn btn-primary" data-toggle="m-tooltip" data-placement="right" data-skin="dark" data-container="body">
                                     <i class="la la-eye"></i>
                                 </a>
-                                @if($has_permissions->update == 1)
+{{--                                @if($has_permissions->update == 1 && ((Auth::user()->role_id == 1 || Auth::user()->role_id == 5) || (Auth::user()->role_id != 1 && Auth::user()->role_id != 5 && $isLocked == 0) ) )--}}
+                                @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5)
+
                                 <a title="Edit" class="btn btn-primary edit_employee" id="{{$employee_list->employee_id}}" href="{{route('employee_form',['employee_id' => $employee_list->employee_id])}}"><i class="fa fa-edit"></i></a>
-                                @endif
-                                @if(Auth::user()->role->role_id == 1 || Auth::user()->role->role_id == 5)
+{{--                                @endif--}}
+{{--                                @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5)--}}
+                                    @if($employee_list->locked == 0)
+                                        <button title="Lock" class="btn btn-info" onclick="lock_employee_record(this);" value="{{$employee_list->employee_id}}"><i class="fa fa-lock"></i></button>
+                                    @endif
 {{--                                <button title="Delete" class="btn btn-danger" onclick="delete_employee(this);" value="{{$employee_list->employee_id}}"><i class="fa fa-trash"></i></button>--}}
                                 @endif
                             </div>
@@ -92,6 +97,17 @@
                     call_ajax('', '{{route('employee_delete')}}', data);
                 }
             })
+        }
+        function lock_employee_record (me){
+            let id = me.value;
+            let data = new FormData();
+            data.append('employee_id', id);
+            data.append('_token', "{{csrf_token()}}");
+            let a = function () {
+                location.reload();
+            }
+            let arr = [a];
+            call_ajax_with_functions('', '{{route('lock_employee_record')}}', data, arr);
         }
     </script>
 @endsection

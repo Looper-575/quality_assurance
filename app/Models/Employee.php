@@ -20,7 +20,7 @@ class Employee extends Model
      */
     protected $fillable = [
         'user_id',
-        'department',
+        'department_id',
         'full_name',
         'father_husband',
         'surname',
@@ -39,12 +39,15 @@ class Employee extends Model
         'blood_group',
         'native_lang',
         'designation',
-        'gross_salary',
+        'net_salary',
         'joining_date',
         'hobbies_interest',
         'approach_previous_employer',
         'previous_employer_service_bond',
-        'service_bond_reason'
+        'service_bond_reason',
+        'locked',
+        'conveyance_allowance',
+        'employment_status'
     ];
 
     /**
@@ -81,8 +84,15 @@ class Employee extends Model
     public function employee_company_reference(){
         return $this->hasMany(EmployeeCompanyReference::class, 'employee_id' , 'employee_id');
     }
+    public function employee_docs(){
+        return $this->hasMany(EmployeeDocs::class, 'employee_id' , 'employee_id');
+    }
     public function employee()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
+    }
+    public function department()
+    {
+        return $this->belongsTo(Department::class, 'department_id', 'department_id');
     }
 }

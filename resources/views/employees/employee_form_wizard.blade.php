@@ -37,6 +37,9 @@
                         <small>
                             Form
                         </small>
+                        @if(isset($message))
+                            {{$message}}
+                        @endif
                     </h3>
                 </div>
             </div>
@@ -63,104 +66,67 @@
                     <div class="m-wizard__steps">
                         <div id="step_1" class="m-wizard__step m-wizard__step--current">
                             <a href="#"  class="m-wizard__step-number">
-                        <span>
-                            <i class="fa  flaticon-placeholder"></i>
-                        </span>
+                            <span><i class="fa fa-info-circle"></i> </span>
                             </a>
                             <div class="m-wizard__step-info">
-                                <div class="m-wizard__step-title">
-                                    1. Employee Information
-                                </div>
-                                <div class="m-wizard__step-desc">
-                                    All feilds are mandatory. And the information
-                                    <br>
-                                    of this form is strictly confidential.
-                                </div>
+                                <h6 >Employee Information</h6>
+{{--                                <div class="m-wizard__step-desc">--}}
+{{--                                    All feilds are mandatory. And the information--}}
+{{--                                    of this form is strictly confidential.--}}
+{{--                                </div>--}}
                             </div>
                         </div>
                         <div id="step_2" class="m-wizard__step">
                             <a href="#" class="m-wizard__step-number">
-                                        <span>
-                                            <i class="fa  flaticon-layers"></i>
-                                        </span>
+                                <span>
+                                    <i class="fa fa-mortar-board"></i>
+                                </span>
                             </a>
                             <div class="m-wizard__step-info">
-                                <div class="m-wizard__step-title">
-                                    2. Educational Details
-                                </div>
-                                <div class="m-wizard__step-desc">
-                                    please add your educational
-                                    <br>
-                                    details choronologically
-                                </div>
+                                <h6>Educational Details</h6>
                             </div>
                         </div>
                         <div id="step_3" class="m-wizard__step">
-                            <a href="#" class="m-wizard__step-number">
-                                        <span>
-                                            <i class="fa  flaticon-layers"></i>
-                                        </span>
+                            <a href="javascript:;" class="m-wizard__step-number">
+                              <span> <i class="fa fa-history"></i></span>
                             </a>
                             <div class="m-wizard__step-info">
-                                <div class="m-wizard__step-title">
-                                    3. Experience Details
-                                </div>
-                                <div class="m-wizard__step-desc">
-                                    please add your old
-                                    <br>
-                                    employement details.
-                                </div>
+                                <h6>Experience Details </h6>
                             </div>
                         </div>
                         <div id="step_4" class="m-wizard__step">
                             <a href="#" class="m-wizard__step-number">
-                                        <span>
-                                            <i class="fa  flaticon-layers"></i>
-                                        </span>
+                             <span><i class="fa fa-group"></i></span>
                             </a>
                             <div class="m-wizard__step-info">
-                                <div class="m-wizard__step-title">
-                                    4. Family Details
-                                </div>
-                                <div class="m-wizard__step-desc">
-                                    please add your family members
-                                    <br>
-                                    and next of kin details.
-                                </div>
+                                <h6>Family Details</h6>
                             </div>
                         </div>
                         <div id="step_5" class="m-wizard__step" >
                             <a href="#" class="m-wizard__step-number">
-                                        <span>
-                                            <i class="fa  flaticon-layers"></i>
-                                        </span>
+                             <span><i class="fa flaticon-information"></i></span>
                             </a>
                             <div class="m-wizard__step-info">
-                                <div class="m-wizard__step-title">
-                                    5. Emergency Contact Details
-                                </div>
-                                <div class="m-wizard__step-desc">
-                                    please add your Emergency
-                                    <br>
-                                    Contact details.
-                                </div>
+                                <h6>Emergency Contact Details</h6>
                             </div>
                         </div>
                         <div id="step_6" class="m-wizard__step" >
                             <a href="#" class="m-wizard__step-number">
-                                        <span>
-                                            <i class="fa  flaticon-layers"></i>
-                                        </span>
+                              <span><i class="fa flaticon-user-ok"></i> </span>
                             </a>
                             <div class="m-wizard__step-info">
-                                <div class="m-wizard__step-title">
-                                    6. Atlantian Reference
-                                </div>
-                                <div class="m-wizard__step-desc">
-                                    please add your any friends/family
-                                    <br>
-                                    details working in AtlantisBPO Solutions.
-                                </div>
+                                <h6>Reference Details</h6>
+                            </div>
+                        </div>
+                        <div id="step_7" class="m-wizard__step" >
+                            <a href="#" class="m-wizard__step-number">
+                             <span><i class="fa fa-file-text"></i></span>
+                            </a>
+                            <div class="m-wizard__step-info">
+                                <h6>Upload Documents</h6>
+{{--                                <div class="m-wizard__step-desc">--}}
+{{--                                    please upload your educational and experience certificates.--}}
+{{--                                </div>--}}
                             </div>
                         </div>
                     </div>
@@ -204,6 +170,11 @@
                         @include('employees.partials.reference_info_form');
                     </div>
                     <!--end: Form Wizard Step 6-->
+                    <!--begin: Form Wizard Step 7-->
+                    <div id="m_wizard_form_step_7" class="m-wizard__form-step">
+                        @include('employees.partials.upload_docs_form');
+                    </div>
+                    <!--end: Form Wizard Step 7-->
                 </div>
                 <!--end: Form Body -->
             </div>
@@ -225,21 +196,41 @@
             if(r == 'remove'){
                 i = i - 2;
             }
-            i = i * (120/6);
+            i = i * (120/7);
             let wid = i +'%';
             $(".progress-bar").css('width',wid);
         }
         $(document).ready(function() {
-            $(document).on('click', '.btn_back', function(){
-                let button_id = $(this).attr("id");
-                change_progress_bar_width(button_id,'remove');
-                $('#m_wizard_form_step_'+button_id+'').removeClass("m-wizard__form-step--current");
-                $('#step_'+button_id+'').removeClass("m-wizard__step--current");
-                let previous = parseInt(button_id) - 1;
-                $('#step_'+previous+'').removeClass("m-wizard__step--done");
-                $('#step_'+previous+'').addClass("m-wizard__step--current");
-                $('#m_wizard_form_step_'+previous+'').addClass("m-wizard__form-step--current");
-            });
+            if($('#employee_id').val() != 0){
+                $(document).on('click', '.m-wizard__step', function(){
+                    let button_id = $(this).attr("id");
+                    button_id = button_id.substring(5);
+                    $('#m_wizard_form_step_'+button_id+'').addClass("m-wizard__form-step--current");
+                    $('#step_'+button_id+'').addClass("m-wizard__step--current");
+                    change_progress_bar_width(button_id,'add');
+                    let previous = parseInt(button_id) - 1;
+                    if(previous > 1){
+                        while(previous >= 1){
+                            $('#step_'+previous+'').addClass("m-wizard__step--done");
+                            $('#step_'+previous+'').removeClass("m-wizard__step--current");
+                            $('#m_wizard_form_step_'+previous+'').removeClass("m-wizard__form-step--current");
+                            previous--;
+                        }
+                    }else{
+                        $('#step_'+previous+'').addClass("m-wizard__step--done");
+                        $('#step_'+previous+'').removeClass("m-wizard__step--current");
+                        $('#m_wizard_form_step_'+previous+'').removeClass("m-wizard__form-step--current");
+                    }
+                    let next = parseInt(button_id) + 1;
+                    change_progress_bar_width(next, 'remove');
+                    while(next <= 7) {
+                        $('#step_' + next + '').removeClass("m-wizard__step--done");
+                        $('#step_' + next + '').removeClass("m-wizard__step--current");
+                        $('#m_wizard_form_step_' + next + '').removeClass("m-wizard__form-step--current");
+                        next++;
+                    }
+                });
+            }
             $(document).on('click', '.btn_skip', function(){
                 let button_id = $(this).attr("id");
                 change_progress_bar_width(button_id,'add');
@@ -253,6 +244,22 @@
                 $('#step_'+next+'').addClass("m-wizard__step--current");
                 $('#m_wizard_form_step_'+next+'').addClass("m-wizard__form-step--current");
             });
+            $(document).on('click', '.btn_back', function(){
+                let button_id = $(this).attr("id");
+                change_progress_bar_width(button_id,'remove');
+                $('#m_wizard_form_step_'+button_id+'').removeClass("m-wizard__form-step--current");
+                $('#step_'+button_id+'').removeClass("m-wizard__step--current");
+                let previous = parseInt(button_id) - 1;
+                $('#step_'+previous+'').removeClass("m-wizard__step--done");
+                $('#step_'+previous+'').addClass("m-wizard__step--current");
+                $('#m_wizard_form_step_'+previous+'').addClass("m-wizard__form-step--current");
+            });
+        });
+        $( document ).ready(function() {
+            let user = $('#user_id').val();
+            if(user != ''){
+                get_user_data(user);
+            }
         });
     </script>
     <style>

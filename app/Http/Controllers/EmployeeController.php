@@ -4,16 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\Department;
 use App\Models\EmployeeCompanyReference;
+use App\Models\EmployeeDocs;
 use App\Models\EmployeeEducation;
 use App\Models\EmployeeEmergencyContact;
 use App\Models\EmployeeExperience;
 use App\Models\EmployeeFamily;
 use App\Models\EmployeeKin;
+use App\Models\LeavesBucket;
 use App\Models\User;
-use Illuminate\Support\Facades\Validator;
 use App\Models\Employee;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 
 class EmployeeController extends Controller
 {
@@ -26,8 +30,10 @@ class EmployeeController extends Controller
         $data['page_title'] = "Employees List - Atlantis BPO CRM";
         if(Auth::user()->role_id == 1 or Auth::user()->role_id == 5){
             $data['employee_lists'] = Employee::where('status' , 1)->orderBy('added_on', 'desc')->get();
+            $data['isLocked']  = false;
         } else {
             $data['employee_lists'] = Employee::where('user_id' , Auth::user()->user_id)->get();
+            $data['isLocked'] = Employee::where('user_id' , Auth::user()->user_id)->pluck('locked')->first();
         }
         return view('employees.employee_list', $data);
     }
@@ -35,35 +41,40 @@ class EmployeeController extends Controller
     {
         $data['page_title'] = "Employee Form - Atlantis BPO CRM";
         $data['departments'] = Department::where('status',1)->orderBy('department_id', 'DESC')->get();
-        $data['employee_ref_users'] = User::where('status',1)->get();
+        $data['employee_ref_users'] = User::whereStatus(1)->get();
         $data['section_id'] = false;
         if(isset($request->employee_id)) {
             $find_user = Employee::where('employee_id', $request->employee_id)->pluck('user_id')->first();
             if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5){
-                $data['employee'] = Employee::where('employee_id', $request->employee_id)->get()[0];
+                $data['employee'] = Employee::where('employee_id', $request->employee_id)->first();
             } else if(Auth::user()->user_id  == $find_user){
-                $data['employee'] = Employee::where('employee_id', $request->employee_id)->where('user_id', $find_user)->get()[0];
+                $data['employee'] = Employee::where('employee_id', $request->employee_id)->where('user_id', $find_user)->first();
             } else {
                 return redirect()->route('access_denied');
             }
-            $data['users'] = User::where('status',1)->get();
-            //$data['employee'] = Employee::where('employee_id', $request->employee_id)->get()[0];
+            $data['users'] = User::whereStatus(1)->where('user_type','Employee')->get();
+            //$data['employee'] = Employee::where('employee_id', $request->employee_id)->first();
             $data['employee_education'] = EmployeeEducation::where('employee_id', $request->employee_id)->get();
             $data['employee_experience'] = EmployeeExperience::where('employee_id', $request->employee_id)->get();
             $data['employee_family'] = EmployeeFamily::where('employee_id', $request->employee_id)->get();
             $count = EmployeeKin::where('employee_id', $request->employee_id)->get()->count();
             if ($count > 0){
-                $data['employee_kin'] = EmployeeKin::where('employee_id', $request->employee_id)->get()[0];
+                $data['employee_kin'] = EmployeeKin::where('employee_id', $request->employee_id)->first();
             }else{
                 $data['employee_kin'] = false;
             }
             $data['employee_emergency_contact'] = EmployeeEmergencyContact::where('employee_id',$request->employee_id)->get();
             $data['employee_company_reference'] = EmployeeCompanyReference::where('employee_id',$request->employee_id)->get();
+            $data['employee_docs'] = EmployeeDocs::where('employee_id',$request->employee_id)->get();
         } else {
-            if(Auth::user()->role_id != 1 && Auth::user()->role_id != 5){
-                return redirect()->route('access_denied');
+            if(Auth::user()->role_id != 1 && Auth::user()->role_id != 5 ) {
+                $find_rec = Employee::where('user_id', Auth::user()->user_id)->get();
+                $check_isLocked = Employee::where('user_id', Auth::user()->user_id)->pluck('locked')->first();
+                if(count($find_rec) > 0 ||  $check_isLocked == 1 ) {
+                    return redirect()->route('access_denied');
+                }
             }
-            $data['users'] = User::doesnthave('employee')->where('status',1)->get();
+            $data['users'] = User::doesnthave('employee')->whereStatus(1)->where('user_type','Employee')->get();
             $data['employee'] = false;
             $data['employee_education'] = false;
             $data['employee_experience'] = false;
@@ -71,6 +82,7 @@ class EmployeeController extends Controller
             $data['employee_kin'] = false;
             $data['employee_emergency_contact'] = false;
             $data['employee_company_reference'] = false;
+            $data['employee_docs'] = false;
         }
         return view('employees.employee_form_wizard',$data);
     }
@@ -96,16 +108,16 @@ class EmployeeController extends Controller
             'religion' => 'required',
             'blood_group' => 'required',
             'native_lang' => 'required',
-            'gross_salary' => 'required',
             'joining_date' => 'required',
-            'department' => 'required'
+            'department_id' => 'required',
+            'correctness_certificate' => 'required'
         ]);
         if($validator->passes()){
             $employee = Employee::where('user_id', $request->user_id)->get();
             $employee_info_data = [
                 'added_by' => Auth::user()->user_id,
                 'user_id' => $request->user_id,
-                'department' => $request->department,
+                'department_id' => $request->department_id,
                 'full_name' => $request->full_name,
                 'surname' => $request->surname,
                 'father_husband' => $request->father_husband,
@@ -129,22 +141,45 @@ class EmployeeController extends Controller
                 'religion' => $request->religion,
                 'blood_group' => $request->blood_group,
                 'native_lang' => $request->native_lang,
-                'gross_salary' => $request->gross_salary,
                 'joining_date' => $request->joining_date,
                 'hobbies_interest' => $request->hobbies_interest,
+                'net_salary' => $request->net_salary,
+                'conveyance_allowance' => $request->conveyance_allowance,
+                'employment_status' => $request->employment_status
             ];
+            if($request->employment_status == 'Confirmed'){
+                Employee::where('user_id', $request->user_id)->update([
+                    'employment_status' => $request->employment_status,
+                    'confirmation_date' => get_date()
+                ]);
+            }
             if($request->hasFile('image')) {
+                if(count($employee)>0){
+                    $employee_old_image =  User::where('user_id', $request->user_id)->pluck('image')->first();
+                    if(File::exists(public_path('user_images'), $employee_old_image)){
+                        Storage::delete(public_path('user_images'), $employee_old_image);
+                    }
+                }
                 $file = $request->file('image');
-                $employee_image = time() . rand(1, 100) . '.' . $file->extension();
-                $file->move(public_path('employee_images'), $employee_image);
-                $employee_info_data['image'] = $employee_image;
+                $user_image = time() . rand(1, 100) . '.' . $file->extension();
+                $file->move(public_path('user_images'), $user_image);
+                User::where('user_id', $request->user_id)->update(['image' => $user_image]);
             }
             if(count($employee)>0){
                 Employee::where('employee_id', $employee[0]->employee_id)->update($employee_info_data);
             } else {
                 Employee::create($employee_info_data);
             }
-            $employee = Employee::where('user_id', $request->user_id)->get()[0];
+            $employee = Employee::where('user_id', $request->user_id)->first();
+            $Leaves_Bucket_record = LeavesBucket::where('user_id',$request->user_id)->count();
+            if($Leaves_Bucket_record == 0 && ($employee->employment_status == 'Confirmed' || $request->employment_status == 'Confirmed')) {
+                LeavesBucket::create(['user_id' => $request->user_id,
+                    'start_date' => get_date(),
+                    'annual_leaves' => 10,
+                    'sick_leaves' => 5,
+                    'casual_leaves' => 4
+                ]);
+            }
             ?>
             <input data-response="Success" type="hidden" id="employee_id" value="<?=$employee->employee_id?>">
             <?php
@@ -162,7 +197,8 @@ class EmployeeController extends Controller
             'education_division_grade' => 'required',
             'education_major_subjects' => 'required',
             'education_from_date' => 'required',
-            'education_to_date' => 'required'
+            'education_to_date' => 'required',
+            'correctness_certificate' => 'required'
         ]);
         if($validator->passes()){
             // remove
@@ -199,7 +235,8 @@ class EmployeeController extends Controller
             'experience_from_date' => 'required',
             'experience_to_date' => 'required',
             'approach_previous_employer' => 'required',
-            'previous_employer_service_bond' => 'required'
+            'previous_employer_service_bond' => 'required',
+            'correctness_certificate' => 'required'
         ]);
         if($validator->passes()){
             // remove
@@ -245,7 +282,8 @@ class EmployeeController extends Controller
             'kin_contact_number' => 'required',
             'kin_address' => 'required',
             'dependents' => 'required',
-            'any_illness_record' => 'required'
+            'any_illness_record' => 'required',
+            'correctness_certificate' => 'required'
         ]);
         if($validator->passes()){
             // remove already prersent data
@@ -273,7 +311,8 @@ class EmployeeController extends Controller
                 'kin_contact_number' => $request->kin_contact_number,
                 'kin_address' => $request->kin_address,
                 'dependents' => $request->dependents,
-                'any_illness_record' => $request->any_illness_record
+                'any_illness_record' => $request->any_illness_record,
+                'illness_details' => $request->illness_details
             ));
 
             $response['status'] = 'success';
@@ -291,7 +330,8 @@ class EmployeeController extends Controller
             'emergency_contact_name' => 'required',
             'emergency_contact_cnic' => 'required',
             'emergency_contact_number' => 'required',
-            'emergency_contact_address' => 'required'
+            'emergency_contact_address' => 'required',
+            'correctness_certificate' => 'required'
         ]);
         if($validator->passes()){
             $employee_id= $request->employee_id;
@@ -346,6 +386,35 @@ class EmployeeController extends Controller
         }
         return response()->json($response);
     }
+    public function employee_docs_save(Request $request){
+        $validator = Validator::make($request->all(), [
+            'employee_id' => 'required',
+            'doc_title' => 'required',
+            'doc_file' => 'required',
+            'correctness_certificate' => 'required'
+        ]);
+        if($validator->passes()){
+            $employee_id = $request->employee_id;
+            foreach ($request->file('doc_file') as $index => $file){
+                $doc_title = $request->doc_title[$index];
+                $filename = $employee_id.'_'.$doc_title. '.' . $file->extension();
+                $file->move(public_path("employee_documents"), $filename);
+                $doc_file = $filename;
+                $employee_docs = new EmployeeDocs();
+                $employee_docs->employee_id = $employee_id;
+                $employee_docs->doc_title = $doc_title;
+                $employee_docs->doc_file = $doc_file;
+                $employee_docs->added_by = Auth::user()->user_id;
+                $employee_docs->save();
+            }
+            $response['status'] = 'success';
+            $response['result'] = 'Added Successfully';
+        } else{
+            $response['status']= 'failure';
+            $response['result'] = $validator->errors()->toJson();
+        }
+        return response()->json($response);
+    }
     // employee data view
     public function employee_data_view(Request $request)
     {
@@ -353,12 +422,12 @@ class EmployeeController extends Controller
         $data['page_title'] = "Employee Data View - Atlantis BPO CRM";
         $data['section_id'] = true;
         $data['department'] = Department::where('status',1)->get();
-        $data['users'] = User::where('status',1)->where('user_id', $find_user)->get();
-        $data['employee_ref_users'] = User::where('status',1)->get();
+        $data['users'] = User::whereStatus(1)->where('user_id', $find_user)->get();
+        $data['employee_ref_users'] = User::whereStatus(1)->get();
         if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5){
-            $data['employee'] = Employee::with('employee_education', 'employee_family', 'employee_kin', 'employee_emergency_contact', 'employee_experience', 'employee_company_reference.user')->where('employee_id', $request->employee_id)->get()[0];
+            $data['employee'] = Employee::with('employee_education', 'employee_family', 'employee_kin', 'employee_emergency_contact', 'employee_experience', 'employee_company_reference.user', 'employee_docs')->where('employee_id', $request->employee_id)->first();
         } else if(Auth::user()->user_id  == $find_user){
-            $data['employee'] = Employee::with('employee_education', 'employee_family', 'employee_kin', 'employee_emergency_contact', 'employee_experience', 'employee_company_reference.user')->where('employee_id', $request->employee_id)->where('user_id', $find_user)->get()[0];
+            $data['employee'] = Employee::with('employee_education', 'employee_family', 'employee_kin', 'employee_emergency_contact', 'employee_experience', 'employee_company_reference.user', 'employee_docs')->where('employee_id', $request->employee_id)->where('user_id', $find_user)->first();
         } else {
             return redirect()->route('access_denied');
         }
@@ -367,50 +436,72 @@ class EmployeeController extends Controller
     // section edits
     public function employees_personal_info_edit(Request $request){
         $data['page_title'] = "Employee Personal Data Update - Atlantis BPO CRM";
-        $data['employee'] = Employee::where('employee_id', $request->employee_id)->get()[0];
+        $data['employee'] = Employee::where('employee_id', $request->employee_id)->first();
         $data['departments'] = Department::where('status',1)->orderBy('department_id', 'DESC')->get();
-        $data['users'] = User::where('status',1)->get();
+        $data['users'] = User::whereStatus(1)->where('user_type','Employee')->get();
         $data['section_id'] = 'personal_info_form';
         return view('employees.partials.personal_info_form', $data);
     }
     public function employees_education_info_edit(Request $request){
         $data['page_title'] = "Employee Education Data Update - Atlantis BPO CRM";
-        $data['employee'] = Employee::where('employee_id', $request->employee_id)->get()[0];
+        $data['employee'] = Employee::where('employee_id', $request->employee_id)->first();
         $data['employee_education'] = EmployeeEducation::where('employee_id', $request->employee_id)->get();
         $data['section_id'] = 'education_info_form';
         return view('employees.partials.education_info_form', $data);
     }
     public function employees_experience_info_edit(Request $request){
         $data['page_title'] = "Employee Education Data Update - Atlantis BPO CRM";
-        $data['employee'] = Employee::where('employee_id', $request->employee_id)->get()[0];
+        $data['employee'] = Employee::where('employee_id', $request->employee_id)->first();
         $data['employee_experience'] = EmployeeExperience::where('employee_id', $request->employee_id)->get();
         $data['section_id'] = 'experience_info_form';
         return view('employees.partials.experience_info_form', $data);
     }
     public function employees_family_info_edit(Request $request){
         $data['page_title'] = "Employee Education Data Update - Atlantis BPO CRM";
-        $data['employee'] = Employee::where('employee_id', $request->employee_id)->get()[0];
+        $data['employee'] = Employee::where('employee_id', $request->employee_id)->first();
         $data['employee_family'] = EmployeeFamily::where('employee_id', $request->employee_id)->get();
-        $data['employee_kin'] = EmployeeKin::where('employee_id', $request->employee_id)->get()[0];
+        $data['employee_kin'] = EmployeeKin::where('employee_id', $request->employee_id)->first();
+        if(!$data['employee_family']){
+            $data['employee_family'] = false;
+        }
+        if(!$data['employee_kin']){
+            $data['employee_kin'] = false;
+        }
         $data['section_id'] = 'family_info_form';
         return view('employees.partials.family_info_form', $data);
     }
     public function employees_emergency_contact_info_edit(Request $request){
         $data['page_title'] = "Employee Education Data Update - Atlantis BPO CRM";
-        $data['employee'] = Employee::where('employee_id', $request->employee_id)->get()[0];
+        $data['employee'] = Employee::where('employee_id', $request->employee_id)->first();
         $data['employee_emergency_contact'] = EmployeeEmergencyContact::where('employee_id',$request->employee_id)->get();
         $data['section_id'] = 'emergency_contact_info_form';
         return view('employees.partials.emergency_contact_info_form', $data);
     }
     public function employees_company_reference_info_edit(Request $request){
         $data['page_title'] = "Employee Education Data Update - Atlantis BPO CRM";
-        $data['employee'] = Employee::where('employee_id', $request->employee_id)->get()[0];
+        $data['employee'] = Employee::where('employee_id', $request->employee_id)->first();
         $data['employee_company_reference'] = EmployeeCompanyReference::where('employee_id',$request->employee_id)->get();
-        $data['employee_ref_users'] = User::where('status',1)->get();
+        $data['employee_ref_users'] = User::whereStatus(1)->get();
         $data['section_id'] = 'reference_info_form';
         return view('employees.partials.reference_info_form', $data);
     }
+    public function employees_docs_edit(Request $request){
+        $data['page_title'] = "Employee Education Data Update - Atlantis BPO CRM";
+        $data['employee'] = Employee::where('employee_id', $request->employee_id)->first();
+        $data['employee_docs'] = EmployeeDocs::where('employee_id',$request->employee_id)->get();
+        $data['section_id'] = 'upload_docs_form';
+        return view('employees.partials.upload_docs_form', $data);
+    }
 
+    public function lock_employee_record(Request $request)
+    {
+        Employee::where('employee_id', $request->employee_id)->update([
+            'locked' => 1,
+        ]);
+        $response['status'] = "Success";
+        $response['result'] = "Locked Successfully";
+        return response()->json($response);
+    }
     public function delete(Request $request)
     {
         Employee::where('employee_id', $request->employee_id)->update([
@@ -418,6 +509,15 @@ class EmployeeController extends Controller
         ]);
         $response['status'] = "Success";
         $response['result'] = "Deleted Successfully";
+        return response()->json($response);
+    }
+    public function employee_doc_delete(Request $request)
+    {
+        $doc = EmployeeDocs::where('id', $request->doc_id)->pluck('doc_file')->first();
+        File::delete(asset('employee_documents/'.$doc));
+        EmployeeDocs::where('id', $request->doc_id)->delete();
+        $response['status'] = "Success";
+        $response['result'] = "Doc File Deleted Successfully";
         return response()->json($response);
     }
     public function get_employee_data(Request $request)

@@ -14,17 +14,27 @@
                                 <input name="full_name" value="{{$user ? $user->full_name : ''}}" required type="text" class="form-control">
                             </div>
                         </div>
-                        <div class="col-6 mb-4">
+                        <div class="col-6">
+                            <label for="agent_id">User Type</label>
+                            <select class="form-control" name="user_type" id="user_type" required>
+                                <option class="form-control" value="" selected disabled>Plese Select</option>
+                                <option class="form-control" {{$user ? ($user->user_type == 'Employee' ? 'selected' : '' ): ''}} value="Employee">Employee</option>
+                                <option class="form-control" {{$user ? ($user->user_type == 'System User' ? 'selected' : '' ): ''}} value="System User">System User</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
                             <label for="agent_id">Department</label>
                             <select class="form-control" name="department_id" id="" required>
-                                <option class="form-control" value="" selected disabled>Plese Select</option>
+                                <option class="form-control" value="" selected disabled>Please Select</option>
                                 @foreach($departments as $dep)
                                     <option {{$user ? ($user->department_id == $dep->department_id ? 'selected' : '' ): ''}}
                                             value="{{$dep->department_id}}">{{$dep->title}}</option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-6 mb-4">
+                        <div class="col-6">
                             <label for="agent_id">Role</label>
                             <select class="form-control" name="role_id" id="" required>
                                 <option class="form-control" value="" selected disabled>Plese Select</option>
@@ -34,6 +44,8 @@
                                 @endforeach
                             </select>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-6">
                             <label  for="agent_id">Reports To</label>
                             <select class="form-control" name="manager_id">
@@ -44,33 +56,14 @@
                                 @endforeach
                             </select>
                         </div>
-                        @if(!$user)
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label class="form-check-label">Email</label>
-                                    <input name="email" required type="email" class="form-control">
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label class="form-check-label">Password</label>
-                                    <input name="password" id="pass" required type="password" class="form-control">
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="form-group mb-0">
-                                    <label class="form-check-label">Confirm Password</label>
-                                    <input required id="c_pass" type="password" class="form-control">
-                                </div>
-                                <div id="pass_response" class="badge-danger p-1 mb-3" style="display: none">Password not matched</div>
-                            </div>
-                        @endif
-                            <div class="col-6">
+                        <div class="col-6">
                                 <div class="form-group">
                                     <label class="form-check-label"> Vicidialer ID</label>
                                     <input name="vicidialer_id" value="{{$user ? $user->vicidialer_id : 0}}" required type="number" class="form-control">
                                 </div>
                             </div>
+                    </div>
+                    <div class="row">
                         <div class="col-6">
                             <div class="form-group">
                                 <label class="form-check-label">Image</label>
@@ -81,11 +74,13 @@
                             <div class="form-group">
                                 <label class="form-check-label">Gender</label>
                                 <select name="gender" required class="form-control">
-                                    <option {{$user ? ($user->role_id == 'Male' ? 'selected' : '' ): ''}} value="Male">Male </option>
-                                    <option {{$user ? ($user->role_id == 'Female' ? 'selected' : '' ): ''}} value="Female">Female </option>
+                                    <option {{$user ? ($user->gender == 'Male' ? 'selected' : '' ): ''}} value="Male">Male </option>
+                                    <option {{$user ? ($user->gender == 'Female' ? 'selected' : '' ): ''}} value="Female">Female </option>
                                 </select>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-6">
                             <div class="form-group">
                                 <label class="form-check-label" for="">Contact Number</label>
@@ -104,6 +99,31 @@
                                 </select>
                             </div>
                         </div>
+                    </div>
+                    @if(!$user)
+                    <div class="row">
+                      <div class="col-4">
+                                <div class="form-group">
+                                    <label class="form-check-label">Email</label>
+                                    <input name="email" required type="email" class="form-control">
+                                </div>
+                            </div>
+                      <div class="col-4">
+                                <div class="form-group">
+                                    <label class="form-check-label">Password</label>
+                                    <input name="password" id="pass" required type="password" class="form-control">
+                                </div>
+                            </div>
+                      <div class="col-4">
+                                <div class="form-group mb-0">
+                                    <label class="form-check-label">Confirm Password</label>
+                                    <input required id="c_pass" type="password" class="form-control">
+                                </div>
+                                <div id="pass_response" class="badge-danger p-1 mb-3" style="display: none">Password not matched</div>
+                            </div>
+                    </div>
+                    @endif
+                    <div class="row">
                         <div class="col-12">
                             <div class="form-group">
                                 <label class="form-check-label" for="">Postal Address</label>

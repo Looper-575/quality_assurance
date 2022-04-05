@@ -11,13 +11,13 @@
                     </h3>
                 </div>
                 <div class="row">
-                    @if($employee && $employee->image != '')
+                    @if($employee && $employee->employee->image != '')
                         @php
-                            $image_src =  asset('employee_images/'.$employee->image);
+                            $image_src = asset('user_images/'.$employee->employee->image);
                         @endphp
                     @else
                         @php
-                            $image_src = asset('assets/img/users/user_avatar.jpg');
+                            $image_src = asset('user_images/user.png');
                         @endphp
                     @endif
                     <div class="col-4">
@@ -27,7 +27,7 @@
                                 <img  id="profile_image" src="{{$image_src}}" class="m--img-rounded m--marginless" width="150" height="150">
                             </div>
                             <div class="avartar-picker">
-                                <input onchange="setImage()" type="file" name="image" id="image" class="inputfile" style="display: none;">
+                                <input type="file" name="image" id="image" class="inputfile" style="display: none">
                                 <label for="image">
                                     <i class="fa fa-camera"></i>
                                     <span>Choose Picture</span>
@@ -40,23 +40,28 @@
                             <div class="col-6">
                                 <div class="form-group m-form__group">
                                     <label for="user_id">* Users</label>
-                                    <?php $user_ddl_perm = ( (Auth::user()->role->role_id != '5' && Auth::user()->role->role_id != '1')  || (Auth::user()->role->role_id == '5' or Auth::user()->role->role_id == '1') && $employee );  ?>
-                                    <select class="form-control" name="user_id" id="user_id" onchange="get_user_data(this)" required {{ $user_ddl_perm  ? 'disabled' : ''}} >
+                                    <?php
+                                        $user_ddl_perm = ( (Auth::user()->role->role_id != '5' && Auth::user()->role->role_id != '1')  || (Auth::user()->role->role_id == '5' or Auth::user()->role->role_id == '1') && $employee );
+                                        $full_name = '';
+                                    ?>
+                                    <select class="form-control" name="user_id" id="user_id" onchange="get_user_data($(this).val())" required {{ $user_ddl_perm  ? 'disabled' : ''}} >
                                         <option value="">Select</option>
                                         @foreach($users as $user)
-                                            <option {{ ($employee && $employee->user_id == $user->user_id)  ? 'selected' : ''}} value="{{$user->user_id}}">{{$user->full_name}}</option>
+                                            <option {{ ($employee && $employee->user_id == $user->user_id) ? 'selected' : (Auth::user()->user_id == $user->user_id ? 'selected' : '' ) }} value="{{$user->user_id}}">{{$user->full_name}}</option>
                                         @endforeach
                                     </select>
                                     @if( $user_ddl_perm )
-                                        <input type="hidden" name="user_id" value="{{$employee->user_id}}">
-{{--                                        (Auth::user()->role->role_id != '5' && Auth::user()->role->role_id != '1')  ? Auth::user()->user_id : $employee->user_id)--}}
+                                        <input type="hidden" name="user_id" value="{{$employee ? $employee->user_id : Auth::user()->user_id}}">
+                                        @php
+                                            $full_name = ($employee ? $employee->full_name : Auth::user()->full_name);
+                                        @endphp
                                     @endif
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="form-group m-form__group">
                                     <label for="full_name">* Full Name</label>
-                                    <input name="full_name" value="{{$employee ? $employee->full_name : ''}}" readonly required type="text" id="full_name_id" class="form-control">
+                                    <input name="full_name" value="{{$full_name}}" readonly required type="text" id="full_name_id" class="form-control">
                                 </div>
                             </div>
                         </div>
@@ -64,14 +69,14 @@
                             <div class="col-6">
                                 <div class="form-group m-form__group">
                                     <label for="department">* Department</label>
-                                    <select class="form-control" name="department" id="department_id" required {{$user_ddl_perm ? 'disabled' : ''}} >
+                                    <select class="form-control" name="department_id" id="department_id" required {{$user_ddl_perm ? 'disabled' : ''}} >
                                         <option value="">Select</option>
                                         @foreach($departments as $department)
-                                            <option {{ (($employee && $employee->department == $department->department_id) or $department->department_id == Auth::user()->department_id) ? 'selected' : ''}} value="{{$department->department_id}}">{{$department->title}}</option>
+                                            <option {{ (($employee && $employee->department_id == $department->department_id) or $department->department_id == Auth::user()->department_id) ? 'selected' : ''}} value="{{$department->department_id}}">{{$department->title}}</option>
                                         @endforeach
                                     </select>
                                     @if($user_ddl_perm)
-                                        <input type="hidden" name="department" value="{{(Auth::user()->role->role_id != '5' && Auth::user()->role->role_id != '1')  ? Auth::user()->user_id : $employee->department}}">
+                                        <input type="hidden" name="department_id" value="{{(Auth::user()->role->role_id != '5' && Auth::user()->role->role_id != '1')  ? Auth::user()->department_id : $employee->department_id}}">
                                     @endif
                                 </div>
                             </div>
@@ -138,12 +143,62 @@
                             <input name="joining_date" value="{{$employee ? $employee->joining_date : ''}}" required type="date" class="form-control">
                         </div>
                     </div>
-                    <div class="col-3">
-                        <div class="form-group m-form__group">
-                            <label  for="gross_salary">* Gross Salary</label>
-                            <input name="gross_salary" value="{{$employee ? $employee->gross_salary : ''}}" required type="number" class="form-control">
+                    @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5 )
+                        <div class="col-3">
+                            <div class="form-group m-form__group">
+                                <label  for="net_salary"> Net Salary</label>
+                                <input name="net_salary" value="{{$employee ? $employee->net_salary : ''}}" required type="number" class="form-control">
+                            </div>
                         </div>
-                    </div>
+                        <div class="col-3">
+                            <div class="form-group m-form__group">
+                                <label  for="employment_status"> Employment Status</label>
+                                <?php
+                                    $confirmed = false;
+                                    if($employee and $employee->employment_status == 'Confirmed'){
+                                        $confirmed = true;
+                                    }
+                                ?>
+                                <div class="m-radio-inline">
+                                    <label class="m-radio m-radio--solid m-radio--brand">
+                                        <input type="radio" name="employment_status" value="Nesting" {{($employee and $employee->employment_status == 'Nesting')? 'checked' : ''}} {{($confirmed ? 'disabled="disabled" ' : '')}} required class="form-control">
+                                        Nesting
+                                        <span></span>
+                                    </label>
+                                    <label class="m-radio m-radio--solid m-radio--brand">
+                                        <input type="radio" name="employment_status" value="Probation" {{($employee and $employee->employment_status == 'Probation')? 'checked' : ''}} {{($confirmed ? 'disabled="disabled" ' : '')}} required class="form-control">
+                                        Probation
+                                        <span></span>
+                                    </label>
+                                    <label class="m-radio m-radio--solid m-radio--brand">
+                                        <input type="radio" name="employment_status" value="Confirmed" {{($employee and $employee->employment_status == 'Confirmed')? 'checked' : ''}} {{($confirmed ? 'disabled="disabled" ' : '')}} required class="form-control">
+                                        Confirmed
+                                        <span></span>
+                                    </label>
+                                    @if($confirmed)
+                                        <input name="employment_status" type="hidden" value="Confirmed">
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group m-form__group">
+                                <label  for="conveyance_allowance"> Conveyance Allowance</label>
+                                <div class="m-radio-inline">
+                                    <label class="m-radio m-radio--solid m-radio--brand">
+                                        <input type="radio" name="conveyance_allowance" value="1" {{($employee and $employee->conveyance_allowance == '1')? 'checked' : ''}} required class="form-control">
+                                        Yes
+                                        <span></span>
+                                    </label>
+                                    <label class="m-radio m-radio--solid m-radio--brand">
+                                        <input type="radio" name="conveyance_allowance" value="0" {{($employee and $employee->conveyance_allowance == '0')? 'checked' : ''}} required class="form-control">
+                                        No
+                                        <span></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                     <div class="col-3">
                         <div class="form-group m-form__group">
                             <label for="email">* Email</label>
@@ -215,7 +270,7 @@
             <div class="row">
                 <div class="col-3">
                     <div class="form-group m-form__group">
-                        <label for="hobbies_interest">* Hobbies Interest</label>
+                        <label for="hobbies_interest"> Hobbies Interest</label>
                         <input name="hobbies_interest" value="{{$employee ? $employee->hobbies_interest : ''}}"  type="text" class="form-control">
                     </div>
                 </div>
@@ -256,6 +311,33 @@
                     </div>
                 </div>
             </div>
+            <div class="m-separator m-separator--dashed m-separator--lg"></div>
+            <div class="m-form__section">
+                <div class="m-form__heading">
+                    <h3 class="m-form__heading-title">
+                        CERTIFICATE OF CORRECTNESS
+                    </h3>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group m-form__group">
+                            <label for="correctness_certificate">
+                                Please make sure before submitting this form that you have answered all questions completely
+                                and correctly. If any of the information furnished above is found to be incorrect, he/she will be liable for
+                                dismissal without notice.
+                            </label>
+                        </div>
+                        <div class="m-checkbox-inline">
+                            <label class="m-checkbox m-checkbox--solid m-checkbox--brand">
+                                <input type="checkbox" name="correctness_certificate" value="1" required>
+                                By clicking on this, I do solemnly affirm that the information furnished in this Employment Form is correct
+                                to the best of my knowledge and belief and that I have withheld nothing which would affect my employment in this company.
+                                <span></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <!--end: Form Actions -->
@@ -288,3 +370,9 @@
     </div>
     <!--end: Form Actions -->
 </form>
+<script>
+    document.getElementById('image').addEventListener('change',function (event) {
+        var image = document.getElementById('profile_image');
+        image.src = URL.createObjectURL(event.target.files[0]);
+    });
+</script>

@@ -12,6 +12,7 @@
             </div>
         </div>
         <div class="m-portlet__body">
+            <div id="remaining_leaves_bucket"></div>
             <form class="m-form m-form--fit m-form--label-align-right" enctype="multipart/form-data" method="post" id="leave_form">
                 @csrf
                 <div class="row">
@@ -99,6 +100,40 @@
     <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script>
+        let remaining_leaves_div_html = (function () {/*<div class="row">
+                <div class="col-12">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Remaining Annual Leaves</th>
+                            <th>Remaining Casual Leaves</th>
+                            <th>Remaining Sick Leaves</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>*/}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1];
+
+        $('#team_member').change(function() {
+            let team_member_id = $('#team_member').val();
+            $.ajax({
+                type: 'post',
+                url: '{{route('get_employee_leaves_bucket')}}',
+                data: {_token:"{{csrf_token()}}",team_member_id: team_member_id},
+                success: function( data ) {
+                    console.log( data );
+                    let remaining_leaves_div = $(remaining_leaves_div_html);
+                    remaining_leaves_div.find('tbody').find('tr').append('<td>'+data.annual_leaves+'</td>');
+                    remaining_leaves_div.find('tbody').find('tr').append('<td>'+data.casual_leaves+'</td>');
+                    remaining_leaves_div.find('tbody').find('tr').append('<td>'+data.sick_leaves+'</td>');
+                    $('#remaining_leaves_bucket').html(remaining_leaves_div);
+                }
+            });
+        });
 
         if($('#leave_type').val() == 3 && $('#no_leaves').val() > 2 ) {
             $("#medical_report").attr("required", true);
@@ -159,7 +194,9 @@
             else{
                 $("#medical_report").removeAttr('required');
             }
+
             dateDifference();
+
         });
         $('#leave_type').change(function (){
 
@@ -212,36 +249,19 @@
         });
 
         function dateDifference(){
-            var from_date = new Date($('#from').val());
-            var to_date = new Date($('#to').val());
-            let days = DaysBetween(from_date,to_date);
-            $('#no_leaves').val(days);
+            var from_date = $('#from').val();
+            var to_date = $('#to').val();
+            from_date = from_date.split('-');
+            to_date = to_date.split('-');
+            from_date = new Date(from_date[0], from_date[1], from_date[2]);
+            to_date = new Date(to_date[0], to_date[1], to_date[2]);
+            from_date_unixtime = parseInt(from_date.getTime() / 1000);
+            to_date_unixtime = parseInt(to_date.getTime() / 1000);
+            var timeDifference =    to_date_unixtime - from_date_unixtime;
+            var timeDifferenceInHours = timeDifference / 60 / 60;
+            var timeDifferenceInDays = timeDifferenceInHours  / 24;
+            $('#no_leaves').val(timeDifferenceInDays + 1 );
 
-
-        }
-
-        function DaysBetween(dDate1, dDate2) {
-            if(dDate1.getDate()===dDate2.getDate()){
-                return 1;
-            }
-            var iWeeks, iDateDiff, iAdjust = 0;
-            if (dDate2 < dDate1) return -1; // error code if dates transposed
-            var iWeekday1 = dDate1.getDay(); // day of week
-            var iWeekday2 = dDate2.getDay();
-            iWeekday1 = (iWeekday1 == 0) ? 7 : iWeekday1; // change Sunday from 0 to 7
-            iWeekday2 = (iWeekday2 == 0) ? 7 : iWeekday2;
-            if ((iWeekday1 > 5) && (iWeekday2 > 5)) iAdjust = 1; // adjustment if both days on weekend
-            iWeekday1 = (iWeekday1 > 5) ? 5 : iWeekday1; // only count weekdays
-            iWeekday2 = (iWeekday2 > 5) ? 5 : iWeekday2;
-            // calculate differnece in weeks (1000mS * 60sec * 60min * 24hrs * 7 days = 604800000)
-            iWeeks = Math.floor((dDate2.getTime() - dDate1.getTime()) / 604800000)
-            if (iWeekday1 <= iWeekday2) { //Equal to makes it reduce 5 days
-                iDateDiff = (iWeeks * 5) + (iWeekday2 - iWeekday1)
-            } else {
-                iDateDiff = ((iWeeks + 1) * 5) - (iWeekday1 - iWeekday2)
-            }
-            iDateDiff -= iAdjust // take into account both days on weekend
-            return (iDateDiff + 1); // add 1 because dates are inclusive
         }
     </script>
 @endsection

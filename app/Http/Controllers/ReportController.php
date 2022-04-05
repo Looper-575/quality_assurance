@@ -4,6 +4,7 @@ use App\Models\AttendanceLog;
 use App\Models\CallDisposition;
 use App\Models\CallDispositionsDid;
 use App\Models\CallType;
+use App\Models\Employee;
 use App\Models\Holiday;
 use App\Models\LeaveApplication;
 use App\Models\QualityAssurance;
@@ -279,5 +280,60 @@ class ReportController extends Controller
             $holiday_count = 1 + $holiday_count + ((strtotime($to) - strtotime($from)) / (60 * 60 * 24));
         }
         return $holiday_count;
+    }
+
+    public function leaves_taken_report_monthly()
+    {
+        $data['page_title'] = "Monthly Leaves Taken Report - Atlantis BPO CRM";
+        if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5){
+            $data['users'] = User::where('status', 1)->get();
+        } else {
+            $team = Team::where('team_lead_id', Auth::user()->user_id)->where('status', 1)->first();
+            $team_users = TeamMember::where('team_id', $team->team_id)->pluck('user_id')->toArray();
+            array_push($team_users, Auth::user()->user_id);
+            $data['users'] = User::whereIn('user_id',$team_users)->where('status', 1)->get();
+        }
+        return view('reports.leaves_taken_report_monthly', $data);
+    }
+    public function generate_monthly_leaves_taken_report(Request $request)
+    {
+        $validator = Validator::make($request->all(),[
+            'user_id' => 'required'
+        ]);
+        if($validator->passes()) {
+            $from_date = Employee::where('user_id',$request->user_id)->pluck('joining_date')->first();// Employee Joining Date
+            $today_date = get_date();
+            $to_date = date("Y-m-t", strtotime($today_date));
+            $holiday_count = $this->check_holidays($from_date, $to_date);
+            $endDate = $to_date;
+            $startDate = $from_date;
+            $working_days = working_days($startDate, $endDate);
+            \DB::connection()->enableQueryLog();
+            $data['leaves_taken'] = LeaveApplication::select('leave_type_id','from','to',
+                DB::raw('sum(no_leaves) as leaves_taken, MONTH(added_on) month'), 'added_by')
+                ->with('user')->where(['approved_by_manager'=>1,'approved_by_hr'=>1])
+                ->where('added_by', $request->user_id)
+                ->whereBetween('from', [$startDate,$endDate])
+                ->whereBetween('to', [$startDate,$endDate])
+                ->whereStatus(1)
+                ->groupBy('month', 'added_by')
+                ->get();
+            $queries = \DB::getQueryLog();
+           // dd($queries);
+           // dd($data['leaves_taken']);
+            $data['employee_name'] = User::where('user_id',$request->user_id)->pluck('full_name')->first();
+            $data['holiday_count'] = $holiday_count;
+            $data['working_days'] = $working_days;
+            $data['start_month'] = $from_date;
+            $data['curr_month'] = $to_date;
+          //  $data['start_month'] = date("m",strtotime($from_date));
+          //  $data['curr_month'] = date("Y",strtotime($today_date));
+            $response['status'] = "Success";
+            $response['result'] = "Report Generated Successfully";
+        } else{
+            $response['status'] = "Failure!";
+            $response['result'] = $validator->errors()->toJson();
+        }
+        return view('reports.partials.leaves_taken_report_monthly' , $data);
     }
 }

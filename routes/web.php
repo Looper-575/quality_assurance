@@ -39,6 +39,8 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::group(['middleware' => ['is-admin']], function() {
         Route::post('/user_delete', 'App\Http\Controllers\UserController@delete')->name('user_delete');
     });
+    Route::post('/change_pass' , 'App\Http\Controllers\UserController@change_pass')->name('change_pass');
+
     //Routes for Roles //////////////////////
     Route::group(['middleware' => ['check-permission:roles_list,view,0,0']], function() {
         Route::get('/roles_list', 'App\Http\Controllers\SettingsController@user_roles_list')->name('roles_list');
@@ -177,7 +179,9 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::get('/get_note_data', 'App\Http\Controllers\NoteController@get_note_data')->name('get_note_data');
     Route::post('/delete_note_form', 'App\Http\Controllers\NoteController@delete_note_form')->name('delete_note_form');
     Route::get('/single_note_data/{id}', 'App\Http\Controllers\NoteController@single_note_data')->name('single_note_data');
-    // Team route
+    Route::post('/save_note_draft', 'App\Http\Controllers\NoteController@save_note_draft')->name('save_note_draft');
+    Route::get('/get_draft_note_data', 'App\Http\Controllers\NoteController@get_draft_note_data')->name('get_draft_note_data');
+    // Team routes
     Route::group(['middleware' => ['check-permission:department,view,0,0']], function() {
         Route::get('/department', 'App\Http\Controllers\DepartmentController@index')->name('department');
     });
@@ -269,6 +273,28 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
 
 
     Route::get('/access_denied','App\Http\Controllers\PermissionController@access_denied')->name('access_denied');
+    Route::get('/edit_profile','App\Http\Controllers\UserController@edit_profile')->name('edit_profile');
+    Route::post('/save_profile_changes','App\Http\Controllers\UserController@save_profile_changes')->name('save_profile_changes');
+
+
+    Route::group(['middleware' => ['check-permission:modules_list,view,0,0']], function() {
+        Route::get('modules_list', 'App\Http\Controllers\ModuleController@modules_list')->name('modules_list');
+        Route::get('single_module_detail/{id}', 'App\Http\Controllers\ModuleController@single_module_detail')->name('single_module_detail');
+    });
+    Route::group(['middleware' => ['check-permission:modules_list,0,add,0']], function() {
+        Route::get('module_form/{id?}', 'App\Http\Controllers\ModuleController@module_form')->name('module_form');
+    });
+    Route::group(['middleware' => ['check-permission:modules_list,0,0,update']], function() {
+        Route::get('/projects_list', 'App\Http\Controllers\ProjectController@projects_list')->name('projects_list');
+        Route::post('/project_delete', 'App\Http\Controllers\ProjectController@project_delete')->name('project_delete');
+        Route::post('/project_save', 'App\Http\Controllers\ProjectController@project_save')->name('project_save');
+    });
+
+    Route::post('save_module_info', 'App\Http\Controllers\ModuleController@save_module_info')->name('save_module_info');
+    Route::post('approve_module', 'App\Http\Controllers\ModuleController@approve_module')->name('approve_module');
+    Route::post('project_modules', 'App\Http\Controllers\ModuleController@project_modules')->name('project_modules');
+
+
 
     Route::get('/managerial_role','App\Http\Controllers\SettingsController@managerial_role')->name('managerial_role');
     Route::post('/managerial_role_save','App\Http\Controllers\SettingsController@managerial_role_save')->name('managerial_role_save');
@@ -287,6 +313,10 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::post('/employee_family_save', 'App\Http\Controllers\EmployeeController@employee_family_save')->name('employee_family_save');
     Route::post('/employee_emergency_contact_save', 'App\Http\Controllers\EmployeeController@employee_emergency_contact_save')->name('employee_emergency_contact_save');
     Route::post('/employee_company_reference_save', 'App\Http\Controllers\EmployeeController@employee_company_reference_save')->name('employee_company_reference_save');
+    Route::post('/employee_docs_save', 'App\Http\Controllers\EmployeeController@employee_docs_save')->name('employee_docs_save');
+    Route::post('/employees_docs_edit', 'App\Http\Controllers\EmployeeController@employees_docs_edit')->name('employees_docs_edit');
+    Route::post('/employee_doc_delete', 'App\Http\Controllers\EmployeeController@employee_doc_delete')->name('employee_doc_delete');
+    Route::post('/lock_employee_record', 'App\Http\Controllers\EmployeeController@lock_employee_record')->name('lock_employee_record');
     Route::get('/get_employee_data', 'App\Http\Controllers\EmployeeController@get_employee_data')->name('get_employee_data');
     Route::get('/employee_data_view', 'App\Http\Controllers\EmployeeController@employee_data_view')->name('employee_data_view');
     Route::post('/employees_personal_info_edit', 'App\Http\Controllers\EmployeeController@employees_personal_info_edit')->name('employees_personal_info_edit');
@@ -296,6 +326,55 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::post('/employees_emergency_contact_info_edit', 'App\Http\Controllers\EmployeeController@employees_emergency_contact_info_edit')->name('employees_emergency_contact_info_edit');
     Route::post('/employees_company_reference_info_edit', 'App\Http\Controllers\EmployeeController@employees_company_reference_info_edit')->name('employees_company_reference_info_edit');
 
+    // Performance Improvement Plans ROUTES
+    Route::get('/performance_improvement_plan', 'App\Http\Controllers\PIPController@index')->name('performance_improvement_plan');
+    Route::get('/pip_form', 'App\Http\Controllers\PIPController@pip_form')->name('pip_form');
+    Route::post('/pip_save', 'App\Http\Controllers\PIPController@pip_save')->name('pip_save');
+    Route::get('/view_pip', 'App\Http\Controllers\PIPController@view_pip')->name('view_pip');
+    Route::post('/hrm_approve_pip', 'App\Http\Controllers\PIPController@hrm_approve_pip')->name('hrm_approve_pip');
+    Route::post('/staff_ack_pip_with_comments', 'App\Http\Controllers\PIPController@staff_ack_pip_with_comments')->name('staff_ack_pip_with_comments');
+    Route::post('/staff_ack_pip', 'App\Http\Controllers\PIPController@staff_ack_pip')->name('staff_ack_pip');
+    Route::get('/get_om_users_data', 'App\Http\Controllers\PIPController@get_om_users_data')->name('get_om_users_data');
+
+    // Employee Assessment Routes
+    Route::get('/employee_assessment', 'App\Http\Controllers\EmployeeAssessmentController@index')->name('employee_assessment');
+    Route::get('/employee_assessment_form', 'App\Http\Controllers\EmployeeAssessmentController@employee_assessment_form')->name('employee_assessment_form');
+    Route::post('/employee_assessment_save', 'App\Http\Controllers\EmployeeAssessmentController@employee_assessment_save')->name('employee_assessment_save');
+    Route::get('/view_employee_assessment', 'App\Http\Controllers\EmployeeAssessmentController@view_employee_assessment')->name('view_employee_assessment');
+    Route::get('/get_employee_details', 'App\Http\Controllers\EmployeeAssessmentController@get_employee_details')->name('get_employee_details');
+    Route::get('/schedule_self_assessment', 'App\Http\Controllers\EmployeeAssessmentController@schedule_self_assessment')->name('schedule_self_assessment');
+
+    // Notification Tray
+    Route::get('/get_pending_notifications', 'App\Http\Controllers\NotificationsController@get_pending_notifications')->name('get_pending_notifications');
+    Route::get('/read_notification', 'App\Http\Controllers\NotificationsController@read_notification')->name('read_notification');
+    Route::get('/clear_all_notifications', 'App\Http\Controllers\NotificationsController@clear_all_notifications')->name('clear_all_notifications');
+
+    // Notification Types
+    Route::get('/notification_types', 'App\Http\Controllers\NotificationsController@index')->name('notification_types');
+    Route::post('/notification_type_form', 'App\Http\Controllers\NotificationsController@notification_type_form')->name('notification_type_form');
+    Route::post('/notification_type_save', 'App\Http\Controllers\NotificationsController@notification_type_save')->name('notification_type_save');
+    Route::post('/view_notification_type', 'App\Http\Controllers\NotificationsController@view_notification_type')->name('view_notification_type');
+
+    // vendors
+    Route::group(['middleware' => ['check-permission:vendors,view,0,0']], function() {
+        Route::get('/vendors', 'App\Http\Controllers\UserController@vendors_list')->name('vendors');
+    });
+    Route::post('/vendor_form', 'App\Http\Controllers\UserController@vendor_form')->name('vendor_form');
+    Route::post('/vendor_save', 'App\Http\Controllers\UserController@vendor_save')->name('vendor_save');
+    Route::group(['middleware' => ['is-admin']], function() {
+        Route::post('/vendor_delete', 'App\Http\Controllers\UserController@delete')->name('vendor_delete');
+        Route::post('/vendor_change_password' , 'App\Http\Controllers\UserController@change_password')->name('vendor_change_password');
+    });
+    // Leave Bucket
+    Route::group(['middleware' => ['check-permission:leaves_bucket,view,0,0']], function() {
+        Route::get('/leaves_bucket', 'App\Http\Controllers\LeavesBucketController@index')->name('leaves_bucket');
+        Route::get('/leaves_bucket_form', 'App\Http\Controllers\LeavesBucketController@leaves_bucket_form')->name('leaves_bucket_form');
+        Route::post('/leaves_bucket_save', 'App\Http\Controllers\LeavesBucketController@leaves_bucket_save')->name('leaves_bucket_save');
+        Route::get('/view_leaves_bucket', 'App\Http\Controllers\LeavesBucketController@view_leaves_bucket')->name('view_leaves_bucket');
+        Route::post('/get_employee_leaves_bucket', 'App\Http\Controllers\LeaveApplicationController@get_employee_leaves_bucket')->name('get_employee_leaves_bucket');
+    });
+    Route::group(['middleware' => ['check-permission:leaves_taken_report_monthly,view,0,0']], function() {
+        Route::get('/leaves_taken_report_monthly','App\Http\Controllers\ReportController@leaves_taken_report_monthly')->name('leaves_taken_report_monthly');
+    });
+    Route::post('/generate_monthly_leaves_taken_report' , 'App\Http\Controllers\ReportController@generate_monthly_leaves_taken_report')->name('generate_monthly_leaves_taken_report');
 });
-
-

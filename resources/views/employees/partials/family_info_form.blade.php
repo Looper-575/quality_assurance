@@ -13,7 +13,7 @@
                     <div class="col-6">
                         <div class="form-group m-form__group">
                             <label for="dependents">* No of Dependents</label>
-                            <input name="dependents" value="{{$employee_kin ? $employee_kin->dependents : ''}}" required min="0" type="number" class="form-control">
+                            <input name="dependents" value="{{($employee_family && count($employee_family)>0 && $employee_kin) ? $employee_kin->dependents : ''}}" required min="0" type="number" class="form-control">
                         </div>
                     </div>
                 </div>
@@ -68,6 +68,7 @@
                                                     <select name="family_relationship[]" required class="form-control">
                                                         <option {{$family->relationship == 'father' ? 'selected' : ''}} value="father">Father</option>
                                                         <option {{$family->relationship == 'mother' ? 'selected' : ''}} value="mother">Mother</option>
+                                                        <option {{$family->relationship == 'sibling' ? 'selected' : ''}} value="sibling">Sibling</option>
                                                         <option {{$family->relationship == 'spouse' ? 'selected' : ''}} value="spouse">Spouse</option>
                                                         <option {{$family->relationship == 'child' ? 'selected' : ''}} value="child">Child</option>
                                                     </select>
@@ -94,11 +95,13 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <div class="form-group m-form__group">
-                                                    <button type="button" onclick="remove_row(this);"
-                                                            class="btn btn-sm btn_remove_edu btn-close btn-danger">X
-                                                    </button>
-                                                </div>
+                                                @if($loop->index > 0)
+                                                    <div class="form-group m-form__group">
+                                                        <button type="button" onclick="remove_row(this);"
+                                                                class="btn btn-sm btn_remove_edu btn-close btn-danger">X
+                                                        </button>
+                                                    </div>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
@@ -109,6 +112,7 @@
                                                 <select name="family_relationship[]" required class="form-control">
                                                     <option value="father">Father</option>
                                                     <option value="mother">Mother</option>
+                                                    <option value="sibling">Sibling</option>
                                                     <option value="spouse">Spouse</option>
                                                     <option value="child">Child</option>
                                                 </select>
@@ -136,9 +140,9 @@
                                         </td>
                                         <td>
                                             <div class="form-group m-form__group">
-                                                <button type="button" onclick="remove_row(this);"
-                                                        class="btn btn-sm btn_remove_edu btn-close btn-danger">X
-                                                </button>
+{{--                                                <button type="button" onclick="remove_row(this);"--}}
+{{--                                                        class="btn btn-sm btn_remove_edu btn-close btn-danger">X--}}
+{{--                                                </button>--}}
                                             </div>
                                         </td>
                                     </tr>
@@ -219,6 +223,33 @@
                     </div>
                 </div>
             </div>
+            <div class="m-separator m-separator--dashed m-separator--lg"></div>
+            <div class="m-form__section">
+                <div class="m-form__heading">
+                    <h3 class="m-form__heading-title">
+                        CERTIFICATE OF CORRECTNESS
+                    </h3>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group m-form__group">
+                            <label for="correctness_certificate">
+                                Please make sure before submitting this form that you have answered all questions completely
+                                and correctly. If any of the information furnished above is found to be incorrect, he/she will be liable for
+                                dismissal without notice.
+                            </label>
+                        </div>
+                        <div class="m-checkbox-inline">
+                            <label class="m-checkbox m-checkbox--solid m-checkbox--brand">
+                                <input type="checkbox" name="correctness_certificate" value="1" required>
+                                By clicking on this, I do solemnly affirm that the information furnished in this Employment Form is correct
+                                to the best of my knowledge and belief and that I have withheld nothing which would affect my employment in this company.
+                                <span></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <!--begin: Form Actions -->
@@ -258,6 +289,3 @@
     </div>
     <!--end: Form Actions -->
 </form>
-<script>
-
-</script>

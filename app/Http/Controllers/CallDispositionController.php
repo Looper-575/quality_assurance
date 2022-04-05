@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\CallRecording;
 use App\Models\Enquiry;
+use App\Models\QualityAssurance;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -12,6 +13,7 @@ use App\Models\CallDisposition;
 use App\Models\CallDispositionsService;
 use App\Models\CallDispositionsDid;
 use App\Models\CallDispositionsTypes;
+use mysql_xdevapi\Exception;
 use function Couchbase\defaultDecoder;
 
 
@@ -301,13 +303,28 @@ class CallDispositionController extends Controller
 
     public function delete(Request $request)
     {
-        $data = CallDisposition::where('call_id', $request->call_id)->update([
-            'status' => 0,
-            'modified_by' => Auth::user()->user_id,
-        ]);
-        $response['status'] = "Success";
-        $response['result'] = "Deleted Successfully";
-        return response()->json($response);
+        DB::beginTransaction();
+        try {
+
+            $data = CallDisposition::where('call_id', $request->call_id)->update([
+                'status' => 0,
+                'modified_by' => Auth::user()->user_id,
+            ]);
+            $data = QualityAssurance::where('call_id', $request->call_id)->update([
+                'status' => 0,
+                'modified_by' => Auth::user()->user_id,
+            ]);
+            DB::commit();
+            $response['status'] = "Success";
+            $response['result'] = "Deleted Successfully";
+            return response()->json($response);
+        }
+        catch (Exception $e){
+            DB::rollBack();
+            $response['status'] = "Failure";
+            $response['result'] = "Unknown error";
+            return response()->json($response);
+        }
     }
 
     protected function add_services($call_id, $request)

@@ -12,6 +12,28 @@
             </div>
         </div>
         <div class="m-portlet__body">
+            <div class="row">
+                <div class="col-12">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Remaining Annual Leaves</th>
+                            <th>Remaining Casual Leaves</th>
+                            <th>Remaining Sick Leaves</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @if($remaining_leaves)
+                            <tr>
+                                <td>{{$remaining_leaves['annual_leaves']}}</td>
+                                <td>{{$remaining_leaves['casual_leaves']}}</td>
+                                <td>{{$remaining_leaves['sick_leaves']}}</td>
+                            </tr>
+                        @endif
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             <form class="m-form m-form--fit m-form--label-align-right" enctype="multipart/form-data" method="post" id="leave_form" action="{{route('leave_save')}}">
                 @csrf
                 <div class="row">
@@ -21,13 +43,16 @@
                                 <input type="hidden" value="{{$leave->leave_id}}" name="leave_id">
                             @endif
                             <label class="form-check-label" for="leave_type">Leave Type</label>
-                            <select class="form-control" name="leave_type"  id="leave_type" required >
-                                <option value="" selected disabled >Select</option>
-                                @foreach($leave_types as $leave_type)
-                                    <option {{$leave ? ($leave->leave_type_id == $leave_type->leave_type_id ? 'selected' : '' ): ''}}
-                                            value="{{$leave_type->leave_type_id}}">{{$leave_type->title}}</option>
-
-                                @endforeach
+                            <select class="form-control" name="leave_type" id="leave_type" required >
+                                @if($remaining_leaves['total_remaining'] == 0)
+                                    <option value="6">Unpaid</option>
+                                @else
+                                    <option value="" selected disabled >Select</option>
+                                    @foreach($leave_types as $leave_type)
+                                        <option {{$leave ? ($leave->leave_type_id == $leave_type->leave_type_id ? 'selected' : '' ): ''}}
+                                                value="{{$leave_type->leave_type_id}}">{{$leave_type->title}}</option>
+                                    @endforeach
+                                @endif
                             </select>
                         </div>
                         <div class="form-group" id="half_day" style="display: none" >
@@ -39,7 +64,6 @@
                             </select>
                         </div>
                     </div>
-
                 </div>
                 <div class="row">
                     <div class="col-6">
@@ -90,7 +114,6 @@
     <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script>
-
         if($('#leave_type').val() == 3 && $('#no_leaves').val() > 2 ) {
             $("#medical_report").attr("required", true);
         }
@@ -168,8 +191,6 @@
 
         });
         $('#leave_type').change(function (){
-
-
             if($(this).val() == 3 && $('#no_leaves').val() > 2 ) {
                 $("#medical_report").attr("required", true);
                 $('#half_day').fadeOut();
@@ -243,7 +264,7 @@
             iWeekday2 = (iWeekday2 > 5) ? 5 : iWeekday2;
             // calculate differnece in weeks (1000mS * 60sec * 60min * 24hrs * 7 days = 604800000)
             iWeeks = Math.floor((dDate2.getTime() - dDate1.getTime()) / 604800000)
-            if (iWeekday1 <= iWeekday2) { //Equal to makes it reduce 5 days
+            if (iWeekday1 < iWeekday2) { //Equal to makes it reduce 5 days
                 iDateDiff = (iWeeks * 5) + (iWeekday2 - iWeekday1)
             } else {
                 iDateDiff = ((iWeeks + 1) * 5) - (iWeekday1 - iWeekday2)

@@ -7,8 +7,8 @@
         }
     }
     //Personal Info JS COde
-    function get_user_data(e){
-        $.get("{{route('get_employee_data')}}", { user_id: e.value} )
+    function get_user_data(user_id){
+        $.get("{{route('get_employee_data')}}", { user_id: user_id} )
             .done(function( data ) {
                 $('#full_name_id').val(data.full_name);
                 $('#email_id').val(data.email);
@@ -90,7 +90,6 @@
         let arr = [a];
         call_ajax_with_functions('', '{{route('employee_education_save')}}', form_data, arr);
     }
-
     //Emergency Contact JS COde
     function add_emergency_contact_row(me) {
        let emergency_contact_tr = (function () {/*  <tr>
@@ -151,7 +150,6 @@
         let arr = [a];
         call_ajax_with_functions('', '{{route('employee_emergency_contact_save')}}', form_data, arr);
     }
-
     //Experiance JS Code
     function add_exp_row(me) {
         let exp_tr = (function () {/*<tr>
@@ -217,7 +215,6 @@
         let arr = [a];
         call_ajax_with_functions('', '{{route('employee_experience_save')}}', form_data, arr);
     }
-
     //Family Info PArtial JS COde
     function add_family_row(me) {
         let family_tr = (function () {/*<tr>
@@ -226,6 +223,7 @@
                                                 <select name="family_relationship[]" required class="form-control">
                                                     <option value="father">Father</option>
                                                     <option value="mother">Mother</option>
+                                                    <option value="sibling">Sibling</option>
                                                     <option value="spouse">Spouse</option>
                                                     <option value="child">Child</option>
                                                 </select>
@@ -283,7 +281,6 @@
         let arr = [a];
         call_ajax_with_functions('', '{{route('employee_family_save')}}', form_data, arr);
     }
-
     //Reference Info JS COde
     function add_reference_info_row(me) {
         let reference_info_tr = (function () {/*<tr>
@@ -366,23 +363,79 @@
             reload_data_view();
             let step_number = 6;
             change_progress_bar_width(step_number,'add');
-            window.location.href = "{{route('employees')}}";
+            $('#m_wizard_form_step_6').removeClass("m-wizard__form-step--current");
+            $('#m_wizard_form_step_7').addClass("m-wizard__form-step--current");
+            $('#step_6').removeClass("m-wizard__step--current");
+            $('#step_1').addClass("m-wizard__step--done");
+            $('#step_2').addClass("m-wizard__step--done");
+            $('#step_3').addClass("m-wizard__step--done");
+            $('#step_4').addClass("m-wizard__step--done");
+            $('#step_5').addClass("m-wizard__step--done");
+            $('#step_6').addClass("m-wizard__step--done");
+            $('#step_7').addClass("m-wizard__step--current");
         }
         let form_data = new FormData($('#reference_info_form')[0]);
         form_data.append('employee_id', $('#employee_id').val());
         let arr = [a];
         call_ajax_with_functions('', '{{route('employee_company_reference_save')}}', form_data, arr);
     }
-
+    // Upload Docs js Code
+    function add_doc_row(me){
+        let doc_tr = (function () {/*<tr>
+                                        <td>
+                                            <div class="form-group m-form__group">
+                                                <input name="doc_title[]"
+                                                       value="" required
+                                                       type="text" class="form-control">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group m-form__group">
+                                                <input name="doc_file[]" required type="file" class="form-control">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group m-form__group">
+                                                <button type="button" onclick="remove_row(this);"
+                                                        class="btn btn-sm btn_remove_edu btn-close btn-danger">X
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>*/}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1];
+        let tr = $(doc_tr);
+        $(me).closest('table').find('tbody').append(tr);
+        $(me).closest('table').find('tbody').find('tr').fadeIn('slow');
+    }
+    function save_employee_docs(){
+        let a = function () {
+            reload_data_view();
+            let step_number = 7;
+            change_progress_bar_width(step_number,'add');
+            window.location.href = "{{route('employees')}}";
+        }
+        let form_data = new FormData($('#upload_docs_form')[0]);
+        form_data.append('employee_id', $('#employee_id').val());
+        let arr = [a];
+        call_ajax_with_functions('', '{{route('employee_docs_save')}}', form_data, arr);
+    }
+    function remove_file(me){
+        let a = function () {
+            $(me).closest('tr').fadeOut('slow', function () {
+                $(this).remove();
+            });
+            reload_data_view();
+        }
+        let doc_id = me.id;
+        let data = new FormData();
+        data.append('doc_id', doc_id);
+        data.append('_token', "{{csrf_token()}}");
+        let arr = [a];
+        call_ajax_with_functions('', '{{route('employee_doc_delete')}}', data, arr);
+    }
     // remove button for all added tr's
     function remove_row(me) {
         $(me).closest('tr').fadeOut('slow', function (){
             this.remove();
         })
-    }
-
-    function setImage(){
-        let src = $('#image').val();
-        $('#profile_image').attr("src", src);
     }
 </script>

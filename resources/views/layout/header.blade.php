@@ -76,6 +76,14 @@
                                                         {{$user->email}}
                                                     </a>
                                                 </div>
+                                                @php $employee_id = get_employee_id(Auth::user()->user_id) @endphp
+                                                @if($employee_id != 0)
+                                                <div class="m-card-user__edit position-absolute">
+                                                    <a href="{{route('employee_data_view',['employee_id' => $employee_id])}}" id="{{$employee_id}}" class="btn btn-info">
+                                                        <i class="la la-edit"></i>
+                                                    </a>
+                                                </div>
+                                                @endif
                                             </div>
                                         </div>
                                         <div class="m-dropdown__body">
@@ -118,3 +126,52 @@
     </div>
 </header>
 <!-- END: Header -->
+<script>
+    function change_pass(me) {
+        $('#change_pass_form_modal').fadeIn();
+        $('#c_user_id').val(me.value);
+    }
+</script>
+<div id="change_pass_form_modal" style="z-index:9999999; height: 100% !important; min-height: 100%; width: 100%; position: fixed; top: 0; background-color: rgba(0, 0, 0, 0.7);display:none;">
+    <div style="z-index:99999999;display: block; padding-right: 17px; top: 100px" class="modal fade show" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog change_pass_modal" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="modal_title">Change Password</h4>
+                    <button type="button" class="btn" onclick="$('#change_pass_form_modal').fadeOut();" aria-hidden="true"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div id="error" class="d-none alert alert-warning text-white" role="alert"></div>
+                    <form id="change_pass" method="POST">
+                        @csrf
+                        <input type="hidden" name="user_id" id="c_user_id" value="{{Auth::user()->user_id}}">
+                        <div class="row">
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label>New Password</label>
+                                            <input id="password" name="password" class="form-control" type="password" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label>Confirm <span class="d-none d-xl-inline">Password</span></label>
+                                            <input id="password_confirmation" name="password_confirmation" class="form-control" type="password" required>
+                                        </div>
+                                    </div>
+                                </div>
+                        <div class="row">
+                            <div class="col-12 mb-3"><b>Please Enter Your Password below to confirm and save changes</b></div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Current Password</label>
+                                    <input id="curr_password" name="curr_password"  class="form-control" type="password" required>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Update Password</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

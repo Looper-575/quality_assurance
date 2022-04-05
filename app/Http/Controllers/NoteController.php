@@ -19,6 +19,7 @@ class NoteController extends Controller
     }
     public function save_note_form(Request $request)
     {
+        Note::where(['status' => 3, 'added_by' => Auth::user()->user_id])->delete();
         $validator = Validator::make($request->all(),[
             'title'=> 'required',
             'description'=> 'required',
@@ -44,9 +45,29 @@ class NoteController extends Controller
         }
         return response()->json($response);
     }
+    public function save_note_draft(Request $request){
+        Note::where(['status' => 3, 'added_by' => Auth::user()->user_id])->delete();
+        Note::create([
+            'title' => $request->title,
+            'description' => $request->discription,
+            'type' => $request->type,
+            'status' => 3,
+            'added_by' => Auth::user()->user_id,
+        ]);
+//            $response['draft_notes'] = Note::where('type', 'note')
+//                ->where('added_by', Auth::user()->user_id)
+//                ->where('status', 3)->first();
+//            return response()->json($response);
+    }
     public function get_note_data(){
-        $data['notes'] = Note::where('type', 'note')->where('added_by', Auth::user()->user_id)->where('status', 1)->orderBy('note_id', 'desc')->get();
+        $data['notes'] = Note::where('type', 'note')->where('added_by', Auth::user()->user_id)
+            ->where('status', 1)->orderBy('note_id', 'desc')->get();
         return view('notes.note_data' , $data);
+    }
+    public function get_draft_note_data(){
+        $data['draft_notes'] = Note::where('type', 'note')->where('added_by', Auth::user()->user_id)
+            ->where('status', 3)->orderBy('note_id', 'desc')->first();
+        return response()->json($data);
     }
     public function delete_note_form(Request $request)
     {

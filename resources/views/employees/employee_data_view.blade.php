@@ -100,22 +100,24 @@
          {{-- personel info --}}
          <div class="row m-0 mb-5 box_shadow">
              <div class="col-12 personal_edit_btn_div">
-                 <button id="personal_info" onclick="edit_personal_info(this)" value="{{$employee->employee_id}}"  class="btn btn_edit"><i class="fa fa-edit"></i></button>
+                 @if($employee->locked == 0)
+                     <button id="personal_info" onclick="edit_personal_info(this)" value="{{$employee->employee_id}}"  class="btn btn_edit"><i class="fa fa-edit"></i></button>
+                 @endif
              </div>
-             @if($employee && $employee->image != '')
+             @if($employee && $employee->employee->image != '')
                  @php
-                     $image_src =  asset('employee_images/'.$employee->image);
+                     $image_src = asset('user_images/'.$employee->employee->image);
                  @endphp
              @else
                  @php
-                     $image_src = asset('assets/img/users/user_avatar.jpg');
+                     $image_src = asset('user_images/user.png');
                  @endphp
              @endif
              <div class="col-12 col-sm-6 col-md-3 col-lg-3 py-3 text-center" >
                  <div class="rounded-circle profile_user_img_div mb-2" >
                      <img src="{{$image_src}}" alt="" class="rounded-circle profile_user_img">
-                     <span class="rounded-circle icon-upload">
-                    <button class="btn p-2 pt-1 pb-1" style="color: white"><i class="fa fa-upload" ></i></button>
+{{--                     <span class="rounded-circle icon-upload">--}}
+{{--                    <button class="btn p-2 pt-1 pb-1" style="color: white"><i class="fa fa-upload" ></i></button>--}}
                 </span>
                  </div>
                  <div class="name_and_designation">
@@ -183,7 +185,9 @@
             <div class="row m-0 mb-5 box_shadow">
             <div class="col-12 d-flex justify-content-between align-items-center">
                 <h4 class="" style="padding-left: 37px;"><b>Education Data</b></h4>
-                <button id="education_info" onclick="edit_education_info(this)" value="{{$employee->employee_id}}" value="{{$employee->employee_id}}" class="btn btn_edit"><i class="fa fa-edit"></i></button>
+                @if($employee->locked == 0)
+                    <button id="education_info" onclick="edit_education_info(this)" value="{{$employee->employee_id}}" value="{{$employee->employee_id}}" class="btn btn_edit"><i class="fa fa-edit"></i></button>
+                @endif
             </div>
             <div class="col-12 px-5">
                 <table class="" style="width:100%;">
@@ -215,7 +219,9 @@
             <div class="row m-0 mb-5 box_shadow">
             <div class="col-12 d-flex justify-content-between align-items-center">
                 <h4 class="" style="padding-left: 37px;"><b>Experience Details</b></h4>
-                <button id="experience_info" onclick="edit_experience_info(this)" value="{{$employee->employee_id}}" class="btn btn_edit"><i class="fa fa-edit"></i></button>
+                @if($employee->locked == 0)
+                    <button id="experience_info" onclick="edit_experience_info(this)" value="{{$employee->employee_id}}" class="btn btn_edit"><i class="fa fa-edit"></i></button>
+                @endif
             </div>
             <div class="col-12 px-5">
                 <table class="w-100">
@@ -261,12 +267,14 @@
             <div class="row m-0 mb-5 box_shadow">
             <div class="col-12 d-flex justify-content-between align-items-center">
                 <h4 class="" style="padding-left: 37px;"><b>Family Details</b></h4>
-                <button id="family_info" onclick="edit_family_info(this)" value="{{$employee->employee_id}}" class="btn btn_edit"><i class="fa fa-edit"></i></button>
+                @if($employee->locked == 0)
+                    <button id="family_info" onclick="edit_family_info(this)" value="{{$employee->employee_id}}" class="btn btn_edit"><i class="fa fa-edit"></i></button>
+                @endif
             </div>
             <div class="col-12 px-5">
                 <div>
                     <span class="p-12 c-gray">Number of Dependents:</span>
-                    <span class="p-12">{{$employee->employee_kin->dependents}}</span>
+                    <span class="p-12">{{$employee->employee_kin ? $employee->employee_kin->dependents : ''}}</span>
                 </div>
                 <table class="" style="width:100%;">
                     <tr>
@@ -276,22 +284,22 @@
                         <th class="p-12 c-gray" scope="col">Education</th>
                         <th class="p-12 c-gray" scope="col">Occupation</th>
                     </tr>
-                    @foreach($employee->employee_family as $employee_family)
-                    <tr>
-                        <td class="px-4 p-12">{{$employee_family->relationship}}</td>
-                        <td class="p-12">{{$employee_family->name}}</td>
-                        <td class="p-12">{{$employee_family->age}}</td>
-                        <td class="p-12">{{$employee_family->education}}</td>
-                        <td class="p-12">{{$employee_family->occupation}}</td>
-                    </tr>
-                    @endforeach
+                    @if(isset($employee->employee_family) && count($employee->employee_family) > 0 )
+                        @foreach($employee->employee_family as $employee_family)
+                        <tr>
+                            <td class="px-4 p-12">{{$employee_family->relationship}}</td>
+                            <td class="p-12">{{$employee_family->name}}</td>
+                            <td class="p-12">{{$employee_family->age}}</td>
+                            <td class="p-12">{{$employee_family->education}}</td>
+                            <td class="p-12">{{$employee_family->occupation}}</td>
+                        </tr>
+                        @endforeach
+                    @endif
                 </table>
             </div>
-
             {{-- next of kin info --}}
             <div class="col-12 d-flex justify-content-between mt-5" style="align-items: center;">
                 <h5 class="" style="padding-left: 37px;"><b>Next of Kin Details</b></h5>
-{{--                <button id="family_info" onclick="edit_family_info(this)" value="{{$employee->employee_id}}" class="btn btn_edit"><i class="fa fa-edit"></i></button>--}}
             </div>
             <br>
             <div class="col-12 px-5">
@@ -304,22 +312,22 @@
                         <th class="p-12 c-gray" scope="col">Address</th>
                     </tr>
                     <tr>
-                        <td class="px-4 p-12">{{$employee->employee_kin->kin_name}}</td>
-                        <td class="p-12">{{$employee->employee_kin->kin_relation}}</td>
-                        <td class="p-12">{{$employee->employee_kin->kin_cnic}}</td>
-                        <td class="p-12">{{$employee->employee_kin->kin_contact_number}}</td>
-                        <td class="p-12">{{$employee->employee_kin->kin_address}}</td>
+                        <td class="px-4 p-12">{{$employee->employee_kin ? $employee->employee_kin->kin_name  : ''}}</td>
+                        <td class="p-12">{{$employee->employee_kin ? $employee->employee_kin->kin_relation  : ''}}</td>
+                        <td class="p-12">{{$employee->employee_kin ?$employee->employee_kin->kin_cnic  : ''}}</td>
+                        <td class="p-12">{{$employee->employee_kin ? $employee->employee_kin->kin_contact_number  : ''}}</td>
+                        <td class="p-12">{{$employee->employee_kin ? $employee->employee_kin->kin_address  : ''}}</td>
                     </tr>
                 </table>
                 <br>
                 <div>
                 <span class="p-12 c-gray">Do you or any of your family member suffer or have suffered
                         from any serious contagious illness or disability?</span><br>
-                    <span class="p-12 bg-style px-4">{{$employee->employee_kin->any_illness_record}}</span>
+                    <span class="p-12 bg-style px-4">{{$employee->employee_kin ? $employee->employee_kin->any_illness_record : ''}}</span>
                 </div>
                 <div>
                     <span class="p-12 c-gray">If YES, please give particulars</span><br>
-                    <span class="p-12 bg-style px-4">{{$employee->employee_kin->illness_details}}</span>
+                    <span class="p-12 bg-style px-4">{{$employee->employee_kin ? $employee->employee_kin->illness_details : ''}}</span>
                 </div>
             </div>
         </div>
@@ -329,7 +337,9 @@
         <div class="row m-0 mb-5 box_shadow">
             <div class="col-12 d-flex justify-content-between align-items-center">
                 <h4 class="" style="padding-left: 37px;"><b>Emergency Details</b></h4>
-                <button id="emergency_contact_info" onclick="edit_emergency_contact_info(this)" value="{{$employee->employee_id}}" class="btn btn_edit"><i class="fa fa-edit"></i></button>
+                @if($employee->locked == 0)
+                    <button id="emergency_contact_info" onclick="edit_emergency_contact_info(this)" value="{{$employee->employee_id}}" class="btn btn_edit"><i class="fa fa-edit"></i></button>
+                @endif
             </div>
             <div class="col-12 px-5">
                 <table class="w-100">
@@ -358,7 +368,9 @@
              <div class="row m-0 mb-5 box_shadow">
                  <div class="col-12 d-flex justify-content-between align-items-center">
                      <h4 class="" style="padding-left: 37px;"><b>Reference Details</b></h4>
-                     <button id="company_reference_info" onclick="edit_company_reference_info(this)" value="{{$employee->employee_id}}" class="btn btn_edit"><i class="fa fa-edit"></i></button>
+                     @if($employee->locked == 0)
+                         <button id="company_reference_info" onclick="edit_company_reference_info(this)" value="{{$employee->employee_id}}" class="btn btn_edit"><i class="fa fa-edit"></i></button>
+                     @endif
                  </div>
                  <div class="col-12 px-5">
                      <table class="" style="width:100%;">
@@ -388,9 +400,9 @@
         <div class="row m-0 mb-5 box_shadow">
             <div class="col-12 d-flex justify-content-between" style="align-items: center;">
                 <h4 class="" style="padding-left: 37px;"><b>Hobbies and Interests</b></h4>
-                <button id="personal_info" onclick="edit_personal_info(this)" value="{{$employee->employee_id}}" class="btn btn_edit"><i class="fa fa-edit"></i></button>
-
-                {{--                <button class="btn"><i class="fa fa-edit" style="font-size: 24px; color: red;"></i></button>--}}
+                @if($employee->locked == 0)
+                    <button id="personal_info" onclick="edit_personal_info(this)" value="{{$employee->employee_id}}" class="btn btn_edit"><i class="fa fa-edit"></i></button>
+                @endif
             </div>
             <div class="col-12 px-5 d-flex">
                 <table class="training_and_hobbies_table" style="width:25%;margin-right: 50px;">
@@ -424,6 +436,31 @@
 {{--                </table>--}}
             </div>
         </div>
+         {{--  Uploaded Documents --}}
+         @if($employee->employee_docs)
+         <div class="row m-0 mb-5 box_shadow">
+             <div class="col-12 d-flex justify-content-between" style="align-items: center;">
+                 <h4 class="" style="padding-left: 37px;"><b>Uploaded Documents</b></h4>
+                 <button id="upload_docs" onclick="edit_employee_docs(this)" value="{{$employee->employee_id}}" class="btn btn_edit"><i class="fa fa-edit"></i></button>
+             </div>
+             <div class="col-12 px-5">
+                 <table class="training_and_hobbies_table" style="width:25%;margin-right: 50px;">
+                     <tr>
+                         <th class="p-6 c-gray" scope="col">Doc Title</th>
+                         <th class="p-6 c-gray" scope="col">Doc File</th>
+                     </tr>
+                     @foreach($employee->employee_docs as $employee_docs)
+                             <tr>
+                                 <td class="px-4 p-6">{{$employee_docs->doc_title}}</td>
+                                 <td class="px-4 p-6"><a href="{{asset('employee_documents/'.$employee_docs->doc_file)}}" target="_blank">
+                                                        <span><i class="fa fa-file-pdf" style='color: red'></i><span></a>
+                                 </td>
+                             </tr>
+                         @endforeach
+                 </table>
+             </div>
+         </div>
+         @endif
     </div>
 @include('employees.partials.employee_js')
 @endsection
@@ -470,6 +507,13 @@
         data.append('employee_id', employee_id);
         data.append('_token', "{{csrf_token()}}");
         call_ajax_modal('POST','{{route('employees_company_reference_info_edit')}}', data, 'Employee Company Reference Info Edit');
+    }
+    function edit_employee_docs(me){
+        let employee_id = me.value;
+        let data = new FormData();
+        data.append('employee_id', employee_id);
+        data.append('_token', "{{csrf_token()}}");
+        call_ajax_modal('POST','{{route('employees_docs_edit')}}', data, 'Employee Uploaded Docs Edit');
     }
 </script>
 @endsection

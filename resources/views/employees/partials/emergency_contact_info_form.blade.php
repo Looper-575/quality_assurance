@@ -80,11 +80,13 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <div class="form-group m-form__group">
-                                                    <button type="button" onclick="remove_row(this);"
-                                                            class="btn btn-sm btn_remove_edu btn-close btn-danger">X
-                                                    </button>
-                                                </div>
+                                                @if($loop->index > 0)
+                                                    <div class="form-group m-form__group">
+                                                        <button type="button" onclick="remove_row(this);"
+                                                                class="btn btn-sm btn_remove_edu btn-close btn-danger">X
+                                                        </button>
+                                                    </div>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
@@ -117,15 +119,42 @@
                                         </td>
                                         <td>
                                             <div class="form-group m-form__group">
-                                                <button type="button" onclick="remove_row(this);"
-                                                        class="btn btn-sm btn_remove_edu btn-close btn-danger">X
-                                                </button>
+{{--                                                <button type="button" onclick="remove_row(this);"--}}
+{{--                                                        class="btn btn-sm btn_remove_edu btn-close btn-danger">X--}}
+{{--                                                </button>--}}
                                             </div>
                                         </td>
                                     </tr>
                                 @endif
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="m-separator m-separator--dashed m-separator--lg"></div>
+            <div class="m-form__section">
+                <div class="m-form__heading">
+                    <h3 class="m-form__heading-title">
+                        CERTIFICATE OF CORRECTNESS
+                    </h3>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group m-form__group">
+                            <label for="correctness_certificate">
+                                Please make sure before submitting this form that you have answered all questions completely
+                                and correctly. If any of the information furnished above is found to be incorrect, he/she will be liable for
+                                dismissal without notice.
+                            </label>
+                        </div>
+                        <div class="m-checkbox-inline">
+                            <label class="m-checkbox m-checkbox--solid m-checkbox--brand">
+                                <input type="checkbox" name="correctness_certificate" value="1" required>
+                                By clicking on this, I do solemnly affirm that the information furnished in this Employment Form is correct
+                                to the best of my knowledge and belief and that I have withheld nothing which would affect my employment in this company.
+                                <span></span>
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -169,6 +198,3 @@
     </div>
     <!--end: Form Actions -->
 </form>
-<script>
-
-</script>

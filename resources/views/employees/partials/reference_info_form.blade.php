@@ -105,11 +105,13 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <div class="form-group m-form__group">
-                                                    <button type="button" onclick="remove_row(this);"
-                                                            class="btn btn-sm btn_remove_edu btn-close btn-danger">X
-                                                    </button>
-                                                </div>
+                                                @if($loop->index > 0)
+                                                    <div class="form-group m-form__group">
+                                                        <button type="button" onclick="remove_row(this);"
+                                                                class="btn btn-sm btn_remove_edu btn-close btn-danger">X
+                                                        </button>
+                                                    </div>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
@@ -158,9 +160,9 @@
                                         </td>
                                         <td>
                                             <div class="form-group m-form__group">
-                                                <button type="button" onclick="remove_row(this);"
-                                                        class="btn btn-sm btn_remove_edu btn-close btn-danger">X
-                                                </button>
+{{--                                                <button type="button" onclick="remove_row(this);"--}}
+{{--                                                        class="btn btn-sm btn_remove_edu btn-close btn-danger">X--}}
+{{--                                                </button>--}}
                                             </div>
                                         </td>
                                     </tr>
@@ -224,8 +226,11 @@
                     </div>
                     <div class="col-lg-6 m--align-right">
                         <button type="submit" class="btn btn-warning m-btn m-btn--custom m-btn--icon">
-                           <span><span>Save & Finish</span><i class="la la-arrow-right"></i></span>
+                           <span><span>Save & Continue</span><i class="la la-arrow-right"></i></span>
                         </button>
+                        <a id="6" href="#" class="btn_skip btn btn-info m-btn m-btn--custom m-btn--icon">
+                            <span><i class="la la-arrow-right"></i><span>Skip</span></span>
+                        </a>
                     </div>
                     <div class="col-lg-2"></div>
                 </div>
@@ -234,7 +239,3 @@
     </div>
     <!--end: Form Actions -->
 </form>
-<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"></script>
-<script>
-
-</script>

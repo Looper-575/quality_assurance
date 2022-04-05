@@ -1,30 +1,20 @@
 @extends('layout.template')
 @section('header_scripts')
     <link href="{{asset('assets/css/datatables.min.css')}}" rel="stylesheet" type="text/css" />
-    <style>
-        .select2-container{
-            z-index: 99999999 !important;
-        }
-    </style>
 @endsection
 @section('content')
-    <?php
-    $has_permissions = get_route_permissions( Auth::user()->role->role_id, @request()->route()->getName());
-    ?>
     <div class="m-portlet m-portlet--mobile">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
                 <div class="m-portlet__head-title float-left">
                     <h3 class="m-portlet__head-text">Users List</h3>
                 </div>
-                @if($has_permissions->add == 1)
                 <div class="float-right mt-3">
                     <a href="javascript:show_form();" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill">
                         <span><i class="la la-phone-square"></i><span>Add New</span></span>
                     </a>
                     <div class="m-separator m-separator--dashed d-xl-none"></div>
                 </div>
-                @endif
             </div>
         </div>
         <div class="m-portlet__body">
@@ -57,11 +47,9 @@
                         <td>{{ isset($user_list->manager->full_name) ? $user_list->manager->full_name : '' }}</td>
                         <td>
                             <div class="btn-group btn-group-sm">
-                                @if($has_permissions->update == 1)
                                 <button title="Edit" class="btn btn-primary edit_user" id="{{$user_list->user_id}}"><i class="fa fa-edit"></i></button>
                                 <button title="Delete" class="btn btn-danger" onclick="delete_user(this);" value="{{$user_list->user_id}}"><i class="fa fa-trash"></i></button>
                                 <button title="Change Password" class="btn btn-info" onclick="change_password(this);" value="{{$user_list->user_id}}"><i class="fa fa-key"></i></button>
-                                @endif
                             </div>
                         </td>
                     </tr>
@@ -70,6 +58,10 @@
             </table>
         </div>
     </div>
+
+
+
+
 @endsection
 @section('footer_scripts')
     <div id="change_pass_modal" style="z-index:9999999; height: 100% !important; min-height: 100%; width: 100%; position: fixed; top: 0; background-color: rgba(0, 0, 0, 0.7);display:none;">
@@ -106,14 +98,7 @@
         function show_form(){
             let data = new FormData();
             data.append('_token', '{{csrf_token()}}');
-            let a = function (){
-                $(".ajax_modal").removeClass('modal-sm').addClass('modal-lg');
-            }
-            let b = function (){
-                $(".select2").select2();
-            }
-            let arr = [a,b];
-            call_ajax_modal_with_functions('{{route('user_form')}}', data, 'Add New User', arr);
+            call_ajax_modal('post', '{{route('user_form')}}', data, 'Add New User');
         }
         function save_user() {
             if($('#pass').val() !== $('#c_pass').val()){
@@ -131,18 +116,12 @@
             let arr = [a,b];
             call_ajax_with_functions('', '{{route('user_save')}}', data, arr);
         }
+
         $('.edit_user').click(function () {
             let data = new FormData();
             data.append('user_id', this.id);
             data.append('_token', '{{csrf_token()}}');
-            let a = function (){
-                $(".ajax_modal").removeClass('modal-sm').addClass('modal-lg');
-            }
-            let b = function (){
-                $(".select2").select2();
-            }
-            let arr = [a,b];
-            call_ajax_modal_with_functions('{{route('user_form')}}', data, 'Add New User', arr);
+            call_ajax_modal('post', '{{route('user_form')}}', data, 'Edit User');
         });
         function delete_user (me) {
             let id = me.value;
