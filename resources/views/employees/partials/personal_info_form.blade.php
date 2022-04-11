@@ -1,7 +1,7 @@
 <div id="employee_id_response"></div>
 <form action="javascript:save_employee()" enctype="multipart/form-data" class="m-form m-form--label-align-left- m-form--state-" id="employee_info_form">
-    @csrf
-    <!--begin: Form Wizard Step 1 Body -->
+@csrf
+<!--begin: Form Wizard Step 1 Body -->
     <div class="row">
         <div class="col-xl-12">
             <div class="m-form__section m-form__section--first">
@@ -41,8 +41,8 @@
                                 <div class="form-group m-form__group">
                                     <label for="user_id">* Users</label>
                                     <?php
-                                        $user_ddl_perm = ( (Auth::user()->role->role_id != '5' && Auth::user()->role->role_id != '1')  || (Auth::user()->role->role_id == '5' or Auth::user()->role->role_id == '1') && $employee );
-                                        $full_name = '';
+                                    $user_ddl_perm = ( (Auth::user()->role->role_id != '5' && Auth::user()->role->role_id != '1')  || (Auth::user()->role->role_id == '5' or Auth::user()->role->role_id == '1') && $employee );
+                                    $full_name = '';
                                     ?>
                                     <select class="form-control" name="user_id" id="user_id" onchange="get_user_data($(this).val())" required {{ $user_ddl_perm  ? 'disabled' : ''}} >
                                         <option value="">Select</option>
@@ -154,10 +154,10 @@
                             <div class="form-group m-form__group">
                                 <label  for="employment_status"> Employment Status</label>
                                 <?php
-                                    $confirmed = false;
-                                    if($employee and $employee->employment_status == 'Confirmed'){
-                                        $confirmed = true;
-                                    }
+                                $confirmed = false;
+                                if($employee and $employee->employment_status == 'Confirmed'){
+                                    $confirmed = true;
+                                }
                                 ?>
                                 <div class="m-radio-inline">
                                     <label class="m-radio m-radio--solid m-radio--brand">
@@ -201,7 +201,7 @@
                     @endif
                     <div class="col-3">
                         <div class="form-group m-form__group">
-                            <label for="email">* Email</label>
+                            <label for="email">* Personal Email</label>
                             <input name="email" value="{{$employee ? $employee->email : ''}}" required type="email" id="email_id" class="form-control">
                         </div>
                     </div>
@@ -235,7 +235,7 @@
                     <div class="col-3">
                         <div class="form-group m-form__group">
                             <label for="father_cnic">* Father CNIC</label>
-                            <input name="father_cnic" value="{{$employee ? $employee->father_cnic : ''}}" id="father_cnic" required type="text" pattern="[0-9]{5}[0-9]{7}[0-9]{1}" class="form-control">
+                            <input name="father_cnic" value="{{$employee ? $employee->father_cnic : ''}}" id="father_cnic" type="text" pattern="[0-9]{5}[0-9]{7}[0-9]{1}" class="form-control">
                         </div>
                     </div>
                 </div>

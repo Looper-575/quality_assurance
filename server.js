@@ -4,29 +4,37 @@
 // TODO : create new port for http traffic of node and proxy from apache or rum directly from that port
 
 const express = require('express');
+const fs = require('fs');
 const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server, {
-    cors: { origin: "*"}
+    cors: { origin: "*"},
+    maxHttpBufferSize: 1e8,
+    pingTimeout: 60000
 });
 
 //init Database
-let mysql = require('mysql');
+let mysql = require('mysql2');
 let conn = mysql.createConnection({
     host     : 'localhost',
-    user     : 'admin',
+    user     : 'danish',
     password : '123',
     database : 'crm'
 });
 
-..a
 let users = [];
 let connections = [];
 
 io.on('connection', (socket) => {
     connections.push(socket.id);
     console.log('user connected');
-
+    console.log(socket.handshake.query);
+    let user_id = parseInt(socket.handshake.query.user_id);
+    users[user_id] = socket.id ;
+    io.sockets.emit('online_users', {
+        'users': users
+    });
+    console.log(users);
     socket.on('disconnect', function (data) {
         connections.splice(connections.indexOf(socket), 1);
         console.log("Sockets still Connected: %s", connections.length);
@@ -37,18 +45,82 @@ io.on('connection', (socket) => {
         });
     });
 
-    socket.on('user_online', function (data) {
-        let user_id = parseInt(data);
-        users[user_id] = socket.id ;
-        io.sockets.emit('online_users', {
-            'users': users
-        });
-        console.log(users);
+    // socket.on('user_online', function (data) {
+    //     let user_id = parseInt(data);
+    //     users[user_id] = socket.id ;
+    //     io.sockets.emit('online_users', {
+    //         'users': users
+    //     });
+    //     console.log(users);
+    // });
+
+    socket.on('get_one_to_one_chats', function (data) {
+        console.log(data);
+        conn.execute(
+            'UPDATE `chats` SET `msg_read`= 1 WHERE (chats.to_user = ? AND chats.from_user = ?)',
+            [data.from_user,data.to_user],
+            function(err,results) {
+                if(results.affectedRows >= 0){
+                    conn.execute(
+                        'SELECT * FROM `chats` WHERE (`to_user`=? AND `from_user`=?) OR (`to_user`= ? AND `from_user`=?) LIMIT 20',
+                        [data.to_user, data.from_user,data.from_user, data.to_user],
+                        function(err, results, fields) {
+                            console.log(results);
+                            console.log(fields);
+                            console.log(err);
+                            socket.emit('chat_history',{ chat: results });
+                        }
+                    );
+                }
+            }
+        );
     });
+
+
+    socket.on('send_one_to_one_msg', (data) => {
+        console.log(data);
+
+
+
+
+
+        // conn.execute(
+        //     'INSERT INTO `chats` ( `to_user`, `from_user`, `msg`, `attachment`, `added_by`) VALUES (?,?,?,?,?)',
+        //     [data.to_user, data.from_user,data.msg,null,data.from_user],
+        //     function(err, results) {
+        //         if(results.affectedRows > 0){
+        //             conn.execute(
+        //                 'SELECT * FROM `chats` WHERE (`chat_id`=?)',
+        //                 [results.insertId],
+        //                 function(err, results) {
+                            io.sockets.emit('recieve_one_to_one_msg', data );
+        //                 }
+        //             );
+        //         }
+        //
+        //     }
+        // );
+    });
+
 
     // setInterval(function (){
     //     socket.emit('test', 'test');
-    // }, 100)
+    // }, 100);
+
+    //Returning Agent Call Queue
+    socket.on('get_call_queue', function (data) {
+        // console.log(data);
+        conn.execute(
+            "select call_recordings.*,call_dispostions_did_numbers.*,call_dispositions_did.title FROM `call_recordings` LEFT OUTER JOIN call_dispostions_did_numbers ON call_dispostions_did_numbers.number_id = call_recordings.to_number LEFT OUTER JOIN call_dispositions_did ON call_dispostions_did_numbers.did_id = call_dispositions_did.did_id where `disposed` is null AND agent_id = ? ORDER BY `call_recordings`.`added_on`  DESC limit 500",
+            [data.user],
+            function(err, results, fields) {
+                // console.log(results);
+                // console.log(fields);
+                // console.log(err);
+                socket.emit('get_call_list',{ call_queue: results });
+            }
+        );
+    });
 });
 
 server.listen(3000, () => {

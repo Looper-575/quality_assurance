@@ -104,7 +104,7 @@ class EmployeeController extends Controller
             'date_of_birth' => 'required',
             'nationality' => 'required',
             'cnic' => 'required',
-            'father_cnic' => 'required',
+//            'father_cnic' => 'required',
             'religion' => 'required',
             'blood_group' => 'required',
             'native_lang' => 'required',
@@ -147,12 +147,6 @@ class EmployeeController extends Controller
                 'conveyance_allowance' => $request->conveyance_allowance,
                 'employment_status' => $request->employment_status
             ];
-            if($request->employment_status == 'Confirmed'){
-                Employee::where('user_id', $request->user_id)->update([
-                    'employment_status' => $request->employment_status,
-                    'confirmation_date' => get_date()
-                ]);
-            }
             if($request->hasFile('image')) {
                 if(count($employee)>0){
                     $employee_old_image =  User::where('user_id', $request->user_id)->pluck('image')->first();
@@ -171,6 +165,12 @@ class EmployeeController extends Controller
                 Employee::create($employee_info_data);
             }
             $employee = Employee::where('user_id', $request->user_id)->first();
+
+            if($request->employment_status == 'Confirmed'){
+                Employee::where('user_id', $request->user_id)->update([
+                    'confirmation_date' => get_date()
+                ]);
+            }
             $Leaves_Bucket_record = LeavesBucket::where('user_id',$request->user_id)->count();
             if($Leaves_Bucket_record == 0 && ($employee->employment_status == 'Confirmed' || $request->employment_status == 'Confirmed')) {
                 LeavesBucket::create(['user_id' => $request->user_id,

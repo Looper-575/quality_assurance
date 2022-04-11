@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Middleware\PreventRequestsDuringMaintenance;
 use App\Models\CallDispositionsService;
 use App\Models\Enquiry;
+use App\Models\Team;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -80,7 +81,8 @@ class DashboardController extends Controller
         // STATS TABLE
         $data['provider_based_stats'] = CallDispositionsService::select('provider_name', DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile'))->where(['status' => 1])->with('call_disposition')->whereBetween('added_on', [$from_date, $to_date])->groupBy('provider_name')->get();
         // main table team based
-        $team_abdullah = $this->get_team_counts($from_date, $to_date, 4, 6);
+       /*
+        $team_abdullah = $this->get_team_counts($from_date, $to_date, 4);
         $total = 0;
         foreach ($team_abdullah[0] as $item) {
             $data['team_abdullah'][$item->provider_name] = $item;
@@ -89,17 +91,16 @@ class DashboardController extends Controller
         $data['team_abdullah']['others'] = $team_abdullah[1][0] ;
         $data['team_abdullah']['total'] = $total + ($data['team_abdullah']['others']->cable + $data['team_abdullah']['others']->phone + $data['team_abdullah']['others']->internet + $data['team_abdullah']['others']->mobile);
 
-            $team_amroz = $this->get_team_counts($from_date, $to_date, 6, 0);
-            $total = 0;
-            foreach ($team_amroz[0] as $item) {
-                $data['team_amroz'][$item->provider_name] = $item;
-                $total += $item->cable + $item->phone + $item->internet + $item->mobile;
-            }
-            $data['team_amroz']['others'] = $team_amroz[1][0] ;
-            $data['team_amroz']['total'] = $total + ($data['team_amroz']['others']->cable + $data['team_amroz']['others']->phone + $data['team_amroz']['others']->internet + $data['team_amroz']['others']->mobile);
-
-            return view('dashboard.dashboard', $data);
-
+        $team_amroz = $this->get_team_counts($from_date, $to_date, 6);
+        $total = 0;
+        foreach ($team_amroz[0] as $item) {
+            $data['team_amroz'][$item->provider_name] = $item;
+            $total += $item->cable + $item->phone + $item->internet + $item->mobile;
+        }
+        $data['team_amroz']['others'] = $team_amroz[1][0] ;
+        $data['team_amroz']['total'] = $total + ($data['team_amroz']['others']->cable + $data['team_amroz']['others']->phone + $data['team_amroz']['others']->internet + $data['team_amroz']['others']->mobile);
+       */
+        return view('dashboard.dashboard', $data);
     }
     public function team_dashboard()
     {
@@ -135,7 +136,8 @@ class DashboardController extends Controller
         $data['six_months_dispositions_count'] = $this->get_6_months_dipositions_count($from_date,$to_date);
         $data['six_months_sales_count'] =  $this->get_6_months_rgo_counts($from_date, $to_date);
         // main table team based
-        $team_abdullah = $this->get_team_counts($from_date, $to_date, 4, 6);
+        //team abdullah
+        $team_abdullah = $this->get_team_counts($from_date, $to_date, 4);
         $total = 0;
         foreach ($team_abdullah[0] as $item) {
             $data['team_abdullah'][$item->provider_name] = $item;
@@ -143,7 +145,8 @@ class DashboardController extends Controller
         }
         $data['team_abdullah']['others'] = $team_abdullah[1][0] ;
         $data['team_abdullah']['total'] = $total + ($data['team_abdullah']['others']->cable + $data['team_abdullah']['others']->phone + $data['team_abdullah']['others']->internet + $data['team_abdullah']['others']->mobile);
-        $team_amroz = $this->get_team_counts($from_date, $to_date, 6, 0);
+        // team amroz
+        $team_amroz = $this->get_team_counts($from_date, $to_date, 6);
         $total = 0;
         foreach ($team_amroz[0] as $item) {
             $data['team_amroz'][$item->provider_name] = $item;
@@ -428,11 +431,12 @@ class DashboardController extends Controller
         $data['six_month'] = $this->get_rgo_counts($from_date, $to_date);
         return $data;
     }
-    private function get_team_counts($from_date, $to_date, $manager_id, $exclude)
+    private function get_team_counts($from_date, $to_date, $manager_id)
     {
-        $data = DB::table('all_sales')->select('provider_name', DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile'))->orWhere(['manager_id'=>$manager_id, 'added_by'=>$manager_id])->whereIn('provider_name',['spectrum','cox','suddenlink','att','directtv','earthlink','frontier','mediacom','optimum','hughesnet'])->whereBetween('added_on', [$from_date, $to_date])->where('added_by','!=', $exclude)->groupBy('provider_name')->get();
-
-        $others = DB::table('all_sales')->select(DB::raw('"others" as provider_name'), DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile'))->orWhere(['manager_id'=>$manager_id, 'added_by'=>$manager_id])->whereNotIn('provider_name',['spectrum','cox','suddenlink','att','directtv','earthlink','frontier','mediacom','optimum','hughesnet'])->whereBetween('added_on', [$from_date, $to_date])->where('added_by','!=', $exclude)->get();
+        $team_members = DB::select(DB::raw("SELECT GROUP_CONCAT(team_members.user_id) as members FROM `teams` INNER JOIN team_members ON team_members.team_id=teams.team_id WHERE team_lead_id=$manager_id;"))[0]->members;
+        $team_members = explode(',', $team_members);
+        $data = DB::table('all_sales')->select('provider_name', DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile'))->whereIn('added_by',$team_members)->whereIn('provider_name',['spectrum','cox','suddenlink','att','directtv','earthlink','frontier','mediacom','optimum','hughesnet'])->whereBetween('added_on', [$from_date, $to_date])->groupBy('provider_name')->get();
+        $others = DB::table('all_sales')->select(DB::raw('"others" as provider_name'), DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile'))->whereIn('added_by',$team_members)->whereNotIn('provider_name',['spectrum','cox','suddenlink','att','directtv','earthlink','frontier','mediacom','optimum','hughesnet'])->whereBetween('added_on', [$from_date, $to_date])->get();
         return [$data , $others];
     }
     private function get_all_sales_stats_counts($from_date, $to_date)

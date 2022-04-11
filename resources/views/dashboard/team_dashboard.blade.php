@@ -339,7 +339,7 @@
                                     <th rowspan="2" class="text-center" style="border-right:2px solid #000;">{{$hughes_sum}}</th>
                                     <th rowspan="2" colspan="4" class="text-center" style="border-right:2px solid #000;">{{$others_sum}}</th>
                                 </tr>
-                                <tr>
+                                <tr style="border-bottom: 2px solid #000;">
                                     <td class="text-center" style="border-right:2px solid #000;" colspan="5">
                                         {{$spectrum_sum}}
                                     </td>
@@ -713,7 +713,7 @@
                                     <th rowspan="2" class="text-center" style="border-right:2px solid #000;">{{$hughes_sum}}</th>
                                     <th rowspan="2" colspan="4" class="text-center" style="border-right:2px solid #000;">{{$others_sum}}</th>
                                 </tr>
-                                <tr>
+                                <tr style="border-bottom: 2px solid #000;">
                                     <td class="text-center" style="border-right:2px solid #000;" colspan="5">
                                         {{$spectrum_sum}}
                                     </td>

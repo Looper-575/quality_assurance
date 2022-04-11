@@ -46,26 +46,26 @@ class LeaveApplicationController extends Controller
             if($manager_id != Null && Auth::user()->role_id == $manager_id->role_id){
                 $approved_by_manager = 1;
             }
-                $leave =new LeaveApplication();
-                $leave->added_by = Auth::user()->user_id;
-                $leave->leave_type_id = $request->leave_type;
-                $leave->from = $request->from;
-                $leave->to = $request->to;
-                $leave->half_type = $request->half;
-                $leave->no_leaves = $request->no_leaves;
-                $leave->approved_by_manager = $approved_by_manager;
-                $leave_file = "";
-                if($request->file('medical_report')) {
-                    $file = $request->file('medical_report');
-                    $leave_file = time() . rand(1, 100) . '.' . $file->extension();
-                    $file->move(public_path('leave_applications'), $leave_file);
-                }
-                $leave->attachement = $leave_file;
-                $leave->no_leaves  = $request->no_leaves;
-                $leave->reason = $request->reason;
-                $leave->save();
-                $response['status'] = "Success";
-                $response['result'] = "Added Successfully";
+            $leave =new LeaveApplication();
+            $leave->added_by = Auth::user()->user_id;
+            $leave->leave_type_id = $request->leave_type;
+            $leave->from = $request->from;
+            $leave->to = $request->to;
+            $leave->half_type = $request->half;
+            $leave->no_leaves = $request->no_leaves;
+            $leave->approved_by_manager = $approved_by_manager;
+            $leave_file = "";
+            if($request->file('medical_report')) {
+                $file = $request->file('medical_report');
+                $leave_file = time() . rand(1, 100) . '.' . $file->extension();
+                $file->move(public_path('leave_applications'), $leave_file);
+            }
+            $leave->attachement = $leave_file;
+            $leave->no_leaves  = $request->no_leaves;
+            $leave->reason = $request->reason;
+            $leave->save();
+            $response['status'] = "Success";
+            $response['result'] = "Added Successfully";
         } else {
             $response['status'] = "Failure!";
             $response['result'] = str_replace('3', 'Sick',$validator->errors()->toJson());
@@ -95,28 +95,32 @@ class LeaveApplicationController extends Controller
     {
         $data['page_title'] = "Leave Applications - Atlantis BPO CRM";
         $manager_id = ManagerialRole::where('role_id', Auth::user()->role_id)->whereType('Manager')->first();
-        $team_lead_id = ManagerialRole::where('role_id', Auth::user()->role_id)->whereType('Team Lead')->first();
         if(isset($manager_id)){
             $manager_role_id = $manager_id->role_id;
-        }
-        else{
+        } else {
             $manager_role_id = 0;
         }
-
-        if(Auth::user()->role_id == 1){
-        $data['leave_lists'] = LeaveApplication::where([
-            ['status','=',1],  ['approved_by_manager','=', 1],
-            ['approved_by_hr','=', 1]
-        ])->with('user')->get();
-        $data['leave_lists_unapproved'] = LeaveApplication::where([
-            ['status', '=' ,1],
-        ])->where(function($query) {
-            $query->where('approved_by_manager','=',NULL)
-                ->orWhere('approved_by_hr','=',NULL);
-        })->with('user')->get();
-
-    }
-    else if(Auth::user()->role_id == $manager_role_id){
+        if(Auth::user()->role_id == 1) {
+            $data['leave_lists'] = LeaveApplication::where([
+                ['status','=',1],  ['approved_by_manager','=', 1],
+                ['approved_by_hr','=', 1]
+            ])->with('user')->get();
+            $data['leave_lists_unapproved'] = LeaveApplication::where([
+                ['status', '=' ,1],
+            ])->where(function($query) {
+                $query->where('approved_by_manager','=',NULL)
+                    ->orWhere('approved_by_hr','=',NULL);
+            })->with('user')->get();
+        } else if(Auth::user()->role_id == 5){
+            $data['leave_lists'] = LeaveApplication::where([
+                ['status','=',1],
+                ['approved_by_manager','=', 1],
+                ['approved_by_hr','=', 1]
+            ])->with('user')->get();
+            $data['leave_lists_unapproved'] = LeaveApplication::where([
+                ['status','=', 1],['approved_by_manager','=',1],['approved_by_hr','=',NULL]
+            ])->with('user')->get();
+        } else if(Auth::user()->role_id == $manager_role_id){
             $data['leave_lists'] = LeaveApplication::where([
                 ['status','=',1],
                 ['approved_by_manager' ,'=',1],
@@ -136,16 +140,6 @@ class LeaveApplicationController extends Controller
                     return $query->where('manager_id', '=', Auth::user()->user_id);
                 })->orWhere('added_by','=',Auth::user()->user_id);
             })->get();
-        }
-        else if(Auth::user()->role_id == 5){
-            $data['leave_lists'] = LeaveApplication::where([
-                ['status','=',1],
-                ['approved_by_manager','=', 1],
-                ['approved_by_hr','=', 1]
-            ])->with('user')->get();
-            $data['leave_lists_unapproved'] = LeaveApplication::where([
-                ['status','=', 1],['approved_by_manager','<>',NULL],['approved_by_hr','=',NULL]
-            ])->with('user')->get();
         } else {
             $data['leave_lists'] = LeaveApplication::where([
                 ['status','=', 1] ,
