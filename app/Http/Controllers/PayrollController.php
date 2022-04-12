@@ -498,7 +498,7 @@ class PayrollController extends Controller
         }
         // if $half_and_late_deductions > 0
         $leaves_deducted_from_bucket=0;
-        if($half_and_late_deductions > 0 && $half_and_late_deductions < $total_leaves){
+        if($half_and_late_deductions > 0 && $half_and_late_deductions < $total_leaves) {
             $leaves_deducted_from_bucket = $total_leaves - $half_and_late_deductions;
         } else if($half_and_late_deductions == 0) {
             $leaves_deducted_from_bucket = $total_leaves;

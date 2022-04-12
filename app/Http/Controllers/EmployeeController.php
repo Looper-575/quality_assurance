@@ -173,12 +173,13 @@ class EmployeeController extends Controller
             }
             $Leaves_Bucket_record = LeavesBucket::where('user_id',$request->user_id)->count();
             if($Leaves_Bucket_record == 0 && ($employee->employment_status == 'Confirmed' || $request->employment_status == 'Confirmed')) {
-                LeavesBucket::create(['user_id' => $request->user_id,
-                    'start_date' => get_date(),
-                    'annual_leaves' => 10,
-                    'sick_leaves' => 5,
-                    'casual_leaves' => 4
-                ]);
+                generate_single_employee_leaves_bucket($request->user_id);
+//                LeavesBucket::create(['user_id' => $request->user_id,
+//                    'start_date' => get_date(),
+//                    'annual_leaves' => 10,
+//                    'sick_leaves' => 5,
+//                    'casual_leaves' => 4
+//                ]);
             }
             ?>
             <input data-response="Success" type="hidden" id="employee_id" value="<?=$employee->employee_id?>">

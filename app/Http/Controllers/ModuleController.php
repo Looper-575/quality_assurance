@@ -30,6 +30,7 @@ class ModuleController  extends Controller
     public function save_module_info(Request  $request)
     {
 
+
         $validator = Validator::make($request->all(), [
             'project' => 'required',
             'module' => 'required',
@@ -41,17 +42,18 @@ class ModuleController  extends Controller
             'module_usage' => 'required',
         ]);
         if ($validator->passes()) {
-            $module_data = new ProjectModule();
 
+
+            $module_data = new ProjectModule();
             if(!isset($request->module_id)){
-                $module_data->project = $request->project;
-                $module_data->module_name = $request->module;
-                $module_data->description = $request->description;
-                $module_data->dependencies = $request->dependency;
-                $module_data->controllers = $request->controller;
-                $module_data->models = $request->models;
-                $module_data->views = $request->views;
-                $module_data->module_usage = $request->module_usage;
+                $module_data->project = trim($request->project);
+                $module_data->module_name = trim($request->module);
+                $module_data->description = trim($request->description);
+                $module_data->dependencies =trim( $request->dependency);
+                $module_data->controllers = trim($request->controller);
+                $module_data->models =trim($request->models);
+                $module_data->views =trim($request->views);
+                $module_data->module_usage =trim($request->module_usage);
                 $module_data->added_by = Auth::user()->user_id;
 
                 $module_data->save();
@@ -142,19 +144,18 @@ class ModuleController  extends Controller
                 $users = TeamMember::where('team_id', $team_id)->pluck('user_id')->toArray();
             }
         }
-//        dd(Auth::user()->user_id);
         if(Auth::user()->role_id == 1){
             $users = User::where('status',1)->pluck('user_id')->toArray();
         }
-        if($users){
-            $data['approved_modules'] = ProjectModule::with(['projects','users'])->where('approved',1)->whereIn('added_by',$users)->orderBy('id','desc')->get();
-            $data['unapproved_modules'] = ProjectModule::with(['projects','users'])->where('approved',0)->whereIn('added_by',$users)->orderBy('id','desc')->get();
-//            dd('herer',$data['approved_modules']);
-
-        }else{
-            $data['approved_modules'] = ProjectModule::where('approved',1)->where('added_by',Auth::user()->user_id)->with(['projects','users'])->orderBy('id','desc')->get();
-            $data['unapproved_modules'] = ProjectModule::where('approved',0)->where('added_by',Auth::user()->user_id)->with(['projects','users'])->orderBy('id','desc')->get();
-        }
+//        if($users){
+//            $data['approved_modules'] = ProjectModule::with(['projects','users'])->where('approved',1)->whereIn('added_by',$users)->orderBy('id','desc')->get();
+//            $data['unapproved_modules'] = ProjectModule::with(['projects','users'])->where('approved',0)->whereIn('added_by',$users)->orderBy('id','desc')->get();
+////            dd('herer',$data['approved_modules']);
+//
+//        }else{
+//            $data['approved_modules'] = ProjectModule::where('approved',1)->where('added_by',Auth::user()->user_id)->with(['projects','users'])->orderBy('id','desc')->get();
+//            $data['unapproved_modules'] = ProjectModule::where('approved',0)->where('added_by',Auth::user()->user_id)->with(['projects','users'])->orderBy('id','desc')->get();
+//        }
 
 
         if($users){

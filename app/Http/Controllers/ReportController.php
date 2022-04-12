@@ -228,13 +228,17 @@ class ReportController extends Controller
     public function attendance_report_single()
     {
         $data['page_title'] = "Attendance Report - Atlantis BPO CRM";
+        $team = Team::where('team_lead_id', Auth::user()->user_id)->where('status', 1)->first();
+        $data['self'] = false;
         if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5){
             $data['agents'] = User::where('status', 1)->get();
-        } else {
-            $team = Team::where('team_lead_id', Auth::user()->user_id)->where('status', 1)->first();
+        }else if($team) {
             $team_users = TeamMember::where('team_id', $team->team_id)->pluck('user_id')->toArray();
             array_push($team_users, Auth::user()->user_id);
             $data['agents'] = User::whereIn('user_id',$team_users)->where('status', 1)->get();
+        } else {
+            $data['agents'] = User::where('user_id', Auth::user()->user_id)->where('status', 1)->get();
+            $data['self'] = true;
         }
         return view('reports.attendance_report_single' , $data);
     }

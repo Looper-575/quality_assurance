@@ -22,9 +22,14 @@ class UserController extends Controller
     {
         if(Auth::user() && Auth::user()->user_id){
             $employee_id = get_employee_id(Auth::user()->user_id);
-            if($employee_id == 0 && Auth::user()->user_type=='Employee'){
+            if(Auth::user()->user_type=='Employee' && $employee_id == 0){
                 return redirect('/employee_form_wizard');
             }else{
+                if(Auth::user()->user_type=='Employee'){
+                    generate_single_employee_leaves_bucket(Auth::user()->user_id);
+                    // working just commented for Dev CRM
+                    // check_single_employee_self_assessment_status();
+                }
                 return redirect('/');
             }
         }
@@ -35,10 +40,7 @@ class UserController extends Controller
     {
         $data['page_title'] = "Users List - Atlantis BPO CRM";
         $data['departments'] = Department::where('status', 1)->get();
-        $data['user_lists'] = User::where([
-            ['status', '=', 1],
-            ['role_id', '!=', 13]
-        ])->with(['role', 'manager'])->get();
+        $data['user_lists'] = User::where('status' , 1)->where('role_id', '!=', 13)->with(['role', 'manager'])->get();
         return view('users.user_list', $data);
     }
     public function user_form(Request $request)
@@ -58,6 +60,7 @@ class UserController extends Controller
     }
     public function login(Request $request)
     {
+
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required',

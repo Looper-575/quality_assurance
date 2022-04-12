@@ -261,22 +261,14 @@ class EmployeeAssessmentController extends Controller
                                 ]);
                     $Leaves_Bucket_record = LeavesBucket::where('user_id',$user_id)->count();
                     if($Leaves_Bucket_record == 0 && ($employee_data->employment_status == 'Confirmed' || $request->employment_status == 'Confirmed')) {
-                        LeavesBucket::create(['user_id' => $request->user_id,
-                            'start_date' => get_date(),
-                            'annual_leaves' => 10,
-                            'sick_leaves' => 5,
-                            'casual_leaves' => 4
-                        ]);
-                    }
-//                    $EmployeeAssessment_record = EmployeeAssessment::where('user_id',$user_id)->count();
-//                    if($EmployeeAssessment_record == 1) {
-//                        LeavesBucket::create(['user_id' => $user_id,
+                        generate_single_employee_leaves_bucket($request->user_id);
+//                        LeavesBucket::create(['user_id' => $request->user_id,
 //                            'start_date' => get_date(),
 //                            'annual_leaves' => 10,
 //                            'sick_leaves' => 5,
 //                            'casual_leaves' => 4
 //                        ]);
-//                    }
+                    }
                 }
             }
             if(count($EmployeeAssessment)>0){

@@ -377,4 +377,47 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
         Route::get('/leaves_taken_report_monthly','App\Http\Controllers\ReportController@leaves_taken_report_monthly')->name('leaves_taken_report_monthly');
     });
     Route::post('/generate_monthly_leaves_taken_report' , 'App\Http\Controllers\ReportController@generate_monthly_leaves_taken_report')->name('generate_monthly_leaves_taken_report');
+
+    // Payroll routes
+    Route::get('/create_payroll','App\Http\Controllers\PayrollController@create_payroll')->name('create_payroll');
+    Route::post('/generate_pay_role','App\Http\Controllers\PayrollController@generate_pay_role')->name('generate_pay_role');
+    Route::post('/payroll_save','App\Http\Controllers\PayrollController@payroll_save')->name('payroll_save');
+    Route::post('/payroll_save_edit','App\Http\Controllers\PayrollController@payroll_save_edit')->name('payroll_save_edit');
+    Route::get('/payroll_details','App\Http\Controllers\PayrollController@payroll_details')->name('payroll_details');
+    Route::post('/payroll_reject','App\Http\Controllers\PayrollController@payroll_reject')->name('payroll_reject');
+    Route::post('/payroll_approve','App\Http\Controllers\PayrollController@payroll_approve')->name('payroll_approve');
+    Route::get('payroll_edit/{payroll_id}','App\Http\Controllers\PayrollController@payroll_edit')->name('payroll_edit');
+    //     Deduction routes
+    Route::get('/deduction','App\Http\Controllers\PayrollController@deduction')->name('deduction');
+    Route::post('/save_deduction_form','App\Http\Controllers\PayrollController@save_deduction_form')->name('save_deduction_form');
+    Route::post('/deduction_delete','App\Http\Controllers\PayrollController@deduction_delete')->name('deduction_delete');
+    //      Allowance routes
+    Route::get('/allowance','App\Http\Controllers\PayrollController@allowance')->name('allowance');
+    Route::post('/save_allowance_form','App\Http\Controllers\PayrollController@save_allowance_form')->name('save_allowance_form');
+    Route::post('/allowance_delete','App\Http\Controllers\PayrollController@allowance_delete')->name('allowance_delete');
+
+    Route::get('/get_department_role','App\Http\Controllers\PayrollController@get_department_role')->name('get_department_role');
+    //    Tax deduction routes
+    Route::get('/tax_deduction','App\Http\Controllers\PayrollController@tax_deduction')->name('tax_deduction');
+    Route::post('/save_tax_deduction_form','App\Http\Controllers\PayrollController@save_tax_deduction_form')->name('save_tax_deduction_form');
+    Route::post('/tax_deduction_delete','App\Http\Controllers\PayrollController@tax_deduction_delete')->name('tax_deduction_delete');
+    //    Call dispostions types routes
+    Route::get('/call_dispositions_types','App\Http\Controllers\SettingsController@call_dispositions_types')->name('call_dispositions_types');
+    Route::post('/call_dispositions_types_save','App\Http\Controllers\SettingsController@call_dispositions_types_save')->name('call_dispositions_types_save');
+    Route::get('/call_dispositions_types_delete','App\Http\Controllers\SettingsController@call_dispositions_types_delete')->name('call_dispositions_types_delete');
+    //    Payslips
+    Route::get('/payslips', 'App\Http\Controllers\PayrollController@payslips')->name('payslips');
+    Route::post('/view_payslip', 'App\Http\Controllers\PayrollController@view_payslip')->name('view_payslip');
+    //    Convenience allowance routes
+    Route::get('/convenience_allowance', 'App\Http\Controllers\PayrollController@convenience_allowance')->name('convenience_allowance');
+    Route::post('/add_convenience_allowance', 'App\Http\Controllers\PayrollController@add_convenience_allowance')->name('add_convenience_allowance');
+    Route::post('/remove_convenience_allowance', 'App\Http\Controllers\PayrollController@remove_convenience_allowance')->name('remove_convenience_allowance');
+
+    Route::post('/get_customer_info', 'App\Http\Controllers\CallDispositionController@get_customer_info')->name('get_customer_info');
+    Route::post('/save_customer_note', 'App\Http\Controllers\CallDispositionController@save_customer_note')->name('save_customer_note');
+
+
+    //Chat Component
+    Route::post('/create_group', 'App\Http\Controllers\ChatController@create_group')->name('create_group');
+
 });
