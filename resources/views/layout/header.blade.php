@@ -40,7 +40,7 @@
                 <button class="m-aside-header-menu-mobile-close  m-aside-header-menu-mobile-close--skin-dark " id="m_aside_header_menu_mobile_close_btn">
                     <i class="la la-close"></i>
                 </button>
-				<!-- BEGIN: Topbar -->
+                <!-- BEGIN: Topbar -->
                 <div id="m_header_topbar" class="m-topbar  m-stack m-stack--ver m-stack--general">
                     <div class="m-stack__item m-topbar__nav-wrapper">
                         <ul class="m-topbar__nav m-nav m-nav--inline">
@@ -64,25 +64,33 @@
                                     <span class="m-dropdown__arrow m-dropdown__arrow--right m-dropdown__arrow--adjust"></span>
                                     <div class="m-dropdown__inner">
                                         <div class="m-dropdown__header m--align-center" style="background: url({{asset('assets/app/media/img/misc/user_profile_bg.jpg')}}); background-size: cover;">
-                                            <div class="m-card-user m-card-user--skin-dark">
+                                            <div class="m-card-user m-card-user--skin-dark position-relative">
                                                 <div class="m-card-user__pic">
                                                     <img src="{{(isset(Auth::user()->image) && !empty(Auth::user()->image))?asset('user_images/'.Auth::user()->image):asset('user_images/user.png')}}" class="m--img-rounded m--marginless m--img-centered" alt="{{Auth::user()->full_name}}"/>
                                                 </div>
                                                 <div class="m-card-user__details">
-																<span class="m-card-user__name m--font-weight-500">
-																	{{$user->full_name}}
-																</span>
+                                                    <span class="m-card-user__name m--font-weight-500">
+                                                        {{$user->full_name}}
+                                                    </span>
                                                     <a href="" class="m-card-user__email m--font-weight-300 m-link">
                                                         {{$user->email}}
                                                     </a>
                                                 </div>
                                                 @php $employee_id = get_employee_id(Auth::user()->user_id) @endphp
-                                                @if($employee_id != 0)
-                                                <div class="m-card-user__edit position-absolute">
-                                                    <a href="{{route('employee_data_view',['employee_id' => $employee_id])}}" id="{{$employee_id}}" class="btn btn-info">
-                                                        <i class="la la-edit"></i>
-                                                    </a>
-                                                </div>
+                                                @if(Auth::user()->user_type == 'Employee')
+                                                    @if($employee_id != 0)
+                                                        <div class="m-card-user__edit position-absolute">
+                                                            <a href="{{route('employee_data_view',['employee_id' => $employee_id])}}" id="{{$employee_id}}" class="btn btn-info">
+                                                                <i class="la la-edit"></i>
+                                                            </a>
+                                                        </div>
+                                                    @else
+                                                        <div class="m-card-user__edit position-absolute">
+                                                            <a href="{{route('employee_form')}}" id="{{$employee_id}}" class="btn btn-info">
+                                                                <i class="la la-edit"></i>
+                                                            </a>
+                                                        </div>
+                                                    @endif
                                                 @endif
                                             </div>
                                         </div>
@@ -94,11 +102,11 @@
                                                     </li>
                                                     <li class="m-nav__separator m-nav__separator--fit"></li>
                                                     <li class="m-nav__item">
-                                                        <a href="{{route('logout')}}" class="btn m-btn--pill    btn-secondary m-btn m-btn--custom m-btn--label-brand m-btn--bolder">
+                                                        <button type="button" class="btn m-btn--pill btn-info m-btn m-btn--label-brand m-btn--bolder" data-toggle="modal" data-target="#change_password" value="{{Auth::user()->user_id}}">
+                                                            Change Password
+                                                        </button>
+                                                        <a href="{{route('logout')}}" class="float-right btn m-btn--pill btn-danger m-btn m-btn--label-brand m-btn--bolder">
                                                             Logout
-                                                        </a>
-                                                        <a href="" class="btn m-btn--pill  float-right  btn-secondary m-btn m-btn--custom m-btn--label-brand m-btn--bolder">
-                                                            Edit Profile
                                                         </a>
                                                     </li>
                                                 </ul>
@@ -112,11 +120,11 @@
                                     <span class="m-nav__link-icon"><i class="flaticon-grid-menu"></i></span>
                                 </a>
                             </li>
-                            <li id="chat_sidebar_toggler" class="m-nav__item">
-                                <a href="javascript:toggle_chat();" class="m-nav__link m-dropdown__toggle">
-                                    <span class="m-nav__link-icon"><i class="flaticon-chat-1"></i></span>
-                                </a>
-                            </li>
+                            {{--                            <li id="chat_sidebar_toggler" class="m-nav__item">--}}
+                            {{--                                <a href="javascript:toggle_chat();" class="m-nav__link m-dropdown__toggle">--}}
+                            {{--                                    <span class="m-nav__link-icon"><i class="flaticon-chat-1"></i></span>--}}
+                            {{--                                </a>--}}
+                            {{--                            </li>--}}
                         </ul>
                     </div>
                 </div>
@@ -126,52 +134,57 @@
     </div>
 </header>
 <!-- END: Header -->
-<script>
-    function change_pass(me) {
-        $('#change_pass_form_modal').fadeIn();
-        $('#c_user_id').val(me.value);
-    }
-</script>
-<div id="change_pass_form_modal" style="z-index:9999999; height: 100% !important; min-height: 100%; width: 100%; position: fixed; top: 0; background-color: rgba(0, 0, 0, 0.7);display:none;">
-    <div style="z-index:99999999;display: block; padding-right: 17px; top: 100px" class="modal fade show" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog change_pass_modal" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title" id="modal_title">Change Password</h4>
-                    <button type="button" class="btn" onclick="$('#change_pass_form_modal').fadeOut();" aria-hidden="true"><i class="fas fa-times"></i></button>
-                </div>
-                <div class="modal-body">
-                    <div id="error" class="d-none alert alert-warning text-white" role="alert"></div>
-                    <form id="change_pass" method="POST">
-                        @csrf
-                        <input type="hidden" name="user_id" id="c_user_id" value="{{Auth::user()->user_id}}">
-                        <div class="row">
-                                    <div class="col-6">
-                                        <div class="form-group">
-                                            <label>New Password</label>
-                                            <input id="password" name="password" class="form-control" type="password" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="form-group">
-                                            <label>Confirm <span class="d-none d-xl-inline">Password</span></label>
-                                            <input id="password_confirmation" name="password_confirmation" class="form-control" type="password" required>
-                                        </div>
-                                    </div>
-                                </div>
-                        <div class="row">
-                            <div class="col-12 mb-3"><b>Please Enter Your Password below to confirm and save changes</b></div>
-                            <div class="col">
-                                <div class="form-group">
-                                    <label>Current Password</label>
-                                    <input id="curr_password" name="curr_password"  class="form-control" type="password" required>
-                                </div>
+<!--begin::Modal-->
+<div class="modal fade" id="change_password" tabindex="-1" role="dialog" aria-labelledby="change_passwordLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="change_passwordLabel">Change Password</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="change_pass" action="javascript:change_password();" method="POST">
+                    @csrf
+                    <input type="hidden" name="user_id" id="c_user_id" value="{{Auth::user()->user_id}}">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>New Password</label>
+                                <input id="password" name="password" class="form-control" type="password" required>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Update Password</button>
-                    </form>
-                </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Confirm <span class="d-none d-xl-inline">Password</span></label>
+                                <input id="password_confirmation" name="password_confirmation" class="form-control" type="password" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 mb-3"><b>Please Enter Your Password below to confirm and save changes</b></div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label>Current Password</label>
+                                <input id="curr_password" name="curr_password"  class="form-control" type="password" required>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary m-t-15 waves-effect">Update Password</button>
+                </form>
             </div>
         </div>
     </div>
 </div>
+<!--end::Modal-->
+<script>
+    function change_password() {
+        let data = new FormData($('#change_pass')[0]);
+        let a = function(){
+            $('#change_password').modal('hide');
+        };
+        let arr = [a];
+        call_ajax_with_functions('','{{route('change_pass')}}',data,arr);
+    }
+</script>

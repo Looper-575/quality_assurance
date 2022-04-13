@@ -116,10 +116,8 @@
         });
     }
     function edit_todo(id, title) {
-        let note_id = id;
-        let note_title = title;
-        document.getElementById('todo_title_id').value = note_title;
-        document.getElementById('note_edit_id').value = note_id;
+        document.getElementById('todo_title_id').value = title;
+        document.getElementById('note_edit_id').value = id;
         document.getElementById('m_quick_sidebar_tabs').scrollIntoView();
     }
     function delete_todo(e){
@@ -186,10 +184,6 @@
             url:"{{ route('get_draft_note_data') }}",
             success: function( resp ) {
                 if(resp.draft_notes){
-                    // console.log(resp);
-                    // console.log(resp.draft_notes.note_id);
-                    // console.log(resp.draft_notes.title);
-                    // console.log(resp.draft_notes.description);
                     $('#note_list_edit_id').val(resp.draft_notes.note_id);
                     $('#note_title_id').val(resp.draft_notes.title);
                     $('#discription_id').val(resp.draft_notes.description);
@@ -278,52 +272,17 @@
                 return;
             }
             let data = { _token: "{{ csrf_token()}}",
-                        note_id: $('#note_list_edit_id').val(),
-                        type: 'note',
-                        title: $('#note_title_id').val(),
-                        discription: $('#discription_id').val(),
-                        status: 3
-                    };
+                note_id: $('#note_list_edit_id').val(),
+                type: 'note',
+                title: $('#note_title_id').val(),
+                discription: $('#discription_id').val(),
+                status: 3
+            };
             $.ajax({
                 type:'post',
                 url:'{{route('save_note_draft')}}',
                 data : data,
                 success: function( resp ) {
-                    // if(resp.draft_notes){
-                    //     // console.log(resp);
-                    //     // console.log(resp.draft_notes.note_id);
-                    //     // console.log(resp.draft_notes.title);
-                    //     // console.log(resp.draft_notes.description);
-                    // }
-                }
-            });
-        });
-        $('#change_pass').submit(function (e) {
-            e.preventDefault();
-        let data = { _token: "{{ csrf_token()}}",
-                     user_id:{{Auth::user()->user_id}},
-                     password:$('#password').val(),
-                     password_confirmation:$('#password_confirmation').val(),
-                     curr_password:$('#curr_password').val()
-                   };
-            $.ajax({
-                type:'POST',
-                url:'{{route('change_pass')}}',
-                data : data,
-                success: function( resp ) {
-                    console.log(resp.status);
-                    if(resp.status.toLowerCase()=="success") {
-                        console.log(resp.result);
-                        $('#change_pass_form_modal').fadeOut();
-                        toastr.success(resp.result);
-                        //swal("Success", resp.result, "success");
-                    } else if(resp.status.toLowerCase()=="failure"){
-                        console.log(resp.result);
-                        $('#error').removeClass('d-none');
-                        $('#error').html(resp.result);
-                        toastr.error(resp.result);
-                       //swal("Failure", resp.result, "error");
-                    }
                 }
             });
         });

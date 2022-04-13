@@ -3,15 +3,15 @@ $has_permissions = get_route_permissions( Auth::user()->role->role_id, 'modules_
 ?>
 <table class="datatable table table-bordered" id="approved_table">
         <thead>
-        <tr>
-            <th>S.no</th>
-            <th>Project</th>
-            <th>Module</th>
-            <th>Added by</th>
-            <th>Added On</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
+            <tr>
+                <th>S.no</th>
+                <th>Project</th>
+                <th>Module</th>
+                <th>Added by</th>
+                <th>Added On</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
         </thead>
         <tbody>
         @foreach($project_modules as $module)
@@ -38,4 +38,3 @@ $has_permissions = get_route_permissions( Auth::user()->role->role_id, 'modules_
         @endforeach
         </tbody>
 </table>
-

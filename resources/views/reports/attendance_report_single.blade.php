@@ -30,12 +30,17 @@
                     <div class="col-4">
                         <div class="form-group">
                             <label class="form-check-label" for="user_id">Users</label>
-                            <select class="form-control" name="user_id" id=user_id" required>
-                                <option value="">Select User</option>
-                                @foreach($agents as $agent)
-                                    <option value="{{$agent->user_id}}">{{$agent->full_name}}</option>
-                                @endforeach
-                            </select>
+                            @if($self)
+                                <input type="text" class="form-control" name="full_name" id=full_name" value="{{Auth::user()->full_name}}" readonly>
+                                <input type="hidden" class="form-control" name="user_id" id=user_id" value="{{Auth::user()->user_id}}" readonly>
+                            @else
+                                <select class="form-control" name="user_id" id=user_id" required>
+                                    <option value="">Select User</option>
+                                    @foreach($agents as $agent)
+                                        <option value="{{$agent->user_id}}">{{$agent->full_name}}</option>
+                                    @endforeach
+                                </select>
+                            @endif
                         </div>
                     </div>
                 </div>

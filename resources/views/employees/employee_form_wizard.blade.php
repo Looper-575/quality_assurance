@@ -231,6 +231,12 @@
                     }
                 });
             }
+            if($('#employee_id').val() == 0){
+                let user = $('#user_id').val();
+                    if(user != ''){
+                        get_user_data(user);
+                    }
+            }
             $(document).on('click', '.btn_skip', function(){
                 let button_id = $(this).attr("id");
                 change_progress_bar_width(button_id,'add');
@@ -254,12 +260,6 @@
                 $('#step_'+previous+'').addClass("m-wizard__step--current");
                 $('#m_wizard_form_step_'+previous+'').addClass("m-wizard__form-step--current");
             });
-        });
-        $( document ).ready(function() {
-            let user = $('#user_id').val();
-            if(user != ''){
-                get_user_data(user);
-            }
         });
     </script>
     <style>

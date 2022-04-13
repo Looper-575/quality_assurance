@@ -1,6 +1,29 @@
 @extends('layout.template')
 @section('header_scripts')
+    <style>
+        .note-editor.note-frame .note-editing-area .note-editable{
+            height: 200px;
+            padding: 30px !important;
+        }
+    </style>
+
     <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js"></script>
+    <script>
+        WebFont.load({
+            google: {"families":["Poppins:300,400,500,600,700","Roboto:300,400,500,600,700"]},
+            active: function() {
+                sessionStorage.fonts = true;
+            }
+        });
+    </script>
+    <link href="{{asset('assets/vendors/base/vendors.bundle.css')}}" rel="stylesheet" type="text/css" />
+    <link href="{{asset('assets/demo/default/base/style.bundle.css')}}" rel="stylesheet" type="text/css" />
+
+
+
+
+
 @endsection
 @section('content')
     <div class="m-portlet m-portlet--mobile">
@@ -35,28 +58,37 @@
                 </div>
                 <div class="row">
                     <div class="col-12 col-md-6 mt-4">
-                        <label for="description" class="form-check-label">Description</label>
-                        <textarea   class="form-control " required name="description" id="description"  rows="3">{{isset($module)?$module->description:''}}</textarea>
-                    </div>
-                    <div class="col-12 col-md-6 mt-4">
                         <label for="dependency" class="form-check-label">Dependencies</label>
-                        <textarea   class="form-control " required name="dependency" id="dependency"  rows="3">{{isset($module)?$module->dependencies:''}}</textarea>
-                    </div>
+                        <div class="summernote" id="dependencies">
+                            {!!isset($module)?$module->dependencies:''!!}
+                        </div>                    </div>
                     <div class="col-12 col-md-6 mt-4">
                         <label for="controller" class="form-check-label">Controllers</label>
-                        <textarea   class="form-control " required name="controller" id="controller"  rows="3">{{isset($module)?$module->controllers:''}}</textarea>
-                    </div>
+                        <div class="summernote" id="controllers">
+                            {!!isset($module)?$module->controllers:''!!}
+                        </div>                    </div>
                     <div class="col-12 col-md-6 mt-4">
                         <label for="models" class="form-check-label">Models</label>
-                        <textarea   class="form-control " required name="models" id="models"  rows="3">{{isset($module)?$module->models:''}}</textarea>
-                    </div>
+                        <div class="summernote" id="models">
+                            {!! isset($module)?$module->models:'' !!}
+                        </div>                    </div>
                     <div class="col-12 col-md-6 mt-4">
                         <label for="views" class="form-check-label">Views</label>
-                        <textarea   class="form-control " required name="views" id="views"  rows="3">{{isset($module)?$module->views:''}}</textarea>
+                        <div class="summernote" id="views">
+                            {!! isset($module)?$module->views:''!!}
+                        </div>                    </div>
+                    <div class="col-12 col-md-6 mt-4">
+                        <label for="description" class="form-check-label">Module Description</label>
+                        <div class="summernote" id="description">
+                            {!! isset($module)?$module->description:'' !!}
+                        </div>
                     </div>
                     <div class="col-12 col-md-6 mt-4">
                         <label for="module_usage" class="form-check-label">Usage</label>
-                        <textarea   class="form-control " required name="module_usage" id="usage"  rows="3">{{isset($module)?$module->module_usage:''}}</textarea>
+                        <div class="summernote" id="usage">
+                            {!! isset($module)?$module->module_usage:''!!}
+                        </div>
+
                     </div>
                     @if(isset($module))
                         <input name="module_id" type="hidden" value="{{$module->id}}">
@@ -71,9 +103,26 @@
     </div>
 @endsection
 @section('footer_scripts')
+    <link href="summernote-bs5.css" rel="stylesheet">
+    <script src="summernote-bs5.js"></script>
+    <!--end::Base Scripts -->
+    <!--begin::Page Resources -->
     <script>
+        $(document).ready(function() {
+            $('.summernote').summernote();
+        });
         function save_module_info(){
+
             let data = new FormData($('#save_module_info_form')[0]);
+            data.append('description', $('#description').siblings('.note-editor').find('.note-editable').html());
+            data.append('dependency', $('#dependencies').siblings('.note-editor').find('.note-editable').html());
+            data.append('controller', $('#controllers').siblings('.note-editor').find('.note-editable').html());
+            data.append('models', $('#models').siblings('.note-editor').find('.note-editable').html());
+            data.append('views', $('#views').siblings('.note-editor').find('.note-editable').html());
+            data.append('module_usage', $('#usage').siblings('.note-editor').find('.note-editable').html());
+
+
+
             let a = function () {
                 window.location = "{{route('modules_list')}}";
             };

@@ -255,10 +255,12 @@
                     <span class="p-12 c-gray">May we approach your Previous Employer?</span><br>
                     <span class="p-12 bg-style px-4">{{$employee->previous_employer_service_bond}}</span>
                 </div>
-                <div>
-                    <span class="p-12 c-gray">If YES then give reason.</span><br>
-                    <span class="p-12 bg-style px-4">{{$employee->service_bond_reason}}</span>
-                </div>
+                @if($employee->previous_employer_service_bond == 'Yes')
+                    <div>
+                        <span class="p-12 c-gray">If YES then give reason.</span><br>
+                        <span class="p-12 bg-style px-4">{{$employee->service_bond_reason}}</span>
+                    </div>
+                @endif
             </div>
         </div>
          @endif
@@ -325,10 +327,12 @@
                         from any serious contagious illness or disability?</span><br>
                     <span class="p-12 bg-style px-4">{{$employee->employee_kin ? $employee->employee_kin->any_illness_record : ''}}</span>
                 </div>
-                <div>
-                    <span class="p-12 c-gray">If YES, please give particulars</span><br>
-                    <span class="p-12 bg-style px-4">{{$employee->employee_kin ? $employee->employee_kin->illness_details : ''}}</span>
-                </div>
+                @if($employee->employee_kin && $employee->employee_kin->any_illness_record == 'Yes')
+                    <div>
+                        <span class="p-12 c-gray">If YES, please give particulars</span><br>
+                        <span class="p-12 bg-style px-4">{{$employee->employee_kin ? $employee->employee_kin->illness_details : ''}}</span>
+                    </div>
+                @endif
             </div>
         </div>
          @endif

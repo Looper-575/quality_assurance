@@ -425,7 +425,7 @@ class EmployeeAssessmentController extends Controller
             ->orderBy('added_on', 'desc')->first();
         if($Previous_EmployeeAssessment && !$incomplete_evaluation){
             $employee_assessment_id = $Previous_EmployeeAssessment->id;
-            if(get_month_diff($Previous_EmployeeAssessment->evaluation_date, get_date()) >= 3) {
+            if(get_month_diff($Previous_EmployeeAssessment->evaluation_date, get_date()) == 3) {
                 $self_assessment = true;
             }
         }else if(!$incomplete_evaluation) {

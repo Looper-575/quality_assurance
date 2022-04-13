@@ -1,6 +1,8 @@
 @extends('layout.template')
 @section('header_scripts')
+
     <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
+
 @endsection
 @section('content')
     <?php
@@ -143,6 +145,7 @@
 @section('footer_scripts')
     <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
+
     <script>
 
         function save_module_info(){
@@ -188,4 +191,5 @@
             call_ajax('projects_container',"{{route('project_modules')}}",data)
         });
     </script>
+
 @endsection

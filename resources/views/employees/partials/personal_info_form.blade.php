@@ -183,7 +183,7 @@
                         </div>
                         <div class="col-3">
                             <div class="form-group m-form__group">
-                                <label  for="conveyance_allowance"> Conveyance Allowance</label>
+                                <label  for="conveyance_allowance"> Transport Facility</label>
                                 <div class="m-radio-inline">
                                     <label class="m-radio m-radio--solid m-radio--brand">
                                         <input type="radio" name="conveyance_allowance" value="1" {{($employee and $employee->conveyance_allowance == '1')? 'checked' : ''}} required class="form-control">
