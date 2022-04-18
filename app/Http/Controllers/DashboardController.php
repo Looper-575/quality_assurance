@@ -238,6 +238,8 @@ class DashboardController extends Controller
 
         $data['monthly_counts'] = $this->get_agent_rgo_counts($from_date,$to_date, $uid);
         $data['status'] = DB::select("SELECT * FROM (SELECT AVG(monitor_percentage) AS average FROM qa_with_color_badge WHERE(added_on >= '".$from_date."' AND added_on <= '".$to_date."' AND agent_id = '".$uid."') ) as avg_table INNER JOIN qa_performance_badge ON (avg_table.average >= qa_performance_badge.min AND avg_table.average <= qa_performance_badge.max)");
+
+
         return view('dashboard.agent_dashboard' , $data);
     }
     public function qa_dashboard()
@@ -294,7 +296,6 @@ class DashboardController extends Controller
 //        $data['six_months_dispositions_count'] = $this->get_did_wise_6_months_dipositions_count($from_date,$to_date,$did_id);
 //        $data['six_months_sales_count'] =  $this->get_did_wise_6_months_rgo_counts($from_date, $to_date,$did_id);
 
-//
 
         return view('dashboard.vendor_dashboard' , $data);
     }
@@ -324,13 +325,39 @@ class DashboardController extends Controller
         $data['providers_daily'] = $this->get_providers_sale($from_date,$to_date);
         $data['rgu_daily'] = $this->get_provider_rgo($from_date,$to_date);
 
+        $data['daily_disp'] = CallDisposition::where('status', 1)->whereBetween('added_on', [$from_date, $to_date])->count();
+        $data['daily_sale_made'] = CallDisposition::where(['status' => 1,'disposition_type' => 1])->whereBetween('added_on', [$from_date, $to_date])->count();
+        $data['daily_call_back'] = CallDisposition::where(['status' => 1,'disposition_type' => 2])->whereBetween('added_on', [$from_date, $to_date])->count();
+        $data['daily_customer_service'] = CallDisposition::where(['status' => 1,'disposition_type' => 3])->whereBetween('added_on', [$from_date, $to_date])->count();
+        $data['daily_no_answer'] = CallDisposition::where(['status' => 1,'disposition_type' => 4])->whereBetween('added_on', [$from_date, $to_date])->count();
+        $data['daily_call_transferred'] = CallDisposition::where(['status' => 1,'disposition_type' => 5])->whereBetween('added_on', [$from_date, $to_date])->count();
+
         $dates[] = get_date_interval();
         $to_date = $dates[0]['to_date'];
         $from_date = $dates[0]['from_date'];
 
         $data['providers_monthly'] = $this->get_providers_sale($from_date,$to_date);
         $data['rgu_monthly'] = $this->get_provider_rgo($from_date,$to_date);
+
+        $data['monthly_sale_made'] = CallDisposition::where(['status' => 1,'disposition_type' => 1])->whereDate('added_on', '>=', $from_date)->whereDate('added_on', '<=', $to_date)->count();
+        $data['monthly_call_back'] = CallDisposition::where(['status' => 1,'disposition_type' => 2])->whereBetween('added_on', [$from_date, $to_date])->count();
+        $data['monthly_customer_service'] = CallDisposition::where(['status' => 1,'disposition_type' => 3])->whereBetween('added_on', [$from_date, $to_date])->count();
+        $data['monthly_no_answer'] = CallDisposition::where(['status' => 1,'disposition_type' => 4])->whereBetween('added_on', [$from_date, $to_date])->count();
+        $data['monthly_call_transferred'] = CallDisposition::where(['status' => 1,'disposition_type' => 5])->whereBetween('added_on', [$from_date, $to_date])->count();
+
+        $data['six_months_dispositions_count'] = $this->get_6_months_dipositions_count($from_date,$to_date);
         //$data['rgu'] = $this->get_rgo_counts('2020-01-01 17:00:00',$to_date);
+
+
+        //Total Counts
+        $data['total_sale_made'] = CallDisposition::where(['status' => 1,'disposition_type' => 1])->count();
+        $data['total_call_back'] = CallDisposition::where(['status' => 1,'disposition_type' => 2])->count();
+        $data['total_customer_service'] = CallDisposition::where(['status' => 1,'disposition_type' => 3])->count();
+        $data['total_no_answer'] = CallDisposition::where(['status' => 1,'disposition_type' => 4])->count();
+        $data['total_call_transferred'] = CallDisposition::where(['status' => 1,'disposition_type' => 5])->count();
+        $data['total_dispositions'] = CallDisposition::where(['status' => 1])->count();
+
+
         return view('dashboard.provider_dashboard' , $data);
     }
     private function get_rgo_counts($from_date, $to_date)

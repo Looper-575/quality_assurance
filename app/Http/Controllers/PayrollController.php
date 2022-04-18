@@ -159,17 +159,16 @@ class PayrollController extends Controller
     }
 
     public function payroll_reject(Request $request){
-        Payroll::where('payroll_id', $request->id)->update([
-            'status' => 0,
-            'hr_approved' => 3,
-        ]);
+        $ids = explode(",", $request->id);
+        Payroll::whereIn('payroll_id', $ids)->delete();
         $response['status'] = "Success";
-        $response['result'] = "Rejected Successfully";
+        $response['result'] = "Deleted Successfully";
         return response()->json($response);
     }
 
     public function payroll_approve(Request $request){
-        Payroll::where('payroll_id', $request->id)->update([
+        $ids = explode(",", $request->id);
+        Payroll::whereIn('payroll_id', $ids)->update([
             'status' => 1,
             'hr_approved' => 1,
         ]);
@@ -259,13 +258,12 @@ class PayrollController extends Controller
 
     public function save_allowance_form(Request $request)
     {
-//        dd($request->all());
         $validator = Validator::make($request->all(),[
             'title' => 'required',
             'type' => 'required',
             'department_id' => 'required',
             'role_id' => 'required',
-            'value' => 'required',
+//            'value' => 'required',
         ]);
         if($validator->passes()) {
             $provider = '';
@@ -281,7 +279,11 @@ class PayrollController extends Controller
             } else {
                 $roles = implode(",", $request->role_id);
             }
-
+            if($request->bench_mark_value == 'mobile'){
+                $value = 0;
+            } else {
+                $value = $request->bench_mark_value;
+            }
             $model = PayrollAllowanceSetting::updateOrCreate([
                 'allowance_id' => $request->allowance_id,
             ], [
@@ -292,7 +294,9 @@ class PayrollController extends Controller
                 'role_id' => $roles,
                 'bench_mark_type' => slugify($request->bench_mark_type),
                 'bench_mark_criteria' => slugify($request->bench_mark_criteria),
-                'bench_mark_value' => $request->bench_mark_value,
+                'bench_mark_value' => $value,
+                'before' => $request->before,
+                'after' => $request->after,
                 'provider' => $provider,
                 'added_by' => Auth::user()->user_id,
             ]);
@@ -636,21 +640,6 @@ class PayrollController extends Controller
         $rgu_bench_mark = 0;
         foreach ($rgu_bench_mark_allowance as $rgu){
             if($rgu->role_id == 0 || $user->role_id == $rgu->role_id){
-                $sales = $this->get_user_total_rgu($from_date, $to_date, $user->user_id, $rgu->provider);
-                if($rgu->bench_mark_type == 'rgu'){
-                    $tem_val = 0;
-                    if($sales['total_rgu'] >= $rgu->bench_mark_value){
-                        if($rgu->bench_mark_criteria == 'fixed'){
-                            $tem_val += $rgu->allowance_value;
-                            $rgu_bench_mark += $rgu->allowance_value;
-                        } else {
-                            $val = intdiv($sales['total_rgu'],$rgu->bench_mark_value);
-                            $rgu_bench_mark += $val * $rgu->allowance_value;
-                            $tem_val += $val * $rgu->allowance_value;
-                        }
-                        $details[$rgu->title] = $tem_val;
-                    }
-                }
                 if($rgu->bench_mark_type == 'single-play'){
                     $play = 1;
                     $single_play = $this->get_user_play($user->user_id,$from_date, $to_date, $rgu->provider, $play);
@@ -699,21 +688,48 @@ class PayrollController extends Controller
                         $details[$rgu->title] = $tem_val;
                     }
                 }
-                if($rgu->bench_mark_type == 'mobile'){
-                    $play = 'mobile';
-                    $mobile_sales = $this->get_user_play($user->user_id,$from_date, $to_date, $rgu->provider, $play);
-                    if($mobile_sales >= $rgu->bench_mark_value){
-                        $tem_val = 0;
-                        if($rgu->bench_mark_criteria == 'fixed'){
-                            $rgu_bench_mark += $rgu->allowance_value;
-                            $tem_val += $rgu->allowance_value;
+
+                //Total RGU Allowance
+                $sales = $this->get_user_total_rgu($from_date, $to_date, $user->user_id, $rgu->provider);
+                $payroll_config = DB::table('payroll_config')->whereStatus(1)->frist();
+
+                if($sales['total_rgu'] >= $payroll_config->rgu_bench_mark){
+                    $tem_val = 0;
+                    $tem_val = $sales['total_rgu'] * $payroll_config->per_rgu; // rate per RGU as we define in payroll_config table
+                    $rgu_bench_mark += $tem_val;
+                    $details['Total RGU'] = $tem_val;
+                }
+
+                if($rgu->bench_mark_type == 'mobile') {
+                    $play = 'mobile'; // get mobile sales
+                    $temp_val = 0;
+                    $mobile_sales = $this->get_user_play($user->user_id, $from_date, $to_date, $rgu->provider, $play);
+                    if($sales['total_rgu'] > $payroll_config->rgu_bench_mark) {
+                        $over_40_remaining = $sales['total_rgu'] - $mobile_sales; // 50-13 = 37
+                        if($over_40_remaining >= $payroll_config->rgu_bench_mark){
+                            $after_mobile_allowance = $rgu->after * $mobile_sales; // greater then bench_mark i.e 1500
+                            $temp_val += $after_mobile_allowance;
                         } else {
-                            $val = intdiv($mobile_sales,$rgu->bench_mark_value);
-                            $rgu_bench_mark += $val * $rgu->allowance_value;
-                            $tem_val += $val * $rgu->allowance_value;
+                            $remaining_mobile = $payroll_config->rgu_bench_mark - $over_40_remaining; // 40 - 37 = 3
+                            if($remaining_mobile >= $payroll_config->rgu_bench_mark) {
+                                $after_mobile_allowance = $rgu->after * $remaining_mobile;
+                                $temp_val += $after_mobile_allowance;
+                            } else {
+                                $before_mobile_allowance = $rgu->before * $remaining_mobile; // 3*1500
+                                $temp_val += $before_mobile_allowance;
+                                $after_mobile_allowance = $rgu->after * ($remaining_mobile - $mobile_sales); //10*2000
+                                $temp_val += $after_mobile_allowance;
+                            }
                         }
-                        $details[$rgu->title] = $tem_val;
+                    } else {
+                        $over_40_remaining = $payroll_config->rgu_bench_mark - $sales['total_rgu'];
+                        $before_mobile_allowance = $over_40_remaining * $rgu->before;
+                        $temp_val += $before_mobile_allowance;
                     }
+
+                    $rgu_bench_mark += $temp_val;
+                    $details['Mobile'] = $temp_val;
+
                 }
             }
             $rgu_bench_mark =+ $rgu_bench_mark;

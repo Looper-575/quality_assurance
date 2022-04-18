@@ -7,14 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class PayrollAllowanceSetting extends Authenticatable
+class PayrollDeduction extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $table = 'payroll_allowance_settings';
-    protected $primaryKey = 'allowance_id';
-    const CREATED_AT = 'added_on';
-    const UPDATED_AT = 'modified_on';
+    protected $table = 'payroll_deductions';
+    protected $primaryKey = 'id';
+    public $timestamps = false;
 
     /**
      * The attributes that are mass assignable.
@@ -22,7 +21,7 @@ class PayrollAllowanceSetting extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'title', 'department_id', 'role_id', 'type', 'bench_mark_type', 'provider', 'bench_mark_criteria', 'bench_mark_value', 'allowance_value', 'before', 'after', 'added_by' ,'modified_by', 'status'
+        'payroll_id', 'title', 'amount',
     ];
 
     /**
@@ -44,13 +43,8 @@ class PayrollAllowanceSetting extends Authenticatable
         'modified_on' => 'datetime',
     ];
 
-    public function added()
+    public function payroll()
     {
-        return $this->belongsTo(User::class , 'added_by' , 'user_id');
-    }
-
-    public function department()
-    {
-        return $this->belongsTo(Department::class , 'department_id' , 'department_id');
+        return $this->belongsTo(Payroll::class , 'payroll_id' , 'payroll_id');
     }
 }
