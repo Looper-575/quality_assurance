@@ -3,9 +3,7 @@
     <link href="{{asset('assets/css/datatables.min.css')}}" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
-    <?php
-    $has_permissions = get_route_permissions( Auth::user()->role->role_id, @request()->route()->getName());
-    ?>
+    <?php $has_permissions = get_route_permissions( Auth::user()->role->role_id, @request()->route()->getName()); ?>
     <div class="m-portlet m-portlet--mobile">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
@@ -14,7 +12,7 @@
                 </div>
                 @if($has_permissions->add == 1)
                     <div class="float-right mt-3">
-                        <a id="add_new_btn" href="javascript:;" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill">
+                        <a id="add_new_btn" data-toggle="modal" data-target="#department_form_modal" href="javascript:;" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill">
                             <span><i class="la la-phone-square"></i><span>Add New</span></span>
                         </a>
                         <div class="m-separator m-separator--dashed d-xl-none"></div>
@@ -56,38 +54,42 @@
     </div>
 @endsection
 @section('footer_scripts')
-    <div id="team_type_form_modal" style="z-index:9999999; height: 100% !important; min-height: 100%; width: 100%; position: fixed; top: 0; background-color: rgba(0, 0, 0, 0.7);display:none;">
-        <div style="z-index:99999999;display: block; padding-right: 17px; top: 100px" class="modal fade show" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog user_roles_modal" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" id="modal_title">Department</h4>
-                        <button type="button" class="btn btn-danger" onclick="$('#team_type_form_modal').fadeOut();" aria-hidden="true"><i class="fa fa-times"></i></button>
-                    </div>
-                    <div class="modal-body">
-                        <form method="post" id="team_type_form">
-                            @csrf
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <label class="form-check-label" for="title">Title </label>
-                                        <input class="form-control" type="text" name="title" placeholder="Title..." id="title" required>
-                                        <input class="form-control" type="hidden" name="team_type_id" id="team_type_id" required>
-                                    </div>
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                                <div class="col-12">
-                                    <button type="submit"  class="btn btn-primary">Save</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+    <!--begin::Modal-->
+    <div class="modal fade" id="department_form_modal" tabindex="-1" role="dialog" aria-labelledby="modal_label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal_label">Department</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
+                <form method="post" id="team_type_form">
+                    <div class="modal-body">
+                        @csrf
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label class="form-check-label" for="title">Title </label>
+                                    <input class="form-control" type="text" name="title" placeholder="Title..." id="title" required>
+                                    <input class="form-control" type="hidden" name="team_type_id" id="team_type_id" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Save changes
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+    <!--end::Modal-->
     <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script src="{{ asset('assets/bundles/select2/dist/js/select2.full.min.js') }}"></script>
@@ -119,9 +121,7 @@
         $('#add_new_btn').click(function () {
             $('#team_type_id').val(null);
             $('#title').val(null);
-            $('#team_type_form_modal').fadeIn();
         });
-
         $('#team_type_form').submit(function (e) {
             e.preventDefault();
             $('#team_type_form_modal').fadeOut();
@@ -133,14 +133,11 @@
             let arr = [a];
             call_ajax_with_functions('', '{{route('team_type_save')}}', data, arr);
         });
-
         $('.edit_btn').click( function () {
             let data = JSON.parse(this.value);
             $('#team_type_id').val(data.department_id);
             $('#title').val(data.title);
-            $('#team_type_form_modal').fadeIn();
-
+            $('#department_form_modal').modal('show');
         });
-
     </script>
 @endsection

@@ -1,5 +1,13 @@
 @extends('layout.template')
 @section('header_scripts')
+    <style>
+        .select2-container{
+            width: 100% !important;
+        }
+        .dependent{
+            display: none;
+        }
+    </style>
 @endsection
 @section('content')
     <div class="m-portlet m-portlet--mobile">
@@ -32,7 +40,7 @@
                     <tr>
                         <td>{{$index+1}}</td>
                         <td>{{$menu->title}}</td>
-                        <td>{{$menu->type}}</td>
+                        <td>{{ucfirst($menu->type)}}</td>
                         <td>{{$menu->value}}</td>
                         <td>
                             <div class="btn-group btn-group-sm">
@@ -47,7 +55,7 @@
         </div>
     </div>
     <!-- View Modal -->
-    <div class="modal fade" id="add_new_modal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="add_new_modalLabel" aria-hidden="true">
+    <div class="modal fade" id="add_new_modal" tabindex="-1" aria-labelledby="add_new_modalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
@@ -80,9 +88,8 @@
                             </div>
                             <div class="col-6">
                                 <div class="form-group">
-                                    <label class="form-check-label" for="role_id">Role</label>
-                                    <select class="form-control mt-2" name="role_id" id="role_id" required>
-                                        <option value="">Please Select</option>
+                                    <label class="form-check-label mb-2" for="role_id">Role</label>
+                                    <select class="form-control mt-2 select2" name="role_id[]" id="role_id" multiple="multiple" required>
                                         <option value="0">All</option>
                                     </select>
                                 </div>
@@ -93,6 +100,15 @@
                                     <select class="form-control mt-2" name="type" id="type" required>
                                         <option value="">Please Select</option>
                                         <option value="convenience">Convenience</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label class="form-check-label" for="type">Criteria</label>
+                                    <select class="form-control mt-2" name="criteria" id="criteria" required>
+                                        <option value="">Please Select</option>
                                         <option value="Fixed">Fixed</option>
                                         <option value="Percentage">Percentage %</option>
                                     </select>
@@ -120,6 +136,9 @@
 @endsection
 @section('footer_scripts')
     <script>
+        $(document).ready(function (){
+            $(".select2").select2();
+        })
         function set_role(department_id, role_id = null)
         {
             $.ajax({
@@ -131,9 +150,9 @@
                 success: function( response ) {
                     $('#role_id').empty().append('');
                     var role_id = $('#role_id');
-                    role_id.append(
-                        $('<option></option>').val('').html('Please Select')
-                    );
+                    // role_id.append(
+                    //     $('<option></option>').val('').html('Please Select')
+                    // );
                     role_id.append(
                         $('<option></option>').val(0).html('All')
                     );
@@ -145,7 +164,8 @@
                 }
             }).then(function(){
                 if(role_id != null){
-                    $('#role_id').val(role_id);
+                    // $('#role_id').val(role_id);
+                    $("#role_id").select2().select2('val', [role_id]);
                 }
             });
         }
@@ -179,6 +199,7 @@
         });
         $('#add_new_btn').click(function () {
             $('#data_form_id').resetForm();
+            $("#role_id").select2().select2('val', [' ']);
             $('#add_new_modal').modal('toggle');
         });
 
@@ -199,9 +220,10 @@
             $('#title').val(data.title);
             $('#type').val(data.type);
             $('#value').val(data.value);
+            $('#criteria').val(data.criteria);
             $('#department_id').val(data.department_id);
-            let department_id = data.department_id;
-            set_role(department_id, data.role_id);
+            let roles = data.role_id.split(',');
+            set_role(data.department_id, roles);
             $('#add_new_modal').modal('toggle');
         });
     </script>

@@ -7,6 +7,7 @@ use App\Models\CallType;
 use App\Models\Employee;
 use App\Models\Holiday;
 use App\Models\LeaveApplication;
+use App\Models\LeaveBucketView;
 use App\Models\QualityAssurance;
 use App\Models\Team;
 use App\Models\TeamMember;
@@ -339,5 +340,37 @@ class ReportController extends Controller
             $response['result'] = $validator->errors()->toJson();
         }
         return view('reports.partials.leaves_taken_report_monthly' , $data);
+    }
+    public function leave_report()
+    {
+        $data['page_title'] = "Employee Leaves Report - Atlantis BPO CRM";
+        if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5){
+            $data['reports'] = LeaveBucketView::with('user')->get();
+        } else {
+            $data['reports'] = LeaveBucketView::with('user')->whereUserId(Auth::user()->user_id)->get();
+        }
+        return view('reports.leave_report' , $data);
+    }
+    public function view_leave_report(Request $request)
+    {
+        $payroll =  DB::table('payrolls')
+            ->select('user_id', 'salary_month', 'leaves', 'half_leaves', 'lates', 'absents')
+            ->where('user_id', $request->user_id)
+            ->where('status', 1)
+            ->where('hr_approved', 1);
+        $data['report'] = DB::table('attendance_log')
+            ->select('user_id', 'attendance_date', 'applied_leave', 'half_leave', 'late', 'absent')
+            ->where('user_id', $request->user_id)
+            ->where(function ($query) {
+                return $query->orWhere('applied_leave', 1)
+                    ->orWhere('half_leave',1)
+                    ->orWhere('late',1)
+                    ->orWhere('absent',1);
+            })
+            ->union($payroll)
+            ->orderBy('attendance_date', 'ASC')
+            ->get();
+        $data['user_id'] = $request->user_id;
+        return view('reports.partials.leave_report' , $data);
     }
 }

@@ -244,9 +244,7 @@ class SettingsController extends Controller
     public function managerial_role()
     {
         $data['page_title'] = "Managerial Roles - Atlantis BPO CRM";
-        $data['managerial_roles'] = ManagerialRole::where([
-            'status' => 1,
-        ])->with('role')->get();
+        $data['managerial_roles'] = UserRole::with('managerrial_role')->has('managerrial_role')->get();
         $data['user_roles'] = UserRole::where([
             'status' => 1,
         ])->get();
@@ -254,20 +252,33 @@ class SettingsController extends Controller
     }
     public function managerial_role_save(Request $request)
     {
-        ManagerialRole::updateOrCreate([
-            'managerial_role_id' => $request->managerial_role_id,
-        ], [
-            'role_id' => $request->role_id,
-            'type' => $request->type,
-            'added_by' => Auth::user()->user_id,
-        ]);
+        if(!isset($request->type)){
+            ManagerialRole::where('role_id',$request->role_id)->where('status', 1)->update([
+                'status' => 0
+            ]);
+        }else{
+            ManagerialRole::where('role_id',$request->role_id)->whereNotIn('type', $request->type)->update([
+                'status' => 0
+            ]);
+            foreach ($request->type as $type){
+                ManagerialRole::updateOrCreate([
+                    'role_id' => $request->role_id,
+                    'type' => $type,
+                ], [
+                    'role_id' => $request->role_id,
+                    'type' => $type,
+                    'status' => 1,
+                    'added_by' => Auth::user()->user_id,
+                ]);
+            }
+        }
         $response['status'] = "Success";
         $response['result'] = "Added Successfully";
         return response()->json($response);
     }
     public function managerial_role_delete(Request $request)
     {
-        ManagerialRole::where('managerial_role_id', $request->managerial_role_id)->update(['status' => 2]);
+        ManagerialRole::where('role_id', $request->role_id)->update(['status' => 2]);
         $response['status'] = "Success";
         $response['result'] = "Deleted Successfully";
         return response()->json($response);

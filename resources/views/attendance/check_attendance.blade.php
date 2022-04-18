@@ -28,7 +28,7 @@
                         <div class="form-group">
                             <label class="form-check-label" for="manager_id">Team</label>
                             <input type="hidden" name="manager_id" value="{{Auth::user()->user_id}}" id="manager_id" {{ Auth::user()->role->role_id == 1 ? 'disabled' : '' }}>
-                            <select class="form-control select2 mt-3" name="manager_id" id="manager_id" required {{ Auth::user()->role->role_id != 1 ? 'disabled' : '' }}>
+                            <select class="form-control select2 mt-3" name="manager_id" id="manager_id" required {{ Auth::user()->role->role_id == 1 ||   Auth::user()->role->role_id==5 ? '' : 'disabled' }}>
                                 <option value="">Select Team</option>
                                 @foreach($teams as $team)
                                     <option {{ Auth::user()->user_id == $team->team_lead_id ? 'selected' : '' }} value="{{$team->team_lead_id}}">{{$team->title}}</option>
@@ -56,12 +56,9 @@
             var last_three_day = new Date(three_day_ago - (3*days));
             last_three_day = last_three_day.toISOString().split("T")[0];
             $('#attendance_date').attr('max', today);
-
-            <?php if(\Illuminate\Support\Facades\Auth::user()->role_id != 1 && \Illuminate\Support\Facades\Auth::user()->role_id != 5){ ?>
+            <?php if(Auth::user()->role_id != 1 && Auth::user()->role_id != 5){ ?>
             $('#attendance_date').attr('min', last_three_day);
             <?php } ?>
-
-
         });
         $('#check_attendance_form').submit(function (e) {
             e.preventDefault();

@@ -58,37 +58,41 @@
             </table>
         </div>
     </div>
-
-
-
-
 @endsection
 @section('footer_scripts')
-    <div id="change_pass_modal" style="z-index:9999999; height: 100% !important; min-height: 100%; width: 100%; position: fixed; top: 0; background-color: rgba(0, 0, 0, 0.7);display:none;">
-        <div style="z-index:99999999;display: block; padding-right: 17px; top: 100px" class="modal fade show" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog change_pass_modal" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" id="modal_title">Change Password</h4>
-                        <button type="button" class="btn" onclick="$('#change_pass_modal').fadeOut();" aria-hidden="true"><i class="fas fa-times"></i></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="change_pass_form">
-                            <div class="form-group">
-                                <label for="change_password">Password</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fas fa-lock"></i></div>
-                                    </div>
-                                    @csrf
-                                    <input type="text" id="change_password" class="form-control" placeholder="Password" name="password">
-                                    <input type="hidden" name="user_id" id="c_user_id">
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary m-t-15 waves-effect">Update Password</button>
-                        </form>
-                    </div>
+    <div class="modal fade" id="change_pass_modal" tabindex="-1" role="dialog" aria-labelledby="modal_label" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal_label">Change Password</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
+                <form method="post" id="change_pass_form">
+                    <div class="modal-body">
+                        @csrf
+                        <div class="form-group">
+                            <label for="change_password">Password</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><i class="fas fa-lock"></i></div>
+                                </div>
+                                @csrf
+                                <input type="text" id="change_password" class="form-control" placeholder="Password" name="password">
+                                <input type="hidden" name="user_id" id="c_user_id">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Save changes
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -108,7 +112,7 @@
             let form = document.getElementById('user_form');
             let data = new FormData(form);
             let a = function () {
-                $('#background_fade_form').fadeOut(function() { $(this).remove(); });
+                $('#background_fade_form').modal('hide');
             }
             let b = function() {
                 window.location.reload();
@@ -147,14 +151,14 @@
             })
         }
         function change_password(me) {
-            $('#change_pass_modal').fadeIn();
+            $('#change_pass_modal').modal('show');
             $('#c_user_id').val(me.value);
         }
         $('#change_pass_form').submit(function (e){
             e.preventDefault();
             let data = new FormData(this);
             let a = function () {
-                $('#change_pass_modal').fadeOut();
+                $('#change_pass_modal').modal('hide');
             }
             let arr = [a];
             call_ajax_with_functions('', '{{route('change_password')}}', data, arr);

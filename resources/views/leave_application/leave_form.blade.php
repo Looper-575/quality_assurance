@@ -23,13 +23,14 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @if($remaining_leaves)
                             <tr>
-                                <td>{{$remaining_leaves['annual_leaves']}}</td>
-                                <td>{{$remaining_leaves['casual_leaves']}}</td>
-                                <td>{{$remaining_leaves['sick_leaves']}}</td>
+                                <?php
+                                $check_leave_bucket = get_leave_bucket_leaves(Auth::user()->user_id);
+                                ?>
+                                <td id="remaining_annual">{{$check_leave_bucket['remaining_annual']}}</td>
+                                <td id="remaining_casual">{{$check_leave_bucket['remaining_casual']}}</td>
+                                <td id="remaining_sick">{{$check_leave_bucket['remaining_sick']}}</td>
                             </tr>
-                        @endif
                         </tbody>
                     </table>
                 </div>
@@ -44,17 +45,15 @@
                             @endif
                             <label class="form-check-label" for="leave_type">Leave Type</label>
                             <select class="form-control" name="leave_type" id="leave_type" required >
-                                @if($remaining_leaves['total_remaining'] == 0)
-                                    <option value="6">Unpaid</option>
-                                @else
-                                    <option value="" selected disabled >Select</option>
-                                    @foreach($leave_types as $leave_type)
-                                        <option {{$leave ? ($leave->leave_type_id == $leave_type->leave_type_id ? 'selected' : '' ): ''}}
-                                                value="{{$leave_type->leave_type_id}}">{{$leave_type->title}}</option>
-                                    @endforeach
-                                @endif
+                                <option value="" selected disabled >Select</option>
+                                @foreach($leave_types as $leave_type)
+                                    <option {{$leave ? ($leave->leave_type_id == $leave_type->leave_type_id ? 'selected' : '' ): ''}}
+                                           {{($check_leave_bucket['remaining_annual']<1 ? ($leave_type->leave_type_id == 1 ? 'disabled' : '') : '')}} {{($check_leave_bucket['remaining_casual']<1 ? ($leave_type->leave_type_id == 2 ? 'disabled' : '') : '')}} {{($check_leave_bucket['remaining_sick']<1 ? ($leave_type->leave_type_id == 3 ? 'disabled' : '') : '')}} value="{{$leave_type->leave_type_id}}">{{$leave_type->title}}</option>
+                                @endforeach
                             </select>
                         </div>
+                    </div>
+                    <div class="col-6">
                         <div class="form-group" id="half_day" style="display: none" >
                             <label for="half_day" class="form-check-label">Select Half Day</label>
                             <select class="form-control" name="half" id="half_day_option">
@@ -84,8 +83,6 @@
                             <input type="file" class="form-control" name="medical_report" id="medical_report">
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-6">
                         <div class="form-group" id="no_of_leaves">
                             <label  class="form-check-label" for="no_leaves">No of Leaves</label>
@@ -234,7 +231,7 @@
             e.preventDefault();
             let data = new FormData(this);
             let a = function () {
-                window.location.href = "{{route('leave_list')}}";
+                {{--window.location.href = "{{route('leave_list')}}";--}}
             };
             let arr = [a];
             call_ajax_with_functions('','{{route('leave_save')}}',data,arr);
@@ -245,8 +242,43 @@
             var to_date = new Date($('#to').val());
             let days = DaysBetween(from_date,to_date);
             $('#no_leaves').val(days);
-
-
+            let annual = $('#remaining_annual').text();
+            let casual = $('#remaining_casual').text();
+            let sick = $('#remaining_sick').text();
+            let leave_type_val = $('#leave_type').val();
+            if(leave_type_val == 1 && annual<days){
+                swal({
+                    title: "Warning!",
+                    text: "Please check you Annual leave limit",
+                    type: "warning",
+                    timer: 2000,
+                    button: false,
+                });
+                $('#to').val('');
+                $('#no_leaves').val('');
+            }
+            if(leave_type_val == 2 && casual<days){
+                swal({
+                    title: "Warning!",
+                    text: "Please check you Casual leave limit",
+                    type: "warning",
+                    timer: 3000,
+                    button: false,
+                });
+                $('#to').val('');
+                $('#no_leaves').val('');
+            }
+            if(leave_type_val == 3 && sick<days){
+                swal({
+                    title: "Warning!",
+                    text: "Please check you Sick leave limit",
+                    type: "warning",
+                    timer: 3000,
+                    button: false,
+                });
+                $('#to').val('');
+                $('#no_leaves').val('');
+            }
         }
 
         function DaysBetween(dDate1, dDate2) {

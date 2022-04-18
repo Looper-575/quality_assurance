@@ -125,11 +125,10 @@
                 url: '{{route('get_employee_leaves_bucket')}}',
                 data: {_token:"{{csrf_token()}}",team_member_id: team_member_id},
                 success: function( data ) {
-                    console.log( data );
                     let remaining_leaves_div = $(remaining_leaves_div_html);
-                    remaining_leaves_div.find('tbody').find('tr').append('<td>'+data.annual_leaves+'</td>');
-                    remaining_leaves_div.find('tbody').find('tr').append('<td>'+data.casual_leaves+'</td>');
-                    remaining_leaves_div.find('tbody').find('tr').append('<td>'+data.sick_leaves+'</td>');
+                    remaining_leaves_div.find('tbody').find('tr').append('<td id="remaining_annual">'+data.remaining_annual+'</td>');
+                    remaining_leaves_div.find('tbody').find('tr').append('<td id="remaining_casual">'+data.remaining_casual+'</td>');
+                    remaining_leaves_div.find('tbody').find('tr').append('<td id="remaining_sick">'+data.remaining_sick+'</td>');
                     $('#remaining_leaves_bucket').html(remaining_leaves_div);
                 }
             });
@@ -261,6 +260,45 @@
             var timeDifferenceInHours = timeDifference / 60 / 60;
             var timeDifferenceInDays = timeDifferenceInHours  / 24;
             $('#no_leaves').val(timeDifferenceInDays + 1 );
+
+            let days = $('#no_leaves').val()
+            let annual = $('#remaining_annual').text();
+            let casual = $('#remaining_casual').text();
+            let sick = $('#remaining_sick').text();
+            let leave_type_val = $('#leave_type').val();
+            if(leave_type_val == 1 && annual<days){
+                swal({
+                    title: "Warning!",
+                    text: "Please check you Annual leave limit",
+                    type: "warning",
+                    timer: 2000,
+                    button: false,
+                });
+                $('#to').val('');
+                $('#no_leaves').val('');
+            }
+            if(leave_type_val == 2 && casual<days){
+                swal({
+                    title: "Warning!",
+                    text: "Please check you Casual leave limit",
+                    type: "warning",
+                    timer: 3000,
+                    button: false,
+                });
+                $('#to').val('');
+                $('#no_leaves').val('');
+            }
+            if(leave_type_val == 3 && sick<days){
+                swal({
+                    title: "Warning!",
+                    text: "Please check you Sick leave limit",
+                    type: "warning",
+                    timer: 3000,
+                    button: false,
+                });
+                $('#to').val('');
+                $('#no_leaves').val('');
+            }
 
         }
     </script>

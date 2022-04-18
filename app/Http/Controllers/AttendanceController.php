@@ -76,38 +76,13 @@ class AttendanceController extends Controller
         array_push($users_id, $manager_id);
         if($hour >= $shift_check_in && date('N', strtotime($today)) < 6 && $check_holiday->count() == 0) {
             $check_record = AttendanceLog::with('user')->where('attendance_date', $date_today)->where('added_by', $manager_id)->get();
+            $att_users_id = $check_record->pluck('user_id')->toArray();
+            $new_users_in_team = array_diff($users_id,$att_users_id);
+            if(count($new_users_in_team)>0){
+                $this->create_attendance_sheet($new_users_in_team, $date_today, $team ,$manager_id);
+            }
             if($check_record->isEmpty()) {
-                DB::beginTransaction();
-                try {
-                    foreach ($users_id as $user_id) {
-                        $attendance_log_check = AttendanceLog::where(['user_id' => $user_id, 'attendance_date' => $date_today])->get();
-                        if (count($attendance_log_check) > 0) {
-                        } else {
-                            $leave = LeaveApplication::where('added_by', $user_id)
-                                ->where(['approved_by_manager' => 1, 'approved_by_hr' => 1])
-                                ->where('from', '<=', $date_today)
-                                ->where('to', '>=', $date_today)
-                                ->first();
-                            $attendance_log = new AttendanceLog;
-                            if ($leave) {
-                                if ($leave->leave_type_id) {
-                                    $attendance_log->half_leave = 1;
-                                } else {
-                                    $attendance_log->on_leave = 1;
-                                }
-                            }
-                            $attendance_log->time_out = $team->shift->check_out;
-                            $attendance_log->user_id = $user_id;
-                            $attendance_log->attendance_date = $date_today;
-                            $attendance_log->added_by = $manager_id;
-                            $attendance_log->save();
-                        }
-                    }
-                } catch (\Exception $ex){
-                    DB::rollBack();
-                } finally {
-                    DB::commit();
-                }
+                $this->create_attendance_sheet($users_id, $date_today, $team ,$manager_id);
                 return AttendanceLog::with('user')->where('attendance_date', $date_today)->WhereIn('user_id', $users_id)->get();
             } else {
                 return AttendanceLog::with('user')->where('attendance_date', $date_today)->whereIn('user_id',$users_id)->get();
@@ -118,6 +93,44 @@ class AttendanceController extends Controller
             return AttendanceLog::with('user')->where('attendance_date', $last_date->attendance_date)->whereIn('user_id',$users_id)->get();
         }
     }
+
+    private function create_attendance_sheet($users_id, $date_today, $team ,$manager_id)
+    {
+        DB::beginTransaction();
+        try {
+            foreach ($users_id as $user_id) {
+                $attendance_log_check = AttendanceLog::where(['user_id' => $user_id, 'attendance_date' => $date_today])->get();
+                if (count($attendance_log_check) > 0) {
+                } else {
+                    $leave = LeaveApplication::where('added_by', $user_id)
+                        ->where(['approved_by_manager' => 1, 'approved_by_hr' => 1])
+                        ->where('from', '<=', $date_today)
+                        ->where('to', '>=', $date_today)
+                        ->first();
+                    $attendance_log = new AttendanceLog;
+                    if ($leave) {
+                        if ($leave->leave_type_id == 4) {
+                            $attendance_log->half_leave = 1;
+                        } else if($leave->leave_type_id == 6) {
+                            $attendance_log->absent = 1;
+                        } else {
+                            $attendance_log->applied_leave = 1;
+                        }
+                    }
+                    $attendance_log->time_out = $team->shift->check_out;
+                    $attendance_log->user_id = $user_id;
+                    $attendance_log->attendance_date = $date_today;
+                    $attendance_log->added_by = $manager_id;
+                    $attendance_log->save();
+                }
+            }
+        } catch (\Exception $ex){
+            DB::rollBack();
+        } finally {
+            DB::commit();
+        }
+    }
+
     public function check_attendance()
     {
         $data['page_title'] = "Check Attendance - Atlantis BPO CRM";
@@ -156,37 +169,7 @@ class AttendanceController extends Controller
         }
         $users_id = TeamMember::where('team_id', $team->team_id)->pluck('user_id')->toArray();
         array_push($users_id, $manager_id);
-        DB::beginTransaction();
-        try {
-            foreach ($users_id as $user_id) {
-                $attendance_log_check = AttendanceLog::where(['user_id' => $user_id, 'attendance_date' => $date_today])->get();
-                if (count($attendance_log_check) > 0) {
-                } else {
-                    $leave = LeaveApplication::where('added_by', $user_id)
-                        ->where(['approved_by_manager' => 1, 'approved_by_hr' => 1])
-                        ->where('from', '<=', $date_today)
-                        ->where('to', '>=', $date_today)
-                        ->first();
-                    $attendance_log = new AttendanceLog;
-                    if ($leave) {
-                        if ($leave->leave_type_id) {
-                            $attendance_log->half_leave = 1;
-                        } else {
-                            $attendance_log->on_leave = 1;
-                        }
-                    }
-                    $attendance_log->time_out = $team->shift->check_out;
-                    $attendance_log->user_id = $user_id;
-                    $attendance_log->attendance_date = $date_today;
-                    $attendance_log->added_by = $manager_id;
-                    $attendance_log->save();
-                }
-            }
-        } catch (\Exception $ex){
-            DB::rollBack();
-        } finally {
-            DB::commit();
-        }
+        $this->create_attendance_sheet($users_id, $date_today, $team ,$manager_id);
         $data['agents'] =  AttendanceLog::with('user')->where('attendance_date', $date_today)->where('added_by', $manager_id)->get();
         $data['not_marked'] = false;
         $data['holiday'] = false;

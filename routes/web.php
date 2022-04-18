@@ -402,9 +402,9 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::post('/save_tax_deduction_form','App\Http\Controllers\PayrollController@save_tax_deduction_form')->name('save_tax_deduction_form');
     Route::post('/tax_deduction_delete','App\Http\Controllers\PayrollController@tax_deduction_delete')->name('tax_deduction_delete');
     //    Call dispostions types routes
-    Route::get('/call_dispositions_types','App\Http\Controllers\SettingsController@call_dispositions_types')->name('call_dispositions_types');
-    Route::post('/call_dispositions_types_save','App\Http\Controllers\SettingsController@call_dispositions_types_save')->name('call_dispositions_types_save');
-    Route::get('/call_dispositions_types_delete','App\Http\Controllers\SettingsController@call_dispositions_types_delete')->name('call_dispositions_types_delete');
+    Route::get('/disposition_type_list','App\Http\Controllers\SettingsController@disposition_type_list')->name('call_dispositions_types');
+    Route::post('/disposition_type_save','App\Http\Controllers\SettingsController@disposition_type_save')->name('call_dispositions_types_save');
+    Route::get('/disposition_type_delete','App\Http\Controllers\SettingsController@disposition_type_delete')->name('call_dispositions_types_delete');
     //    Payslips
     Route::get('/payslips', 'App\Http\Controllers\PayrollController@payslips')->name('payslips');
     Route::post('/view_payslip', 'App\Http\Controllers\PayrollController@view_payslip')->name('view_payslip');
@@ -419,5 +419,11 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
 
     //Chat Component
     Route::post('/create_group', 'App\Http\Controllers\ChatController@create_group')->name('create_group');
+    Route::post('/edit_chat_group', 'App\Http\Controllers\ChatController@edit_chat_group')->name('edit_chat_group');
+    Route::post('/leave_chat_group', 'App\Http\Controllers\ChatController@leave_chat_group')->name('leave_chat_group');
+
+    //Leave report
+    Route::get('/leave_report' , 'App\Http\Controllers\ReportController@leave_report')->name('leave_report');
+    Route::post('/view_leave_report' , 'App\Http\Controllers\ReportController@view_leave_report')->name('view_leave_report');
 
 });

@@ -3,7 +3,6 @@
     <link href="{{asset('assets/css/datatables.min.css')}}" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
-
     <div class="m-portlet m-portlet--mobile">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
@@ -48,78 +47,40 @@
             </table>
         </div>
     </div>
-
-
-{{--    <div class="row">--}}
-{{--        <div class="col-12">--}}
-{{--            <div class="card">--}}
-{{--                <div class="card-header" style="justify-content: space-between;">--}}
-{{--                    <h4>User Roles List</h4>--}}
-{{--                    <a class="btn btn-icon icon-left btn-primary" id="add_new_btn" href="javascript:;"><i class="fas fa-plus"></i> Add new</a>--}}
-{{--                </div>--}}
-{{--                <div class="card-body">--}}
-{{--                    <div class="table-responsive">--}}
-{{--                        <table class="table table-striped" id="chkbox_table">--}}
-{{--                            <thead>--}}
-{{--                            <tr>--}}
-{{--                                <th>S.No.</th>--}}
-{{--                                <th>Title</th>--}}
-{{--                                <th>Slug</th>--}}
-{{--                                <th>Added On</th>--}}
-{{--                                <th>Action</th>--}}
-{{--                            </tr>--}}
-{{--                            </thead>--}}
-{{--                            <tbody>--}}
-{{--                            @foreach ($roles as $role)--}}
-{{--                                <tr>--}}
-{{--                                    <td>{{$loop->index+1}}</td>--}}
-{{--                                    <td>{{$role->title}}</td>--}}
-{{--                                    <td>{{$role->slug}}</td>--}}
-{{--                                    <td>{{parse_datetime_get($role->added_on)}}</td>--}}
-{{--                                    <td>--}}
-{{--                                        <button type="button" class="btn btn-primary edit_btn" value="{{json_encode($role)}}">Edit</button>--}}
-{{--                                        <button type="button" class="btn btn-danger detele_btn" value="{{$role->role_id}}"> Delete </button>--}}
-{{--                                    </td>--}}
-{{--                                </tr>--}}
-{{--                            @endforeach--}}
-{{--                            </tbody>--}}
-{{--                        </table>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-{{--        </div>--}}
-{{--    </div>--}}
 @endsection
 @section('footer_scripts')
-    <div id="user_roles_form_modal" style="z-index:9999999; height: 100% !important; min-height: 100%; width: 100%; position: fixed; top: 0; background-color: rgba(0, 0, 0, 0.7);display:none;">
-        <div style="z-index:99999999;display: block; padding-right: 17px; top: 100px" class="modal fade show" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog user_roles_modal" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" id="modal_title">User Role</h4>
-                        <button type="button" class="btn" onclick="$('#user_roles_form_modal').fadeOut();" aria-hidden="true"><i class="fas fa-times"></i></button>
-                    </div>
-                    <div class="modal-body">
-                        <form method="post" id="user_roles_form">
-                            @csrf
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <label class="form-check-label" for="title">Title </label>
-                                        <input class="form-control" type="text" name="title" id="title" required>
-                                        <input class="form-control" type="hidden" name="role_id" id="role_id" required>
-                                    </div>
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                                <div class="col-12">
-                                    <button type="submit"  class="btn btn-primary">Save</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+
+    <div class="modal fade" id="user_roles_form_modal" tabindex="-1" role="dialog" aria-labelledby="modal_label" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal_label">Users Role Form</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
+                <form method="post" id="user_roles_form">
+                    <div class="modal-body">
+                        @csrf
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label class="form-check-label" for="title">Title </label>
+                                    <input class="form-control" type="text" name="title" id="title" required>
+                                    <input class="form-control" type="hidden" name="role_id" id="role_id" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Save changes
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -154,9 +115,8 @@
         $('#add_new_btn').click(function () {
             $('#role_id').val(null);
             $('#title').val(null);
-            $('#user_roles_form_modal').fadeIn();
+            $('#user_roles_form_modal').modal('show');
         });
-
         $('#user_roles_form').submit(function (e) {
             e.preventDefault();
             let form = document.getElementById('user_roles_form');
@@ -167,14 +127,12 @@
             let arr = [a];
             call_ajax_with_functions('', '{{route('roles_save')}}', data, arr);
         });
-
         $('.edit_btn').click( function () {
             let data = JSON.parse(this.value);
             $('#role_id').val(data.role_id);
             $('#title').val(data.title);
-            $('#user_roles_form_modal').fadeIn();
+            $('#user_roles_form_modal').modal('show');
 
         });
-
     </script>
 @endsection

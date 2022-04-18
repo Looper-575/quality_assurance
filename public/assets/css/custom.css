@@ -223,3 +223,102 @@ button.buttons-pdf{
 #sale_made_table_wrapper > div:nth-child(2) > div.col-sm-12 >  table{
     transform: rotateX(180deg);
 }
+.m-card-user__edit{
+    right: 0;
+    top: 0;
+}
+
+/*------------------------chat sidebar Styling--------------------*/
+.one_to_one_user{
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+.active_chat_info {
+    height: 50px;
+    padding: 10px;
+    background: #e6e6e6;
+}
+.message-text_recieved,.message-text_send{
+    padding: 10px;
+    background: #e6e6e6;
+    border-radius: 10px;
+}
+.message-text_send{
+    background: #716aca;
+    margin-right: 10px;
+    color: white;
+}
+.m-messenger .m-messenger__messages .m-messenger__message.m-messenger__message--out{
+    padding-left: unset;
+}
+#chat_arrow_icon {
+     background-color: transparent;
+    border-radius: 50%;
+    color: #000;
+    border: 1px solid #000;
+    margin: 0px auto;
+    position: absolute;
+    bottom: 50px;
+    left: 40%;
+    z-index: 9;
+}
+.chat_attachment{
+    width: fit-content;
+    max-width: 100px;
+}
+.m-messenger .m-messenger__form{
+    display: unset;
+}
+#btn_create_group{
+    top: 43%;
+    right: 30px;
+    border-radius: 50%;
+}
+#btn_create_group:hover,#btn_create_group:focus{
+    background-color: transparent !important;
+    color: #716aca !important;
+    border-color: #716aca !important;
+}
+
+
+.modal-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    opacity: 1;
+    top: 0px;
+    left: 0px;
+}
+.modal-img {
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.modal-img img {
+    padding: 5px;
+    width: fit-content;
+    max-width: 50%;
+}
+.noscroll {
+    overflow: hidden;
+}
+.item_group{
+    cursor: pointer;
+}
+.m-widget4 .m-widget4__item .m-widget4__img.m-widget4__img--logo img{
+    height: 3.5rem;
+}
+.group_edit_btn{
+    background: transparent;
+}
+.group_edit_btn i{
+    font-size: 25px;
+}
+.select2-container--open {
+    z-index: 2147483647 !important;
+}

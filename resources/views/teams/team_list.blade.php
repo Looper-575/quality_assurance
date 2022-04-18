@@ -62,67 +62,6 @@
     </div>
 @endsection
 @section('footer_scripts')
-    <div id="team_form_modal" style="z-index:9999999; height: 100% !important; min-height: 100%; width: 100%; position: fixed; top: 0; background-color: rgba(0, 0, 0, 0.7);display:none;">
-        <div style="z-index:99999999;display: block; padding-right: 17px; top: 100px" class="modal fade show" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog user_roles_modal modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" id="modal_title">Team</h4>
-                        <button type="button" class="btn btn-danger" onclick="$('#team_form_modal').fadeOut();" aria-hidden="true"><i class="fa fa-times"></i></button>
-                    </div>
-                    <div class="modal-body">
-                        <form method="post" id="team_form">
-                            @csrf
-                            <div class="row">
-                                <div class="col-6">
-                                    <div class="form-group">
-                                        <label class="form-check-label" for="title">Title </label>
-                                        <input class="form-control" type="text" name="title" id="title" placeholder="Enter Title.." required>
-                                        <input class="form-control" type="hidden" name="team_id" id="team_id" required>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <label class="form-check-label" for="shift_id">Shift</label>
-                                    <select class="form-control select2" name="shift_id" id="shift_id">
-                                        <option value="">Select Shift </option>
-                                        @foreach($shifts as $shift)
-                                            <option value="{{$shift->shift_id}}"> {{$shift->title}} </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-6">
-                                    <label class="form-check-label" for="team_lead_id">Team Lead</label>
-                                    <select class="form-control select2" name="team_lead_id" id="team_lead_id" required>
-                                        <option value=""> Select Team Lead </option>
-                                        @foreach($team_leads as $agent)
-                                            <option value="{{$agent->user_id}}"> {{$agent->full_name}} </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-6">
-                                    <label class="form-check-label" for="team_type_id">Team Type</label>
-                                    <select class="form-control select2" name="team_type_id" id="team_type_id" required>
-                                        <option value=""> Select User </option>
-                                        @foreach($types as $agent)
-                                            <option value="{{$agent->department_id}}"> {{$agent->title}} </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                                <div class="col-12">
-                                    <button type="submit"  class="btn btn-primary">Save</button>
-                                </div>
-                            </div>
-                        </form>
-
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script src="{{ asset('assets/bundles/select2/dist/js/select2.full.min.js') }}"></script>
@@ -151,12 +90,6 @@
                 }
             })
         });
-        $('#add_new_btn').click(function () {
-            $('#team_type_id').val(null);
-            $('#title').val(null);
-            $('#team_form_modal').fadeIn();
-        });
-
         $('#team_form').submit(function (e) {
             e.preventDefault();
             $('#team_form_modal').fadeOut();
@@ -168,17 +101,5 @@
             let arr = [a];
             call_ajax_with_functions('', '{{route('team_save')}}', data, arr);
         });
-
-        $('.edit_btn').click( function () {
-            let data = JSON.parse(this.value);
-            $('#team_id').val(data.team_id);
-            $('#shift_id').val(data.shift_id);
-            $('#team_lead_id').val(data.team_lead_id);
-            $('#team_type_id').val(data.team_type.department_id);
-            $('#title').val(data.title);
-            $('#team_form_modal').fadeIn();
-
-        });
-
     </script>
 @endsection

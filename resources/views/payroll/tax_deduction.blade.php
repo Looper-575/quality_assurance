@@ -23,6 +23,7 @@
                     <th>S.No.</th>
                     <th>From</th>
                     <th>To</th>
+                    <th>Amount</th>
                     <th>Value(%)</th>
                     <th>Action</th>
                 </tr>
@@ -33,6 +34,7 @@
                         <td>{{$index+1}}</td>
                         <td>{{$menu->from}}</td>
                         <td>{{$menu->to}}</td>
+                        <td>{{$menu->amount}}</td>
                         <td>{{$menu->value}}</td>
                         <td>
                             <div class="btn-group btn-group-sm">
@@ -61,28 +63,34 @@
                         @csrf
                         <div id="add_more_div">
                             <div class="row" id="new_val">
-                            <div class="col-4">
-                                <div class="form-group">
-                                    <label class="form-check-label" for="from">From</label>
-                                    <input type="numeric" class="form-control" name="from[]" id="from"  required>
+                                <div class="col-3">
+                                    <div class="form-group">
+                                        <label class="form-check-label" for="from">From</label>
+                                        <input type="numeric" class="form-control" name="from[]" id="from"  required>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="form-group">
+                                        <label class="form-check-label" for="to_id">To</label>
+                                        <input type="numeric" class="form-control" name="to[]" id="to_id"  required>
+                                    </div>
+                                </div>
+                                <div class="col-2">
+                                    <div class="form-group">
+                                        <label class="form-check-label" for="amount_id">Amount</label>
+                                        <input type="numeric" class="form-control" name="amount[]" id="amount_id"  required>
+                                    </div>
+                                </div>
+                                <div class="col-2">
+                                    <div class="form-group">
+                                        <label class="form-check-label" for="value">Value(%)</label>
+                                        <input type="numeric" class="form-control" name="value[]" id="value"  required>
+                                    </div>
+                                </div>
+                                <div class="col-2 mt-4">
+                                    <button type="button" class="btn btn-success" id="add_more_id" onclick="add_more(this)">Add More</button>
                                 </div>
                             </div>
-                            <div class="col-4">
-                                <div class="form-group">
-                                    <label class="form-check-label" for="to_id">To</label>
-                                    <input type="numeric" class="form-control" name="to[]" id="to_id"  required>
-                                </div>
-                            </div>
-                            <div class="col-2">
-                                <div class="form-group">
-                                    <label class="form-check-label" for="value">Value(%)</label>
-                                    <input type="numeric" class="form-control" name="value[]" id="value"  required>
-                                </div>
-                            </div>
-                            <div class="col-2 mt-4">
-                                <button class="btn btn-success" id="add_more_id" onclick="add_more(this)">Add More</button>
-                            </div>
-                        </div>
                         </div>
                         <div class="row">
                             <div class="col-12">
@@ -99,37 +107,11 @@
 @endsection
 @section('footer_scripts')
     <script>
-        let tax_row = (function () {/*<div class="row" id="copy_val">
-                            <div class="col-4">
-                                <div class="form-group">
-                                    <label class="form-check-label" for="from">From</label>
-                                    <input type="numeric" class="form-control" name="from[]" id="from[]" required>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="form-group">
-                                    <label class="form-check-label" for="to_id">To</label>
-                                    <input type="numeric" class="form-control" name="to[]" id="to_id[]" required>
-                                </div>
-                            </div>
-                            <div class="col-2">
-                                <div class="form-group">
-                                    <label class="form-check-label" for="value">Value(%)</label>
-                                    <input type="numeric" class="form-control" name="value[]" id="value[]"  required>
-                                </div>
-                            </div>
-                            <div class="col-2 mt-4">
-                                <button class="btn btn-danger" onclick="remove_row(this)">Remove</button>
-                            </div>
-                        </div>*/}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1];
         function add_more(me) {
-            let from_val = $('#from').val();
-            let to_val = $('#to_id').val();
-            let value_val = $('#value').val();
-            $("#new_val").after("<div class='row' id='copy_val'><div class='col-4'><div class='form-group'><label class='form-check-label' for='from'>From</label> <input type='numeric' class='form-control' name='from[]' id='from[]' value="+from_val+"> </div> </div> <div class='col-4'> <div class='form-group'> <label class='form-check-label' for='to_id'>To</label> <input type='numeric' class='form-control' name='to[]' id='to_id[]' value="+to_val+"> </div> </div> <div class='col-2'> <div class='form-group'> <label class='form-check-label' for='value'>Value(%)</label> <input type='numeric' class='form-control' name='value[]' id='value[]' value="+value_val+"> </div> </div> <div class='col-2 mt-4'> <button class='btn btn-danger' onclick='remove_row(this)'>Remove</button> </div> </div>");
-            $('#from').val('');
-            $('#to_id').val('');
-            $('#value').val('');
+            let new_row = $(me).closest('#new_val').clone();
+            $('#add_more_div').prepend(new_row)
+            new_row.find('input').val('');
+            $(me).closest('#new_val').find('button').removeClass('btn-primary').addClass('btn-danger').removeAttr('onclick').attr('onclick', 'remove_row(this)').html('Remove');
         }
         function remove_row(me) {
             $(me).closest('.row').fadeOut('slow', function (){
@@ -223,6 +205,7 @@
             $('#from').val(data.from);
             $('#to_id').val(data.to);
             $('#value').val(data.value);
+            $('#amount_id').val(data.amount);
             $('#add_new_modal').modal('toggle');
         });
     </script>

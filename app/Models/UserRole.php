@@ -64,4 +64,9 @@ class UserRole extends Authenticatable
     {
         return $this->hasMany(RolePermission::class, 'role_id', 'role_id');
     }
+
+    public function managerrial_role()
+    {
+        return $this->hasMany(ManagerialRole::class, 'role_id', 'role_id')->whereStatus(1);
+    }
 }

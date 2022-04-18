@@ -284,6 +284,11 @@ class UserController extends Controller
     {
         $data['page_title'] = "Vendors List - Atlantis BPO CRM";
         $data['user_lists'] = User::where('status' , 1)->where('role_id', 13)->get();
+        $data['user_roles'] = UserRole::where('status',1)->where('role_id', 13)->first();
+        $data['dids'] = CallDispositionsDid::where('status', 1)->get();
+        if(isset($request->user_id)){
+            $data['user'] = User::where('user_id',$request->user_id)->first();
+        }
         return view('vendors.vendor_list', $data);
     }
     public function vendor_form(Request $request)
@@ -291,11 +296,8 @@ class UserController extends Controller
         $data['page_title'] = "Vendors List - Atlantis BPO CRM";
         $data['user_roles'] = UserRole::where('status',1)->where('role_id', 13)->get();
         $data['dids'] = CallDispositionsDid::where('status', 1)->get();
-        DB::enableQueryLog();
         if(isset($request->user_id)){
-            $data['user'] = User::where('user_id',$request->user_id)->get()[0];
-        } else {
-            $data['user'] = false;
+            $data['user'] = User::where('user_id',$request->user_id)->first();
         }
         return view('vendors.vendor_form',$data);
     }
@@ -307,9 +309,7 @@ class UserController extends Controller
                 'gender' => 'required',
                 'postal_address' => 'required',
                 'contact_number' => 'required',
-                'role_id' => 'required',
                 'vendor_did_id' => 'required',
-                'user_type' => 'required',
             ]);
         } else {
             $validator = Validator::make($request->all(), [
@@ -320,44 +320,33 @@ class UserController extends Controller
                 'gender' => 'required',
                 'postal_address' => 'required',
                 'contact_number' => 'required',
-                'role_id' => 'required',
                 'vendor_did_id' => 'required',
-                'user_type' => 'required',
             ]);
         }
         if($validator->passes()){
-            $vendor_did_id = implode(", ", $request->vendor_did_id);
+            $vendor_did_id = implode(",", $request->vendor_did_id);
+            $user_data = [
+                'full_name' => $request->full_name,
+                'role_id' => 13,
+                'vendor_did_id' => $vendor_did_id,
+                'gender' => $request->gender,
+                'contact_number' => $request->contact_number,
+                'postal_address' => $request->postal_address,
+                'user_type' => 'System User',
+            ];
             if(isset($request->user_id)){
-                User::where('user_id', $request->user_id)->update([
-                    'full_name' => $request->full_name,
-                    'role_id' => $request->role_id,
-                    'vendor_did_id' => $request->vendor_did_id,
-                    'gender' => $request->gender,
-                    'contact_number' => $request->contact_number,
-                    'postal_address' => $request->postal_address,
-                    'vendor_did_id' => $vendor_did_id,
-                    'user_type' => $request->user_type,
-                ]);
+                User::where('user_id', $request->user_id)->update($user_data);
             } else {
-                $user = new User;
-                $user->added_by = Auth::user()->user_id;
-                $user->full_name = $request->full_name;
-                $user->email = $request->email;
-                $user->vendor_did_id = $vendor_did_id;
-                $user->password = encrypt_password($request->input('password'));
                 $user_image = "";
                 if($request->file('image')) {
                     $file = $request->file('image');
                     $user_image = time() . rand(1, 100) . '.' . $file->extension();
                     $file->move(public_path('user_images'), $user_image);
                 }
-                $user->image = $user_image;
-                $user->gender = $request->gender;
-                $user->postal_address = $request->postal_address;
-                $user->contact_number = $request->contact_number;
-                $user->role_id = $request->role_id;
-                $user->user_type = $request->user_type;
-                $user->save();
+                $user_data['password'] =  encrypt_password($request->input('password'));
+                $user_data['email'] = $request->email;
+                $user_data['image'] = $user_image;
+                User::create($user_data);
             }
             $response['status'] = 'Success';
             $response['result'] = 'Added Successfully';

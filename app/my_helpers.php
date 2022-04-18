@@ -420,74 +420,10 @@ if(!function_exists('get_employee_id')) {
         return $employee_id;
     }
 }
-if(!function_exists('get_user_total_rgu')) {
-    function get_user_total_rgu($from_date, $to_date, $user_id, $provider){
-        $provider = explode(',', $provider);
-        $single_play = DB::table('all_sales')->where('added_by', $user_id)->where('services_sold', 1)->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
-        $double_play = DB::table('all_sales')->where('added_by', $user_id)->where('services_sold', 2)->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
-        $triple_play = DB::table('all_sales')->where('added_by', $user_id)->where('services_sold', 3)->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
-        $quad_play = DB::table('all_sales')->where('added_by', $user_id)->where('services_sold', 4)->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
-        $services = DB::table('all_sales')->where('added_by', $user_id)->select('provider_name', DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile, count(case when services_sold = "1" then 1 else null end) as single_play, count(case when services_sold = "2" then 1 else null end) as double_play, count(case when services_sold = "3" then 1 else null end) as triple_play, count(case when services_sold = "4" then 1 else null end) as quad_play'))
-            ->whereBetween('added_on', [$from_date, $to_date])
-            ->groupBy('provider_name')->limit(5)->get();
-        $total_rgu = ($single_play+($double_play*2)+($triple_play*3)+($quad_play*4));
-        $total_sales = ($single_play+$double_play+$triple_play+$quad_play);
-        return [
-            'services' => $services,
-            'single_play' => $single_play,
-            'double_play' => $double_play,
-            'triple_play' => $triple_play,
-            'quad_play' => $quad_play,
-            'total_rgu' => $total_rgu,
-            'total_sales' => $total_sales
-        ];
-    }
-}
-if(!function_exists('get_user_play')) {
-    function get_user_play($user_id, $from_date, $to_date, $provider, $play)
-    {
-        $provider = explode(',', $provider);
-        if ($provider[0] == 'all') {
-            $sales_play = DB::table('call_dispositions')
-                ->join('call_dispositions_services', 'call_dispositions.call_id', '=', 'call_dispositions_services.call_id')
-                ->where('call_dispositions.added_by', $user_id)
-                ->whereBetween('call_dispositions.added_on', [$from_date, $to_date])
-                ->whereRaw('(cable+internet+phone) = ' . $play)
-                ->count('call_dispositions_services.call_id');
-        } else {
-            $sales_play = DB::table('call_dispositions')
-                ->join('call_dispositions_services', 'call_dispositions.call_id', '=', 'call_dispositions_services.call_id')
-                ->where('call_dispositions.added_by', $user_id)
-                ->whereIn('call_dispositions_services.provider_name', $provider)
-                ->whereBetween('call_dispositions.added_on', [$from_date, $to_date])
-                ->whereRaw('(cable+internet+phone) = ' . $play)
-                ->count('call_dispositions_services.call_id');
-        }
-        if($play == 'mobile'){
-            if ($provider[0] == 'all') {
-                $sales_play = DB::table('call_dispositions')
-                    ->join('call_dispositions_services', 'call_dispositions.call_id', '=', 'call_dispositions_services.call_id')
-                    ->where('call_dispositions.added_by', $user_id)
-                    ->whereBetween('call_dispositions.added_on', [$from_date, $to_date])
-                    ->where('call_dispositions_services.mobile', '!=', 0)
-                    ->count('call_dispositions_services.call_id');
-            } else {
-                $sales_play = DB::table('call_dispositions')
-                    ->join('call_dispositions_services', 'call_dispositions.call_id', '=', 'call_dispositions_services.call_id')
-                    ->where('call_dispositions.added_by', $user_id)
-                    ->whereIn('call_dispositions_services.provider_name', $provider)
-                    ->whereBetween('call_dispositions.added_on', [$from_date, $to_date])
-                    ->where('call_dispositions_services.mobile', '!=', 0)
-                    ->count('call_dispositions_services.call_id');
-            }
-        }
-        return $sales_play;
-    }
-}
 if(!function_exists('get_leave_bucket_leaves')) {
     function get_leave_bucket_leaves($user_id)
     {
-        $data = DB::table('payroll_bucket')->where('user_id',$user_id)->first();
+        $data = DB::table('leave_bucket_view')->where('user_id',$user_id)->first();
         if($data != null) {
             $remaining_annual = $data->annual_bucket - $data->annual;
             $remaining_casual = @$data->casual_bucket - (@$data->casual + @$data->other_leaves);
@@ -498,9 +434,9 @@ if(!function_exists('get_leave_bucket_leaves')) {
                 $remaining_sick = @$data->sick_bucket - @$data->sick;
             }
         } else {
-            $remaining_annual = 10;
-            $remaining_casual = 4;
-            $remaining_sick = 5;
+            $remaining_annual = 0;
+            $remaining_casual = 0;
+            $remaining_sick = 0;
         }
         return [
             'remaining_annual' => $remaining_annual,
@@ -509,25 +445,8 @@ if(!function_exists('get_leave_bucket_leaves')) {
         ];
     }
 }
-if(!function_exists('update_all_employees_leaves_bucket')){
-    function update_all_employees_leaves_bucket()
-    {
-        $users = \App\Models\Employee::with('employee:user_id,user_type')
-            ->whereStatus(1)->select('user_id')->get()->toArray();
-        foreach ($users as $user){
-            dd($user['user_id'],$user['employee']['user_type']);
-        }
-    }
-}
-if(!function_exists('update_single_signedIn_employee_leaves_bucket')){
-    function update_single_signedIn_employee_leaves_bucket()
-    {
-        $leave_bucket = \App\Models\LeavesBucket::where('user_id', Auth::user()->user_id)->first();
-        dd($leave_bucket);
-    }
-}
-if(!function_exists('check_single_signedIn_employee_self_assessment_status')){
-    function check_single_signedIn_employee_self_assessment_status()
+if(!function_exists('check_single_employee_self_assessment_status')){
+    function check_single_employee_self_assessment_status()
     {
         $self_assessment = false;
         // Incomplete  OR Previous appraisal record check
@@ -541,7 +460,7 @@ if(!function_exists('check_single_signedIn_employee_self_assessment_status')){
             ->orderBy('added_on', 'desc')->first();
         if($Previous_EmployeeAssessment && !$incomplete_evaluation){
             $employee_assessment_id = $Previous_EmployeeAssessment->id;
-            if(get_month_diff($Previous_EmployeeAssessment->evaluation_date, get_date()) >= 3) {
+            if(get_month_diff($Previous_EmployeeAssessment->evaluation_date, get_date()) == 3) {
                 $self_assessment = true;
             }
         }else if(!$incomplete_evaluation) {
@@ -554,7 +473,8 @@ if(!function_exists('check_single_signedIn_employee_self_assessment_status')){
             }
         }
         if($self_assessment == true){
-            if(Auth::user()->role_id != 1){
+            //if(Auth::user()->role_id != 1){
+            if(Auth::user()->user_type == 'Employee'){
                 $Notification_data = \App\Models\Notifications::where([
                     'reference_table' => 'employee_assessments',
                     'type' => 'Evaluation',
@@ -569,8 +489,8 @@ if(!function_exists('check_single_signedIn_employee_self_assessment_status')){
         //  return $self_assessment;
     }
 }
-if(!function_exists('generate_single_signedIn_employee_leaves_bucket')){
-    function generate_single_signedIn_employee_leaves_bucket($user_id)
+if(!function_exists('generate_single_employee_leaves_bucket')){
+    function generate_single_employee_leaves_bucket($user_id)
     {
         $leave_bucket = \App\Models\LeavesBucket::where('user_id', $user_id)->count();
         if($leave_bucket == 0 ){
@@ -580,6 +500,30 @@ if(!function_exists('generate_single_signedIn_employee_leaves_bucket')){
                 'sick_leaves' => 5,
                 'casual_leaves' => 4
             ]);
+        }
+    }
+}
+if(!function_exists('update_all_employee_leaves_bucket')){
+    function update_all_employee_leaves_bucket()
+    {
+        $users = \App\Models\Employee::with('employee:user_id,user_type')
+            ->whereStatus(1)->select('user_id')->get()->toArray();
+        foreach ($users as $user){
+            $leave_bucket = \App\Models\LeavesBucket::where('user_id', $user['user_id'])->first();
+            if($leave_bucket){
+                $interval = date_diff(date_create($leave_bucket->start_date), date_create(get_date()));
+                if($interval->y == 1){
+                    \App\Models\LeavesBucket::where('user_id', $user['user_id'])->update(['start_date',get_date()]);
+                }
+            }
+//        else{
+//            \App\Models\LeavesBucket::create(['user_id' => $user['user_id'],
+//                'start_date' => get_date(),
+//                'annual_leaves' => 10,
+//                'sick_leaves' => 5,
+//                'casual_leaves' => 4
+//            ]);
+//        }
         }
     }
 }

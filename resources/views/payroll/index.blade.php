@@ -78,7 +78,7 @@
             let data = new FormData($('#payroll_form_id')[0]);
             data.append('_token', '{{csrf_token()}}');
             let a = function() {
-                window.location.reload();
+                // window.location.reload();
             }
             let arr = [a];
             call_ajax_with_functions('', '{{route('payroll_save')}}', data, arr);

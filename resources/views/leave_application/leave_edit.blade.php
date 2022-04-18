@@ -9,7 +9,7 @@
                 <div class="row">
                     <div class="col-6">
                         <div class="form-group ">
-                            <label class="form-check-label" for="from">From </label>
+                            <label class="form-check-label" for="from">From 3434</label>
                             <input value="{{$leave ? $leave->from:''}}" required type="date" class="form-control" name="from" id="from" >
                         </div>
                     </div>

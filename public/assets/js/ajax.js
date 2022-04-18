@@ -178,7 +178,7 @@ function call_ajax_modal_with_functions(php_file, form_data, title, functions)
 function print_div(print_target) {
     let divElements = document.getElementById(print_target).innerHTML;
     newpage = window.open('', '_blank');
-    data = "<link rel='stylesheet' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>";
+    data = "<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css'>";
     let script = newpage.document.createElement('script');
     script.setAttribute('type', 'text/javascript');
     script.innerHTML = "setInterval(function(){ window.print(); window.close(); }, 2000);";

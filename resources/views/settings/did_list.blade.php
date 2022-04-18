@@ -61,56 +61,60 @@
     </div>
 @endsection
 @section('footer_scripts')
-    <div id="did_form_modal" style="z-index:9999999; height: 100% !important; min-height: 100%; width: 100%; position: fixed; top: 0; background-color: rgba(0, 0, 0, 0.7);display:none;">
-        <div style="z-index:99999999;display: block; padding-right: 17px; top: 100px" class="modal fade show" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog disposition_type_modal modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" id="modal_title">DID</h4>
-                        <button type="button" class="btn" onclick="$('#did_form_modal').fadeOut();" aria-hidden="true"><i class="fas fa-times"></i></button>
-                    </div>
-                    <div class="modal-body">
-                        <form method="post" id="did_form">
-                            @csrf
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <label class="form-check-label" for="title"> DID </label>
-                                        <input class="form-control" type="text" name="title" id="title" required>
-                                        <input class="form-control" type="hidden" name="type_id" id="type_id" required>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <div class="input-group">
-                                            <label class="form-check-label mr-5" for="number"> VICCI
-                                                <input class="form-control" type="number" name="vicci_number_id[]" id="vicci_number_id" required></label>
-                                            <label class="form-check-label w-50 mr-5" for="number"> Number
-                                                <input class="form-control" type="number" name="number[]" id="number" required></label>
-                                            <div class="input-group-append1 mt-4">
-                                                <button class="btn btn-primary" title="Add more" type="button" id="add_more_number">
-                                                    <i class="la la-plus font-19"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div id="did_dynamic_numbers"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                                <div class="col-12">
-                                    <button type="submit" class="btn btn-primary float-right">Save</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+    <!--begin::Modal-->
+    <div class="modal fade" id="did_form_modal" tabindex="-1" role="dialog" aria-labelledby="modal_label" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal_label">DID</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
+                <form method="post" id="did_form">
+                    <div class="modal-body">
+                        @csrf
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label class="form-check-label" for="title"> DID </label>
+                                    <input class="form-control" type="text" name="title" id="title" required>
+                                    <input class="form-control" type="hidden" name="type_id" id="type_id" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <label class="form-check-label mr-5" for="number"> VICCI
+                                            <input class="form-control" type="number" name="vicci_number_id[]" id="vicci_number_id" required></label>
+                                        <label class="form-check-label w-50 mr-5" for="number"> Number
+                                            <input class="form-control" type="number" name="number[]" id="number" required></label>
+                                        <div class="input-group-append1 mt-4">
+                                            <button class="btn btn-primary" title="Add more" type="button" id="add_more_number">
+                                                <i class="la la-plus font-19"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div id="did_dynamic_numbers"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Save changes
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+    <!--end::Modal-->
     <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script src="{{ asset('assets/bundles/select2/dist/js/select2.full.min.js') }}"></script>
@@ -155,7 +159,7 @@
             $('#number').val('');
             $('#vicci_number_id').val('');
             $('#did_dynamic_numbers').empty();
-            $('#did_form_modal').fadeIn();
+            $('#did_form_modal').modal('show');
         });
 
         $('#did_form').submit(function (e) {
@@ -184,7 +188,7 @@
                     $("#did_dynamic_numbers").prepend("<div class='input-group py-2 remove-input'><label class='form-check-label mr-5' for='number'>VICCI<input class='form-control' type='number' name='vicci_number_id[]' value=" + value.number_id + "></label><label class='form-check-label w-50 mr-5' for='number'> Number<input class='form-control' type='number' name='number[]' value=" + value.number + " required></label><div class='input-group-append1 mt-4'><button class='btn btn-primary' title='Add more' type='button' onclick='remove_number(this)'><i class='la la-minus font-19'></i></button></div></div>");
                 }
             });
-            $('#did_form_modal').fadeIn();
+            $('#did_form_modal').modal('show');
         });
     </script>
 @endsection

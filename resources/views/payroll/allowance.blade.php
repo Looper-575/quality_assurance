@@ -41,7 +41,7 @@
                     <tr>
                         <td>{{$index+1}}</td>
                         <td>{{$menu->title}}</td>
-                        <td>{{$menu->type}}</td>
+                        <td>{{ ucwords(str_replace('-', ' ', $menu->type))}}</td>
                         <td>{{$menu->allowance_value}}</td>
                         <td>
                             <div class="btn-group btn-group-sm">
@@ -56,7 +56,7 @@
         </div>
     </div>
     <!-- View Modal -->
-    <div class="modal fade" id="add_new_modal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="add_new_modalLabel" aria-hidden="true">
+    <div class="modal fade" id="add_new_modal" tabindex="-1" aria-labelledby="add_new_modalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
@@ -89,9 +89,8 @@
                             </div>
                             <div class="col-6">
                                 <div class="form-group">
-                                    <label class="form-check-label" for="role_id">Role</label>
-                                    <select class="form-control mt-2" name="role_id" id="role_id" required>
-                                        <option value="">Please Select</option>
+                                    <label class="form-check-label mb-2" for="role_id">Role</label>
+                                    <select class="form-control mt-2 select2" name="role_id[]" id="role_id" multiple="multiple" required>
                                         <option value="0">All</option>
                                     </select>
                                 </div>
@@ -194,9 +193,6 @@
                     $('#role_id').empty().append('');
                     var role_id = $('#role_id');
                     role_id.append(
-                        $('<option></option>').val('').html('Please Select')
-                    );
-                    role_id.append(
                         $('<option></option>').val(0).html('All')
                     );
                     $.each(response, function(val, data) {
@@ -207,7 +203,8 @@
                 }
             }).then(function(){
                 if(role_id != null){
-                    $('#role_id').val(role_id);
+                    // $('#role_id').val(role_id);
+                    $("#role_id").select2().select2('val', [role_id]);
                 }
             });
         }
@@ -253,6 +250,7 @@
         $('#add_new_btn').click(function () {
             $('#add_form_id').resetForm();
             $("#provider").select2().select2('val', [' ']);
+            $("#role_id").select2().select2('val', [' ']);
             $('#add_new_modal').modal('toggle');
         });
 
@@ -285,9 +283,8 @@
                 $('.dependent').css('display', 'none');
             }
             $('#add_new_modal').modal('toggle');
-            $('#role_id').val(data.role_id);
-            let department_id = data.department_id;
-            set_role(department_id, data.role_id);
+            let roles = data.role_id.split(',');
+            set_role(data.department_id, roles);
         });
     </script>
 @endsection

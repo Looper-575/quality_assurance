@@ -146,7 +146,7 @@
                     @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5 )
                         <div class="col-3">
                             <div class="form-group m-form__group">
-                                <label  for="net_salary"> Net Salary</label>
+                                <label  for="net_salary"> Gross Salary</label>
                                 <input name="net_salary" value="{{$employee ? $employee->net_salary : ''}}" required type="number" class="form-control">
                             </div>
                         </div>

@@ -19,9 +19,7 @@
     </style>
 @endsection
 @section('content')
-    <?php
-    $has_permissions = get_route_permissions( Auth::user()->role->role_id, @request()->route()->getName());
-    ?>
+    <?php $has_permissions = get_route_permissions( Auth::user()->role->role_id, @request()->route()->getName()); ?>
     <div class="m-portlet m-portlet--mobile">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
@@ -75,57 +73,54 @@
     </div>
 @endsection
 @section('footer_scripts')
-    <div id="did_form_modal" style="z-index:9999999; height: 100% !important; min-height: 100%; width: 100%; position: fixed; top: 0; background-color: rgba(0, 0, 0, 0.7);display:none;">
-        <div style="z-index:99999999;display: block; padding-right: 17px; top: 100px" class="modal fade show" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog disposition_type_modal" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" id="modal_title">Policies</h4>
-                        <button type="button" class="btn" onclick="$('#did_form_modal').fadeOut();" aria-hidden="true"><i class="fa fa-times"></i></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="container">
-                            <form id="policy_form" method="post" enctype="multipart/form-data">
-                                {{ csrf_field() }}
-                                <input type="text" class="form-control mb-4" placeholder="Title" id="title" name="title" required/>
-                                <input type="file" id="uploadFile" class="mr-5" accept="application/pdf" name="uploadFile[]" multiple required/>
-                                <input type="submit" class="btn btn-success ml-3" name='submitFile' value="Upload"/>
-                            </form>
-                            <br/>
-                            <div id="filePreview" class="text-center"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- View Modal -->
-    <div class="modal fade" id="preview_files_modal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="preview_files_modalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal fade" id="policies_form_modal" tabindex="-1" role="dialog" aria-labelledby="modal_label" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="preview_files_modalLabel">title</h5>
+                    <h5 class="modal-title" id="modal_label">Add Managerial Role</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <div id="filesPreview"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                </div>
+                <form method="post" id="policy_form" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        @csrf
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="role_id">Title</label>
+                                    <input type="text" class="form-control mb-4" placeholder="Title" id="title" name="title" required/>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="type">Files</label>
+                                    <input type="file" class="form-control mb-4" id="uploadFile" class="mr-5" accept="application/pdf" name="uploadFile[]" multiple required/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Save changes
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+    <!-- View Modal -->
     <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script src="{{ asset('assets/bundles/select2/dist/js/select2.full.min.js') }}"></script>
     <script>
-        var files = new Array();
+        let files = new Array();
         $("#uploadFile").change(function(){
             $('#filePreview').html("");
-            var total_file=document.getElementById("uploadFile").files.length;
+            let total_file=document.getElementById("uploadFile").files.length;
             for(var i=0;i<total_file;i++)
             {
                 $('#filePreview').append("<iframe src='"+URL.createObjectURL(event.target.files[i])+"'></iframe>");
@@ -159,7 +154,7 @@
             $('#type_id').val(null);
             $('#title').val(null);
             $('#number').val(null);
-            $('#did_form_modal').fadeIn();
+            $('#policies_form_modal').modal('show');
         });
         $('#policy_form').submit(function (e) {
             e.preventDefault();
@@ -176,7 +171,7 @@
             $('#type_id').val(data.did_id);
             $('#title').val(data.title);
             $('#number').val(data.number);
-            $('#did_form_modal').fadeIn();
+            $('#policies_form_modal').modal('show');
         });
         $('.view_btn').click( function () {
             let data = JSON.parse(this.value);

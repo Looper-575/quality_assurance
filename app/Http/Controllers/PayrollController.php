@@ -1,15 +1,15 @@
 <?php
 namespace App\Http\Controllers;
-use App\Models\Allowance;
 use App\Models\AttendanceLog;
-use App\Models\Deduction;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Holiday;
 use App\Models\Payroll;
-use App\Models\PayrollAllowance;
-use App\Models\PayrollDeduction;
-use App\Models\TaxDeduction;
+use App\Models\PayrollAllowanceDetail;
+use App\Models\PayrollAllowanceSetting;
+use App\Models\PayrollDeductionDetail;
+use App\Models\PayrollDeductionSetting;
+use App\Models\PayrollTaxSlab;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -53,20 +53,29 @@ class PayrollController extends Controller
             $year = date("Y",strtotime($request->year_month));
             if($request->user[0] == 0) {
                 $user_ids = User::has('Employee')->where('user_type', 'Employee')->where('status', 1)->get()->pluck('user_id')->toArray();
+                $payroll = Payroll::where('salary_month',date('Y-m-t', strtotime($request->year_month)).' 23:59:59')->whereStatus(1)
+                    ->where(function ($query1) {
+                        return $query1->where('hr_approved', 1)
+                            ->orWhere('hr_approved', 2);
+                    })
+                    ->get()->pluck('user_id')->toArray();
             } else {
                 $user_ids = $request->user;
+                $payroll = Payroll::where('salary_month',date('Y-m-t', strtotime($request->year_month)).' 23:59:59')->whereStatus(1)
+                    ->whereIn('user_id', $user_ids)
+                    ->where(function ($query1) {
+                        return $query1->where('hr_approved', 1)
+                            ->orWhere('hr_approved', 2);
+                    })
+                    ->get()->pluck('user_id')->toArray();
             }
+            $data['payroll_exists'] = User::whereIn('user_id', $payroll)->get();
             $form_date = date($year.'-'.$month.'-01');
             $to_date = date("Y-m-t", strtotime($request->year_month));
             $holiday_count = $this->check_holidays($form_date, $to_date);
             $endDate = $to_date;
             $startDate = $form_date;
             $working_days = working_days($startDate, $endDate);
-            $payroll = Payroll::where('salary_month', date("Y-m-d", strtotime($request->year_month)))->whereStatus(1)
-                ->where(function ($query1) {
-                    return $query1->where('hr_approved', 1)
-                        ->orWhere('hr_approved', 2);
-                })->get()->pluck('user_id')->toArray();
             foreach ($payroll as $user_payroll){
                 if (($key = array_search($user_payroll, $user_ids)) !== false) {
                     unset($user_ids[$key]);
@@ -92,6 +101,7 @@ class PayrollController extends Controller
             $response['status'] = "Failure!";
             $response['result'] = $validator->errors()->toJson();
         }
+
         return view('payroll.partials.payroll' , $data);
     }
 
@@ -99,51 +109,51 @@ class PayrollController extends Controller
         DB::beginTransaction();
         try {
             foreach ($request['user_id'] as $key => $value){
-            $model = new Payroll;
-            $model->user_id = $value;
-            $model->salary_month = $request['salary_month'][$key];
-            $model->attendance_marked = $request['attendance_marked'][$key];
-            $model->attendance_not_marked = $request['attendance_not_marked'][$key];
-            $model->leaves = $request['leaves'][$key];
-            $model->half_leaves = $request['half_leaves'][$key];
-            $model->lates = $request['lates'][$key];
-            $model->absents = $request['absents'][$key];
-            $model->leaves_of_late = $request['leaves_of_late'][$key];
-            $model->leaves_of_half = $request['leaves_of_half'][$key];
-            $model->presents = $request['presents'][$key];
-            $model->deduction_bucket = $request['deduction_bucket'][$key];
-            $model->basic_salary = $request['basic_salary'][$key];
-            $model->gross_salary = $request['gross_salary'][$key];
-            $model->added_by = Auth::user()->user_id;
-            $model->save();
-            $payroll_id = $model->payroll_id;
-            if($request->has('deduction_title') == true) {
-                foreach ($request['deduction_title'][$value] as $index => $deductions) {
-                    $pay_ded = new PayrollDeduction();
-                    $pay_ded->payroll_id = $payroll_id;
-                    $pay_ded->title = $deductions;
-                    $pay_ded->amount = $request['deduction_value'][$value][$index];
-                    $pay_ded->save();
+                $salary_month = date('Y-m-t', strtotime($request['salary_month'][$key])).' 23:59:59';
+                $model = new Payroll;
+                $model->user_id = $value;
+                $model->salary_month = $salary_month;
+                $model->attendance_marked = $request['attendance_marked'][$key];
+                $model->attendance_not_marked = $request['attendance_not_marked'][$key];
+                $model->leaves = $request['leaves'][$key];
+                $model->half_leaves = $request['half_leaves'][$key];
+                $model->lates = $request['lates'][$key];
+                $model->absents = $request['absents'][$key];
+                $model->leaves_of_late = $request['leaves_of_late'][$key];
+                $model->leaves_of_half = $request['leaves_of_half'][$key];
+                $model->presents = $request['presents'][$key];
+                $model->deduction_bucket = $request['deduction_bucket'][$key];
+                $model->basic_salary = $request['basic_salary'][$key];
+                $model->gross_salary = $request['gross_salary'][$key];
+                $model->added_by = Auth::user()->user_id;
+                $model->save();
+                $payroll_id = $model->payroll_id;
+                if($request->has('deduction_title') == true && isset($request['deduction_title'][$value])) {
+                    foreach ($request['deduction_title'][$value] as $index => $deductions) {
+                        $pay_ded = new PayrollDeductionDetail();
+                        $pay_ded->payroll_id = $payroll_id;
+                        $pay_ded->title = $deductions;
+                        $pay_ded->amount = $request['deduction_value'][$value][$index];
+                        $pay_ded->save();
                 }
             }
-            if($request->has('allowance_title') == true) {
-                foreach ($request['allowance_title'][$value] as $index => $deductions) {
-                    $pay_ded = new PayrollAllowance();
+            if($request->has('allowance_title') == true && isset($request['allowance_title'][$value])) {
+                foreach ($request['allowance_title'][$value] as $index => $allowance) {
+                    $pay_ded = new PayrollAllowanceDetail();
                     $pay_ded->payroll_id = $payroll_id;
-                    $pay_ded->title = $deductions;
+                    $pay_ded->title = $allowance;
                     $pay_ded->amount = $request['allowance_value'][$value][$index];
                     $pay_ded->save();
                 }
             }
         }
+            $response['status'] = "Success";
+            $response['result'] = "Saved Successfully";
+            DB::commit();
         } catch (\Exception $ex){
             DB::rollBack();
             $response['status'] = "Failure";
             $response['result'] = "Server Errors please try again!";
-        } finally {
-            $response['status'] = "Success";
-            $response['result'] = "Saved Successfully";
-            DB::commit();
         }
         return response()->json($response);
     }
@@ -191,7 +201,7 @@ class PayrollController extends Controller
     public function deduction()
     {
         $data['page_title'] = "Deduction - Atlantis BPO CRM";
-        $data['deductions'] = Deduction::where('status', 1)->get();
+        $data['deductions'] = PayrollDeductionSetting::where('status', 1)->get();
         $data['departments'] = Department::where('status', 1)->get();
         return view('payroll.deduction' , $data);
     }
@@ -206,13 +216,19 @@ class PayrollController extends Controller
             'value' => 'required',
         ]);
         if($validator->passes()) {
-            $model = Deduction::updateOrCreate([
+            if($request->role_id[0] == 0){
+                $roles = 0;
+            } else {
+                $roles = implode(",", $request->role_id);
+            }
+            $model = PayrollDeductionSetting::updateOrCreate([
                 'deduction_id' => $request->deduction_id,
             ], [
                 'title' => $request->title,
                 'type' => $request->type,
+                'criteria' => $request->criteria,
                 'department_id' => $request->department_id,
-                'role_id' => $request->role_id,
+                'role_id' => $roles,
                 'value' => $request->value,
                 'added_by' => Auth::user()->user_id,
             ]);
@@ -227,7 +243,7 @@ class PayrollController extends Controller
 
     public function deduction_delete(Request $request)
     {
-        Deduction::where('deduction_id', $request->id)->update(['status' => 0]);
+        PayrollDeductionSetting::where('deduction_id', $request->id)->update(['status' => 0]);
         $response['status'] = "Success";
         $response['result'] = "Deduction Deleted Successfully";
         return response()->json($response);
@@ -236,13 +252,14 @@ class PayrollController extends Controller
     public function allowance()
     {
         $data['page_title'] = "Allowance - Atlantis BPO CRM";
-        $data['allowances'] = Allowance::where('status', 1)->get();
+        $data['allowances'] = PayrollAllowanceSetting::where('status', 1)->get();
         $data['departments'] = Department::where('status', 1)->get();
         return view('payroll.allowance' , $data);
     }
 
     public function save_allowance_form(Request $request)
     {
+//        dd($request->all());
         $validator = Validator::make($request->all(),[
             'title' => 'required',
             'type' => 'required',
@@ -259,20 +276,27 @@ class PayrollController extends Controller
                     $provider = implode(",", $request->provider);
                 }
             }
-            $model = Allowance::updateOrCreate([
+            if($request->role_id[0] == 0){
+                $roles = 0;
+            } else {
+                $roles = implode(",", $request->role_id);
+            }
+
+            $model = PayrollAllowanceSetting::updateOrCreate([
                 'allowance_id' => $request->allowance_id,
             ], [
                 'title' => $request->title,
                 'type' => slugify($request->type),
                 'allowance_value' => $request->value,
                 'department_id' => $request->department_id,
-                'role_id' => $request->role_id,
+                'role_id' => $roles,
                 'bench_mark_type' => slugify($request->bench_mark_type),
                 'bench_mark_criteria' => slugify($request->bench_mark_criteria),
                 'bench_mark_value' => $request->bench_mark_value,
                 'provider' => $provider,
                 'added_by' => Auth::user()->user_id,
             ]);
+
             $response['status'] = "Success";
             $response['result'] = "Allowance Added Successfully";
         } else {
@@ -284,7 +308,7 @@ class PayrollController extends Controller
 
     public function allowance_delete(Request $request)
     {
-        Allowance::where('allowance_id', $request->id)->update(['status' => 0]);
+        PayrollAllowanceSetting::where('allowance_id', $request->id)->update(['status' => 0]);
         $response['status'] = "Success";
         $response['result'] = "Allowance Deleted Successfully";
         return response()->json($response);
@@ -292,14 +316,14 @@ class PayrollController extends Controller
 
     public function get_department_role(Request $request)
     {
-        $model = User::with('role')->where('department_id', $request->department_id)->groupBy('role_id')->get();
+        $model = User::with('role')->where('department_id', $request->department_id)->distinct()->get('role_id');
         return response()->json($model);
     }
 
     public function tax_deduction()
     {
         $data['page_title'] = "Tax Deduction - Atlantis BPO CRM";
-        $data['deductions'] = TaxDeduction::whereStatus( 1)->get();
+        $data['deductions'] = PayrollTaxSlab::whereStatus( 1)->get();
         $data['departments'] = Department::where('status', 1)->get();
         return view('payroll.tax_deduction' , $data);
     }
@@ -307,9 +331,10 @@ class PayrollController extends Controller
     public function save_tax_deduction_form(Request $request)
     {
         if($request->tax_deduction_id != null){
-            $model = TaxDeduction::where('tax_deduction_id', $request->tax_deduction_id)->first();
+            $model = PayrollTaxSlab::where('tax_deduction_id', $request->tax_deduction_id)->first();
             $model->from = $request->from[0];
             $model->to = $request->to[0];
+            $model->amount =$request->amount[0];
             $model->value =$request->value[0];
             $model->modified_by = Auth::user()->user_id;
             $model->save();
@@ -321,6 +346,7 @@ class PayrollController extends Controller
                 $model->from = $request->from[$key];
                 $model->to = $request->to[$key];
                 $model->value =$request->value[$key];
+                $model->amount =$request->amount[$key];
                 $model->added_by = Auth::user()->user_id;
                 $model->save();
             }
@@ -333,7 +359,7 @@ class PayrollController extends Controller
 
     public function tax_deduction_delete(Request $request)
     {
-        TaxDeduction::where('tax_deduction_id', $request->id)->update(['status' => 0]);
+        PayrollTaxSlab::where('tax_deduction_id', $request->id)->update(['status' => 0]);
         $response['status'] = "Success";
         $response['result'] = "Tax Deduction Deleted Successfully";
         return response()->json($response);
@@ -358,7 +384,7 @@ class PayrollController extends Controller
     {
         $deduction_val = 0;
         foreach ($request->deduction as $index => $deductions){
-            PayrollDeduction::where('id', $index)->update([
+            PayrollDeductionDetail::where('id', $index)->update([
                 'amount' => $deductions,
             ]);
             $deduction_val += $deductions;
@@ -366,7 +392,7 @@ class PayrollController extends Controller
         $allowance_val = 0;
         if($request->has('allowance') == true){
             foreach ($request->allowance as $index => $allowance){
-                PayrollAllowance::where('id', $index)->update([
+                PayrollAllowanceDetail::where('id', $index)->update([
                     'amount' => $allowance,
                 ]);
                 $allowance_val += $allowance;
@@ -432,7 +458,6 @@ class PayrollController extends Controller
 
     public function add_convenience_allowance(Request $request)
     {
-
         Employee::where('user_id', $request->user_id)->update([
             'conveyance_allowance' => 1,
         ]);
@@ -451,33 +476,39 @@ class PayrollController extends Controller
         return response()->json($response);
     }
 
-    private function employee_deduction($user, $attendace_log, $allowance)
+    private function calculate_deductions($user)
     {
-        $fixed_deduction = \App\Models\Deduction::select(DB::raw('sum(value) as fixed_deduction'))
-            ->where('type', 'Fixed')
+        $fixed_deduction = PayrollDeductionSetting::select(DB::raw('sum(value) as fixed_deduction'))
+            ->where('type', 'other')
+            ->where('criteria', 'Fixed')
             ->where(function ($query) use($user) {
                 return $query->where('department_id', $user->department_id)
                     ->orWhere('department_id',0);
             })
             ->where(function ($query1) use($user) {
-                return $query1->where('role_id', $user->role_id)
+                return $query1->whereRaw('FIND_IN_SET("'.$user->role_id.'",role_id)')
                     ->orWhere('role_id',0);
             })
             ->whereStatus(1)->get();
         $fixed_deduction = $fixed_deduction[0]['fixed_deduction'];
-        $pct_deduction = \App\Models\Deduction::select(DB::raw('sum(value) as pct_deduction'))
-            ->where('type', 'Percentage')
+        $pct_deduction = PayrollDeductionSetting::select(DB::raw('sum(value) as pct_deduction'))
+            ->where('type', 'other')
+            ->where('criteria', 'Percentage')
             ->where(function ($query2) use($user) {
                 return $query2->where('department_id', $user->department_id)
                     ->orWhere('department_id',0);
             })
             ->where(function ($query3) use($user) {
-                return $query3->where('role_id', $user->role_id)
+                return $query3->whereRaw('FIND_IN_SET("'.$user->role_id.'",role_id)')
                     ->orWhere('role_id',0);
             })
             ->whereStatus(1)->get();
         $pct_deduction = $user->net_salary *  $pct_deduction[0]['pct_deduction'] / 100;
+        return $fixed_deduction + $pct_deduction;
+    }
 
+    private function employee_deduction($user, $attendace_log, $allowance)
+    {
         $late_absents = ($attendace_log->lates/3>=1) ? intval($attendace_log->lates/3) : 0;
         $half_leavs_absents = ($attendace_log->half_leaves/2>=1) ? intval($attendace_log->half_leaves/2) : 0;
         $leaves_bucket = DB::table('leave_bucket_view')->where('user_id',$user->user_id)->first();
@@ -498,7 +529,7 @@ class PayrollController extends Controller
         }
         // if $half_and_late_deductions > 0
         $leaves_deducted_from_bucket=0;
-        if($half_and_late_deductions > 0 && $half_and_late_deductions < $total_leaves) {
+        if($half_and_late_deductions > 0 && $half_and_late_deductions < $total_leaves){
             $leaves_deducted_from_bucket = $total_leaves - $half_and_late_deductions;
         } else if($half_and_late_deductions == 0) {
             $leaves_deducted_from_bucket = $total_leaves;
@@ -508,28 +539,35 @@ class PayrollController extends Controller
         $absent_deductions = $daily_wage*$attendace_log->absents;
         $half_and_late_deductions_amount = $daily_wage*$half_and_late_deductions;
         $total_absents_deduction = $absent_deductions+$half_and_late_deductions_amount;
-        $deduction_details = \App\Models\Deduction::where('type', '!=', 'convenience')
+
+        $deduction_details = PayrollDeductionSetting::where('type', '!=', 'convenience')
             ->where(function ($query) use($user) {
                 return $query->where('department_id', $user->department_id)
                     ->orWhere('department_id',0);
             })
             ->where(function ($query1) use($user) {
-                return $query1->where('role_id', $user->role_id)
+                return $query1->whereRaw('FIND_IN_SET("'.$user->role_id.'",role_id)')
                     ->orWhere('role_id',0);
             })
             ->whereStatus(1)->get()->pluck('title', 'value')->toArray();
         // calculating tax
         $tax_deduction_val = $this->calculate_income_tax($user, $allowance);
-        $deduction_details[$tax_deduction_val] = 'Income Tax';
-        $deduction_details[$total_absents_deduction] = 'Absentees Deductions';
-        $convenience_deduction = \App\Models\Deduction::select(DB::raw('sum(value) as convenience'))->where('type', 'convenience')->whereStatus(1)->get();
+        if($tax_deduction_val != 0){
+            $deduction_details[$tax_deduction_val] = 'Income Tax';
+        }
+        if($total_absents_deduction != 0){
+            $deduction_details[$total_absents_deduction] = 'Absentees Deductions';
+        }
+        $convenience_deduction = PayrollDeductionSetting::select(DB::raw('sum(value) as convenience'))->where('type', 'convenience')->whereStatus(1)->get();
         if($user->conveyance_allowance == 1){
             $convenience_deduction = $convenience_deduction[0]['convenience'];
             $deduction_details[$convenience_deduction] = 'Convenience Allowance';
         } else {
             $convenience_deduction = 0;
         }
-        $total_deductions = $convenience_deduction + $tax_deduction_val + $pct_deduction + $fixed_deduction + $total_absents_deduction;
+
+        $calculated_deductions = $this->calculate_deductions($user);
+        $total_deductions = $convenience_deduction + $tax_deduction_val + $calculated_deductions + $total_absents_deduction;
         return [
             'total_deductions' => $total_deductions,
             'deduction_bucket' => $leaves_deducted_from_bucket,
@@ -542,13 +580,13 @@ class PayrollController extends Controller
     private function employee_allowance($user_id, $num_of_leave, $num_of_absent, $month)
     {
         $user = User::whereUserId($user_id)->whereStatus(1)->first();
-        $dependability_allowance = \App\Models\Allowance::where('type', 'dependability')
+        $dependability_allowance = PayrollAllowanceSetting::where('type', 'dependability')
             ->where(function ($query) use($user) {
                 return $query->where('department_id', $user->department_id)
                     ->orWhere('department_id',0);
             })
             ->where(function ($query1) use($user) {
-                return $query1->where('role_id', $user->role_id)
+                return $query1->whereRaw('FIND_IN_SET("'.$user->role_id.'",role_id)')
                     ->orWhere('role_id',0);
             })
             ->whereStatus(1)->get();
@@ -588,7 +626,7 @@ class PayrollController extends Controller
         }
         $from_date = $from_date.' 17:00:00';
         $to_date = $to_date.' 17:00:00';
-        $rgu_bench_mark_allowance = \App\Models\Allowance::select('*','department_id', 'role_id')
+        $rgu_bench_mark_allowance = PayrollAllowanceSetting::select('*','department_id', 'role_id')
             ->where('type', 'rgu-bench-mark')
             ->where(function ($query) use ($user){
                 $query->where('department_id', $user->department_id)
@@ -598,7 +636,7 @@ class PayrollController extends Controller
         $rgu_bench_mark = 0;
         foreach ($rgu_bench_mark_allowance as $rgu){
             if($rgu->role_id == 0 || $user->role_id == $rgu->role_id){
-                $sales = get_user_total_rgu($from_date, $to_date, $user->user_id, $rgu->provider);
+                $sales = $this->get_user_total_rgu($from_date, $to_date, $user->user_id, $rgu->provider);
                 if($rgu->bench_mark_type == 'rgu'){
                     $tem_val = 0;
                     if($sales['total_rgu'] >= $rgu->bench_mark_value){
@@ -615,7 +653,7 @@ class PayrollController extends Controller
                 }
                 if($rgu->bench_mark_type == 'single-play'){
                     $play = 1;
-                    $single_play = get_user_play($user->user_id,$from_date, $to_date, $rgu->provider, $play);
+                    $single_play = $this->get_user_play($user->user_id,$from_date, $to_date, $rgu->provider, $play);
                     if($single_play >= $rgu->bench_mark_value){
                         $tem_val = 0;
                         if($rgu->bench_mark_criteria == 'fixed'){
@@ -631,7 +669,7 @@ class PayrollController extends Controller
                 }
                 if($rgu->bench_mark_type == 'double-play'){
                     $play = 2;
-                    $single2 = get_user_play($user->user_id,$from_date, $to_date, $rgu->provider, $play);
+                    $single2 = $this->get_user_play($user->user_id,$from_date, $to_date, $rgu->provider, $play);
                     if($single2 >= $rgu->bench_mark_value){
                         $tem_val = 0;
                         if($rgu->bench_mark_criteria == 'fixed'){
@@ -647,7 +685,7 @@ class PayrollController extends Controller
                 }
                 if($rgu->bench_mark_type == 'triple-play'){
                     $play = 3;
-                    $single3 = get_user_play($user->user_id,$from_date, $to_date, $rgu->provider, $play);
+                    $single3 = $this->get_user_play($user->user_id,$from_date, $to_date, $rgu->provider, $play);
                     if($single3 >= $rgu->bench_mark_value){
                         $tem_val = 0;
                         if($rgu->bench_mark_criteria == 'fixed'){
@@ -663,7 +701,7 @@ class PayrollController extends Controller
                 }
                 if($rgu->bench_mark_type == 'mobile'){
                     $play = 'mobile';
-                    $mobile_sales = get_user_play($user->user_id,$from_date, $to_date, $rgu->provider, $play);
+                    $mobile_sales = $this->get_user_play($user->user_id,$from_date, $to_date, $rgu->provider, $play);
                     if($mobile_sales >= $rgu->bench_mark_value){
                         $tem_val = 0;
                         if($rgu->bench_mark_criteria == 'fixed'){
@@ -694,7 +732,7 @@ class PayrollController extends Controller
         // total salary minus medical allowance
         $salary = ($salary)-(($salary*10)/100);
         $annul_salary = $salary*12;
-        $tax_deduction = \App\Models\TaxDeduction::whereStatus(1)
+        $tax_deduction = PayrollTaxSlab::whereStatus(1)
             ->where(function ($query) use ($annul_salary) {
                 $query->where('from', '<', $annul_salary);
                 $query->where('to', '>', $annul_salary);
@@ -707,5 +745,67 @@ class PayrollController extends Controller
             $tax_deduction_val = (($tax_deduction->amount + ($tax_deduction->value/100) * $amount))/12;
         }
         return $tax_deduction_val;
+    }
+
+    private function get_user_total_rgu($from_date, $to_date, $user_id, $provider){
+        $provider = explode(',', $provider);
+        $single_play = DB::table('all_sales')->where('added_by', $user_id)->where('services_sold', 1)->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
+        $double_play = DB::table('all_sales')->where('added_by', $user_id)->where('services_sold', 2)->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
+        $triple_play = DB::table('all_sales')->where('added_by', $user_id)->where('services_sold', 3)->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
+        $quad_play = DB::table('all_sales')->where('added_by', $user_id)->where('services_sold', 4)->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
+        $services = DB::table('all_sales')->where('added_by', $user_id)->select('provider_name', DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile, count(case when services_sold = "1" then 1 else null end) as single_play, count(case when services_sold = "2" then 1 else null end) as double_play, count(case when services_sold = "3" then 1 else null end) as triple_play, count(case when services_sold = "4" then 1 else null end) as quad_play'))
+            ->whereBetween('added_on', [$from_date, $to_date])
+            ->groupBy('provider_name')->limit(5)->get();
+        $total_rgu = ($single_play+($double_play*2)+($triple_play*3)+($quad_play*4));
+        $total_sales = ($single_play+$double_play+$triple_play+$quad_play);
+        return [
+            'services' => $services,
+            'single_play' => $single_play,
+            'double_play' => $double_play,
+            'triple_play' => $triple_play,
+            'quad_play' => $quad_play,
+            'total_rgu' => $total_rgu,
+            'total_sales' => $total_sales
+        ];
+    }
+
+    private function get_user_play($user_id, $from_date, $to_date, $provider, $play)
+    {
+        $provider = explode(',', $provider);
+        if ($provider[0] == 'all') {
+            $sales_play = DB::table('call_dispositions')
+                ->join('call_dispositions_services', 'call_dispositions.call_id', '=', 'call_dispositions_services.call_id')
+                ->where('call_dispositions.added_by', $user_id)
+                ->whereBetween('call_dispositions.added_on', [$from_date, $to_date])
+                ->whereRaw('(cable+internet+phone) = ' . $play)
+                ->count('call_dispositions_services.call_id');
+        } else {
+            $sales_play = DB::table('call_dispositions')
+                ->join('call_dispositions_services', 'call_dispositions.call_id', '=', 'call_dispositions_services.call_id')
+                ->where('call_dispositions.added_by', $user_id)
+                ->whereIn('call_dispositions_services.provider_name', $provider)
+                ->whereBetween('call_dispositions.added_on', [$from_date, $to_date])
+                ->whereRaw('(cable+internet+phone) = ' . $play)
+                ->count('call_dispositions_services.call_id');
+        }
+        if($play == 'mobile'){
+            if ($provider[0] == 'all') {
+                $sales_play = DB::table('call_dispositions')
+                    ->join('call_dispositions_services', 'call_dispositions.call_id', '=', 'call_dispositions_services.call_id')
+                    ->where('call_dispositions.added_by', $user_id)
+                    ->whereBetween('call_dispositions.added_on', [$from_date, $to_date])
+                    ->where('call_dispositions_services.mobile', '!=', 0)
+                    ->count('call_dispositions_services.call_id');
+            } else {
+                $sales_play = DB::table('call_dispositions')
+                    ->join('call_dispositions_services', 'call_dispositions.call_id', '=', 'call_dispositions_services.call_id')
+                    ->where('call_dispositions.added_by', $user_id)
+                    ->whereIn('call_dispositions_services.provider_name', $provider)
+                    ->whereBetween('call_dispositions.added_on', [$from_date, $to_date])
+                    ->where('call_dispositions_services.mobile', '!=', 0)
+                    ->count('call_dispositions_services.call_id');
+            }
+        }
+        return $sales_play;
     }
 }

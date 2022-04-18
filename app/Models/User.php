@@ -31,6 +31,8 @@ class User extends Authenticatable
         'remember_token',
         'vicidialer_id',
         'role_id',
+        'postal_address',
+        'vendor_did_id',
     ];
 
     /**
