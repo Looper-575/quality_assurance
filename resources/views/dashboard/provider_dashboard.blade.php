@@ -21,6 +21,7 @@
                     <option value="all">All Sales</option>
                     <option value="daily">Daily Sales</option>
                     <option value="monthly">Monthly Sales</option>
+                    <option value="dispositions">Dispositions</option>
                 </select>
             </div>
         </div>
@@ -653,6 +654,197 @@
 
     </div>
 
+    <div class="dispositions sales_container">
+        <div class="sale_boxes">
+            <div class="sale_boxe_row1 daily-sales" id="daily_sales">
+                <div class="row justify-content-around">
+                    <div class="col-2 mb-3">
+                        <div class="s_b_col1">
+                            <p class="black_text">TOTAL</p>
+                            <p class="red_text">Dispositions</p>
+                            <div class="s_box_icons">
+                                <i class="fa fa-bar-chart"></i>
+                            </div>
+                            <div class="red_b_circle">
+                                <p class="p_nums">{{$total_dispositions}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2 mb-3">
+                        <div class="s_b_col1">
+                            <p class="black_text">TOTAL</p>
+                            <p class="red_text">Sale Made</p>
+                            <div class="dice_icons no_transform">
+                                <i class="fa fa-dollar"></i>
+                            </div>
+                            <div class="red_b_circle">
+                                <p class="p_nums">{{$total_sale_made}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2 mb-3">
+                        <div class="s_b_col1">
+                            <p class="black_text">TOTAL</p>
+                            <p class="red_text">Call Back</p>
+                            <div class="dice_icons no_transform">
+                                <i class="fa fa-phone-volume"></i>
+                            </div>
+                            <div class="red_b_circle">
+                                <p class="p_nums">{{$total_call_back}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2 mb-3">
+                        <div class="s_b_col1">
+                            <p class="black_text">TOTAL</p>
+                            <p class="red_text">Customer Service</p>
+                            <div class="box_icons">
+                            <img src="{{asset('assets/img/icons/headset-solid.svg')}}" alt="">
+                        </div>
+                            <div class="red_b_circle">
+                                <p class="p_nums">{{$total_customer_service}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2 mb-3">
+                        <div class="s_b_col1">
+                            <p class="black_text">TOTAL</p>
+                            <p class="red_text">No Answer</p>
+                            <div class="box_icons">
+                            <img src="{{asset('assets/img/icons/phone-slash-solid.svg')}}" alt="">
+                        </div>
+                            <div class="red_b_circle">
+                                <p class="p_nums">{{$total_no_answer}}</p>
+                            </div>
+                        </div>
+                    </div>
+{{--                    //second row--}}
+                    <div class="col-2 mb-3">
+                        <div class="s_b_col2">
+                            <p class="black_text">Monthly</p>
+                            <p class="red_text">Dispositions</p>
+                            <div class="s_box_icons">
+                                <i class="fa fa-bar-chart"></i>
+                            </div>
+                            <div class="red_b_circle">
+                                <p class="p_nums">{{$six_months_dispositions_count['one_month']}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2 mb-3">
+                        <div class="s_b_col2">
+                            <p class="black_text">Monthly</p>
+                            <p class="red_text">Sale Made</p>
+                            <div class="dice_icons no_transform">
+                                <i class="fa fa-dollar"></i>
+                            </div>
+                            <div class="red_b_circle">
+                                <p class="p_nums">{{$monthly_sale_made}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2 mb-3">
+                        <div class="s_b_col2">
+                            <p class="black_text">Monthly</p>
+                            <p class="red_text">Call Back</p>
+                            <div class="dice_icons no_transform">
+                                <i class="fa fa-phone-volume"></i>
+                            </div>
+                            <div class="red_b_circle">
+                                <p class="p_nums">{{$monthly_call_back}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2 mb-3">
+                        <div class="s_b_col2">
+                            <p class="black_text">Monthly</p>
+                            <p class="red_text">Customer Service</p>
+                            <div class="box_icons">
+                            <img src="{{asset('assets/img/icons/headset-solid.svg')}}" alt="">
+                        </div>
+                            <div class="red_b_circle">
+                                <p class="p_nums">{{$monthly_customer_service}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2 mb-3">
+                        <div class="s_b_col2">
+                            <p class="black_text">Monthly</p>
+                            <p class="red_text">No Answer</p>
+                            <div class="box_icons">
+                            <img src="{{asset('assets/img/icons/phone-slash-solid.svg')}}" alt="">
+                        </div>
+                            <div class="red_b_circle">
+                                <p class="p_nums">{{$monthly_no_answer}}</p>
+                            </div>
+                        </div>
+                    </div>
+{{--                    //third row--}}
+                    <div class="col-2 mb-3">
+                        <div class="s_b_col3">
+                            <p class="white_text">Daily</p>
+                            <p class="yellow_text">Dispositions</p>
+                            <div class="s_box_icons">
+                                <i class="fa fa-bar-chart"></i>
+                            </div>
+                            <div class="red_b_circle">
+                                <p class="p_nums">{{$daily_disp}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2 mb-3">
+                        <div class="s_b_col3">
+                            <p class="white_text">Daily</p>
+                            <p class="yellow_text">Sale Made</p>
+                            <div class="dice_icons no_transform">
+                                <i class="fa fa-dollar"></i>
+                            </div>
+                            <div class="red_b_circle">
+                                <p class="p_nums">{{$daily_sale_made}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2 mb-3">
+                        <div class="s_b_col3">
+                            <p class="white_text">Daily</p>
+                            <p class="yellow_text">Call Back</p>
+                            <div class="dice_icons no_transform">
+                                <i class="fa fa-phone-volume"></i>
+                            </div>
+                            <div class="red_b_circle">
+                                <p class="p_nums">{{$daily_call_back}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2 mb-3">
+                        <div class="s_b_col3">
+                            <p class="white_text">Daily</p>
+                            <p class="yellow_text">Customer Service</p>
+                            <div class="box_icons">
+                            <img src="{{asset('assets/img/icons/headset-solid.svg')}}" alt="">
+                        </div>
+                            <div class="red_b_circle">
+                                <p class="p_nums">{{$daily_customer_service}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2 mb-3">
+                        <div class="s_b_col3">
+                            <p class="white_text">Daily</p>
+                            <p class="yellow_text">No Answer</p>
+                            <div class="box_icons">
+                            <img src="{{asset('assets/img/icons/phone-slash-solid.svg')}}" alt="">
+                        </div>
+                            <div class="red_b_circle">
+                                <p class="p_nums">{{$daily_no_answer}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 {{--    <div class="daily sales_container">--}}
 {{--        <div class="sale_boxes">--}}
 {{--            <div class="sale_boxe_row1 daily-sales" id="daily_sales">--}}
@@ -1086,17 +1278,26 @@
             if($(this).val() == "all"){
                 window.localStorage.setItem("reports_state", "all");
                 $('.sales_container').hide();
+                $('.dispositions').hide();
                 $('.all').show();
             }
             else if($(this).val() == "daily"){
                 window.localStorage.setItem("reports_state", "daily");
                 $('.sales_container').hide();
+                $('.dispositions').hide();
                 $('.daily').show();
             }
-            else{
+            else if($(this).val() == "monthly"){
                 window.localStorage.setItem("reports_state", "monthly");
                 $('.sales_container').hide();
+                $('.dispositions').hide();
                 $('.monthly').show();
+            }
+            else{
+                window.localStorage.setItem("reports_state", "dispositions");
+                $('.sales_container').hide();
+                $('.monthly').hide();
+                $('.dispositions').show();
             }
         });
 

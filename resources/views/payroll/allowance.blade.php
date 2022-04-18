@@ -5,7 +5,7 @@
         .select2-container{
             width: 100% !important;
         }
-        .dependent{
+        .dependent, .dependent-mobile{
             display: none;
         }
     </style>
@@ -111,7 +111,7 @@
                                     <label class="form-check-label" for="bench_mark_type">Bench Mark Type</label>
                                     <select class="form-control mt-2" name="bench_mark_type" id="bench_mark_type">
                                         <option value="">Please Select</option>
-                                        <option value="rgu">RGU</option>
+{{--                                        <option value="rgu">RGU</option>--}}
                                         <option value="single-play">Single Play</option>
                                         <option value="double-play">Double Play</option>
                                         <option value="triple-play">Triple Play</option>
@@ -138,7 +138,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-6 dependent">
+                            <div class="col-6 dependent bench_mark_criteria">
                                 <div class="form-group">
                                     <label class="form-check-label" for="bench_mark_criteria">Bench Mark Criteria</label>
                                     <select class="form-control mt-2" name="bench_mark_criteria" id="bench_mark_criteria">
@@ -154,7 +154,19 @@
                                     <input class="form-control" type="number" name="bench_mark_value" value="" id="bench_mark_value">
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-6 dependent-mobile">
+                                <div class="form-group">
+                                    <label class="form-check-label" for="before">Before Bench Mark</label>
+                                    <input class="form-control" type="number" name="before" value="" id="before">
+                                </div>
+                            </div>
+                            <div class="col-6 dependent-mobile">
+                                <div class="form-group">
+                                    <label class="form-check-label" for="after">After Bench Mark</label>
+                                    <input class="form-control" type="number" name="after" value="" id="after">
+                                </div>
+                            </div>
+                            <div class="col-6 bench-mark-value">
                                 <div class="form-group">
                                     <label class="form-check-label" for="value">Value</label>
                                     <input class="form-control" type="number" name="value" value="" id="value" required>
@@ -223,6 +235,18 @@
                 $('.dependent').css('display', 'none');
             }
         });
+        $('#bench_mark_type').on('change', function () {
+            if(this.value == 'mobile'){
+                $('.dependent-mobile').css('display', 'block');
+                $('.bench_mark_criteria').css('display', 'none');
+                $('.bench-mark-value').css('display', 'none');
+                $('#value').prop('required',false);
+            } else {
+                $('.dependent-mobile').css('display', 'none');
+                $('.bench_mark_criteria').css('display', 'block');
+                $('.bench-mark-value').css('display', 'block');
+            }
+        });
         $('.detele_btn').click( function () {
             let id = this.value;
             let me = this;
@@ -275,12 +299,24 @@
             $('#bench_mark_type').val(data.bench_mark_type);
             $('#bench_mark_criteria').val(data.bench_mark_criteria);
             $('#bench_mark_value').val(data.bench_mark_value);
+            $('#before').val(data.before);
+            $('#after').val(data.after);
             let provider = data.provider.split(',');
             $("#provider").select2().select2('val', [provider]);
             if(data.type == 'rgu-bench-mark' || data.type == 'added-incentive'){
                 $('.dependent').css('display', 'block');
             } else {
                 $('.dependent').css('display', 'none');
+            }
+            if(data.bench_mark_type == 'mobile'){
+                $('.dependent-mobile').css('display', 'block');
+                $('.bench_mark_criteria').css('display', 'none');
+                $('.bench-mark-value').css('display', 'none');
+                $('#value').prop('required',false);
+            } else {
+                $('.dependent-mobile').css('display', 'none');
+                $('.bench_mark_criteria').css('display', 'block');
+                $('.bench-mark-value').css('display', 'block');
             }
             $('#add_new_modal').modal('toggle');
             let roles = data.role_id.split(',');

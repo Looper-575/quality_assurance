@@ -10,7 +10,6 @@
         <tr>
             <th>Employee Name</th>
             <th>Attendance Marked</th>
-{{--            <th>Not Marked</th>--}}
             <th>On Leave</th>
             <th>Half Day Leave</th>
             <th>Lates</th>
@@ -33,7 +32,6 @@
                     <input type="hidden" name="attendance_marked[]" value="{{$attendace_log->attendance_marked}}">
                     <input type="hidden" name="attendance_not_marked[]" value="{{$working_days - $attendace_log->attendance_marked}}">
                 </td>
-{{--                <td>{{ $working_days - $attendace_log->attendance_marked }} </td>--}}
                 <td>{{ $attendace_log->leaves }} <input type="hidden" name="leaves[]" value="{{$attendace_log->leaves}}"></td>
                 <td>{{ $attendace_log->half_leaves }} <input type="hidden" name="half_leaves[]" value="{{$attendace_log->half_leaves}}"></td>
                 <td>{{ $attendace_log->lates }} <input type="hidden" name="lates[]" value="{{$attendace_log->lates}}"></td>
@@ -44,29 +42,26 @@
                 <?php $ded_det = $attendace_log->deductions;?>
                     <input type="hidden" name="leaves_of_late[]" value="{{$ded_det['leaves_of_late']}}">
                     <input type="hidden" name="leaves_of_half[]" value="{{$ded_det['leaves_of_half']}}">
-
                     <input type="hidden" name="deduction_bucket[]" value="{{$ded_det['deduction_bucket']}}">
-
                     @foreach($ded_det['details'] as $key => $ded)
-                        <p>{{$ded}}:  <span class="float-right">{{$key}}</span></p>
+                        <p>{{$ded}}:  <span class="float-right">{{number_format($key,0)}}</span></p>
                         <input value="{{$ded}}" name="deduction_title[{{$attendace_log->user->user_id}}][]" type="hidden" class="form-control" />
                         <input value="{{$key}}" name="deduction_value[{{$attendace_log->user->user_id}}][]" type="hidden" class="form-control" />
                     @endforeach
-                    <p><b>Total:  <span class="float-right">{{ $ded_det['total_deductions'] }}</span></b></p>
+                    <p><b>Total:  <span class="float-right">{{ number_format($ded_det['total_deductions'], 0) }}</span></b></p>
                 </td>
                 <td class="p-line-height pt-3">
-                    <?php $allowance = $attendace_log->allowance; //  = employee_allowance($attendace_log->user_id, $attendace_log->user->employee->net_salary, $attendace_log->leaves, $attendace_log->absents, $month) ?>
-
-                        @foreach($allowance['details'] as $key => $allowanc)
+                    <?php $allowance = $attendace_log->allowance;?>
+                        @foreach($attendace_log->allowance['details'] as $key => $allowanc)
                             <p>{{$key}}: <span class="float-right">{{$allowanc}}</span></p>
                             <input value="{{$key}}" name="allowance_title[{{$attendace_log->user->user_id}}][]" type="hidden" class="form-control" />
                             <input value="{{$allowanc}}" name="allowance_value[{{$attendace_log->user->user_id}}][]" type="hidden" class="form-control" />
                         @endforeach
-                    <p><b>Total: <span class="float-right">{{$allowance['play']}}</span></b></p>
+                    <p><b>Total: <span class="float-right">{{$allowance['total_allowance']}}</span></b></p>
                 </td>
                 <td>
-                     {{ number_format($attendace_log->user->employee->net_salary - $ded_det['total_deductions'] + $allowance['play'], 2)}}
-                    <input type="hidden" name="gross_salary[]" value="{{$attendace_log->user->employee->net_salary - $ded_det['total_deductions'] + $allowance['play']}}">
+                     {{ number_format($attendace_log->user->employee->net_salary - $ded_det['total_deductions'] + $allowance['total_allowance'], 0)}}
+                    <input type="hidden" name="gross_salary[]" value="{{$attendace_log->user->employee->net_salary - $ded_det['total_deductions'] + $allowance['total_allowance']}}">
                 </td>
             </tr>
         @endforeach

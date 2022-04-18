@@ -93,7 +93,7 @@ class NotificationsController extends Controller
            return redirect('/');
        }else{
            Notifications::where('notification_id', $request->notification_id)->update(['status' => 2]);
-           if($request->type == 'leaves'){
+           if($request->type == 'Leaves'){
                return redirect('/leave_list');
            }
            if($request->type == 'PIP'){

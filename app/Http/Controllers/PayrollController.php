@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
-
 class PayrollController extends Controller
 {
     /**
@@ -27,21 +26,18 @@ class PayrollController extends Controller
     public function __construct()
     {
     }
-
     public function create_payroll()
     {
         $data['page_title'] = "Create Payroll - Atlantis BPO CRM";
         $data['users'] = User::has('employee')->where('user_type', 'Employee')->where('status', 1)->get();
         return view('payroll.index', $data);
     }
-
     public function payroll_details()
     {
         $data['page_title'] = "Payroll - Atlantis BPO CRM";
         $data['payroll'] = Payroll::with('user', 'added', 'payroll_deduction', 'payroll_allowance')->whereStatus(1)->whereHrApproved(2)->get();
         return view('payroll.payroll_details', $data);
     }
-
     public function generate_pay_role(Request $request)
     {
         $validator = Validator::make($request->all(),[
@@ -89,7 +85,7 @@ class PayrollController extends Controller
                 ->get();
             for ($i=0; $i<count($attendance_list); $i++){
                 $attendance_list[$i]->allowance = $this->employee_allowance($attendance_list[$i]->user->user_id, $attendance_list[$i]->leaves, $attendance_list[$i]->absents, $form_date);
-                $attendance_list[$i]->deductions = $this->employee_deduction($attendance_list[$i]->user->employee, $attendance_list[$i], $attendance_list[$i]->allowance['play']);
+                $attendance_list[$i]->deductions = $this->employee_deduction($attendance_list[$i]->user->employee, $attendance_list[$i], $attendance_list[$i]->allowance['total_allowance'], $working_days);
             }
             $data['attendance_list'] = $attendance_list;
             $data['holiday_count'] = $holiday_count;
@@ -101,10 +97,8 @@ class PayrollController extends Controller
             $response['status'] = "Failure!";
             $response['result'] = $validator->errors()->toJson();
         }
-
         return view('payroll.partials.payroll' , $data);
     }
-
     public function payroll_save(Request $request){
         DB::beginTransaction();
         try {
@@ -135,18 +129,18 @@ class PayrollController extends Controller
                         $pay_ded->title = $deductions;
                         $pay_ded->amount = $request['deduction_value'][$value][$index];
                         $pay_ded->save();
+                    }
+                }
+                if($request->has('allowance_title') == true && isset($request['allowance_title'][$value])) {
+                    foreach ($request['allowance_title'][$value] as $index => $allowance) {
+                        $pay_ded = new PayrollAllowanceDetail();
+                        $pay_ded->payroll_id = $payroll_id;
+                        $pay_ded->title = $allowance;
+                        $pay_ded->amount = $request['allowance_value'][$value][$index];
+                        $pay_ded->save();
+                    }
                 }
             }
-            if($request->has('allowance_title') == true && isset($request['allowance_title'][$value])) {
-                foreach ($request['allowance_title'][$value] as $index => $allowance) {
-                    $pay_ded = new PayrollAllowanceDetail();
-                    $pay_ded->payroll_id = $payroll_id;
-                    $pay_ded->title = $allowance;
-                    $pay_ded->amount = $request['allowance_value'][$value][$index];
-                    $pay_ded->save();
-                }
-            }
-        }
             $response['status'] = "Success";
             $response['result'] = "Saved Successfully";
             DB::commit();
@@ -157,19 +151,16 @@ class PayrollController extends Controller
         }
         return response()->json($response);
     }
-
     public function payroll_reject(Request $request){
-        Payroll::where('payroll_id', $request->id)->update([
-            'status' => 0,
-            'hr_approved' => 3,
-        ]);
+        $ids = explode(",", $request->id);
+        Payroll::whereIn('payroll_id', $ids)->delete();
         $response['status'] = "Success";
-        $response['result'] = "Rejected Successfully";
+        $response['result'] = "Deleted Successfully";
         return response()->json($response);
     }
-
     public function payroll_approve(Request $request){
-        Payroll::where('payroll_id', $request->id)->update([
+        $ids = explode(",", $request->id);
+        Payroll::whereIn('payroll_id', $ids)->update([
             'status' => 1,
             'hr_approved' => 1,
         ]);
@@ -177,7 +168,6 @@ class PayrollController extends Controller
         $response['result'] = "Approved Successfully";
         return response()->json($response);
     }
-
     private function check_holidays($form_date, $to_date)
     {
         $check_holidays = Holiday::whereBetween('date_from', [$form_date, $to_date])->orWhereBetween('date_to', [$form_date, $to_date])->get();
@@ -197,7 +187,6 @@ class PayrollController extends Controller
         }
         return $holiday_count;
     }
-
     public function deduction()
     {
         $data['page_title'] = "Deduction - Atlantis BPO CRM";
@@ -205,7 +194,6 @@ class PayrollController extends Controller
         $data['departments'] = Department::where('status', 1)->get();
         return view('payroll.deduction' , $data);
     }
-
     public function save_deduction_form(Request $request)
     {
         $validator = Validator::make($request->all(),[
@@ -240,7 +228,6 @@ class PayrollController extends Controller
         }
         return response()->json($response);
     }
-
     public function deduction_delete(Request $request)
     {
         PayrollDeductionSetting::where('deduction_id', $request->id)->update(['status' => 0]);
@@ -248,7 +235,6 @@ class PayrollController extends Controller
         $response['result'] = "Deduction Deleted Successfully";
         return response()->json($response);
     }
-
     public function allowance()
     {
         $data['page_title'] = "Allowance - Atlantis BPO CRM";
@@ -256,16 +242,14 @@ class PayrollController extends Controller
         $data['departments'] = Department::where('status', 1)->get();
         return view('payroll.allowance' , $data);
     }
-
     public function save_allowance_form(Request $request)
     {
-//        dd($request->all());
         $validator = Validator::make($request->all(),[
             'title' => 'required',
             'type' => 'required',
             'department_id' => 'required',
             'role_id' => 'required',
-            'value' => 'required',
+//            'value' => 'required',
         ]);
         if($validator->passes()) {
             $provider = '';
@@ -281,7 +265,11 @@ class PayrollController extends Controller
             } else {
                 $roles = implode(",", $request->role_id);
             }
-
+            if($request->bench_mark_value == 'mobile'){
+                $value = 0;
+            } else {
+                $value = $request->bench_mark_value;
+            }
             $model = PayrollAllowanceSetting::updateOrCreate([
                 'allowance_id' => $request->allowance_id,
             ], [
@@ -292,11 +280,12 @@ class PayrollController extends Controller
                 'role_id' => $roles,
                 'bench_mark_type' => slugify($request->bench_mark_type),
                 'bench_mark_criteria' => slugify($request->bench_mark_criteria),
-                'bench_mark_value' => $request->bench_mark_value,
+                'bench_mark_value' => $value,
+                'before' => $request->before,
+                'after' => $request->after,
                 'provider' => $provider,
                 'added_by' => Auth::user()->user_id,
             ]);
-
             $response['status'] = "Success";
             $response['result'] = "Allowance Added Successfully";
         } else {
@@ -305,7 +294,6 @@ class PayrollController extends Controller
         }
         return response()->json($response);
     }
-
     public function allowance_delete(Request $request)
     {
         PayrollAllowanceSetting::where('allowance_id', $request->id)->update(['status' => 0]);
@@ -313,13 +301,11 @@ class PayrollController extends Controller
         $response['result'] = "Allowance Deleted Successfully";
         return response()->json($response);
     }
-
     public function get_department_role(Request $request)
     {
         $model = User::with('role')->where('department_id', $request->department_id)->distinct()->get('role_id');
         return response()->json($model);
     }
-
     public function tax_deduction()
     {
         $data['page_title'] = "Tax Deduction - Atlantis BPO CRM";
@@ -327,7 +313,6 @@ class PayrollController extends Controller
         $data['departments'] = Department::where('status', 1)->get();
         return view('payroll.tax_deduction' , $data);
     }
-
     public function save_tax_deduction_form(Request $request)
     {
         if($request->tax_deduction_id != null){
@@ -350,13 +335,11 @@ class PayrollController extends Controller
                 $model->added_by = Auth::user()->user_id;
                 $model->save();
             }
-
             $response['status'] = "Success";
             $response['result'] = "Tax Deduction Added Successfully";
         }
         return response()->json($response);
     }
-
     public function tax_deduction_delete(Request $request)
     {
         PayrollTaxSlab::where('tax_deduction_id', $request->id)->update(['status' => 0]);
@@ -364,7 +347,6 @@ class PayrollController extends Controller
         $response['result'] = "Tax Deduction Deleted Successfully";
         return response()->json($response);
     }
-
     public function payroll_edit($payroll_id)
     {
         $data['page_title'] = "Edit Payroll - Atlantis BPO CRM";
@@ -379,7 +361,6 @@ class PayrollController extends Controller
             ->where('user_id', $data['payroll']->user_id)->get();
         return view('payroll.partials.payroll_edit', $data);
     }
-
     public function payroll_save_edit(Request $request)
     {
         $deduction_val = 0;
@@ -418,7 +399,6 @@ class PayrollController extends Controller
         $response['result'] = 'Payroll Updated Successfully';
         return response()->json($response);
     }
-
     public function payslips()
     {
         $data['page_title'] = "Payslips - Atlantis BPO CRM";
@@ -429,7 +409,6 @@ class PayrollController extends Controller
         }
         return view('payroll.payslips', $data);
     }
-
     public function view_payslip(Request $request)
     {
         $data['payslip'] = Payroll::with('user', 'user.department', 'user.role', 'payroll_deduction', 'payroll_allowance')
@@ -438,24 +417,21 @@ class PayrollController extends Controller
             ->orderBy('payroll_id', 'desc')->first();
         return view('payroll.partials.view_payslip', $data);
     }
-
     public function convenience_allowance()
     {
         $data['page_title'] = "Convenience Allowance - Atlantis BPO CRM";
         $data['user_convenience'] = User::with('employee')
             ->whereHas('employee', function($q) {
-            $q->where('conveyance_allowance', 1);
-        })
+                $q->where('conveyance_allowance', 1);
+            })
             ->whereStatus(1)->get();
         $data['users'] = User::with('employee')
             ->whereHas('employee', function($q) {
-            $q->where('conveyance_allowance', 0);
-        })
+                $q->where('conveyance_allowance', 0);
+            })
             ->whereStatus(1)->get();
-
         return view('payroll.convenience_allowance', $data);
     }
-
     public function add_convenience_allowance(Request $request)
     {
         Employee::where('user_id', $request->user_id)->update([
@@ -465,7 +441,6 @@ class PayrollController extends Controller
         $response['result'] = "Conveyance Allowance Added Successfully";
         return response()->json($response);
     }
-
     public function remove_convenience_allowance(Request $request)
     {
         Employee::where('user_id', $request->id)->update([
@@ -475,7 +450,6 @@ class PayrollController extends Controller
         $response['result'] = "Conveyance Allowance Removed Successfully";
         return response()->json($response);
     }
-
     private function calculate_deductions($user)
     {
         $fixed_deduction = PayrollDeductionSetting::select(DB::raw('sum(value) as fixed_deduction'))
@@ -506,8 +480,7 @@ class PayrollController extends Controller
         $pct_deduction = $user->net_salary *  $pct_deduction[0]['pct_deduction'] / 100;
         return $fixed_deduction + $pct_deduction;
     }
-
-    private function employee_deduction($user, $attendace_log, $allowance)
+    private function employee_deduction($user, $attendace_log, $allowance, $working_days)
     {
         $late_absents = ($attendace_log->lates/3>=1) ? intval($attendace_log->lates/3) : 0;
         $half_leavs_absents = ($attendace_log->half_leaves/2>=1) ? intval($attendace_log->half_leaves/2) : 0;
@@ -536,10 +509,10 @@ class PayrollController extends Controller
         }
         // deduction_in_salary  AND deduction_from_bucket
         $daily_wage = $user->net_salary/22;
+        $unmarked_days_wage = ($working_days - $attendace_log->attendance_marked) * ($user->net_salary/$working_days);
         $absent_deductions = $daily_wage*$attendace_log->absents;
         $half_and_late_deductions_amount = $daily_wage*$half_and_late_deductions;
         $total_absents_deduction = $absent_deductions+$half_and_late_deductions_amount;
-
         $deduction_details = PayrollDeductionSetting::where('type', '!=', 'convenience')
             ->where(function ($query) use($user) {
                 return $query->where('department_id', $user->department_id)
@@ -550,13 +523,11 @@ class PayrollController extends Controller
                     ->orWhere('role_id',0);
             })
             ->whereStatus(1)->get()->pluck('title', 'value')->toArray();
-        // calculating tax
-        $tax_deduction_val = $this->calculate_income_tax($user, $allowance);
-        if($tax_deduction_val != 0){
-            $deduction_details[$tax_deduction_val] = 'Income Tax';
-        }
         if($total_absents_deduction != 0){
             $deduction_details[$total_absents_deduction] = 'Absentees Deductions';
+        }
+        if($unmarked_days_wage != 0){
+            $deduction_details[$unmarked_days_wage] = 'Unmarked Attendance';
         }
         $convenience_deduction = PayrollDeductionSetting::select(DB::raw('sum(value) as convenience'))->where('type', 'convenience')->whereStatus(1)->get();
         if($user->conveyance_allowance == 1){
@@ -565,9 +536,16 @@ class PayrollController extends Controller
         } else {
             $convenience_deduction = 0;
         }
-
         $calculated_deductions = $this->calculate_deductions($user);
-        $total_deductions = $convenience_deduction + $tax_deduction_val + $calculated_deductions + $total_absents_deduction;
+
+        $before_tax_deduction = $unmarked_days_wage+$convenience_deduction+$calculated_deductions+$total_absents_deduction;
+        // calculating tax
+        $tax_deduction_val = $this->calculate_income_tax($user, $allowance, $before_tax_deduction);
+        if($tax_deduction_val != 0){
+            $deduction_details[$tax_deduction_val] = 'Income Tax';
+        }
+        $total_deductions =  $tax_deduction_val +  $before_tax_deduction;
+
         return [
             'total_deductions' => $total_deductions,
             'deduction_bucket' => $leaves_deducted_from_bucket,
@@ -576,7 +554,6 @@ class PayrollController extends Controller
             'leaves_of_half' => $half_leavs_absents
         ];
     }
-
     private function employee_allowance($user_id, $num_of_leave, $num_of_absent, $month)
     {
         $user = User::whereUserId($user_id)->whereStatus(1)->first();
@@ -630,106 +607,111 @@ class PayrollController extends Controller
             ->where('type', 'rgu-bench-mark')
             ->where(function ($query) use ($user){
                 $query->where('department_id', $user->department_id)
-                    ->orWhere('department_id', 0);
+                    ->orWhere('department_id', 0); // for all depts
             })
             ->whereStatus(1)->get();
-        $rgu_bench_mark = 0;
+        $total_allowance = array(
+            'sp'=>0,
+            'dp'=>0,
+            'tp'=>0,
+            'rgu'=>0,
+            'mobile'=>0,
+            'dependebility'=>$dependability,
+        );
         foreach ($rgu_bench_mark_allowance as $rgu){
             if($rgu->role_id == 0 || $user->role_id == $rgu->role_id){
-                $sales = $this->get_user_total_rgu($from_date, $to_date, $user->user_id, $rgu->provider);
-                if($rgu->bench_mark_type == 'rgu'){
-                    $tem_val = 0;
-                    if($sales['total_rgu'] >= $rgu->bench_mark_value){
-                        if($rgu->bench_mark_criteria == 'fixed'){
-                            $tem_val += $rgu->allowance_value;
-                            $rgu_bench_mark += $rgu->allowance_value;
-                        } else {
-                            $val = intdiv($sales['total_rgu'],$rgu->bench_mark_value);
-                            $rgu_bench_mark += $val * $rgu->allowance_value;
-                            $tem_val += $val * $rgu->allowance_value;
-                        }
-                        $details[$rgu->title] = $tem_val;
-                    }
-                }
                 if($rgu->bench_mark_type == 'single-play'){
-                    $play = 1;
-                    $single_play = $this->get_user_play($user->user_id,$from_date, $to_date, $rgu->provider, $play);
+                    $single_play = $this->get_user_play($user->user_id,$from_date, $to_date, $rgu->provider, 1);
                     if($single_play >= $rgu->bench_mark_value){
                         $tem_val = 0;
                         if($rgu->bench_mark_criteria == 'fixed'){
-                            $rgu_bench_mark += $rgu->allowance_value;
+                            $total_allowance['sp'] += $rgu->allowance_value;
                             $tem_val += $rgu->allowance_value;
                         } else {
                             $val = intdiv($single_play, $rgu->bench_mark_value);
-                            $rgu_bench_mark += $val * $rgu->allowance_value;
+                            $total_allowance['sp'] += $val * $rgu->allowance_value;
                             $tem_val += $val * $rgu->allowance_value;
                         }
                         $details[$rgu->title] = $tem_val;
                     }
                 }
                 if($rgu->bench_mark_type == 'double-play'){
-                    $play = 2;
-                    $single2 = $this->get_user_play($user->user_id,$from_date, $to_date, $rgu->provider, $play);
+                    $single2 = $this->get_user_play($user->user_id,$from_date, $to_date, $rgu->provider, 2);
                     if($single2 >= $rgu->bench_mark_value){
                         $tem_val = 0;
                         if($rgu->bench_mark_criteria == 'fixed'){
-                            $rgu_bench_mark += $rgu->allowance_value;
+                            $total_allowance['dp'] += $rgu->allowance_value;
                             $tem_val += $rgu->allowance_value;
                         } else {
                             $val = intdiv($single2,$rgu->bench_mark_value);
-                            $rgu_bench_mark += $val * $rgu->allowance_value;
+                            $total_allowance['dp'] += $val * $rgu->allowance_value;
                             $tem_val += $val * $rgu->allowance_value;
                         }
                         $details[$rgu->title] = $tem_val;
                     }
                 }
                 if($rgu->bench_mark_type == 'triple-play'){
-                    $play = 3;
-                    $single3 = $this->get_user_play($user->user_id,$from_date, $to_date, $rgu->provider, $play);
+                    $single3 = $this->get_user_play($user->user_id,$from_date, $to_date, $rgu->provider, 3);
                     if($single3 >= $rgu->bench_mark_value){
                         $tem_val = 0;
                         if($rgu->bench_mark_criteria == 'fixed'){
-                            $rgu_bench_mark += $rgu->allowance_value;
+                            $total_allowance['tp'] += $rgu->allowance_value;
                             $tem_val += $rgu->allowance_value;
                         } else {
                             $val = intdiv($single3,$rgu->bench_mark_value);
-                            $rgu_bench_mark += $val * $rgu->allowance_value;
+                            $total_allowance['tp'] += $val * $rgu->allowance_value;
                             $tem_val += $val * $rgu->allowance_value;
                         }
                         $details[$rgu->title] = $tem_val;
                     }
                 }
-                if($rgu->bench_mark_type == 'mobile'){
-                    $play = 'mobile';
-                    $mobile_sales = $this->get_user_play($user->user_id,$from_date, $to_date, $rgu->provider, $play);
-                    if($mobile_sales >= $rgu->bench_mark_value){
-                        $tem_val = 0;
-                        if($rgu->bench_mark_criteria == 'fixed'){
-                            $rgu_bench_mark += $rgu->allowance_value;
-                            $tem_val += $rgu->allowance_value;
+                //Total RGU Allowance
+                $sales = $this->get_user_total_rgu($from_date, $to_date, $user->user_id, $rgu->provider);
+                $payroll_config = DB::table('payroll_config')->first();
+                // over 40 rguw bonus
+                if($sales['total_rgu'] > $payroll_config->rgu_bench_mark){
+                    $details['Total RGU'] = ($sales['total_rgu']-$payroll_config->rgu_bench_mark)*$payroll_config->per_rgu;
+                    $total_allowance['rgu'] =$details['Total RGU'];
+                }
+                // Mobile Bonus
+                if($rgu->bench_mark_type == 'mobile') {
+                    $allowance_amount = 0;
+                    $mobile_sales = $this->get_user_play($user->user_id, $from_date, $to_date, $rgu->provider, 'mobile');
+                    if($sales['total_rgu'] > $payroll_config->rgu_bench_mark) {
+                        $rgu_remaining_after_mobile = $sales['total_rgu'] - $mobile_sales; // 50-13 = 37
+                        if($rgu_remaining_after_mobile >= $payroll_config->rgu_bench_mark) {
+                            $allowance_amount = $rgu->after * $mobile_sales; // greater then bench_mark i.e 1500
                         } else {
-                            $val = intdiv($mobile_sales,$rgu->bench_mark_value);
-                            $rgu_bench_mark += $val * $rgu->allowance_value;
-                            $tem_val += $val * $rgu->allowance_value;
+                            // mobile = 7, RGU = 45, after_mobile = 38
+                            // if after deducting mobile rgus are less than 40
+                            $rgu_val_before = $payroll_config->rgu_bench_mark - $rgu_remaining_after_mobile; // 40 - 38 = 2
+                            $rgu_val_after = $mobile_sales-$rgu_val_before;
+                            $allowance_amount = ($rgu_val_before*$rgu->before);
+                            $allowance_amount += ($rgu_val_after*$rgu->after);
                         }
-                        $details[$rgu->title] = $tem_val;
+                    } else {
+                        $allowance_amount = ($mobile_sales*$rgu->before);
+                    }
+                    $total_allowance['mobile'] += $allowance_amount;
+                    if($allowance_amount>0){
+                        $details['Mobile'] = $allowance_amount;
                     }
                 }
             }
-            $rgu_bench_mark =+ $rgu_bench_mark;
         }
         return [
-            'play' => $rgu_bench_mark + $dependability,
+            'allowances' => $total_allowance,
+            'total_allowance' => $total_allowance['sp']+$total_allowance['dp']+$total_allowance['tp']+$total_allowance['mobile']+$total_allowance['rgu']+$total_allowance['dependebility'],
             'details' => $details
         ];
-    }
 
-    private function calculate_income_tax($user, $allowance)
+    }
+    private function calculate_income_tax($user, $allowance, $deduction)
     {
         if(!$user->net_salary) { die('Salary not available for employee '.$user->full_name); }
-        // basic salary plus all allowances
-        $salary = $user->net_salary + $allowance;
-        // total salary minus medical allowance
+        // basic salary plus all allowances and minus all deductions
+        $salary = ($user->net_salary + $allowance) - $deduction;
+        // total salary minus medical allowance 10%
         $salary = ($salary)-(($salary*10)/100);
         $annul_salary = $salary*12;
         $tax_deduction = PayrollTaxSlab::whereStatus(1)
@@ -746,7 +728,6 @@ class PayrollController extends Controller
         }
         return $tax_deduction_val;
     }
-
     private function get_user_total_rgu($from_date, $to_date, $user_id, $provider){
         $provider = explode(',', $provider);
         $single_play = DB::table('all_sales')->where('added_by', $user_id)->where('services_sold', 1)->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
@@ -768,7 +749,6 @@ class PayrollController extends Controller
             'total_sales' => $total_sales
         ];
     }
-
     private function get_user_play($user_id, $from_date, $to_date, $provider, $play)
     {
         $provider = explode(',', $provider);

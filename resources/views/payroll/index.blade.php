@@ -78,10 +78,23 @@
             let data = new FormData($('#payroll_form_id')[0]);
             data.append('_token', '{{csrf_token()}}');
             let a = function() {
-                // window.location.reload();
+                window.location.reload();
             }
             let arr = [a];
-            call_ajax_with_functions('', '{{route('payroll_save')}}', data, arr);
+            swal({
+                title: "Are you sure?",
+                text: "Once save payroll, you will not be able to re-create this!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        call_ajax_with_functions('', '{{route('payroll_save')}}', data, arr);
+                    } else {
+                        // swal("Your imaginary file is safe!");
+                    }
+                });
         }
     </script>
 @endsection
