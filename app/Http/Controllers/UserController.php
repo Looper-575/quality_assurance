@@ -252,9 +252,9 @@ class UserController extends Controller
         }
     }
     public function change_pass(Request $request)
-    {//dd($request->all());
-        $check_curr_pass = User::where([ 'user_id'=>$request->user_id,
-                                         'password'=>encrypt_password($request->curr_password)])->count();
+    {
+        $check_curr_pass = User::where(['user_id'=>$request->user_id,
+                                        'password'=>encrypt_password($request->curr_password)])->count();
         $validator = Validator::make($request->all(), [
             'password' => 'required|confirmed',
             'password_confirmation' => 'required',

@@ -80,7 +80,7 @@
                                 </div>
                                 @csrf
                                 <input type="text" id="change_password" class="form-control" placeholder="Password" name="password">
-                                <input type="hidden" name="user_id" id="c_user_id">
+                                <input type="hidden" name="user_id" id="cp_user_id" value="">
                             </div>
                         </div>
                     </div>
@@ -151,8 +151,8 @@
             })
         }
         function change_password(me) {
+            $('#cp_user_id').val(me.value);
             $('#change_pass_modal').modal('show');
-            $('#c_user_id').val(me.value);
         }
         $('#change_pass_form').submit(function (e){
             e.preventDefault();

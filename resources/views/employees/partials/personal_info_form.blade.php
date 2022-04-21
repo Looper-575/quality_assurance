@@ -47,7 +47,7 @@
                                     <select class="form-control" name="user_id" id="user_id" onchange="get_user_data($(this).val())" required {{ $user_ddl_perm  ? 'disabled' : ''}} >
                                         <option value="">Select</option>
                                         @foreach($users as $user)
-                                            <option {{ ($employee && $employee->user_id == $user->user_id) ? 'selected' : (Auth::user()->user_id == $user->user_id ? 'selected' : '' ) }} value="{{$user->user_id}}">{{$user->full_name}}</option>
+                                            <option {{ ($employee && $employee->user_id == $user->user_id) ? 'selected' : ((Auth::user()->role->role_id != '5' && Auth::user()->role->role_id != '1') && Auth::user()->user_id == $user->user_id ? 'selected' : '' ) }} value="{{$user->user_id}}">{{$user->full_name}}</option>
                                         @endforeach
                                     </select>
                                     @if( $user_ddl_perm )
@@ -72,11 +72,11 @@
                                     <select class="form-control" name="department_id" id="department_id" required {{$user_ddl_perm ? 'disabled' : ''}} >
                                         <option value="">Select</option>
                                         @foreach($departments as $department)
-                                            <option {{ (($employee && $employee->department_id == $department->department_id) or $department->department_id == Auth::user()->department_id) ? 'selected' : ''}} value="{{$department->department_id}}">{{$department->title}}</option>
+                                            <option {{ (($employee && $employee->department_id == $department->department_id) or ( Auth::user()->role->role_id != '5' && Auth::user()->role->role_id != '1' && $department->department_id == Auth::user()->department_id)) ? 'selected' : ''}} value="{{$department->department_id}}">{{$department->title}}</option>
                                         @endforeach
                                     </select>
                                     @if($user_ddl_perm)
-                                        <input type="hidden" name="department_id" value="{{(Auth::user()->role->role_id != '5' && Auth::user()->role->role_id != '1')  ? Auth::user()->department_id : $employee->department_id}}">
+                                        <input type="hidden" name="department_id" value="{{(Auth::user()->role->role_id != '5' && Auth::user()->role->role_id != '1') ? Auth::user()->department_id : $employee->department_id}}">
                                     @endif
                                 </div>
                             </div>

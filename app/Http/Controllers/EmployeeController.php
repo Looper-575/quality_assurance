@@ -21,10 +21,7 @@ use Illuminate\Support\Facades\File;
 
 class EmployeeController extends Controller
 {
-    public function __construct()
-    {
-        //$this->middleware('auth');
-    }
+    public function __construct() { }
     public function index()
     {
         $data['page_title'] = "Employees List - Atlantis BPO CRM";
@@ -142,11 +139,13 @@ class EmployeeController extends Controller
                 'blood_group' => $request->blood_group,
                 'native_lang' => $request->native_lang,
                 'joining_date' => $request->joining_date,
-                'hobbies_interest' => $request->hobbies_interest,
-                'net_salary' => $request->net_salary,
-                'conveyance_allowance' => $request->conveyance_allowance,
-                'employment_status' => $request->employment_status
+                'hobbies_interest' => $request->hobbies_interest
             ];
+            if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5){
+                    $employee_info_data['net_salary'] = $request->net_salary;
+                    $employee_info_data['conveyance_allowance'] = $request->conveyance_allowance;
+                    $employee_info_data['employment_status'] = $request->employment_status;
+            }
             if($request->hasFile('image')) {
                 if(count($employee)>0){
                     $employee_old_image =  User::where('user_id', $request->user_id)->pluck('image')->first();
@@ -493,7 +492,6 @@ class EmployeeController extends Controller
         $data['section_id'] = 'upload_docs_form';
         return view('employees.partials.upload_docs_form', $data);
     }
-
     public function lock_employee_record(Request $request)
     {
         Employee::where('employee_id', $request->employee_id)->update([

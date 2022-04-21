@@ -77,17 +77,18 @@
     </div>
     <!--end::Modal-->
     <!--begin::Modal-->
-    <div class="modal fade" id="change_password_modal" tabindex="-1" role="dialog" aria-labelledby="change_password_modalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade" id="change_pass_modal" tabindex="-1" role="dialog" aria-labelledby="modal_label" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="change_password_modalLabel">Change Password</h5>
+                    <h5 class="modal-title" id="modal_label">Change Password</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <form id="change_pass_form" action="javascript:change_password();">
+                <form method="post" id="change_pass_form">
+                    <div class="modal-body">
+                        @csrf
                         <div class="form-group">
                             <label for="change_password">Password</label>
                             <div class="input-group">
@@ -95,13 +96,20 @@
                                     <div class="input-group-text"><i class="fas fa-lock"></i></div>
                                 </div>
                                 @csrf
-                                <input type="text" id="change_password" class="form-control" placeholder="Password" name="password" required>
-                                <input type="hidden" name="user_id" id="c_user_id">
+                                <input type="text" id="change_password" class="form-control" placeholder="Password" name="password">
+                                <input type="hidden" name="user_id" id="cp_user_id" value="">
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Update Password</button>
-                    </form>
-                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Save changes
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -171,20 +179,19 @@
             let arr = [a,b];
             call_ajax_with_functions('vendor_form_data',"{{route('vendor_form')}}",data,arr);
         }
-
         function vendor_change_password(me) {
-            $('#c_user_id').val(me.value);
-            $('#change_password_modal').modal('show');
+            $('#cp_user_id').val(me.value);
+            $('#change_pass_modal').modal('show');
         }
-        function change_password() {
-            let data = new FormData($('#change_pass_form')[0]);
-            data.append('_token', "{{csrf_token()}}");
-            let a = function(){
-                $('#change_password_modal').modal('hide');
-            };
+        $('#change_pass_form').submit(function (e){
+            e.preventDefault();
+            let data = new FormData(this);
+            let a = function () {
+                $('#change_pass_modal').modal('hide');
+            }
             let arr = [a];
-            call_ajax_with_functions('','{{route('vendor_change_password')}}',data,arr);
-        }
+            call_ajax_with_functions('', '{{route('change_password')}}', data, arr);
+        });
         document.addEventListener("DOMContentLoaded", function(event) {
             $('.select2').select2({
                 placeholder: "Select did_ids",

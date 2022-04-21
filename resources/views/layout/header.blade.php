@@ -147,7 +147,7 @@
             <div class="modal-body">
                 <form id="change_pass" action="javascript:change_password();" method="POST">
                     @csrf
-                    <input type="hidden" name="user_id" id="c_user_id" value="{{Auth::user()->user_id}}">
+                    <input type="hidden" name="user_id" value="{{Auth::user()->user_id}}">
                     <div class="row">
                         <div class="col-6">
                             <div class="form-group">
