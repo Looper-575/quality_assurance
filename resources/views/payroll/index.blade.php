@@ -3,6 +3,11 @@
     <link href="{{asset('assets/css/datatables.min.css')}}" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
+    <style>
+       th{
+            font-weight: bold !important;
+        }
+    </style>
     <div class="m-portlet m-portlet--mobile">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
@@ -46,10 +51,11 @@
     </div>
 @endsection
 @section('footer_scripts')
-{{--    <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>--}}
-{{--    <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>--}}
+    <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
+    <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script src="{{ asset('assets/bundles/select2/dist/js/select2.full.min.js') }}"></script>
     <script>
+        let data_table=''
         $(document).ready(function (){
             $(".select2").select2();
         });
@@ -58,27 +64,22 @@
             let data = new FormData(this);
             data.append('_token', "{{csrf_token()}}")
             let a = function () {
-                $('#reports_table').DataTable({
-                    dom: 'Bfrtip',
-                    buttons: [
-                        'copy', 'csv', 'excel', 'pdf',
-                        {
-                            extend: 'print',
-                            customize: function (win) {
-                                $(win.document.body).find('thead').prepend($('#report_header').html());
-                            }
-                        },
-                    ]
+                data_table = $('#reports_table').DataTable({
+                    paging: false,
                 });
             };
             let arr = [a];
             call_ajax_with_functions('report_data', '{{route('generate_pay_role')}}', data, arr);
         });
         function save_payroll_form() {
+            // reseting any search in datable
+            $('#reports_table_filter input').val('');
+            data_table.search('').columns().search('').draw();
+
             let data = new FormData($('#payroll_form_id')[0]);
             data.append('_token', '{{csrf_token()}}');
             let a = function() {
-                window.location.reload();
+                // window.location.reload();
             }
             let arr = [a];
             swal({

@@ -24,7 +24,7 @@
             </div>
         </div>
         <div class="m-portlet__body">
-            <table class="table table-bordered" id="html_table">
+            <table class="datatable table table-bordered" id="html_table">
                 <thead>
                 <tr>
                     <th>S.No.</th>

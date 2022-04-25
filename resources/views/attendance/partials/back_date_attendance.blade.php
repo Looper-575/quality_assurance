@@ -1,13 +1,10 @@
-<?php
-$has_permissions = get_route_permissions( Auth::user()->role->role_id, 'check_attendance');
-?>
+<?php $has_permissions = get_route_permissions( Auth::user()->role->role_id, 'check_attendance'); ?>
 <div style="width: 100%">
-    @if($agents && !$holiday && !$not_marked)
+    @if($agents && !$not_marked)
         <table class="datatable table table-bordered" id="mark_tid" style="width:100%">
             <thead>
             <tr>
                 <th>Agent Name</th>
-                {{--                        <th>Email</th>--}}
                 <th>Date</th>
                 <th>Time In</th>
                 <th>Time Out</th>
@@ -19,7 +16,6 @@ $has_permissions = get_route_permissions( Auth::user()->role->role_id, 'check_at
                 <tr>
                     <input type="hidden" name="attendance_id" value="{{$agent_list->attendance_id}}" id="row_{{@$agent_list->user->user_id}}">
                     <td>{{ @$agent_list->user->full_name }}</td>
-                    {{--                                <td>{{ @$agent_list->user->email }}</td>--}}
                     <td>{{ $agent_list->attendance_date }}</td>
                     <td>
                         <input class="form-control" type="time" onchange="time_in({{@$agent_list->user->user_id}})" name="time_in" value="{{$agent_list->time_in}}" id="time_in_{{@$agent_list->user->user_id}}">
@@ -81,9 +77,6 @@ $has_permissions = get_route_permissions( Auth::user()->role->role_id, 'check_at
             @endforeach
             </tbody>
         </table>
-    @endif
-    @if($holiday)
-    <h3>You Select Holiday!</h3>
     @endif
     @if($not_marked)
             @if($has_permissions->add == 1)

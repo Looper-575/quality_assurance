@@ -1,5 +1,6 @@
 @extends('layout.template')
 @section('header_scripts')
+    <link href="{{asset('assets/css/datatables.min.css')}}" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
     <?php
@@ -141,6 +142,8 @@
     </div>
 @endsection
 @section('footer_scripts')
+    <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
+    <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script>
         $('.detele_btn').click( function () {
             let id = this.value;

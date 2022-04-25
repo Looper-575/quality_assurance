@@ -24,7 +24,7 @@ class Holiday extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'title' , 'type', 'date_from', 'date_to', 'added_by' ,'modified_by', 'deleted_by',
+        'title' , 'department_id', 'role_id', 'user_id', 'date_from', 'date_to', 'added_by' ,'modified_by', 'deleted_by',
     ];
 
     /**
@@ -59,5 +59,10 @@ class Holiday extends Authenticatable
     public function manager()
     {
         return $this->belongsTo(User::class , 'added_by' , 'user_id');
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class , 'department_id', 'department_id');
     }
 }

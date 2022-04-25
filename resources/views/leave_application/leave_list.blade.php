@@ -1,7 +1,6 @@
 @extends('layout.template')
 @section('header_scripts')
     <link href="{{asset('assets/css/datatables.min.css')}}" rel="stylesheet" type="text/css" />
-    {{--    <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">--}}
 @endsection
 @section('content')
     <?php
@@ -186,8 +185,6 @@
             dangerMode: true,
         }).then(function(isConfirm) {
             if (isConfirm) {
-                // $(me).closest('tr').fadeOut('slow', function (){
-                //     $(this).remove();
                 let a = function () {
                     window.location.href = "{{route('leave_list')}}";
                 };
@@ -211,8 +208,6 @@
             dangerMode: false,
         }).then(function(isConfirm) {
             if (isConfirm) {
-                // $(me).closest('tr').fadeOut('slow', function (){
-                //     $(this).remove();
                 let a = function () {
                     window.location.href = "{{route('leave_list')}}";
                 };

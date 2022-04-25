@@ -2,13 +2,13 @@
     <table class="table table-striped" id="reports_table">
         <thead>
         <tr id="report_header">
-            <th colspan="2"><h5>Report: <?php $yrdata= strtotime($month); echo date('M-Y', $yrdata); ?></h5></th>
-            <th colspan="3"><h5>Total Working Days: {{$working_days}}</h5></th>
-            <th colspan="2"><h5>Total Holidays: {{$holiday_count}}</h5></th>
+            <th colspan="4"><h5>Report: <?php $yrdata= strtotime($month); echo date('M-Y', $yrdata); ?></h5></th>
+            <th colspan="4"><h5>Total Working Days: {{$working_days}}</h5></th>
         </tr>
         <tr>
             <th title="Field #1">Agent Name</th>
             <th title="Field #2">Attendance Marked</th>
+            <th title="Field #2">Holidays</th>
             <th title="Field #3">Present</th>
             <th title="Field #4">On Leave</th>
             <th title="Field #5">Half Day Leave</th>
@@ -21,6 +21,7 @@
             <tr>
                 <td>{{ $call_disp_list->user->full_name }}</td>
                 <td>{{ $call_disp_list->attendance_marked }}</td>
+                <td>{{ $call_disp_list->holiday_count }}</td>
                 <td>{{ $call_disp_list->attendance_marked - ($call_disp_list->absents + $call_disp_list->leaves)}}</td>
                 <td>{{ $call_disp_list->leaves }}</td>
                 <td>{{ $call_disp_list->half_leaves }}</td>

@@ -74,7 +74,7 @@ class AttendanceController extends Controller
         $shift_check_in = (date("H"  ,strtotime($team->shift->check_in)) - 2);
         $users_id = TeamMember::where('team_id', $team->team_id)->pluck('user_id')->toArray();
         array_push($users_id, $manager_id);
-        if($hour >= $shift_check_in && date('N', strtotime($today)) < 6 && $check_holiday->count() == 0) {
+        if($hour >= $shift_check_in && date('N', strtotime($today)) < 6) { //&& $check_holiday->count() == 0
             $check_record = AttendanceLog::with('user')->where('attendance_date', $date_today)->where('added_by', $manager_id)->get();
             $att_users_id = $check_record->pluck('user_id')->toArray();
             $new_users_in_team = array_diff($users_id,$att_users_id);
@@ -99,8 +99,25 @@ class AttendanceController extends Controller
         DB::beginTransaction();
         try {
             foreach ($users_id as $user_id) {
+                $user = User::whereUserId($user_id)->first();
+                $check_holiday = Holiday::where('date_from','<=', $date_today)->where('date_to','>=', $date_today)
+                    ->where(function ($query_dpt) use($user) {
+                        return $query_dpt->where('department_id',$user->department_id)
+                            ->orWhere('department_id',0);
+                    })
+                    ->where(function ($query_role) use($user) {
+                        return $query_role->whereRaw('FIND_IN_SET("'.$user->role_id.'",role_id)')
+                            ->orWhere('role_id',0);
+                    })
+                    ->where(function ($query1) use($user_id) {
+                        return $query1->whereRaw('FIND_IN_SET("'.$user_id.'",user_id)')
+                            ->orWhere('user_id',0);
+                    })
+                    ->first();
                 $attendance_log_check = AttendanceLog::where(['user_id' => $user_id, 'attendance_date' => $date_today])->get();
-                if (count($attendance_log_check) > 0) {
+
+                if (count($attendance_log_check) > 0 || $check_holiday != null) {
+                    //if attendance already created and user on holiday then don't create attendance
                 } else {
                     $leave = LeaveApplication::where('added_by', $user_id)
                         ->where(['approved_by_manager' => 1, 'approved_by_hr' => 1])
@@ -145,17 +162,14 @@ class AttendanceController extends Controller
     public function check_back_date_attendance(Request $request)
     {
         $date_today = date("Y-m-d"  ,strtotime($request->attendance_date));
-        $check_holiday = Holiday::where('date_from','<=', $date_today)->where('date_to','>=', $date_today)->get();
         $data['not_marked'] = false;
-        $data['holiday'] = false;
-        if(date('N', strtotime($date_today)) < 6 && $check_holiday->count() == 0){
+        if(date('N', strtotime($date_today)) < 6){
             $data['agents'] =  AttendanceLog::with('user')->where('attendance_date', $date_today)->where('added_by', $request->manager_id)->get();
             if(count($data['agents']) == 0){
                 $data['not_marked'] = true;
             }
         } else {
             $data['agents'] = null;
-            $data['holiday'] = true;
         }
         return view('attendance.partials.back_date_attendance' , $data);
     }

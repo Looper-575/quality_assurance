@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers;
+use App\Models\AttendanceLog;
 use App\Models\ManagerialRole;
 use App\Models\Team;
 use App\Models\TeamMember;
@@ -84,8 +85,8 @@ class LeaveApplicationController extends Controller
                 $manager_id = User::where('user_id', Auth::user()->user_id)->pluck('manager_id')->first();
                 add_notifications('leave_applications','Leaves',$pending_leave_id,$manager_id,'Pending Leave Approval by Manager');
             }
-                $response['status'] = "Success";
-                $response['result'] = "Added Successfully";
+            $response['status'] = "Success";
+            $response['result'] = "Added Successfully";
         } else {
             $response['status'] = "Failure!";
             $response['result'] = str_replace('3', 'Sick',$validator->errors()->toJson());
@@ -114,38 +115,30 @@ class LeaveApplicationController extends Controller
     public function list()
     {
         $data['page_title'] = "Leave Applications - Atlantis BPO CRM";
-        $manager_id = ManagerialRole::where('role_id', Auth::user()->role_id)->whereType('Manager')->first();
-        $team_lead_id = ManagerialRole::where('role_id', Auth::user()->role_id)->whereType('Team Lead')->first();
+        $manager_id = ManagerialRole::where('role_id', Auth::user()->role_id)->orWhere([['type','=','Manager'],['type','=','Team Lead']])->first();
         if(isset($manager_id)){
             $manager_role_id = $manager_id->role_id;
-        }
-        else{
+        } else {
             $manager_role_id = 0;
         }
+        if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5) {
+            $data['leave_lists'] = LeaveApplication::where([
+                ['status','=',1], ['approved_by_manager','=', 1],
+                ['approved_by_hr','=', 1]
+            ])->with('user')->get();
 
-        if(Auth::user()->role_id == 1){
-            $data['leave_lists'] = LeaveApplication::where([
-                ['status','=',1],  ['approved_by_manager','=', 1],
-                ['approved_by_hr','=', 1]
-            ])->with('user')->get();
             $data['leave_lists_unapproved'] = LeaveApplication::where([
-            ['status', '=' ,1],
-        ])->where(function($query) {
-            $query->where('approved_by_manager','=',NULL)
-                ->orWhere('approved_by_hr','=',NULL);
-        })->with('user')->get();
-        }
-        else if(Auth::user()->role_id == 5){
-            $data['leave_lists'] = LeaveApplication::where([
-                ['status','=',1],
-                ['approved_by_manager','=', 1],
-                ['approved_by_hr','=', 1]
-            ])->with('user')->get();
-            $data['leave_lists_unapproved'] = LeaveApplication::where([
-                ['status','=', 1],['approved_by_manager','<>',NULL],['approved_by_hr','=',NULL]
-            ])->with('user')->get();
-        }
-        else if(Auth::user()->role_id == $manager_role_id){
+                ['status', '=' ,1],
+            ])->where(function($query) {
+                $query->where('approved_by_manager','=',NULL)
+                    ->orWhere('approved_by_hr','=',NULL);
+            })->with('user')->get();
+            if(Auth::user()->role_id == 5){
+                $data['leave_lists_unapproved'] = LeaveApplication::where([
+                    ['status','=', 1],['approved_by_manager','=',1],['approved_by_hr','=',NULL]
+                ])->with('user')->get();
+            }
+        } else if(Auth::user()->role_id == $manager_role_id){
             $data['leave_lists'] = LeaveApplication::where([
                 ['status','=',1],
                 ['approved_by_manager' ,'=',1],
@@ -165,8 +158,7 @@ class LeaveApplicationController extends Controller
                     return $query->where('manager_id', '=', Auth::user()->user_id);
                 })->orWhere('added_by','=',Auth::user()->user_id);
             })->get();
-        }
-        else {
+        } else {
             $data['leave_lists'] = LeaveApplication::where([
                 ['status','=', 1] ,
                 ['added_by','=',Auth::user()->user_id],
@@ -204,6 +196,10 @@ class LeaveApplicationController extends Controller
     Public function approve(Request $request)
     {
         if (Auth::user()->role_id == 5) {
+            $leave = LeaveApplication::where('leave_id', $request->id)->first();
+            AttendanceLog::where('user_id', $leave->added_by)
+                ->whereBetween('attendance_date', [$leave->from, $leave->to])
+                ->update(['applied_leave' => 1, 'on_leave' => 0, 'late' => 0, 'half_leave' => 0, 'absent' => 0]);
             LeaveApplication::where('leave_id', $request->id)->update([
                 'approved_by_hr' => 1,
             ]);
@@ -256,8 +252,6 @@ class LeaveApplicationController extends Controller
                     'reason' => $request->reason,
                 ]);
                 $leave_id = $request->leave_id;
-//                $response['status'] = "Success";
-//                $response['result'] = "Updated Successfully";
             } else {
                 $leave = new LeaveApplication();
                 $leave->added_by = $added_by;

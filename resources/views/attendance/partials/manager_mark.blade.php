@@ -3,7 +3,6 @@
         <thead>
         <tr>
             <th>Agent Name</th>
-            <th>Email</th>
             <th>Date</th>
             <th>Time In</th>
             <th>Time Out</th>

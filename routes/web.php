@@ -225,6 +225,8 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::group(['middleware' => ['is-admin']], function() {
         Route::post('/holiday_delete', 'App\Http\Controllers\HolidayController@holiday_delete')->name('holiday_delete');
     });
+    Route::get('/get_selected_role_users' , 'App\Http\Controllers\HolidayController@get_selected_role_users')->name('get_selected_role_users');
+
     //reports
     Route::group(['middleware' => ['check-permission:qa_report_form,view,0,0']], function() {
         Route::get('/qa_report_form' , 'App\Http\Controllers\ReportController@qa_report_form')->name('qa_report_form');
@@ -295,19 +297,26 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::post('project_modules', 'App\Http\Controllers\ModuleController@project_modules')->name('project_modules');
 
 
-
-    Route::get('/managerial_role','App\Http\Controllers\SettingsController@managerial_role')->name('managerial_role');
+    Route::group(['middleware' => ['check-permission:managerial_role,view,0,0']], function() {
+        Route::get('/managerial_role','App\Http\Controllers\SettingsController@managerial_role')->name('managerial_role');
+    });
     Route::post('/managerial_role_save','App\Http\Controllers\SettingsController@managerial_role_save')->name('managerial_role_save');
-    Route::post('/managerial_role_delete','App\Http\Controllers\SettingsController@managerial_role_delete')->name('managerial_role_delete');
+    Route::group(['middleware' => ['is-admin']], function() {
+        Route::post('/managerial_role_delete','App\Http\Controllers\SettingsController@managerial_role_delete')->name('managerial_role_delete');
+    });
     Route::get('/check_managerial_role','App\Http\Controllers\SettingsController@check_managerial_role')->name('check_managerial_role');
 
     Route::get('rec_download/{recordings}', 'App\Http\Controllers\QAController@rec_download')->name('rec_download');
 
     //    Employee Routes
-    Route::get('/employees', 'App\Http\Controllers\EmployeeController@index')->name('employees');
+    Route::group(['middleware' => ['check-permission:employees,view,0,0']], function() {
+        Route::get('/employees', 'App\Http\Controllers\EmployeeController@index')->name('employees');
+    });
     Route::get('/employee_form_wizard', 'App\Http\Controllers\EmployeeController@employee_form')->name('employee_form');
     Route::post('/employee_save', 'App\Http\Controllers\EmployeeController@employee_info_save')->name('employee_save');
-    Route::post('/employee_delete', 'App\Http\Controllers\EmployeeController@delete')->name('employee_delete');
+    Route::group(['middleware' => ['is-admin']], function() {
+        Route::post('/employee_delete', 'App\Http\Controllers\EmployeeController@delete')->name('employee_delete');
+    });
     Route::post('/employee_education_save', 'App\Http\Controllers\EmployeeController@employee_education_save')->name('employee_education_save');
     Route::post('/employee_experience_save', 'App\Http\Controllers\EmployeeController@employee_experience_save')->name('employee_experience_save');
     Route::post('/employee_family_save', 'App\Http\Controllers\EmployeeController@employee_family_save')->name('employee_family_save');
@@ -327,20 +336,24 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::post('/employees_company_reference_info_edit', 'App\Http\Controllers\EmployeeController@employees_company_reference_info_edit')->name('employees_company_reference_info_edit');
 
     // Performance Improvement Plans ROUTES
-    Route::get('/performance_improvement_plan', 'App\Http\Controllers\PIPController@index')->name('performance_improvement_plan');
-    Route::get('/pip_form', 'App\Http\Controllers\PIPController@pip_form')->name('pip_form');
+    Route::group(['middleware' => ['check-permission:performance_improvement_plan,view,0,0']], function() {
+        Route::get('/performance_improvement_plan', 'App\Http\Controllers\PIPController@index')->name('performance_improvement_plan');
+        Route::get('/pip_form', 'App\Http\Controllers\PIPController@pip_form')->name('pip_form');
+        Route::get('/view_pip', 'App\Http\Controllers\PIPController@view_pip')->name('view_pip');
+    });
     Route::post('/pip_save', 'App\Http\Controllers\PIPController@pip_save')->name('pip_save');
-    Route::get('/view_pip', 'App\Http\Controllers\PIPController@view_pip')->name('view_pip');
     Route::post('/hrm_approve_pip', 'App\Http\Controllers\PIPController@hrm_approve_pip')->name('hrm_approve_pip');
     Route::post('/staff_ack_pip_with_comments', 'App\Http\Controllers\PIPController@staff_ack_pip_with_comments')->name('staff_ack_pip_with_comments');
     Route::post('/staff_ack_pip', 'App\Http\Controllers\PIPController@staff_ack_pip')->name('staff_ack_pip');
     Route::get('/get_om_users_data', 'App\Http\Controllers\PIPController@get_om_users_data')->name('get_om_users_data');
 
     // Employee Assessment Routes
-    Route::get('/employee_assessment', 'App\Http\Controllers\EmployeeAssessmentController@index')->name('employee_assessment');
-    Route::get('/employee_assessment_form', 'App\Http\Controllers\EmployeeAssessmentController@employee_assessment_form')->name('employee_assessment_form');
+    Route::group(['middleware' => ['check-permission:employee_assessment,view,0,0']], function() {
+        Route::get('/employee_assessment', 'App\Http\Controllers\EmployeeAssessmentController@index')->name('employee_assessment');
+        Route::get('/employee_assessment_form', 'App\Http\Controllers\EmployeeAssessmentController@employee_assessment_form')->name('employee_assessment_form');
+        Route::get('/view_employee_assessment', 'App\Http\Controllers\EmployeeAssessmentController@view_employee_assessment')->name('view_employee_assessment');
+    });
     Route::post('/employee_assessment_save', 'App\Http\Controllers\EmployeeAssessmentController@employee_assessment_save')->name('employee_assessment_save');
-    Route::get('/view_employee_assessment', 'App\Http\Controllers\EmployeeAssessmentController@view_employee_assessment')->name('view_employee_assessment');
     Route::get('/get_employee_details', 'App\Http\Controllers\EmployeeAssessmentController@get_employee_details')->name('get_employee_details');
     Route::get('/schedule_self_assessment', 'App\Http\Controllers\EmployeeAssessmentController@schedule_self_assessment')->name('schedule_self_assessment');
 
@@ -348,12 +361,7 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::get('/get_pending_notifications', 'App\Http\Controllers\NotificationsController@get_pending_notifications')->name('get_pending_notifications');
     Route::get('/read_notification', 'App\Http\Controllers\NotificationsController@read_notification')->name('read_notification');
     Route::get('/clear_all_notifications', 'App\Http\Controllers\NotificationsController@clear_all_notifications')->name('clear_all_notifications');
-
-    // Notification Types
-    Route::get('/notification_types', 'App\Http\Controllers\NotificationsController@index')->name('notification_types');
-    Route::post('/notification_type_form', 'App\Http\Controllers\NotificationsController@notification_type_form')->name('notification_type_form');
-    Route::post('/notification_type_save', 'App\Http\Controllers\NotificationsController@notification_type_save')->name('notification_type_save');
-    Route::post('/view_notification_type', 'App\Http\Controllers\NotificationsController@view_notification_type')->name('view_notification_type');
+    Route::get('/show_welcome_modal', 'App\Http\Controllers\NotificationsController@show_welcome_modal')->name('show_welcome_modal');
 
     // vendors
     Route::group(['middleware' => ['check-permission:vendors,view,0,0']], function() {
@@ -377,37 +385,54 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
         Route::get('/leaves_taken_report_monthly','App\Http\Controllers\ReportController@leaves_taken_report_monthly')->name('leaves_taken_report_monthly');
     });
     Route::post('/generate_monthly_leaves_taken_report' , 'App\Http\Controllers\ReportController@generate_monthly_leaves_taken_report')->name('generate_monthly_leaves_taken_report');
-
-    // Payroll routes
-    Route::get('/create_payroll','App\Http\Controllers\PayrollController@create_payroll')->name('create_payroll');
-    Route::post('/generate_pay_role','App\Http\Controllers\PayrollController@generate_pay_role')->name('generate_pay_role');
-    Route::post('/payroll_save','App\Http\Controllers\PayrollController@payroll_save')->name('payroll_save');
-    Route::post('/payroll_save_edit','App\Http\Controllers\PayrollController@payroll_save_edit')->name('payroll_save_edit');
-    Route::get('/payroll_details','App\Http\Controllers\PayrollController@payroll_details')->name('payroll_details');
-    Route::post('/payroll_reject','App\Http\Controllers\PayrollController@payroll_reject')->name('payroll_reject');
-    Route::post('/payroll_approve','App\Http\Controllers\PayrollController@payroll_approve')->name('payroll_approve');
-    Route::get('payroll_edit/{payroll_id}','App\Http\Controllers\PayrollController@payroll_edit')->name('payroll_edit');
-    //     Deduction routes
-    Route::get('/deduction','App\Http\Controllers\PayrollController@deduction')->name('deduction');
-    Route::post('/save_deduction_form','App\Http\Controllers\PayrollController@save_deduction_form')->name('save_deduction_form');
-    Route::post('/deduction_delete','App\Http\Controllers\PayrollController@deduction_delete')->name('deduction_delete');
-    //      Allowance routes
-    Route::get('/allowance','App\Http\Controllers\PayrollController@allowance')->name('allowance');
-    Route::post('/save_allowance_form','App\Http\Controllers\PayrollController@save_allowance_form')->name('save_allowance_form');
-    Route::post('/allowance_delete','App\Http\Controllers\PayrollController@allowance_delete')->name('allowance_delete');
-
-    Route::get('/get_department_role','App\Http\Controllers\PayrollController@get_department_role')->name('get_department_role');
-    //    Tax deduction routes
-    Route::get('/tax_deduction','App\Http\Controllers\PayrollController@tax_deduction')->name('tax_deduction');
-    Route::post('/save_tax_deduction_form','App\Http\Controllers\PayrollController@save_tax_deduction_form')->name('save_tax_deduction_form');
-    Route::post('/tax_deduction_delete','App\Http\Controllers\PayrollController@tax_deduction_delete')->name('tax_deduction_delete');
-    //    Call dispostions types routes
-    Route::get('/disposition_type_list','App\Http\Controllers\SettingsController@disposition_type_list')->name('call_dispositions_types');
-    Route::post('/disposition_type_save','App\Http\Controllers\SettingsController@disposition_type_save')->name('call_dispositions_types_save');
-    Route::get('/disposition_type_delete','App\Http\Controllers\SettingsController@disposition_type_delete')->name('call_dispositions_types_delete');
     //    Payslips
     Route::get('/payslips', 'App\Http\Controllers\PayrollController@payslips')->name('payslips');
     Route::post('/view_payslip', 'App\Http\Controllers\PayrollController@view_payslip')->name('view_payslip');
+    // Payroll routes
+    Route::group(['middleware' => ['check-permission:create_payroll,view,0,0']], function() { // generation module
+        Route::post('/generate_pay_role','App\Http\Controllers\PayrollController@generate_pay_role')->name('generate_pay_role');
+        Route::post('/payroll_save','App\Http\Controllers\PayrollController@payroll_save')->name('payroll_save');
+        Route::get('/create_payroll','App\Http\Controllers\PayrollController@create_payroll')->name('create_payroll');
+    });
+    Route::group(['middleware' => ['check-permission:create_payroll,view,add,update']], function() { // approval module
+        Route::get('/payroll_details','App\Http\Controllers\PayrollController@payroll_details')->name('payroll_details');
+        Route::get('payroll_edit/{payroll_id}','App\Http\Controllers\PayrollController@payroll_edit')->name('payroll_edit');
+        Route::post('/payroll_save_edit','App\Http\Controllers\PayrollController@payroll_save_edit')->name('payroll_save_edit');
+        Route::post('/payroll_reject','App\Http\Controllers\PayrollController@payroll_reject')->name('payroll_reject');
+        Route::post('/payroll_approve','App\Http\Controllers\PayrollController@payroll_approve')->name('payroll_approve');
+    });
+    //     Deduction routes
+    Route::group(['middleware' => ['check-permission:deduction,view,add,update']], function() { // generation module
+        Route::get('/deduction','App\Http\Controllers\PayrollController@deduction')->name('deduction');
+        Route::post('/save_deduction_form','App\Http\Controllers\PayrollController@save_deduction_form')->name('save_deduction_form');
+    });
+    Route::group(['middleware' => ['is-admin']], function() {
+        Route::post('/deduction_delete','App\Http\Controllers\PayrollController@deduction_delete')->name('deduction_delete');
+    });
+    //      Allowance routes
+    Route::group(['middleware' => ['check-permission:allowance,view,add,update']], function() { // generation module
+        Route::get('/allowance','App\Http\Controllers\PayrollController@allowance')->name('allowance');
+        Route::post('/save_allowance_form','App\Http\Controllers\PayrollController@save_allowance_form')->name('save_allowance_form');
+    });
+    Route::group(['middleware' => ['is-admin']], function() {
+        Route::post('/allowance_delete','App\Http\Controllers\PayrollController@allowance_delete')->name('allowance_delete');
+    });
+    //    Tax deduction routes
+    Route::group(['middleware' => ['check-permission:deduction,view,add,update']], function() { // generation module
+        Route::get('/tax_deduction','App\Http\Controllers\PayrollController@tax_deduction')->name('tax_deduction');
+        Route::post('/save_tax_deduction_form','App\Http\Controllers\PayrollController@save_tax_deduction_form')->name('save_tax_deduction_form');
+    });
+    Route::group(['middleware' => ['is-admin']], function() {
+        Route::post('/tax_deduction_delete','App\Http\Controllers\PayrollController@tax_deduction_delete')->name('tax_deduction_delete');
+    });
+
+    Route::get('/get_department_role','App\Http\Controllers\PayrollController@get_department_role')->name('get_department_role');
+    //    Call dispostions types routes
+    Route::get('/disposition_type_list','App\Http\Controllers\SettingsController@disposition_type_list')->name('call_dispositions_types');
+    Route::post('/disposition_type_save','App\Http\Controllers\SettingsController@disposition_type_save')->name('call_dispositions_types_save');
+    Route::group(['middleware' => ['is-admin']], function() {
+        Route::get('/disposition_type_delete','App\Http\Controllers\SettingsController@disposition_type_delete')->name('call_dispositions_types_delete');
+    });
     //    Convenience allowance routes
     Route::get('/convenience_allowance', 'App\Http\Controllers\PayrollController@convenience_allowance')->name('convenience_allowance');
     Route::post('/add_convenience_allowance', 'App\Http\Controllers\PayrollController@add_convenience_allowance')->name('add_convenience_allowance');
@@ -415,13 +440,10 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
 
     Route::post('/get_customer_info', 'App\Http\Controllers\CallDispositionController@get_customer_info')->name('get_customer_info');
     Route::post('/save_customer_note', 'App\Http\Controllers\CallDispositionController@save_customer_note')->name('save_customer_note');
-
-
     //Chat Component
     Route::post('/create_group', 'App\Http\Controllers\ChatController@create_group')->name('create_group');
     Route::post('/edit_chat_group', 'App\Http\Controllers\ChatController@edit_chat_group')->name('edit_chat_group');
     Route::post('/leave_chat_group', 'App\Http\Controllers\ChatController@leave_chat_group')->name('leave_chat_group');
-
     //Leave report
     Route::get('/leave_report' , 'App\Http\Controllers\ReportController@leave_report')->name('leave_report');
     Route::post('/view_leave_report' , 'App\Http\Controllers\ReportController@view_leave_report')->name('view_leave_report');

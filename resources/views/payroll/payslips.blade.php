@@ -19,6 +19,7 @@
                         <th title="Field #1">Employee Name</th>
                         <th title="Field #1">Salary Month</th>
                         <th title="Field #2">Attendance Marked</th>
+                        <th title="Field #2">Holidays</th>
                         <th title="Field #3">On Leave</th>
                         <th title="Field #6">Absents</th>
                         <th title="Field #7">Present</th>
@@ -33,11 +34,12 @@
                             <td>{{ $pay->user->full_name }}</td>
                             <td>{{ date('M-Y', strtotime($pay->salary_month)) }}</td>
                             <td>{{ $pay->attendance_marked }}</td>
+                            <td>{{ $pay->holiday_count }}</td>
                             <td>{{ $pay->leaves }}</td>
                             <td>{{ $pay->absents }}</td>
                             <td>{{ $pay->presents}}</td>
                             <td>{{$pay->basic_salary}}</td>
-                            <td>{{$pay->gross_salary}}</td>
+                            <td>{{intval($pay->gross_salary)}}</td>
                             <td>
                                 <div class="btn-group btn-group-sm">
                                     <button title="Reject" class="btn btn-primary" onclick="view_payroll(this);" value="{{$pay->payroll_id}}"><i class="fa fa-eye"></i></button>

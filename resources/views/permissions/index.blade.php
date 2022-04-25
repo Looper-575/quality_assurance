@@ -1,5 +1,6 @@
 @extends('layout.template')
 @section('header_scripts')
+    <link href="{{asset('assets/css/datatables.min.css')}}" rel="stylesheet" type="text/css" />
     <style>
         .permission-check-box{
             height: 17px;
@@ -155,6 +156,8 @@
     </div>
 @endsection
 @section('footer_scripts')
+    <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
+    <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script>
         $('.detele_btn').click( function () {
             let id = this.value;

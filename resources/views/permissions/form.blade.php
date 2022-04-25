@@ -172,7 +172,7 @@
             let form = document.getElementById('add_data_form_id');
             let data = new FormData(form);
             let a = function() {
-                window.location.reload();
+                window.location.href = "{{route('permissions')}}";
             }
             let arr = [a];
             call_ajax_with_functions('', '{{route('save_permissions')}}', data, arr);

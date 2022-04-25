@@ -1,5 +1,11 @@
 @extends('layout.template')
 @section('header_scripts')
+    <link href="{{asset('assets/css/datatables.min.css')}}" rel="stylesheet" type="text/css" />
+    <style>
+    .select2-container{
+        width: 100% !important;
+    }
+</style>
 @endsection
 @section('content')
     <?php
@@ -29,7 +35,8 @@
                     <th>Title</th>
                     <th>From Date</th>
                     <th>To Date</th>
-                    <th>Type</th>
+                    <th>No Of Days</th>
+                    <th>Department</th>
                     <th>Action</th>
                 </tr>
                 </thead>
@@ -38,9 +45,10 @@
                     <tr>
                         <td>{{$index+1}}</td>
                         <td>{{$item->title}}</td>
-                        <td>{{$item->date_from}}</td>
-                        <td>{{$item->date_to}}</td>
-                        <td>{{$item->type}}</td>
+                        <td>{{ parse_date_get($item->date_from) }}</td>
+                        <td>{{ parse_date_get($item->date_to) }}</td>
+                        <td>{{ $item->holiday_count }}</td>
+                        <td>{{ ($item->department_id == 0 ? 'All': $item->department->title) }}</td>
                         <td>
                             <div class="btn-group btn-group-sm">
                                 @if($has_permissions->update == 1)
@@ -79,12 +87,29 @@
                             </div>
                             <div class="col-6">
                                 <div class="form-group">
-                                    <label class="form-check-label" for="type">Type</label>
-                                    <select class="form-control select2" name="type" id="type" required>
-                                        <option value="">Select Type </option>
-                                        <option value="Muslim">Muslim </option>
-                                        <option value="Christian">Christian </option>
-                                        <option value="All">All </option>
+                                    <label class="form-check-label" for="department_id">Department</label>
+                                    <select class="form-control mt-2" name="department_id" id="department_id" required>
+                                        <option value="">Please Select</option>
+                                        <option value="0">All</option>
+                                        @foreach($departments as $dpt)
+                                            <option value="{{$dpt->department_id}}">{{$dpt->title}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label class="form-check-label mb-2" for="role_id">Role</label>
+                                    <select class="form-control mt-2 select2" name="role_id[]" id="role_id" multiple="multiple" required>
+                                        <option value="0">All</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label class="form-check-label mb-2" for="user_id">User</label>
+                                    <select class="form-control mt-2 select2" name="user_id[]" id="user_id" multiple="multiple" required>
+                                        <option value="0">All</option>
                                     </select>
                                 </div>
                             </div>
@@ -115,7 +140,80 @@
     </div>
 @endsection
 @section('footer_scripts')
+        <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
+        <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script>
+        let user_temp = [];
+        $(document).ready(function (){
+            $(".select2").select2();
+        })
+        function set_role(department_id, role_id = null)
+        {
+            $.ajax({
+                type:'get',
+                url:'get_department_role',
+                data:{
+                    department_id: department_id,
+                },
+                success: function( response ) {
+                    $('#role_id').empty().append('');
+                    var role_id = $('#role_id');
+                    role_id.append(
+                        $('<option></option>').val(0).html('All')
+                    );
+                    $.each(response, function(val, data) {
+                        role_id.append(
+                            $('<option></option>').val(data.role.role_id).html(data.role.title)
+                        );
+                    });
+                }
+            }).then(function(){
+                if(role_id != null){
+                    $("#role_id").select2().select2('val', [role_id]);
+                }
+            });
+        }
+        $('#department_id').on('change', function() {
+            let department_id = this.value;
+            user_temp = [];
+            set_role(department_id);
+        });
+        function get_selected_role_users(role_id, user_id){
+            let department_id = $('#department_id').val();
+            $.ajax({
+                type:'get',
+                url:'get_selected_role_users',
+                data:{
+                    role_id: role_id,
+                    department_id:department_id,
+                },
+                success: function( response ) {
+                    $('#user_id').empty().append('');
+                    var user_id = $('#user_id');
+                    user_id.append(
+                        $('<option></option>').val(0).html('All')
+                    );
+                    $.each(response, function(val, data) {
+                        user_id.append(
+                            $('<option></option>').val(data.user_id).html(data.full_name)
+                        );
+                    });
+                }
+            }).then(function(){
+                if(user_id != null){
+                    $("#user_id").select2().select2('val', [user_id]);
+                }
+            });
+        }
+
+        $('#role_id').change( function () {
+            let role_id = $(this).val();
+            get_selected_role_users(role_id, user_temp);
+        });
+        $('#date_to').on('change', function () {
+            var startDate = new Date($('#date_from').val());
+            var endDate = new Date($('#date_to').val());
+        });
         $('.detele_btn').click( function () {
             let id = this.value;
             let me = this;
@@ -141,11 +239,10 @@
             })
         });
         $('#add_new_btn').click(function () {
-            $('#holiday_id').val(null);
-            $('#title').val(null);
-            $('#type').val(null);
-            $('#date_from').val(null);
-            $('#date_to').val(null);
+            $('#holiday_form_id').resetForm();
+            user_temp = [];
+            $("#role_id").select2().select2('val', [' ']);
+            $("#user_id").select2().select2('val', [' ']);
             $('#add_new_modal').modal('toggle');
         });
 
@@ -161,10 +258,16 @@
         });
 
         $('.edit_btn').click( function () {
+            user_temp = [];
             let data = JSON.parse(this.value);
             $('#holiday_id').val(data.holiday_id);
             $('#title').val(data.title);
-            $('#type').val(data.type);
+            $('#department_id').val(data.department_id);
+            let roles = data.role_id.split(',');
+            set_role(data.department_id, roles);
+            let users = data.user_id.split(',');
+            user_temp = users;
+            get_selected_role_users(roles, user_temp);
             $('#date_from').val(data.date_from);
             $('#date_to').val(data.date_to);
             $('#add_new_modal').modal('toggle');

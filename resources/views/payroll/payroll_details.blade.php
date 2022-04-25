@@ -14,7 +14,7 @@
         <div class="m-portlet__body">
             <div class="float-right mr-4" style="height: 50px">
                 <span id="selected_btn">
-                    <button class="btn btn-danger" title="Delete Selected Payroll" onclick="reject_selected_payroll()">Delete</button>
+                    <button class="btn btn-danger" title="Reject Selected Payroll" onclick="reject_selected_payroll()">Reject</button>
                     <button class="btn btn-success" title="Approve Selected Payroll" onclick="approve_selected_payroll()">Approve</button>
                 </span>
             </div>
@@ -26,6 +26,7 @@
                         <th>Employee Name</th>
                         <th>Attendance Month</th>
                         <th>Attendance Marked</th>
+                        <th>Holidays</th>
                         <th>On Leave</th>
                         <th>Absents</th>
                         <th>Present</th>
@@ -41,6 +42,7 @@
                             <td>{{ $pay->user->full_name }}</td>
                             <td>{{ date('M-Y', strtotime($pay->salary_month)) }}</td>
                             <td>{{ $pay->attendance_marked }}</td>
+                            <td>{{ $pay->holiday_count }}</td>
                             <td>{{ $pay->leaves }}</td>
                             <td>{{ $pay->absents }}</td>
                             <td>{{ $pay->presents}}</td>

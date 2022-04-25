@@ -426,7 +426,7 @@ if(!function_exists('get_leave_bucket_leaves')) {
         $data = DB::table('leave_bucket_view')->where('user_id',$user_id)->first();
         if($data != null) {
             $remaining_annual = $data->annual_bucket - $data->annual;
-            $remaining_casual = @$data->casual_bucket - (@$data->casual + @$data->other_leaves);
+            $remaining_casual = $data->casual_bucket - ($data->casual + $data->other_leaves + $data->payroll_deductions);
             if ($remaining_casual < 0) {
                 $remaining_sick = @$data->sick_bucket - @$data->sick + $remaining_casual;
                 $remaining_casual = 0;
