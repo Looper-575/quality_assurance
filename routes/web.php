@@ -444,8 +444,17 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::post('/create_group', 'App\Http\Controllers\ChatController@create_group')->name('create_group');
     Route::post('/edit_chat_group', 'App\Http\Controllers\ChatController@edit_chat_group')->name('edit_chat_group');
     Route::post('/leave_chat_group', 'App\Http\Controllers\ChatController@leave_chat_group')->name('leave_chat_group');
+
     //Leave report
     Route::get('/leave_report' , 'App\Http\Controllers\ReportController@leave_report')->name('leave_report');
     Route::post('/view_leave_report' , 'App\Http\Controllers\ReportController@view_leave_report')->name('view_leave_report');
+
+    // Agent Dashboard 2.0
+    Route::post('/get_customer_info', 'App\Http\Controllers\CallDispositionController@get_customer_info')->name('get_customer_info');
+    Route::post('/save_customer_note', 'App\Http\Controllers\CallDispositionController@save_customer_note')->name('save_customer_note');
+    Route::post('/search_customer', 'App\Http\Controllers\CallDispositionController@search_customer')->name('search_customer');
+    Route::post('/update_customer_details', 'App\Http\Controllers\CallDispositionController@update_customer_details')->name('update_customer_details');
+    Route::post('/update_sales_chart', 'App\Http\Controllers\DashboardController@update_sales_chart')->name('update_sales_chart');
+
 
 });

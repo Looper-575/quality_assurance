@@ -1,9 +1,8 @@
 <?php /** @noinspection ALL */
-
 namespace App\Http\Controllers;
-
 use App\Http\Middleware\PreventRequestsDuringMaintenance;
 use App\Models\CallDispositionsService;
+use App\Models\AttendanceLog;
 use App\Models\Enquiry;
 use App\Models\Team;
 use Illuminate\Http\Request;
@@ -12,8 +11,6 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\CallDisposition;
 use Illuminate\Support\Facades\DB;
 use DateTime;
-
-
 class DashboardController extends Controller
 {
     /**
@@ -69,7 +66,6 @@ class DashboardController extends Controller
         $dates[] = get_date_interval();
         $to_date = $dates[0]['to_date'];
         $from_date = $dates[0]['from_date'];
-
         $data['sale_made'] = CallDisposition::where(['status' => 1, 'disposition_type' => 1])->whereBetween('added_on', [$from_date, $to_date])->count();
         $data['call_back'] = CallDisposition::where(['status' => 1, 'disposition_type' => 2])->whereBetween('added_on', [$from_date, $to_date])->count();
         $data['customer_service'] = CallDisposition::where(['status' => 1, 'disposition_type' => 3])->whereBetween('added_on', [$from_date, $to_date])->count();
@@ -80,26 +76,6 @@ class DashboardController extends Controller
         $data['six_months_sales_count'] = $this->get_6_months_rgo_counts($from_date, $to_date);
         // STATS TABLE
         $data['provider_based_stats'] = CallDispositionsService::select('provider_name', DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile'))->where(['status' => 1])->with('call_disposition')->whereBetween('added_on', [$from_date, $to_date])->groupBy('provider_name')->get();
-        // main table team based
-       /*
-        $team_abdullah = $this->get_team_counts($from_date, $to_date, 4);
-        $total = 0;
-        foreach ($team_abdullah[0] as $item) {
-            $data['team_abdullah'][$item->provider_name] = $item;
-            $total += $item->cable + $item->phone + $item->internet + $item->mobile;
-        }
-        $data['team_abdullah']['others'] = $team_abdullah[1][0] ;
-        $data['team_abdullah']['total'] = $total + ($data['team_abdullah']['others']->cable + $data['team_abdullah']['others']->phone + $data['team_abdullah']['others']->internet + $data['team_abdullah']['others']->mobile);
-
-        $team_amroz = $this->get_team_counts($from_date, $to_date, 6);
-        $total = 0;
-        foreach ($team_amroz[0] as $item) {
-            $data['team_amroz'][$item->provider_name] = $item;
-            $total += $item->cable + $item->phone + $item->internet + $item->mobile;
-        }
-        $data['team_amroz']['others'] = $team_amroz[1][0] ;
-        $data['team_amroz']['total'] = $total + ($data['team_amroz']['others']->cable + $data['team_amroz']['others']->phone + $data['team_amroz']['others']->internet + $data['team_amroz']['others']->mobile);
-       */
         return view('dashboard.dashboard', $data);
     }
     public function team_dashboard()
@@ -170,7 +146,6 @@ class DashboardController extends Controller
             $total += $item->cable+$item->phone+$item->internet+$item->mobile;
         }
         $data['my_team_stats']['total'] = $total;
-
         $all_sales = $this->get_all_sales_stats_counts($from_date, $to_date);
         $total = 0;
         foreach ($all_sales[0] as $item) {
@@ -185,7 +160,6 @@ class DashboardController extends Controller
         }
         $data['all_sales_stats']['misc'] = [];
         foreach ($all_sales[2] as $item) {
-
             if (array_key_exists($item->provider_name,$data['all_sales_stats']['misc']))
             {
                 $data['all_sales_stats']['misc'][$item->provider_name]->cable += $item->cable;
@@ -228,18 +202,35 @@ class DashboardController extends Controller
             $from_date = $from_date.' 17:00:00';
             $to_date = $to_date.' 17:00:00';
         }
-
-        $uid = Auth::user()->user_id;
-        $data['daily_counts'] = $this->get_agent_rgo_counts($from_date,$to_date, $uid);
+        $uid =Auth::user()->user_id;
+        $data['daily_stats'] = DB::select('SELECT call_dispositions_services.provider_name, SUM(call_dispositions_services.mobile) as mobile,SUM(call_dispositions_services.mobile + call_dispositions_services.internet + call_dispositions_services.phone +call_dispositions_services.cable ) As total_sales FROM call_dispositions JOIN call_dispositions_services ON call_dispositions.call_id =call_dispositions_services.call_id WHERE  call_dispositions.added_on>="'.$from_date.'" AND call_dispositions.added_on<="'.$to_date.'" AND call_dispositions.added_by="'.$uid.'" AND call_dispositions_services.provider_name IS NOT NULL GROUP BY call_dispositions_services.provider_name ORDER BY total_sales DESC');
+        $data["services_sold_daily"] = DB::select('SELECT count(case when call_dispositions.services_sold = "1" then 1 else null end) as single_play, count(case when call_dispositions.services_sold = "2" then 1 else null end) as double_play, count(case when call_dispositions.services_sold = "3" then 1 else null end) as triple_play, count(case when call_dispositions.services_sold = "4" then 1 else null end) as quad_play FROM call_dispositions WHERE call_dispositions.added_on>="'.$from_date.'" AND call_dispositions.added_on<="'.$to_date.'" AND call_dispositions.added_by="'.$uid.'"');
+        $total_sale = 0;
+        foreach ($data['daily_stats'] as $stat){
+            $total_sale = $total_sale + $stat->total_sales;
+        }
+        $data['daily_total'] = $total_sale;
+        $data['daily_status'] = DB::select("SELECT * FROM (SELECT AVG(monitor_percentage) AS average FROM qa_with_color_badge WHERE(added_on >= '".$from_date."' AND added_on <= '".$to_date."' AND agent_id = '".$uid."') ) as avg_table INNER JOIN qa_performance_badge ON (avg_table.average >= qa_performance_badge.min AND avg_table.average <= qa_performance_badge.max)");
+        $data["services_sold_daily"] = DB::select('SELECT count(case when call_dispositions.services_sold = "1" then 1 else null end) as single_play, count(case when call_dispositions.services_sold = "2" then 1 else null end) as double_play, count(case when call_dispositions.services_sold = "3" then 1 else null end) as triple_play, count(case when call_dispositions.services_sold = "4" then 1 else null end) as quad_play FROM call_dispositions WHERE call_dispositions.added_on>="'.$from_date.'" AND call_dispositions.added_on<="'.$to_date.'" AND call_dispositions.added_by="'.$uid.'"');
         // sales
         $dates[] = get_date_interval();
         $to_date = $dates[0]['to_date'];
         $from_date = $dates[0]['from_date'];
-
-        $data['monthly_counts'] = $this->get_agent_rgo_counts($from_date,$to_date, $uid);
-        $data['status'] = DB::select("SELECT * FROM (SELECT AVG(monitor_percentage) AS average FROM qa_with_color_badge WHERE(added_on >= '".$from_date."' AND added_on <= '".$to_date."' AND agent_id = '".$uid."') ) as avg_table INNER JOIN qa_performance_badge ON (avg_table.average >= qa_performance_badge.min AND avg_table.average <= qa_performance_badge.max)");
-
-
+        $month  = date('m', strtotime($today));
+        $year  = date('Y', strtotime($today));
+        $data['attendance_list'] = AttendanceLog::select(DB::raw('sum(late) as `lates`, sum(absent) as `absents`, sum(on_leave) as `leaves` ,sum(applied_leave) as `applied_leave`, sum(half_leave) as `half_leaves` , count(user_id) as `attendance_marked`', 'ANY_VALUE(user_id)'))
+            ->where('user_id', Auth::user()->user_id)
+            ->whereYear('attendance_date', $year)
+            ->whereMonth('attendance_date', $month)
+            ->first();
+        $data['monthly_stats'] = DB::select('SELECT call_dispositions_services.provider_name, SUM(call_dispositions_services.mobile) as mobile,SUM(call_dispositions_services.mobile + call_dispositions_services.internet + call_dispositions_services.phone +call_dispositions_services.cable ) As total_sales FROM call_dispositions JOIN call_dispositions_services ON call_dispositions.call_id =call_dispositions_services.call_id WHERE  call_dispositions.added_on>="'.$from_date.'" AND call_dispositions.added_on<="'.$to_date.'" AND call_dispositions.added_by="'.$uid.'" AND call_dispositions_services.provider_name IS NOT NULL GROUP BY call_dispositions_services.provider_name ORDER BY total_sales DESC');
+        $data["services_sold_monthly"] = DB::select('SELECT count(case when call_dispositions.services_sold = "1" then 1 else null end) as single_play, count(case when call_dispositions.services_sold = "2" then 1 else null end) as double_play, count(case when call_dispositions.services_sold = "3" then 1 else null end) as triple_play, count(case when call_dispositions.services_sold = "4" then 1 else null end) as quad_play FROM call_dispositions WHERE call_dispositions.added_on>="'.$from_date.'" AND call_dispositions.added_on<="'.$to_date.'" AND call_dispositions.added_by="'.$uid.'"');
+        $total_sale = 0;
+        foreach ($data['monthly_stats'] as $stat){
+            $total_sale = $total_sale + $stat->total_sales;
+        }
+        $data['monthly_total'] = $total_sale;
+        $data['monthly_status'] = DB::select("SELECT * FROM (SELECT AVG(monitor_percentage) AS average FROM qa_with_color_badge WHERE(added_on >= '".$from_date."' AND added_on <= '".$to_date."' AND agent_id = '".$uid."') ) as avg_table INNER JOIN qa_performance_badge ON (avg_table.average >= qa_performance_badge.min AND avg_table.average <= qa_performance_badge.max)");
         return view('dashboard.agent_dashboard' , $data);
     }
     public function qa_dashboard()
@@ -253,7 +244,6 @@ class DashboardController extends Controller
         $data['small_nav'] = true;
         $did_id = explode(',',Auth::user()->vendor_did_id);
         $today = get_date();
-//        $today = Date('2022-01-29');
         $datetime = new DateTime($today);
         $date_today = date("d"  ,strtotime($today));
         // daily counts
@@ -269,34 +259,13 @@ class DashboardController extends Controller
             $from_date = $from_date.' 17:00:00';
             $to_date = $to_date.' 17:00:00';
         }
-
         $data['providers_daily'] = $this->get_did_wise_providers_sale($from_date,$to_date,$did_id);
         $data['rgu_daily'] = $this->get_did_wise_provider_rgo($from_date,$to_date,$did_id);
-
-//        $data['daily_disp'] = CallDisposition::whereIn('did_id', $did_id)->where('status', 1)->whereBetween('added_on', [$from_date, $to_date])->count();
-//        $data['sale_made'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 1])->whereBetween('added_on', [$from_date, $to_date])->count();
-//        $data['call_back'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 2])->whereBetween('added_on', [$from_date, $to_date])->count();
-//        $data['customer_service'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 3])->whereBetween('added_on', [$from_date, $to_date])->count();
-//        $data['no_answer'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 4])->whereBetween('added_on', [$from_date, $to_date])->count();
-//        $data['call_transferred'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 5])->whereBetween('added_on', [$from_date, $to_date])->count();
-//        $data['daily_counts'] = $this->get_did_wise_rgo_counts($from_date, $to_date,$did_id);
-
         $dates[] = get_date_interval();
         $to_date = $dates[0]['to_date'];
         $from_date = $dates[0]['from_date'];
-
         $data['providers_monthly'] = $this->get_did_wise_providers_sale($from_date,$to_date,$did_id);
         $data['rgu_monthly'] = $this->get_did_wise_provider_rgo($from_date,$to_date,$did_id);
-
-//        $data['monthly_sale_made'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 1])->whereDate('added_on', '>=', $from_date)->whereDate('added_on', '<=', $to_date)->count();
-//        $data['monthly_call_back'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 2])->whereBetween('added_on', [$from_date, $to_date])->count();
-//        $data['monthly_customer_service'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 3])->whereBetween('added_on', [$from_date, $to_date])->count();
-//        $data['monthly_no_answer'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 4])->whereBetween('added_on', [$from_date, $to_date])->count();
-//        $data['monthly_call_transferred'] = CallDisposition::whereIn('did_id', $did_id)->where(['status' => 1,'disposition_type' => 5])->whereBetween('added_on', [$from_date, $to_date])->count();
-//        $data['six_months_dispositions_count'] = $this->get_did_wise_6_months_dipositions_count($from_date,$to_date,$did_id);
-//        $data['six_months_sales_count'] =  $this->get_did_wise_6_months_rgo_counts($from_date, $to_date,$did_id);
-
-
         return view('dashboard.vendor_dashboard' , $data);
     }
     public function provider_dashboard(){
@@ -318,37 +287,27 @@ class DashboardController extends Controller
             $from_date = $from_date.' 17:00:00';
             $to_date = $to_date.' 17:00:00';
         }
-
         $data['providers_all'] = $this->get_providers_sale('2021-01-01 17:00:00',$to_date);
         $data['rgu_all'] = $this->get_provider_rgo('2021-01-01 17:00:00',$to_date);
-        //$data['spectrum_daily'] = $this->get_providers_sale($from_date,$to_date,"spectrum");
         $data['providers_daily'] = $this->get_providers_sale($from_date,$to_date);
         $data['rgu_daily'] = $this->get_provider_rgo($from_date,$to_date);
-
         $data['daily_disp'] = CallDisposition::where('status', 1)->whereBetween('added_on', [$from_date, $to_date])->count();
         $data['daily_sale_made'] = CallDisposition::where(['status' => 1,'disposition_type' => 1])->whereBetween('added_on', [$from_date, $to_date])->count();
         $data['daily_call_back'] = CallDisposition::where(['status' => 1,'disposition_type' => 2])->whereBetween('added_on', [$from_date, $to_date])->count();
         $data['daily_customer_service'] = CallDisposition::where(['status' => 1,'disposition_type' => 3])->whereBetween('added_on', [$from_date, $to_date])->count();
         $data['daily_no_answer'] = CallDisposition::where(['status' => 1,'disposition_type' => 4])->whereBetween('added_on', [$from_date, $to_date])->count();
         $data['daily_call_transferred'] = CallDisposition::where(['status' => 1,'disposition_type' => 5])->whereBetween('added_on', [$from_date, $to_date])->count();
-
         $dates[] = get_date_interval();
         $to_date = $dates[0]['to_date'];
         $from_date = $dates[0]['from_date'];
-
         $data['providers_monthly'] = $this->get_providers_sale($from_date,$to_date);
         $data['rgu_monthly'] = $this->get_provider_rgo($from_date,$to_date);
-
         $data['monthly_sale_made'] = CallDisposition::where(['status' => 1,'disposition_type' => 1])->whereDate('added_on', '>=', $from_date)->whereDate('added_on', '<=', $to_date)->count();
         $data['monthly_call_back'] = CallDisposition::where(['status' => 1,'disposition_type' => 2])->whereBetween('added_on', [$from_date, $to_date])->count();
         $data['monthly_customer_service'] = CallDisposition::where(['status' => 1,'disposition_type' => 3])->whereBetween('added_on', [$from_date, $to_date])->count();
         $data['monthly_no_answer'] = CallDisposition::where(['status' => 1,'disposition_type' => 4])->whereBetween('added_on', [$from_date, $to_date])->count();
         $data['monthly_call_transferred'] = CallDisposition::where(['status' => 1,'disposition_type' => 5])->whereBetween('added_on', [$from_date, $to_date])->count();
-
         $data['six_months_dispositions_count'] = $this->get_6_months_dipositions_count($from_date,$to_date);
-        //$data['rgu'] = $this->get_rgo_counts('2020-01-01 17:00:00',$to_date);
-
-
         //Total Counts
         $data['total_sale_made'] = CallDisposition::where(['status' => 1,'disposition_type' => 1])->count();
         $data['total_call_back'] = CallDisposition::where(['status' => 1,'disposition_type' => 2])->count();
@@ -356,8 +315,6 @@ class DashboardController extends Controller
         $data['total_no_answer'] = CallDisposition::where(['status' => 1,'disposition_type' => 4])->count();
         $data['total_call_transferred'] = CallDisposition::where(['status' => 1,'disposition_type' => 5])->count();
         $data['total_dispositions'] = CallDisposition::where(['status' => 1])->count();
-
-
         return view('dashboard.provider_dashboard' , $data);
     }
     private function get_rgo_counts($from_date, $to_date)
@@ -387,7 +344,6 @@ class DashboardController extends Controller
         $double_play = DB::table('all_sales')->where(['services_sold'=> 2, 'added_by'=>$user_id])->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
         $triple_play = DB::table('all_sales')->where(['services_sold'=> 3, 'added_by'=>$user_id])->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
         $quad_play = DB::table('all_sales')->where(['services_sold'=> 4, 'added_by'=>$user_id])->whereBetween('added_on', [$from_date, $to_date])->count('call_id');
-
         $total_rgu = ($single_play+($double_play*2)+($triple_play*3)+($quad_play*4));
         $total_sales = ($single_play+$double_play+$triple_play+$quad_play);
         return [
@@ -468,7 +424,6 @@ class DashboardController extends Controller
     }
     private function get_all_sales_stats_counts($from_date, $to_date)
     {
-
         $csr_provider = DB::table('all_sales')->select('full_name', 'provider_name', DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile'))
             ->whereIn('provider_name',['spectrum','cox','suddenlink','att','directtv','earthlink','frontier','mediacom','optimum','hughesnet'])
             ->where('role_id', 4)
@@ -563,9 +518,7 @@ count(case when internet = "1" AND cable = "1" AND mobile = "0" AND phone = "0" 
 count(case when phone = "1" AND cable = "1" AND mobile = "0" AND internet = "0" then 1 else null end) as pc,
 SUM(services_sold) As total_sales
 FROM all_sales  WHERE added_on>="'.$from_date.'" AND added_on<="'.$to_date.'" AND provider_name IS NOT NULL  GROUP BY provider_name ORDER BY total_sales DESC');
-
         return $data;
-
     }
     private function get_provider_rgo($from_date, $to_date)
     {
@@ -584,7 +537,6 @@ FROM all_sales  WHERE added_on>="'.$from_date.'" AND added_on<="'.$to_date.'" AN
             'internet' => $internet,
             'phone' => $phone,
             'mobile' => $mobile,
-
         ];
     }
     private function get_did_wise_providers_sale($from_date,$to_date,$did){
@@ -598,9 +550,7 @@ count(case when internet = "1" AND cable = "1" AND mobile = "0" AND phone = "0" 
 count(case when phone = "1" AND cable = "1" AND mobile = "0" AND internet = "0" then 1 else null end) as pc,
 SUM(services_sold) As total_sales
 FROM all_sales  WHERE added_on>="'.$from_date.'" AND added_on<="'.$to_date.'" AND  did_id IN ('.implode(",", $did).')  AND provider_name IS NOT NULL  GROUP BY provider_name ORDER BY total_sales DESC');
-
         return $data;
-
     }
     private function get_did_wise_provider_rgo($from_date, $to_date,$did)
     {
@@ -619,7 +569,53 @@ FROM all_sales  WHERE added_on>="'.$from_date.'" AND added_on<="'.$to_date.'" AN
             'internet' => $internet,
             'phone' => $phone,
             'mobile' => $mobile,
-
         ];
+    }
+    function update_sales_chart(Request $request){
+        $today = get_date();
+        $datetime = new DateTime($today);
+        $date_today = date("d"  ,strtotime($today));
+        // daily rgu and paly count
+        $hour = date("H"  ,strtotime(get_date_time()));
+        if($hour >= 17){
+            $from_date = date("Y-m-d"  ,strtotime($today));
+            $to_date = date("Y-m-d"  ,strtotime($today));
+            $from_date = $from_date.' 17:00:00';
+            $to_date = $to_date.' 23:59:59';
+        } else {
+            $from_date = date("Y-m-d"  ,strtotime("-1 Day" , strtotime($today)));
+            $to_date = date("Y-m-d"  ,strtotime($today));
+            $from_date = $from_date.' 17:00:00';
+            $to_date = $to_date.' 17:00:00';
+        }
+        $uid =Auth::user()->user_id;
+        $data['daily_stats'] = DB::select('SELECT call_dispositions_services.provider_name, SUM(call_dispositions_services.mobile) as mobile,SUM(call_dispositions_services.mobile + call_dispositions_services.internet + call_dispositions_services.phone +call_dispositions_services.cable ) As total_sales FROM call_dispositions JOIN call_dispositions_services ON call_dispositions.call_id =call_dispositions_services.call_id WHERE  call_dispositions.added_on>="'.$from_date.'" AND call_dispositions.added_on<="'.$to_date.'" AND call_dispositions.added_by="'.$uid.'" AND call_dispositions_services.provider_name IS NOT NULL GROUP BY call_dispositions_services.provider_name ORDER BY total_sales DESC');
+        $data["services_sold_daily"] = DB::select('SELECT count(case when call_dispositions.services_sold = "1" then 1 else null end) as single_play, count(case when call_dispositions.services_sold = "2" then 1 else null end) as double_play, count(case when call_dispositions.services_sold = "3" then 1 else null end) as triple_play, count(case when call_dispositions.services_sold = "4" then 1 else null end) as quad_play FROM call_dispositions WHERE call_dispositions.added_on>="'.$from_date.'" AND call_dispositions.added_on<="'.$to_date.'" AND call_dispositions.added_by="'.$uid.'"');
+        $total_sale = 0;
+        foreach ($data['daily_stats'] as $stat){
+            $total_sale = $total_sale + $stat->total_sales;
+        }
+        $data['daily_total'] = $total_sale;
+        // sales
+        $dates[] = get_date_interval();
+        $to_date = $dates[0]['to_date'];
+        $from_date = $dates[0]['from_date'];
+        $month  = date('m', strtotime($today));
+        $year  = date('Y', strtotime($today));
+        $data['attendance_list'] = AttendanceLog::select(DB::raw('sum(late) as `lates`, sum(absent) as `absents`, sum(on_leave) as `leaves` ,sum(applied_leave) as `applied_leave`, sum(half_leave) as `half_leaves` , count(user_id) as `attendance_marked`'), 'user_id')
+            ->where('user_id', Auth::user()->user_id)
+            ->whereYear('attendance_date', $year)
+            ->whereMonth('attendance_date', $month)
+            ->first();
+        //  $data['monthly_counts'] = $this->get_agent_rgo_counts($from_date,$to_date, $uid);
+        // $data['attendance_list'] = AttendanceLog::where('user_id', 14)->whereBetween('attendance_date', [$form_date, $to_date])->get();
+        $data['monthly_stats'] = DB::select('SELECT call_dispositions_services.provider_name, SUM(call_dispositions_services.mobile) as mobile,SUM(call_dispositions_services.mobile + call_dispositions_services.internet + call_dispositions_services.phone +call_dispositions_services.cable ) As total_sales FROM call_dispositions JOIN call_dispositions_services ON call_dispositions.call_id =call_dispositions_services.call_id WHERE  call_dispositions.added_on>="'.$from_date.'" AND call_dispositions.added_on<="'.$to_date.'" AND call_dispositions.added_by="'.$uid.'" AND call_dispositions_services.provider_name IS NOT NULL GROUP BY call_dispositions_services.provider_name ORDER BY total_sales DESC');
+        $data["services_sold_monthly"] = DB::select('SELECT count(case when call_dispositions.services_sold = "1" then 1 else null end) as single_play, count(case when call_dispositions.services_sold = "2" then 1 else null end) as double_play, count(case when call_dispositions.services_sold = "3" then 1 else null end) as triple_play, count(case when call_dispositions.services_sold = "4" then 1 else null end) as quad_play FROM call_dispositions WHERE call_dispositions.added_on>="'.$from_date.'" AND call_dispositions.added_on<="'.$to_date.'" AND call_dispositions.added_by="'.$uid.'"');
+        $total_sale = 0;
+        foreach ($data['monthly_stats'] as $stat){
+            $total_sale = $total_sale + $stat->total_sales;
+        }
+        $data['monthly_total'] = $total_sale;
+        return view('dashboard.partial.csr_sales_chart',$data);
     }
 }

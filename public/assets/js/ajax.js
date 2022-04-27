@@ -86,7 +86,11 @@ function call_ajax_with_functions(response_div, php_file, form_data, functions) 
                     console.log(request.responseText);
                 }
             } else {
-                document.getElementById(response_div).innerHTML = request.responseText;
+                if(request.responseText.toLowerCase().search('fail') !== -1) {
+                    swal("Failure", "Unexpected Error", "error");
+                } else {
+                    document.getElementById(response_div).innerHTML = request.responseText;
+                }
             }
             if(functions.length > 0) {
                 if(request.responseText.toLowerCase().search('fail') !== -1) {

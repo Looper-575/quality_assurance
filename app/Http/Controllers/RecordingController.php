@@ -1,15 +1,11 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\CallDisposition;
 use App\Models\CallDispositionsTypes;
 use App\Models\CallRecording;
 use Illuminate\Support\Facades\Auth;
-
 class RecordingController extends Controller
 {
-
     public function recordings()
     {
         $data['page_title'] = "Atlantis BPO CRM - Users List";
@@ -26,21 +22,13 @@ class RecordingController extends Controller
         }
         return view('call_dipositions.recording_list', $data);
     }
-
-
     public function dispose($id){
         $data['page_title'] = "Atlantis BPO CRM - Roles";
         $recording_id = CallDisposition::where('recording_id', $id)->doesntExist();
         if ($recording_id) {
-            // Updating anonymous numbers and alphabetical number to zero
-//            CallRecording::where([['rec_id','=', $id],['from_number', 'regexp', '^[A-z]+']])->update([
-//                'from_number' => '00000000',]);
-
-
             $current = CallRecording::where([
                 'rec_id'=> $id,
             ])->first();
-
             if(is_numeric($current->to_number)){
                 $data['call_data'] = CallRecording::where([
                     'rec_id'=> $id,
@@ -58,7 +46,6 @@ class RecordingController extends Controller
                     ])->with('did_numbers.disposition_did')->get();
                 }
             }
-
             $data['disposition_types'] = CallDispositionsTypes::where([
                 'status' => 1,
             ])->get();
@@ -69,5 +56,4 @@ class RecordingController extends Controller
             return response()->json($response);
         }
     }
-
 }

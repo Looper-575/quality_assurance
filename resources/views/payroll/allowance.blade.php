@@ -111,7 +111,6 @@
                                     <label class="form-check-label" for="bench_mark_type">Bench Mark Type</label>
                                     <select class="form-control mt-2" name="bench_mark_type" id="bench_mark_type">
                                         <option value="">Please Select</option>
-{{--                                        <option value="rgu">RGU</option>--}}
                                         <option value="single-play">Single Play</option>
                                         <option value="double-play">Double Play</option>
                                         <option value="triple-play">Triple Play</option>

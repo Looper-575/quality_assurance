@@ -1,5 +1,5 @@
 <div class="col-6">
-    <div class="m-portlet m-portlet--full-height ">
+    <div class="m-portlet">
         <div class="m-portlet__head pt-4" style="height: 5rem">
             <div class="d-flex align-items-center m-portlet__head-caption float-left" >
                 <div class="m-portlet__head-title d-inline-block ">
@@ -8,52 +8,63 @@
                     </h3>
                 </div>
             </div>
-            <div class="m-portlet__head-tools">
-                <ul class="m-portlet__nav">
-                    <li class="m-nav__item m-dropdown m-dropdown--large m-dropdown--arrow m-dropdown--align-center m-dropdown--mobile-full-width m-dropdown--skin-light m-list-search m-list-search--skin-light" m-dropdown-toggle="click" id="m_quicksearch" m-quicksearch-mode="dropdown" m-dropdown-persistent="1" aria-expanded="true">
-                        <a href="#" class="m-nav__link m-dropdown__toggle">
+            @if(!isset($customer))
+                <div class="m-portlet__head-tools">
+                    <ul class="m-portlet__nav">
+                        <li class="m-nav__item m-dropdown m-dropdown--large m-dropdown--arrow m-dropdown--align-center m-dropdown--mobile-full-width m-dropdown--skin-light m-list-search m-list-search--skin-light" m-dropdown-toggle="click" id="m_quicksearch" m-quicksearch-mode="dropdown" m-dropdown-persistent="1" aria-expanded="true">
+                            <a href="#" class="m-nav__link m-dropdown__toggle">
                             <span class="m-nav__link-icon">
                                 <i class="flaticon-search-1"></i>
                             </span>
-                        </a>
-                        <div class="m-dropdown__wrapper" style="z-index: 101;">
-                            <span class="m-dropdown__arrow m-dropdown__arrow--center"></span>
-                            <div class="m-dropdown__inner ">
-                                <div class="m-dropdown__header">
-                                    <form  id="customer_search_form" action="javascript:search_customer();" method="POST" class="m-list-search__form">
-                                        @csrf
-                                        <div class="m-list-search__form-wrapper">
+                            </a>
+                            <div class="m-dropdown__wrapper" style="z-index: 101;">
+                                <span class="m-dropdown__arrow m-dropdown__arrow--center"></span>
+                                <div class="m-dropdown__inner ">
+                                    <div class="m-dropdown__header">
+                                        <form  id="customer_search_form" action="javascript:search_customer();" method="POST" class="m-list-search__form">
+                                            @csrf
+                                            <div class="m-list-search__form-wrapper">
                                             <span class="m-list-search__form-input-wrapper">
-                                                <input required name="customer_email" id="search_customer_input"  list="customerList" autocomplete="off" type="text"  class="m-list-search__form-input"  placeholder="Search...">
-                                                <datalist id="customerList">
-                                                    @foreach($customers_list as $customerr)
-                                                        <option value="{{$customerr->email}}" />
+                                                <select  id="search_customer_input"  class="search_customer " name="customer_email" required>
+                                                       <option value="">Select Customer</option>
+                                                        @foreach($customers_list as $customerr)
+                                                        <option value="{{$customerr->email}}">{{$customerr->primary_number}} / {{$customerr->email}} / {{$customerr->account_number}} / {{$customerr->mobile_work_order_number??0}} / {{$customerr->alternate_numbers??0}}</option>
                                                     @endforeach
-                                                </datalist>
+                                                </select>
+                                                <span>
+                                                    <button id="search_btn" class="ml-2" type="submit"><i style="font-size: 16px;cursor: pointer" class="fa fa-search"></i></button>
+                                                </span>
                                             </span>
-                                        </div>
-                                    </form>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
+                        </li>
+                    </ul>
+                </div>
+            @endif
         </div>
-        <div class="m-portlet__body" style="height: 30vh; overflow:auto;">
+        <div class="m-portlet__body" style="height: 32.5vh; overflow:auto;">
             <div class="m-widget1 pb-0" >
                 <div class="m-widget12">
                     <div class="m-widget12__item">
-                        <span class="m-widget12__text1">Name: <strong id="customer">{{isset($customer) && $customer->name?$customer->name:'No Customer Found' }}</strong> </span>
+                        <span class="m-widget12__text1">Name: <strong id="customer">{{isset($customer) && $customer->name?$customer->name:'No Customer Found' }}</strong>
+                            @if(isset($customer))
+                                <span>
+                                    <i  data-toggle="modal" data-target="#update_customer_modal"  style="cursor: pointer" class="fa fa-edit ml-3 text-warning"></i>
+                                </span>
+                            @endif
+                        </span>
                     </div>
                     <div class="m-widget12__item">
                         <span class="m-widget12__text2">Email: <strong>{{isset($customer) && $customer->email?$customer->email:'N/A' }}</strong></span>
                     </div>
                     <div class="m-widget12__item">
-                        <span class="m-widget12__text1">Account: <strong>{{isset($customer) && $customer->account_number?$customer->account_number:'N/A' }}</strong></span>
+                        <span class="m-widget12__text2">Phone No#: <strong id="customer_number">{{isset($customer) && $customer->primary_number?$customer->primary_number:0 }}</strong></span>
                     </div>
                     <div class="m-widget12__item">
-                        <span class="m-widget12__text2">Phone No#: <strong id="customer_number">{{isset($customer) && $customer->primary_number?$customer->primary_number:0 }}</strong></span>
+                        <span class="m-widget12__text1">Service Address: <strong>{{isset($customer) && $customer->service_address?$customer->service_address:'N/A' }}</strong></span>
                     </div>
                     <div class="m-widget12__item">
                         <span class="m-widget12__text2">Alternate Phone No#: <strong id="customer_alternate">{{isset($customer) && $customer->alternate_numbers?$customer->alternate_numbers:'N/A' }}</strong></span>
@@ -70,46 +81,54 @@
                 </div>
             </div>
         </div>
-        <div class="m-portlet__body" style="height: 40vh; overflow:auto;">
+        <div class="m-portlet__body" style="height: 33vh; overflow:auto;">
             <div class="m-widget3 pb-0" >
-                @foreach($sales_history as $history)
-                    <div class="m-widget3__item">
-                        <div class="m-widget3__header">
-                            <div class="m-widget3__user-img">
-                                <img class="m-widget3__img" src="{{(isset($history->user->image) && !empty($history->user->image))?asset('user_images/'.$history->user->image):asset('user_images/user.png')}}" alt="">
+                @if(isset($sales_history))
+                    @foreach($sales_history as $history)
+                        <a style="text-decoration: none !important;" onclick="view_lead(this)"  id="{{$history->call_id}}"  href="javascript:;">
+                            <div class="m-widget3__item">
+                                <div class="m-widget3__header">
+                                    <div class="m-widget3__user-img">
+                                        <img style="width: 41px; height: 41px; object-fit: cover;" class="m-widget3__img" src="{{(isset($history->user->image) && !empty($history->user->image))?asset('user_images/'.$history->user->image):asset('user_images/user.png')}}" alt="">
+                                    </div>
+                                    <div class="m-widget3__info" style="width: 70%;">
+                                        <span class="m-widget3__username"><strong class="text-success">{{$history->user->full_name}}</strong></span>
+                                        <br>
+                                        <span class="m-widget3__time text-capitalize">
+                                        @foreach($history->call_dispositions_services as $service)
+                                                {{$service->provider_name.': '}}
+                                                {{$service->internet == 1?'Internet, ':''}}
+                                                {{$service->phone == 1?'Phone, ':''}}
+                                                {{$service->cable == 1?'Cable, ':''}}
+                                                {{$service->mobile == 1?'Mobile, ':''}}
+                                            @endforeach
+                                    </span>
+                                        <br>
+                                        <span class="m-widget3__time text-capitalize">
+                                        {{$history->account_number??'N/A'}} /  {{$history->mobile_work_order_number??'N/A'}}
+                                    </span>
+                                    </div>
+                                    <div class="m-widget3__info">
+                                    <span class="m-widget3__status m--font-primary pt-0">
+                                        <strong>{{$history->phone_number}}</strong>
+                                    </span>
+                                        <br>
+                                        <span class="m-widget3__time float-right text-right">{{parse_datetime_get($history->added_on)}}</span>
+                                    </div>
+                                </div>
+                                <div class="m-widget3__body">
+                                    <p class="m-widget3__text">{{$history->comments}}</p>
+                                </div>
                             </div>
-                            <div class="m-widget3__info" style="width: 70%;">
-                                <span class="m-widget3__username"><strong>{{$history->user->full_name}}</strong></span>
-                                <br>
-                                <span class="m-widget3__time text-capitalize">
-                                    @foreach($history->call_dispositions_services as $service)
-                                        {{$service->provider_name.': '}}
-                                        {{$service->internet == 1?'Internet, ':''}}
-                                        {{$service->phone == 1?'Phone, ':''}}
-                                        {{$service->cable == 1?'Cable, ':''}}
-                                        {{$service->mobile == 1?'Mobile, ':''}}
-                                    @endforeach
-                                </span>
-                            </div>
-                            <div class="m-widget3__info">
-                                <span class="m-widget3__status m--font-primary pt-0">
-                                    <strong>{{$history->phone_number}}</strong>
-                                </span>
-                                <br>
-                                <span class="m-widget3__time float-right">{{parse_datetime_get($history->added_on)}}</span>
-                            </div>
-                        </div>
-                        <div class="m-widget3__body">
-                            <p class="m-widget3__text">{{$history->comments}}</p>
-                        </div>
-                    </div>
-                @endforeach
+                        </a>
+                    @endforeach
+                @endif
             </div>
         </div>
     </div>
 </div>
 <div class="col-6">
-    <div class="m-portlet m-portlet--full-height ">
+    <div class="m-portlet">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
                 <div class="m-portlet__head-title">
@@ -136,7 +155,19 @@
                                                 </span>
                                             </li>
                                             <li class="m-nav__item">
-                                                <a href="javascript:;" class="m-nav__link">
+                                                <a href="javascript:;" data-id="2" data-toggle="modal" data-target="#nonsale_modal" class="m-nav__link">
+                                                    <i class="m-nav__link-icon flaticon-share"></i>
+                                                    <span class="m-nav__link-text">Call Back</span>
+                                                </a>
+                                            </li>
+                                            <li class="m-nav__item">
+                                                <a href="javascript:;" data-id="3" data-toggle="modal" data-target="#nonsale_modal" class="m-nav__link">
+                                                    <i class="m-nav__link-icon flaticon-share"></i>
+                                                    <span class="m-nav__link-text">Customer Service</span>
+                                                </a>
+                                            </li>
+                                            <li class="m-nav__item">
+                                                <a href="javascript:;" data-id="4"  data-toggle="modal" data-target="#nonsale_modal" class="m-nav__link">
                                                     <i class="m-nav__link-icon flaticon-share"></i>
                                                     <span class="m-nav__link-text">No Answer</span>
                                                 </a>
@@ -147,21 +178,17 @@
                                                     <span class="m-nav__link-text">Sale Made</span>
                                                 </a>
                                             </li>
-                                            <li class="m-nav__item">
-                                                <a href="" class="m-nav__link">
-                                                    <i class="m-nav__link-icon flaticon-info"></i>
-                                                    <span class="m-nav__link-text">FAQ</span>
-                                                </a>
-                                            </li>
                                             <li class="m-nav__section m-nav__section--first">
                                                 <span class="m-nav__section-text">
                                                     Other Action
                                                 </span>
                                             </li>
                                             <li class="m-nav__item">
-                                                <a href="" class="m-nav__link">
-                                                    <i class="m-nav__link-icon flaticon-lifebuoy"></i>
-                                                    <span class="m-nav__link-text">Excel</span>
+                                                <a style="text-decoration: none;" title="Exit to Dashboard" href="javascript:show_dashboard();" class="m-portlet__nav-link m-portlet__nav-link--icon m-portlet__nav-link--icon-xl m-dropdown__toggle ">
+                                                    <i class="m-nav__link-icon fa fa-sign-out"></i>
+                                                    <span class="m-nav__link-text">
+                                                        Dashboard
+                                                    </span>
                                                 </a>
                                             </li>
                                         </ul>
@@ -170,21 +197,16 @@
                             </div>
                         </div>
                     </li>
-                    <li class="m-portlet__nav-item m-dropdown m-dropdown--inline m-dropdown--arrow m-dropdown--align-right m-dropdown--align-push" m-dropdown-toggle="hover" aria-expanded="true">
-                        <a title="Exit to Dashboard" href="javascript:show_dashboard();" class="m-portlet__nav-link m-portlet__nav-link--icon m-portlet__nav-link--icon-xl m-dropdown__toggle ">
-                            <i class="m-nav__link-icon fa fa-sign-out text-danger"></i>
-                        </a>
-                    </li>
                 </ul>
             </div>
         </div>
-        <div class="m-portlet__body" style="height: 77vh; overflow:auto;">
+        <div class="m-portlet__body" style="height: 76vh; overflow:auto;">
             <div class="m-widget3">
                 @foreach($call_logs as $log)
                     <div class="m-widget3__item">
                         <div class="m-widget3__header">
                             <div class="m-widget3__user-img">
-                                <img class="m-widget3__img" src="{{(isset($log->user->image) && !empty($log->user->image))?asset('user_images/'.$log->user->image):asset('user_images/user.png')}}" alt="">
+                                <img style="width: 41px; height: 41px; object-fit: cover;" class="m-widget3__img" src="{{(isset($log->user->image) && !empty($log->user->image))?asset('user_images/'.$log->user->image):asset('user_images/user.png')}}" alt="">
                             </div>
                             <div class="m-widget3__info" style="width: 70%;">
                                 <span class="m-widget3__username"><strong>{{$log->user->full_name}}</strong></span>
@@ -192,7 +214,7 @@
                                 <span class="m-widget3__time">{{parse_datetime_get($log->added_on)}}</span>
                             </div>
                             <div class="m-widget3__info">
-                                <span class="m-widget3__status m--font-info pt-0"><strong>{{$log->call_disposition_types->title}}</strong></span>
+                                <span class="m-widget3__status m--font-info pt-0 text-right"><strong>{{$log->call_disposition_types->title}}</strong></span>
                                 <br>
                                 <span class="m-widget3__time float-right">{{$log->phone_number}}</span>
                             </div>
@@ -206,8 +228,6 @@
         </div>
     </div>
 </div>
-
-
 <div class="modal fade" id="nonsale_modal" tabindex="-1" role="dialog" aria-labelledby="notesModalLabel" aria-hidden="true">
     <div class="modal-dialog .modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -228,21 +248,10 @@
                                             <label class="form-check-label" for="disposition_type"> Disposition Type </label>
                                             <select  name="disposition_type" id="disposition_type" class="form-control" required>
                                                 <option  value="">Select</option>
-                                                <option value="2">Call Back</option>
-                                                <option value="3">Customer Service</option>
-                                                <option value="4">No Answer</option>
-                                                <option value="5">Call Transferred</option>
-                                                <option value="6">Declined Sale</option>
-                                                <option value="7">Xfinity Transfer</option>
-                                                <option value="8">Vivint Transfer</option>
-                                                <option value="10">Bulk Account</option>
+                                                @foreach($disposition_types as $disposition_type)
+                                                    <option value="{{$disposition_type->disposition_type_id}}">{{$disposition_type->title}}</option>
+                                                @endforeach
                                             </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="form-group">
-                                            <label class="form-check-label" for="phone">Phone</label>
-                                            <input required type="number" class="form-control fixed_input_height" name="phone_number" id="phone_number" value="{{isset($phone)?$phone:0}}">
                                         </div>
                                     </div>
                                     <div class="col-6">
@@ -251,23 +260,90 @@
                                             <select required class="form-control select2" name="did_id" id="did">
                                                 <option value="" disabled selected >Select</option>
                                                 @foreach($lead_did_data as $did_data)
-                                                    <option value="{{ $did_data->did_id }}"> {{ $did_data->title }}</option>
+                                                    <option value="{{ $did_data->did_id }}" {{isset($did_id) && ($did_data->did_id == $did_id) ? 'selected' : ''}}> {{ $did_data->title }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-12">
                                         <div class="form-group">
-                                            <textarea placeholder="Comments" name="comments" id="comments" cols="30" rows="3" required></textarea>
+                                            <textarea style="height: 100px !important;" class="form-control" placeholder="Comments" name="comments" id="comments" cols="25" rows="10" required></textarea>
                                         </div>
                                     </div>
                                     <input type="hidden" class="form-control" name="rec_id" id="rec_id" value="{{$rec_id}}">
+                                    <input  type="hidden" class="form-control fixed_input_height" name="phone_number" id="phone_number" value="{{isset($phone)?$phone:0}}">
+                                    <input  type="hidden" class="form-control fixed_input_height" name="customer_id" id="" value="{{isset($customer)?$customer->customer_id:''}}">
                                 </div>
                             </div>
                         </div>
                         <div class="col-12">
-                            <button style="margin-top: -65px;margin-right: 80px;"  id="cancel_btn" type="button" class="btn btn-danger float-right ml-3">Cancel</button>
-                            <button style="margin-top: -65px;margin-right: 20px;"  id="non_sale_submit_btn" type="submit" class="btn btn-primary float-right"> Save</button>
+                            <button  type="button" class="btn btn-danger float-right ml-3" data-dismiss="modal">Cancel</button>
+                            <button  id="non_sale_submit_btn" type="submit" class="btn btn-primary float-right"> Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="update_customer_modal" tabindex="-1" role="dialog" aria-labelledby="customerModalLabel" aria-hidden="true">
+    <div class="modal-dialog .modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Update Customer</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="javascript:update_customer_details();" class="m-form m-form--fit m-form--label-align-right mt-3" id="customer_update_form">
+                    @csrf
+                    <div class="row">
+                        <div class="col-12">
+                            <div id="main_form"><div class="row">
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label class="form-check-label" for="name"> Customer Name</label>
+                                            <input class="form-control" type="text" name="customer_name" value="{{isset($customer)?$customer->name:''}}" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label class="form-check-label" for="phone"> Phone</label>
+                                            <input class="form-control" type="text" name="phone" value="{{isset($customer)?$customer->primary_number:''}}" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label class="form-check-label" for="email"> Email</label>
+                                            <input class="form-control" type="text" name="email" value="{{isset($customer)?$customer->email:''}}" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label class="form-check-label" for="account"> Account</label>
+                                            <input class="form-control" type="text" name="account" value="{{isset($customer)?$customer->account_number:''}}" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label class="form-check-label" for="service_address">Service Address</label>
+                                            <textarea style="height: 100px !important;" class="form-control"  name="service_address" cols="25" rows="10" required>{{isset($customer)?$customer->service_address:''}}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label class="form-check-label" for="alternate_numbers"> Alternate Numbers</label>
+                                            <textarea style="height: 100px !important;" class="form-control"  name="alternate_numbers"cols="25" rows="10">{{isset($customer)?$customer->alternate_numbers:''}}</textarea>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" class="form-control" name="customer_id" id="customer_id" value="{{isset($customer)?$customer->customer_id:''}}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <button  type="button" class="btn btn-danger float-right ml-3" data-dismiss="modal">Cancel</button>
+                            <button  id="" type="submit" class="btn btn-primary float-right"> Save</button>
                         </div>
                     </div>
                 </form>
@@ -310,7 +386,6 @@
                                                 @endforeach
                                             </select>
                                         </div>
-
                                         <div class="form-group">
                                             <label class="form-check-label" for="customer_name">Customer Name </label>
                                             <input required="" type="text" class="form-control" name="customer_name" id="customer_name" value="{{isset($customer->name)?$customer->name:''}}">
@@ -327,7 +402,6 @@
                                             <label class="form-check-label" for="email">Email </label>
                                             <input required="" type="email" class="form-control" name="email" id="email" value="{{isset($customer->email)?$customer->email:''}}">
                                         </div>
-
                                         <div class="form-group">
                                             <label class="form-check-label" for="account_number">Account Number</label>
                                             <input type="text" class="form-control" name="account_number" id="account_number" value="{{isset($customer->account_number)?$customer->account_number:''}}">
@@ -338,7 +412,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label class="form-check-label" for="order_number">Order Number</label>
-                                            <input type="text" class="form-control" name="order_number" id="order_number">
+                                            <input type="text" class="form-control" name="order_number" id="order_number" required>
                                         </div>
                                         <div class="form-group" id="prof_install" style="display: none">
                                             <label class="form-check-label" for="installation_date">Installation Date</label>
@@ -358,22 +432,17 @@
                                         </div>
                                         <input type="hidden" class="form-control" name="rec_id" id="rec_id" value="{{$rec_id}}">
                                         <input type="hidden" class="form-control" name="disposition_type" id="" value="1">
-
                                         @if(!isset($customer))
-
                                             <input type="hidden" name="new_customer" value="1">
                                         @endif
-
                                     </div>
                                     <div class="col-6">
                                         <div class="form-group">
                                             <br> <strong>Providers</strong>
                                         </div>
-
                                         <div class="m-checkbox-list">
                                             <label class="m-checkbox" for="spectrum"> Spectrum
                                                 <input class="form-check-input provider_chk" type="checkbox" id="spectrum" name="spectrum" value="spectrum">
-
                                                 <div class="sp_checks mb-2 service_chk">
                                                     <div class="m-checkbox-list form-check-inline">
                                                         <label class="m-checkbox" for="sp_internet"> Internet
@@ -404,8 +473,6 @@
                                                 <span></span>
                                             </label>
                                         </div>
-
-
                                         <div class="m-checkbox-list">
                                             <label class="m-checkbox" for="att"> ATT
                                                 <input class="form-check-input provider_chk" type="checkbox" id="att" name="att" value="att">
@@ -433,7 +500,6 @@
                                                 <span></span>
                                             </label>
                                         </div>
-
                                         <div class="m-checkbox-list">
                                             <label class="m-checkbox" for="direct_tv"> Direct Tv
                                                 <input class="form-check-input provider_chk" type="checkbox" id="direct_tv" name="direct_tv" value="directtv">
@@ -449,7 +515,6 @@
                                                 <span></span>
                                             </label>
                                         </div>
-
                                         <div class="m-checkbox-list">
                                             <label class="m-checkbox" for="earth_link"> Earth link
                                                 <input class="form-check-input provider_chk" type="checkbox" id="earth_link" name="earth_link" value="earthlink">
@@ -477,11 +542,9 @@
                                                 <span></span>
                                             </label>
                                         </div>
-
                                         <div class="m-checkbox-list">
                                             <label class="m-checkbox" for="mediacom"> Mediacom
                                                 <input class="form-check-input provider_chk" type="checkbox" id="mediacom" name="mediacom" value="mediacom">
-
                                                 <div class="mc_checks mb-2 service_chk">
                                                     <div class="m-checkbox-list form-check-inline">
                                                         <label class="m-checkbox" for="mc_internet"> Internet
@@ -506,7 +569,6 @@
                                                 <span></span>
                                             </label>
                                         </div>
-
                                         <div class="m-checkbox-list">
                                             <label class="m-checkbox" for="viasat"> Viasat
                                                 <input class="form-check-input provider_chk" type="checkbox" id="viasat" name="viasat" value="viasat">
@@ -528,7 +590,6 @@
                                                 <span></span>
                                             </label>
                                         </div>
-
                                         <div class="m-checkbox-list">
                                             <label class="m-checkbox" for="hughesnet"> Hughesnet
                                                 <input class="form-check-input provider_chk" type="checkbox" id="hughesnet" name="hughesnet" value="hughesnet">
@@ -662,7 +723,7 @@
                                         <div class="form-group m-form__group">
                                             <label> Pre Payment </label><br>
                                             <label class="m-radio">
-                                                <input type="radio" name="pre_payment" id="pre_payment1" value="1">
+                                                <input type="radio" name="pre_payment" id="pre_payment1" value="1" required>
                                                 Yes
                                                 <span></span>
                                             </label>
@@ -676,7 +737,7 @@
                                         <div class="form-group m-form__group">
                                             <label> Installation Type </label><br>
                                             <label class="m-radio">
-                                                <input class="yes_radio" type="radio" name="installation_type" id="self_install" value="1">
+                                                <input class="yes_radio" type="radio" name="installation_type" id="self_install" value="1" required>
                                                 Self Install
                                                 <span></span>
                                             </label>
