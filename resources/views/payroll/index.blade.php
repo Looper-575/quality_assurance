@@ -79,7 +79,7 @@
             let data = new FormData($('#payroll_form_id')[0]);
             data.append('_token', '{{csrf_token()}}');
             let a = function() {
-                // window.location.reload();
+                window.location.reload();
             }
             let arr = [a];
             swal({
@@ -92,8 +92,6 @@
                 .then((willDelete) => {
                     if (willDelete) {
                         call_ajax_with_functions('', '{{route('payroll_save')}}', data, arr);
-                    } else {
-                        // swal("Your imaginary file is safe!");
                     }
                 });
         }

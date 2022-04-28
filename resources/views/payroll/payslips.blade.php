@@ -16,16 +16,14 @@
                 <table class="table table-striped" id="payroll_table">
                     <thead>
                     <tr>
-                        <th title="Field #1">Employee Name</th>
-                        <th title="Field #1">Salary Month</th>
-                        <th title="Field #2">Attendance Marked</th>
-                        <th title="Field #2">Holidays</th>
-                        <th title="Field #3">On Leave</th>
-                        <th title="Field #6">Absents</th>
-                        <th title="Field #7">Present</th>
-                        <th title="Field #7">Basic Salary</th>
-                        <th title="Field #9">Gross Salary</th>
-                        <th title="Field #10">Actions</th>
+                        <th>Employee Name</th>
+                        <th>Salary Month</th>
+                        <th>Basic Salary</th>
+                        <th>Deductions</th>
+                        <th>Allowance</th>
+                        <th>Income Tax</th>
+                        <th>Gross Salary</th>
+                        <th>Actions</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -33,12 +31,10 @@
                         <tr>
                             <td>{{ $pay->user->full_name }}</td>
                             <td>{{ date('M-Y', strtotime($pay->salary_month)) }}</td>
-                            <td>{{ $pay->attendance_marked }}</td>
-                            <td>{{ $pay->holiday_count }}</td>
-                            <td>{{ $pay->leaves }}</td>
-                            <td>{{ $pay->absents }}</td>
-                            <td>{{ $pay->presents}}</td>
                             <td>{{$pay->basic_salary}}</td>
+                            <td>{{$pay->deduction_amount}}</td>
+                            <td>{{$pay->allowance_amount}}</td>
+                            <td>{{$pay->income_tax}}</td>
                             <td>{{intval($pay->gross_salary)}}</td>
                             <td>
                                 <div class="btn-group btn-group-sm">
@@ -58,13 +54,6 @@
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script src="{{ asset('assets/bundles/select2/dist/js/select2.full.min.js') }}"></script>
     <script>
-        function print_payslip(){
-            var divToPrint=document.getElementById("payslip_print");
-            newWin= window.open("");
-            newWin.document.write(divToPrint.outerHTML);
-            newWin.print();
-            newWin.close();
-        }
         $(document).ready(function() {
             $('#payroll_table').DataTable( {
             });
