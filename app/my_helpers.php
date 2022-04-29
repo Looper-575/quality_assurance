@@ -4,13 +4,12 @@
  * @Copyright:   Copyright (c) Danish Sheraz,
  * @Senior-Developer: Danish Sheraz
  **/
-
 // date time helpers
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
-
+use Illuminate\Support\Facades\Mail;
 if (!function_exists('get_date_time')) {
     function get_date_time()
     {
@@ -113,8 +112,8 @@ if (!function_exists('slugify')) {
 if (!function_exists('send_email')) {
     function send_email($email_body, $email_address, $subject)
     {
-        $em = "no_reply@marchamarlo.com";
-        $na = "Marcha Marlo Dev Team";
+        $em = "no_reply@atlantisbpo.com";
+        $na = "Atlantis BPO Solutions Dev Team";
         $from = $na . "<" . $em . ">";
         $xheaders = 'MIME-Version: 1.0' . "\r\n";
         $xheaders .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
@@ -122,9 +121,9 @@ if (!function_exists('send_email')) {
         $xheaders .= "From: " . $from . "\r\n";
         $xheaders .= "Reply-To: " . $from . "\r\n";
         $xheaders .= "Return-Path: " . $from . "\r\n";
-        $xheaders .= "Cc: danish.sheraz575@gmail.com";
+        $xheaders .= "Cc: rafianltvc@gmail.com";
+//        $xheaders .= "Cc: danish.sheraz575@gmail.com";
         @mail($email_address, $subject, $email_body, $xheaders);
-
     }
 }
 if (!function_exists('working_days')) {
@@ -172,12 +171,9 @@ if (!function_exists('get_period')) {
         if (strtotime($endDate) >= strtotime($startDate)) {
             $syear = date('Y', strtotime($startDate));
             $smonth = date('F', strtotime($startDate));
-
             $eyear = date('Y', strtotime($endDate));
             $emonth = date('F', strtotime($endDate));
-
             $period =  $smonth. " " . $syear . ' - '. $emonth. " " . $eyear;
-
             return $period;
         } else {
             return "Please check the dates.";
@@ -229,13 +225,9 @@ if(!function_exists('get_parent_menus')){
         $role_permission = \App\Models\SideMenu::with('menu_permission', 'children.menu_permission')->where([
             'status' => 1,
             'parent_id' => 0,
-        ])
-            ->whereHas('menu_permission', function ($query) use ($role_id)
-            {
+        ])->whereHas('menu_permission', function ($query) use ($role_id) {
                 $query->where('role_id', $role_id);
-            })
-            ->orderBy('sort_order', 'ASC')
-            ->get();
+        })->orderBy('sort_order', 'ASC')->get();
         if($role_permission){
             return $role_permission;
         } else {
@@ -249,9 +241,7 @@ if(!function_exists('get_child_menus')){
         $role_permission = \App\Models\SideMenu::with('menu_permission')->where([
             'status' => 1,
             'parent_id' => $parent_id,
-        ])
-            ->orderBy('sort_order', 'ASC')
-            ->get();
+        ])->orderBy('sort_order', 'ASC')->get();
         if($role_permission){
             return $role_permission;
         } else {
@@ -281,11 +271,8 @@ if(!function_exists('get_date_interval')){
     function get_date_interval()
     {
         $today = get_date();
-        //$today = Date('2022-01-31');
-        $datetime = new DateTime($today);
         $date_today = date("d", strtotime($today));
         $hour = date("H", strtotime(get_date_time()));
-        //$hour = 5;
         if($date_today == 29 && $hour < 7) {
             $from_date = date("Y-m"  ,strtotime("-1 Month" , strtotime($today)));
             $to_date = date("Y-m", strtotime($today));
@@ -308,12 +295,10 @@ if(!function_exists('get_date_interval')){
         } else {
             $from_date = $from_date . '-29 17:00:00';
         }
-
         $dates = [
             'to_date' => $to_date,
             'from_date'=>  $from_date
         ];
-        //dd($dates);
         return $dates;
     }
 }
@@ -346,7 +331,7 @@ if(!function_exists('parse_only_date_time_zone')){
     }
 }
 if(!function_exists('add_notifications')){
-    function add_notifications($reference_table,$type,$reference_id,$for_user_id,$message)
+    function add_notifications($reference_table,$type,$reference_id,$for_user_id,$message,$send_email)
     {
         \App\Models\Notifications::create([
             'reference_table' => $reference_table,
@@ -355,15 +340,16 @@ if(!function_exists('add_notifications')){
             'user_id' => $for_user_id,
             'message' => $message,
         ]);
+        if($send_email){
+
+        }
     }
 }
 if(!function_exists('schedule_all_employees_self_assessment')){
     function schedule_all_employees_self_assessment()
     {
-        $users = \App\Models\Employee::with('employee:user_id,user_type')
-            ->whereStatus(1)->select('user_id')->get()->toArray();
+        $users = \App\Models\Employee::with('employee:user_id,user_type')->whereStatus(1)->select('user_id')->get()->toArray();
         foreach ($users as $user){
-           // dd($user['user_id'],$user['employee']['user_type']);
             $self_assessment = false;
             // Previous appraisal record check
             $incomplete_evaluation = \App\Models\EmployeeAssessment::with('employees')
@@ -374,16 +360,22 @@ if(!function_exists('schedule_all_employees_self_assessment')){
                 ->where('user_id', $user['user_id'])
                 ->where('hr_sign', 1)
                 ->orderBy('added_on', 'desc')->first();
-            if($Previous_EmployeeAssessment && !$incomplete_evaluation){
+            if($Previous_EmployeeAssessment && !$incomplete_evaluation) {
                 $employee_assessment_id = $Previous_EmployeeAssessment->id;
                 if(get_month_diff($Previous_EmployeeAssessment->evaluation_date, get_date()) == 3) {
                     $self_assessment = true;
                 }
-            }else if(!$incomplete_evaluation) {
+            } else if(!$incomplete_evaluation) {
                 $employee_assessment_id = 0; //for first evaluation
                 $employees = \App\Models\Employee::where('user_id', $user['user_id'])->first();
-                if (get_month_diff($employees->joining_date, get_date()) >= 3) {
-                    $self_assessment = true;
+                if($employees->confirmation_date == Null){
+                    if (get_month_diff($employees->joining_date, get_date()) >= 3) {
+                        $self_assessment = true;
+                    }
+                } else {
+                    if (get_month_diff($employees->confirmation_date, get_date()) >= 3) {
+                        $self_assessment = true;
+                    }
                 }
             }
             if($self_assessment == true){
@@ -395,7 +387,8 @@ if(!function_exists('schedule_all_employees_self_assessment')){
                         'user_id' => $user['user_id'],
                     ])->first();
                     if(!$incomplete_evaluation && !$Notification_data ){
-                        add_notifications('employee_assessments','Evaluation',$employee_assessment_id,$user['user_id'],'Pending Self Evaluation');
+                        $send_email = false;
+                        add_notifications('employee_assessments','Evaluation',$employee_assessment_id,$user['user_id'],'Pending Self Evaluation',$send_email);
                     }
                 }
             }
@@ -426,17 +419,17 @@ if(!function_exists('get_leave_bucket_leaves')) {
         $data = DB::table('leave_bucket_view')->where('user_id',$user_id)->first();
         if($data != null) {
             $remaining_annual = $data->annual_bucket - $data->annual;
-            $remaining_casual = $data->casual_bucket - ($data->casual + $data->other_leaves + $data->payroll_deductions);
+            $remaining_casual = $data->casual_bucket - $data->casual;
             if ($remaining_casual < 0) {
-                $remaining_sick = @$data->sick_bucket - @$data->sick + $remaining_casual;
+                $remaining_sick = $data->sick_bucket - $data->sick + $remaining_casual;
                 $remaining_casual = 0;
             } else {
-                $remaining_sick = @$data->sick_bucket - @$data->sick;
+                $remaining_sick = $data->sick_bucket - $data->sick;
             }
         } else {
-            $remaining_annual = 0;
-            $remaining_casual = 0;
-            $remaining_sick = 0;
+            $remaining_annual = 10;
+            $remaining_casual = 4;
+            $remaining_sick = 5;
         }
         return [
             'remaining_annual' => $remaining_annual,
@@ -467,8 +460,14 @@ if(!function_exists('check_single_employee_self_assessment_status')){
             $employee_assessment_id = 0; //for first evaluation
             if(Auth::user()->user_type == 'Employee'){
                 $employees = \App\Models\Employee::where('user_id', Auth::user()->user_id)->first();
-                if (get_month_diff($employees->joining_date, get_date()) >= 3) {
-                    $self_assessment = true;
+                if($employees->confirmation_date == Null){
+                    if (get_month_diff($employees->joining_date, get_date()) >= 3) {
+                        $employee_assessment = true;
+                    }
+                }else{
+                    if (get_month_diff($employees->confirmation_date, get_date()) >= 3) {
+                        $employee_assessment = true;
+                    }
                 }
             }
         }
@@ -482,7 +481,8 @@ if(!function_exists('check_single_employee_self_assessment_status')){
                     'user_id' => Auth::user()->user_id,
                 ])->first();
                 if(!$incomplete_evaluation && !$Notification_data ){
-                    add_notifications('employee_assessments','Evaluation',$employee_assessment_id,Auth::user()->user_id,'Pending Self Evaluation');
+                    $send_email = false;
+                    add_notifications('employee_assessments','Evaluation',$employee_assessment_id,Auth::user()->user_id,'Pending Self Evaluation',$send_email);
                 }
             }
         }
@@ -516,17 +516,8 @@ if(!function_exists('update_all_employee_leaves_bucket')){
                     \App\Models\LeavesBucket::where('user_id', $user['user_id'])->update(['start_date',get_date()]);
                 }
             }
-//        else{
-//            \App\Models\LeavesBucket::create(['user_id' => $user['user_id'],
-//                'start_date' => get_date(),
-//                'annual_leaves' => 10,
-//                'sick_leaves' => 5,
-//                'casual_leaves' => 4
-//            ]);
-//        }
         }
     }
 }
-
 /* End of file custom_helpers.php */
 /* Location: ./application/helpers/custom_helpers.php */

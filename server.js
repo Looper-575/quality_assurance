@@ -1,7 +1,6 @@
 /**
  * Created by Looper on 26-04-2017.
  */
-// TODO : create new port for http traffic of node and proxy from apache or rum directly from that port
 const express = require('express');
 const fs = require('fs');
 const app = express();
@@ -160,7 +159,25 @@ io.on('connection', (socket) => {
     });
     //Send group msg
     socket.on('send_group_msg', (data) => {
-        if(data.chat_id == null){
+        if(data.referenced){
+            conn.execute(
+                'INSERT INTO `group_chats` ( `from_user`, `group_id`, `msg`, `referenced`) VALUES (?,?,?,?)',
+                [data.from_user, data.group_id,data.msg,data.referenced],
+                function(err, results) {
+                    if(results.affectedRows > 0){
+                        conn.execute(
+                            'SELECT c.*,DATE_FORMAT(c.added_on,"%H:%i %d-%m-%X") as dateTime,r.msg as reply_msg,r.attachment as reply_attachment FROM `group_chats` c LEFT JOIN group_chats r on r.group_chat_id = c.referenced WHERE (c.group_chat_id=?)',
+                            [results.insertId],
+                            function(err, results) {
+                                io.sockets.emit('receive_group_msg', results );
+                            }
+                        );
+                    }
+
+                }
+            );
+        }
+        else if(data.chat_id == null){
             conn.execute(
                 'INSERT INTO `group_chats` ( `from_user`,`group_id`, `msg`) VALUES (?,?,?)',
                 [data.from_user,data.group_id,data.msg],
@@ -189,7 +206,7 @@ io.on('connection', (socket) => {
     //Get Group Chats
     socket.on('get_group_chats', (data) => {
         conn.execute(
-            "SELECT group_chats.*, DATE_FORMAT(group_chats.added_on,'%H:%i %d-%m-%X') as dateTime,users.full_name,users.image as user_image FROM `group_chats` JOIN users on users.user_id = group_chats.from_user WHERE group_id = ? ORDER by group_chat_id desc LIMIT 20",
+            "SELECT g.*, DATE_FORMAT(g.added_on,'%H:%i %d-%m-%X') as dateTime,users.full_name,users.image as user_image,r.msg as reply_msg,r.attachment as reply_attachment FROM `group_chats` g LEFT JOIN group_chats r on r.group_chat_id = g.referenced JOIN users on users.user_id = g.from_user WHERE g.group_id = ? ORDER by g.group_chat_id desc LIMIT 20",
             [data.group_id],
             function(err, results, fields) {
                 socket.emit('receive_group_chats',{ chat: results });

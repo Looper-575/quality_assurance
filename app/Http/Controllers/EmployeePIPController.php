@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\ManagerialRole;
 use App\Models\Notifications;
 use App\Models\PIP;
@@ -9,8 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Auth;
-
-class PIPController extends Controller
+class EmployeePIPController extends Controller
 {
     public function __construct()
     {    }
@@ -34,7 +31,7 @@ class PIPController extends Controller
             $data['is_om'] = false;
             $data['is_staff'] = true;
         }
-        return view('performance_improvement_plan.index' , $data);
+        return view('performance_improvement_plan.pip_list' , $data);
     }
     public function pip_form(Request $request)
     {
@@ -105,7 +102,8 @@ class PIPController extends Controller
                 'user_id' => $staff_id,
             ])->first();
             if(!$Notification_data ) {
-                add_notifications('performance_improvement_plans', 'PIP', $pip_id, $staff_id, 'Pending PIP Ack.');
+                $send_email = false;
+                add_notifications('performance_improvement_plans', 'PIP', $pip_id, $staff_id, 'Pending PIP Ack.',$send_email);
             }
             $response['status'] = 'success';
             $response['result'] = 'Added Successfully';
@@ -127,9 +125,9 @@ class PIPController extends Controller
             'staff_acknowledgement_date' => get_date()
         ]);
         if($staff_ack){
+            $send_email = false;
             $hr_user_id = User::where('role_id', 5)->pluck('user_id')->first();
-            add_notifications('performance_improvement_plans','PIP',$request->pip_id,$hr_user_id,'Pending PIP HR Approval');
-
+            add_notifications('performance_improvement_plans','PIP',$request->pip_id,$hr_user_id,'Pending PIP HR Approval',$send_email);
             $response['status'] = "Success";
             $response['result'] = "Staff Acknowledged Successfully";
         }else{
@@ -148,7 +146,6 @@ class PIPController extends Controller
         $response['result'] = "Approved by HRM Successfully";
         return response()->json($response);
     }
-
     public function view_pip(Request $request)
     {
         $data['page_title'] = "View Performance Improvement Plan Details - Atlantis BPO CRM";
@@ -159,11 +156,9 @@ class PIPController extends Controller
         }
         return view('performance_improvement_plan.view_pip', $data);
     }
-
     public function get_om_users_data(Request $request)
     {
         $data['staff'] = User::whereStatus(1)->where('manager_id', $request->om_id)->get();
         return response()->json($data);
     }
-
 }

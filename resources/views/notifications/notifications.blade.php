@@ -3,7 +3,8 @@
     @if(isset($notifications))
         <div class="m-dropdown__inner">
             <div class="m-dropdown__header m--align-center" style="background: url({{asset('assets/app/media/img/misc/notification_bg.jpg')}}); background-size: cover;">
-				<span class="m-dropdown__header-title">{{count($notifications)}} New</span>
+                <span class="m-dropdown__header-title">{{$unread_notifications}} New</span>
+                <input type="hidden" id="unread_count" value="{{$unread_notifications}}">
                 <span class="m-dropdown__header-subtitle">User Notifications</span>
             </div>
             <div class="m-dropdown__body">
@@ -63,6 +64,10 @@
             url:"{{ route('get_pending_notifications') }}",
             success: function( data ) {
                 document.getElementById('notifications').innerHTML = data;
+                if($('#unread_count').val() > 0 ){
+                    $('.notification_icon').addClass('new');
+                    $('.notification_icon').html($('#unread_count').val());
+                }
             }
         });
     }

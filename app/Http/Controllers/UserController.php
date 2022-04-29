@@ -27,8 +27,6 @@ class UserController extends Controller
             }else{
                 if(Auth::user()->user_type=='Employee'){
                     generate_single_employee_leaves_bucket(Auth::user()->user_id);
-                    // working just commented for Dev CRM
-                    // check_single_employee_self_assessment_status();
                 }
                 return redirect('/');
             }
@@ -40,7 +38,7 @@ class UserController extends Controller
     {
         $data['page_title'] = "Users List - Atlantis BPO CRM";
         $data['departments'] = Department::where('status', 1)->get();
-        $data['user_lists'] = User::where('status' , 1)->where('role_id', '!=', 13)->with(['role', 'manager'])->get();
+        $data['user_lists'] = User::where('status' , 1)->where('role_id', '!=', 13)->with(['role', 'manager','department','team_member.team'])->get();
         return view('users.user_list', $data);
     }
     public function user_form(Request $request)
@@ -73,6 +71,13 @@ class UserController extends Controller
             ])->first();
             if($user) {
                 Auth::login($user);
+                if(!isset($_COOKIE['isPopUpShown'])) {
+                    setcookie('isPopUpShown', 'No'); // , time() + (86400) // 86400 = 1 day
+                } else {
+                    if($_COOKIE['isPopUpShown'] == 'Yes' ) {
+                        setcookie('isPopUpShown', 'No');
+                    }
+                }
                 $response['status'] = "Success";
                 $response['result'] = "Logged In";
             } else {
@@ -191,7 +196,6 @@ class UserController extends Controller
         return view('Auth.edit_profile',$data);
     }
     public function save_profile_changes(Request $request){
-     // dd($request->all());
         if($request->user_id){
             $validator = Validator::make($request->all(), [
                 'full_name' => 'required',

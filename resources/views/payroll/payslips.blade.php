@@ -20,8 +20,8 @@
                         <th>Salary Month</th>
                         <th>Basic Salary</th>
                         <th>Deductions</th>
-                        <th>Allowance</th>
                         <th>Income Tax</th>
+                        <th>Allowance</th>
                         <th>Gross Salary</th>
                         <th>Actions</th>
                     </tr>
@@ -33,8 +33,8 @@
                             <td>{{ date('M-Y', strtotime($pay->salary_month)) }}</td>
                             <td>{{$pay->basic_salary}}</td>
                             <td>{{$pay->deduction_amount}}</td>
-                            <td>{{$pay->allowance_amount}}</td>
                             <td>{{$pay->income_tax}}</td>
+                            <td>{{$pay->allowance_amount}}</td>
                             <td>{{intval($pay->gross_salary)}}</td>
                             <td>
                                 <div class="btn-group btn-group-sm">

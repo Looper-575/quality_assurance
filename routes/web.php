@@ -337,15 +337,15 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
 
     // Performance Improvement Plans ROUTES
     Route::group(['middleware' => ['check-permission:performance_improvement_plan,view,0,0']], function() {
-        Route::get('/performance_improvement_plan', 'App\Http\Controllers\PIPController@index')->name('performance_improvement_plan');
-        Route::get('/pip_form', 'App\Http\Controllers\PIPController@pip_form')->name('pip_form');
-        Route::get('/view_pip', 'App\Http\Controllers\PIPController@view_pip')->name('view_pip');
+        Route::get('/performance_improvement_plan', 'App\Http\Controllers\EmployeePIPController.php@index')->name('performance_improvement_plan');
+        Route::get('/pip_form', 'App\Http\Controllers\EmployeePIPController.php@pip_form')->name('pip_form');
+        Route::get('/view_pip', 'App\Http\Controllers\EmployeePIPController.php@view_pip')->name('view_pip');
     });
-    Route::post('/pip_save', 'App\Http\Controllers\PIPController@pip_save')->name('pip_save');
-    Route::post('/hrm_approve_pip', 'App\Http\Controllers\PIPController@hrm_approve_pip')->name('hrm_approve_pip');
-    Route::post('/staff_ack_pip_with_comments', 'App\Http\Controllers\PIPController@staff_ack_pip_with_comments')->name('staff_ack_pip_with_comments');
-    Route::post('/staff_ack_pip', 'App\Http\Controllers\PIPController@staff_ack_pip')->name('staff_ack_pip');
-    Route::get('/get_om_users_data', 'App\Http\Controllers\PIPController@get_om_users_data')->name('get_om_users_data');
+    Route::post('/pip_save', 'App\Http\Controllers\EmployeePIPController.php@pip_save')->name('pip_save');
+    Route::post('/hrm_approve_pip', 'App\Http\Controllers\EmployeePIPController.php@hrm_approve_pip')->name('hrm_approve_pip');
+    Route::post('/staff_ack_pip_with_comments', 'App\Http\Controllers\EmployeePIPController.php@staff_ack_pip_with_comments')->name('staff_ack_pip_with_comments');
+    Route::post('/staff_ack_pip', 'App\Http\Controllers\EmployeePIPController.php@staff_ack_pip')->name('staff_ack_pip');
+    Route::get('/get_om_users_data', 'App\Http\Controllers\EmployeePIPController.php@get_om_users_data')->name('get_om_users_data');
 
     // Employee Assessment Routes
     Route::group(['middleware' => ['check-permission:employee_assessment,view,0,0']], function() {

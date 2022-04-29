@@ -17,6 +17,8 @@
     },
     "dependencies": {
         "express": "^4.17.3",
-        "socket.io": "^4.4.1"
+        "mysql2": "^2.3.3",
+        "socket.io": "^4.4.1",
+        "socketio-file-upload": "^0.7.3"
     }
 }

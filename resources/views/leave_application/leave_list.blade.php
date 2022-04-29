@@ -25,14 +25,14 @@
                             Approved
                         </a>
                     </li>
-                    @if($has_permissions->add == 1)
+                    @if($has_permissions->add == 1 && Auth::user()->user_type == 'Employee')
                         <li class="nav-item m-tabs__item">
                             <a class="nav-link m-tabs__link" href="{{route('leave_form')}}">
                                 Leave Form
                             </a>
                         </li>
                     @endif
-                    @if(Auth::user()->user_team && $has_permissions->add == 1)
+                    @if(Auth::user()->user_team && $has_permissions->add == 1 && Auth::user()->user_type == 'Employee')
                         <li class="nav-item m-tabs__item">
                             <a class="nav-link m-tabs__link" href="{{route('team_leave_form')}}">
                                 Team Leave Form

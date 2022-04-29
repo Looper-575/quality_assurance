@@ -81,9 +81,14 @@ class LeaveApplicationController extends Controller
                 $pending_leave_id = $pending_leaves->leave_id;
             }
             // NOTIFICATION for Pending Leave Approval by Manager
+            $send_email = true;
             if($approved_by_manager == NULL){
                 $manager_id = User::where('user_id', Auth::user()->user_id)->pluck('manager_id')->first();
-                add_notifications('leave_applications','Leaves',$pending_leave_id,$manager_id,'Pending Leave Approval by Manager');
+                add_notifications('leave_applications','Leaves',$pending_leave_id,$manager_id,'Pending Leave Approval by Manager',$send_email);
+            }
+            if($approved_by_manager = 1){
+                $hr_user_id = User::where('role_id', 5)->pluck('user_id')->first();
+                add_notifications('leave_applications','Leaves',$pending_leave_id,$hr_user_id,'Pending Leave Approval by HR',$send_email);
             }
             $response['status'] = "Success";
             $response['result'] = "Added Successfully";
@@ -126,7 +131,6 @@ class LeaveApplicationController extends Controller
                 ['status','=',1], ['approved_by_manager','=', 1],
                 ['approved_by_hr','=', 1]
             ])->with('user')->get();
-
             $data['leave_lists_unapproved'] = LeaveApplication::where([
                 ['status', '=' ,1],
             ])->where(function($query) {
@@ -197,25 +201,45 @@ class LeaveApplicationController extends Controller
     {
         if (Auth::user()->role_id == 5) {
             $leave = LeaveApplication::where('leave_id', $request->id)->first();
-            AttendanceLog::where('user_id', $leave->added_by)
-                ->whereBetween('attendance_date', [$leave->from, $leave->to])
-                ->update(['applied_leave' => 1, 'on_leave' => 0, 'late' => 0, 'half_leave' => 0, 'absent' => 0]);
-            LeaveApplication::where('leave_id', $request->id)->update([
-                'approved_by_hr' => 1,
-            ]);
+            if($leave->leave_type_id == 4)
+            {
+                AttendanceLog::where('user_id', $leave->added_by)
+                    ->where('attendance_date', $leave->from)
+                    ->update(['applied_leave' => 0, 'on_leave' => 0, 'late' => 0, 'half_leave' => 1, 'absent' => 0]);
+                LeaveApplication::where('leave_id', $request->id)->update([
+                    'approved_by_hr' => 1,
+                ]);
+            }
+            else if($leave->leave_type_id == 5)
+            {
+                AttendanceLog::where('user_id', $leave->added_by)
+                    ->whereBetween('attendance_date', [$leave->from, $leave->to])
+                    ->update(['applied_leave' => 0, 'on_leave' => 0, 'late' => 0, 'half_leave' => 0, 'absent' => 1]);
+                LeaveApplication::where('leave_id', $request->id)->update([
+                    'approved_by_hr' => 1,
+                ]);
+            }
+             else {
+                 AttendanceLog::where('user_id', $leave->added_by)
+                     ->whereBetween('attendance_date', [$leave->from, $leave->to])
+                     ->update(['applied_leave' => 1, 'on_leave' => 0, 'late' => 0, 'half_leave' => 0, 'absent' => 0]);
+                 LeaveApplication::where('leave_id', $request->id)->update([
+                     'approved_by_hr' => 1,
+                 ]);
+             }
         }
         else {
             LeaveApplication::where('leave_id', $request->id)->update([
                 'approved_by_manager' => 1,
             ]);
+            $send_email = true;
             $hr_user_id = User::where('role_id', 5)->pluck('user_id')->first();
-            add_notifications('leave_applications','Leaves',$request->id,$hr_user_id,'Pending Leave Approval by HR');
+            add_notifications('leave_applications','Leaves',$request->id,$hr_user_id,'Pending Leave Approval by HR',$send_email);
         }
         $response['status'] = "Success";
         $response['result'] = "Application Accepted";
         return response()->json($response);
     }
-
     public function team_leave_form()
     {
         $data['page_title'] = "Team Leave Application Form - Atlantis BPO CRM";
@@ -224,7 +248,6 @@ class LeaveApplicationController extends Controller
         $data['leave'] = false;
         return view('leave_application.team_leave_form' , $data);
     }
-
     public function team_leave_save(Request $request)
     {
         $validator = Validator::make($request->all(),[
@@ -274,8 +297,9 @@ class LeaveApplicationController extends Controller
                 $new_leave_record_get = $leave->fresh();
                 $leave_id = $new_leave_record_get->leave_id;
             }
+            $send_email = true;
             $hr_user_id = User::where('role_id', 5)->pluck('user_id')->first();
-            add_notifications('leave_applications','Leaves',$leave_id,$hr_user_id,'Pending Leave Approval by HR');
+            add_notifications('leave_applications','Leaves',$leave_id,$hr_user_id,'Pending Leave Approval by HR',$send_email);
             $response['status'] = "Success";
             $response['result'] = "Added Successfully";
         } else {
@@ -284,7 +308,6 @@ class LeaveApplicationController extends Controller
         }
         return response()->json($response);
     }
-
     public function get_employee_leaves_bucket(Request $request){
         return get_leave_bucket_leaves($request->team_member_id);
     }

@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\AttendanceLog;
 use App\Models\Department;
 use App\Models\EmployeeObjectives;
@@ -57,9 +55,8 @@ class EmployeeAssessmentController extends Controller
             $data['EmployeeAssessment_SELF'] = EmployeeAssessment::with('employees')->where('user_id', Auth::user()->user_id)->get();
             $data['EmployeeAssessment'] = false;
         }
-      //  $data['self_assessment'] = false;
         $data['self_assessment'] = $this->self_assessment_button_enable();
-        return view('employee_assessment.index' , $data);
+        return view('employee_assessment.employee_assessment_list' , $data);
     }
     public function employee_assessment_form(Request $request)
     {
@@ -102,7 +99,6 @@ class EmployeeAssessmentController extends Controller
             $data['emp_manager_evaluation_standards'] = EvaluationStandards::where('assessment_id',$request->id)->get();
             $data['period'] = $period;
             $data['total_service'] = total_service($EmployeeAssessment->employees->joining_date, get_date());
-
             $data['previous_overall_ratings'] = [];
             $data['employee_previous_objectives'] = false;
             if(count($Previous_EmployeeAssessment) > 0 ){
@@ -194,7 +190,6 @@ class EmployeeAssessmentController extends Controller
                 if($Previous_EmployeeAssessment){
                     $confirmation_status = $Previous_EmployeeAssessment->confirmation_status;
                 }
-                //'employee_comments' => $request->employee_comments,
                 $EmployeeAssessment_data = [
                     'added_by' => Auth::user()->user_id,
                     'user_id' => $request->user_id,
@@ -262,12 +257,6 @@ class EmployeeAssessmentController extends Controller
                     $Leaves_Bucket_record = LeavesBucket::where('user_id',$user_id)->count();
                     if($Leaves_Bucket_record == 0 && ($employee_data->employment_status == 'Confirmed' || $request->employment_status == 'Confirmed')) {
                         generate_single_employee_leaves_bucket($request->user_id);
-//                        LeavesBucket::create(['user_id' => $request->user_id,
-//                            'start_date' => get_date(),
-//                            'annual_leaves' => 10,
-//                            'sick_leaves' => 5,
-//                            'casual_leaves' => 4
-//                        ]);
                     }
                 }
             }
@@ -280,13 +269,15 @@ class EmployeeAssessmentController extends Controller
             }
             if(isset($request->ESA_duties)) {
                 // NOTIFICATION TRAY
+                $send_email = false;
                 $manager_id = User::where('user_id', Auth::user()->user_id)->where('user_type','Employee')->pluck('manager_id')->first();
-                add_notifications('employee_assessments','Evaluation',$employee_assessment_id,$manager_id,'Pending Manager Evaluation');
+                add_notifications('employee_assessments','Evaluation',$employee_assessment_id,$manager_id,'Pending Manager Evaluation',$send_email);
             }
             if(isset($request->manager_comments)){
                 // Notification Tray
+                $send_email = false;
                 $hr_user_id = User::where('role_id', 5)->pluck('user_id')->first();
-                add_notifications('employee_assessments','Evaluation',$employee_assessment_id,$hr_user_id,'Pending HR Evaluation');
+                add_notifications('employee_assessments','Evaluation',$employee_assessment_id,$hr_user_id,'Pending HR Evaluation',$send_email);
             }
             // if admin is doing both manager and hr evaluations
             $employee_record = Employee::with('employee')->where('user_id', $user_id)->first();
@@ -297,7 +288,8 @@ class EmployeeAssessmentController extends Controller
                 }else if(isset($request->manager_comments)){
                     $remarker_id = $employee_record->employee->manager_id;
                     // NOTIFICATION TRAY
-                    add_notifications('employee_assessments','Evaluation',$employee_assessment_id,$HR_manager->user_id,'Pending HR Evaluation');
+                    $send_email = false;
+                    add_notifications('employee_assessments','Evaluation',$employee_assessment_id,$HR_manager->user_id,'Pending HR Evaluation',$send_email);
                 }
             }else{
                 $remarker_id = Auth::user()->user_id;
@@ -353,7 +345,6 @@ class EmployeeAssessmentController extends Controller
                 'user_id' => $user_id,
                 'remarker_id'  => $remarker_id
             ])->get();
-
             if(count($EvaluationStandards)>0){
                 EvaluationStandards::where('eval_id', $EvaluationStandards[0]->eval_id)->update($Eval_data);
             } else {
@@ -428,12 +419,18 @@ class EmployeeAssessmentController extends Controller
             if(get_month_diff($Previous_EmployeeAssessment->evaluation_date, get_date()) == 3) {
                 $self_assessment = true;
             }
-        }else if(!$incomplete_evaluation) {
+        } else if(!$incomplete_evaluation) {
             $employee_assessment_id = 0; //for first evaluation
             if(Auth::user()->user_type == 'Employee'){
                 $employees = Employee::where('user_id', Auth::user()->user_id)->first();
-                if (get_month_diff($employees->joining_date, get_date()) >= 3) {
-                    $self_assessment = true;
+                if($employees->confirmation_date == Null){
+                    if (get_month_diff($employees->joining_date, get_date()) >= 3) {
+                        $self_assessment = true;
+                    }
+                } else {
+                    if (get_month_diff($employees->confirmation_date, get_date()) >= 3) {
+                        $self_assessment = true;
+                    }
                 }
             }
         }
@@ -446,7 +443,8 @@ class EmployeeAssessmentController extends Controller
                     'user_id' => Auth::user()->user_id,
                 ])->first();
                 if(!$incomplete_evaluation && !$Notification_data ){
-                    add_notifications('employee_assessments','Evaluation',$employee_assessment_id,Auth::user()->user_id,'Pending Self Evaluation');
+                    $send_email = false;
+                    add_notifications('employee_assessments','Evaluation',$employee_assessment_id,Auth::user()->user_id,'Pending Self Evaluation',$send_email);
                 }
             }
         }
@@ -509,7 +507,6 @@ class EmployeeAssessmentController extends Controller
     public function get_attendance_log($form_date, $to_date, $user_id){
         $holiday_count = $this->check_holidays($form_date, $to_date);
         $working_days = working_days($form_date, $to_date);
-        //  dd($holiday_count, $working_days, $data['attendance_log']);
         $attendance_log = AttendanceLog::select(DB::raw('sum(late) as `lates`, sum(absent) as `absents`, sum(on_leave) as `leaves` , sum(half_leave) as `half_leaves` , count(user_id) as `attendance_marked` , MONTH(attendance_date) month'), 'user_id')
             ->where('user_id', $user_id)
             ->whereBetween('attendance_date', [$form_date, $to_date])

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\GroupChat;
-use App\Models\UserChats;
+use App\Models\UserChat;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use App\Models\CallRecording;
@@ -68,7 +68,7 @@ class ApiController extends Controller
 
 
     public function send_chat_msg(Request $request){
-        $msg = new UserChats();
+        $msg = new UserChat();
         $msg->to_user = $request->to_user;
         $msg->from_user = $request->from_user;
         $msg->msg = $request->msg;

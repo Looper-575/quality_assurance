@@ -26,9 +26,8 @@
                     <th title="Field #3">Email</th>
                     <th title="Field #4">Role</th>
                     <th title="Field #5">Vicidialer id</th>
-                    <th title="Field #6">Gender</th>
-                    <th title="Field #7">Address</th>
-                    <th title="Field #8">Contact</th>
+                    <th title="Field #6">Department</th>
+                    <th title="Field #7">Team</th>
                     <th title="Field #9">Manager</th>
                     <th title="Field #10">Action</th>
                 </tr>
@@ -41,9 +40,8 @@
                         <td>{{ $user_list->email }}</td>
                         <td>{{ $user_list->role->title }}</td>
                         <td>{{ $user_list->vicidialer_id ? $user_list->vicidialer_id : 'N/A' }}</td>
-                        <td>{{ $user_list->gender }}</td>
-                        <td>{{ $user_list->postal_address }}</td>
-                        <td>{{ $user_list->contact_number }}</td>
+                        <td>{{ $user_list->department->title??'' }}</td>
+                        <td>{{ $user_list->team_member->team->title??'' }}</td>
                         <td>{{ isset($user_list->manager->full_name) ? $user_list->manager->full_name : '' }}</td>
                         <td>
                             <div class="btn-group btn-group-sm">

@@ -30,7 +30,7 @@ class PayrollController extends Controller
     {
         $data['page_title'] = "Create Payroll - Atlantis BPO CRM";
         $data['users'] = User::has('employee')->where('user_type', 'Employee')->where('status', 1)->get();
-        return view('payroll.index', $data);
+        return view('payroll.create_payroll', $data);
     }
     public function payroll_details()
     {

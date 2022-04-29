@@ -53,6 +53,7 @@
                             <div class="m-stack__item m-topbar__nav-wrapper">
                                 <ul class="m-topbar__nav m-nav m-nav--inline">
                                     <li class="m-nav__item m-topbar__notifications m-topbar__notifications--img m-dropdown m-dropdown--large m-dropdown--header-bg-fill m-dropdown--arrow m-dropdown--align-center 	m-dropdown--mobile-full-width" m-dropdown-toggle="click" m-dropdown-persistent="1">
+                                        <span class="notification_icon d-flex justify-content-center align-items-center"></span>
                                         <a href="#" class="m-nav__link m-dropdown__toggle" id="m_topbar_notification_icon">
                                             <span class="m-nav__link-icon"><i class="flaticon-music-2"></i></span>
                                         </a>
@@ -188,6 +189,7 @@
         </div>
     </div>
 </div>
+@include('dashboard.partial.welcome_modal')
 <!--end::Modal-->
 <script>
     function change_password() {
@@ -198,14 +200,41 @@
         let arr = [a];
         call_ajax_with_functions('','{{route('change_pass')}}',data,arr);
     }
-    // function toggleAlert(){
-    //     $("#braodcast_alert").toggleClass('in out');
-    //     return false; // Keep close.bs.alert event from removing from DOM
-    // }
-
-    // document.addEventListener("DOMContentLoaded", function(event) {
-    //     // $("#btn").on("click", toggleAlert);
-    //     $('#braodcast_alert').on('close.bs.alert', toggleAlert)
-    // });
-
+    document.addEventListener("DOMContentLoaded", function(event) {
+        if(Cookies.get("isPopUpShown") == 'No'){
+            show_welcome_modal();
+            document.cookie = 'isPopUpShown' + '=' + 'Yes';
+        }
+    });
+    function show_welcome_modal(){
+        $.ajax({
+            type:'get',
+            url:"{{ route('show_welcome_modal') }}",
+            success: function( data ) {
+                console.log(data.user_birthday);
+                if(data.user_birthday == true){
+                    $(".modal-content").addClass("text-white");
+                    $('#welcome_message').html('Happy Birthday');
+                    $('#welcome_message').css("color","#ffffff");
+                    $('#emp_name').css({'color': '#F19868E1', 'font-size': '22px'});
+                    $('#welcome_note').css("margin-top","50px");
+                    $('#cap').removeClass('d-none');
+                    $('#cake').removeClass('d-none');
+                    $('#birthday_message').removeClass('d-none');
+                    $('#birthday_message').html("May your all Birthday wishes come true, except the illegal one's ;) Have a great day Today!");
+                    $("#welcome_modal_content").css("background-color","#7d38da");
+                }else{
+                    $('#welcome_message').css("color","#000000");
+                }
+                $('#notifications_count').html(data.notifications_count);
+                $('#unread_messages_count').html(data.unread_messages_count);
+                if(data.other_user_birthday.length > 0){
+                    $('#other_birthday').removeClass('d-none');
+                    let other_birthday_names = data.other_user_birthday.join(', ').replace(/,([^,]*)$/, ' and$1');
+                    $('#other_birthday_names').html(other_birthday_names);
+                }
+                $('#welcome_modal').modal('show');
+            }
+        });
+    }
 </script>
