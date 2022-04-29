@@ -22,4 +22,7 @@ Route::middleware(\App\Http\Middleware\ValidateApi::class)->group(function () {
     //Route::post('/call_connect', 'App\Http\Controllers\ApiController@call_connect')->name('call_connect_api');
     Route::get('/call_end', 'App\Http\Controllers\ApiController@call_end')->name('call_end_api');
     //Route::post('/call_end', 'App\Http\Controllers\ApiController@call_end')->name('call_end_api');
+
+    Route::post('/send_chat_msg', 'App\Http\Controllers\ApiController@send_chat_msg')->name('send_chat_msg');
+    Route::post('/send_group_msg', 'App\Http\Controllers\ApiController@send_group_msg')->name('send_group_msg');
 });

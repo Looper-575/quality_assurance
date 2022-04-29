@@ -36,99 +36,110 @@
             </div>
             <!-- END: Brand -->
             <div class="m-stack__item m-stack__item--fluid m-header-head" id="m_header_nav">
-                <!-- BEGIN: Horizontal Menu -->
-                <button class="m-aside-header-menu-mobile-close  m-aside-header-menu-mobile-close--skin-dark " id="m_aside_header_menu_mobile_close_btn">
-                    <i class="la la-close"></i>
-                </button>
-                <!-- BEGIN: Topbar -->
-                <div id="m_header_topbar" class="m-topbar  m-stack m-stack--ver m-stack--general">
-                    <div class="m-stack__item m-topbar__nav-wrapper">
-                        <ul class="m-topbar__nav m-nav m-nav--inline">
-                            <li class="m-nav__item m-topbar__notifications m-topbar__notifications--img m-dropdown m-dropdown--large m-dropdown--header-bg-fill m-dropdown--arrow m-dropdown--align-center 	m-dropdown--mobile-full-width" m-dropdown-toggle="click" m-dropdown-persistent="1">
-                                <a href="#" class="m-nav__link m-dropdown__toggle" id="m_topbar_notification_icon">
-                                    <span class="m-nav__link-icon"><i class="flaticon-music-2"></i></span>
-                                </a>
-                                @include('notifications.notifications')
-                            </li>
-                            <?php $user = Auth::user(); ?>
-                            <li class="m-nav__item m-topbar__user-profile m-topbar__user-profile--img  m-dropdown m-dropdown--medium m-dropdown--arrow m-dropdown--header-bg-fill m-dropdown--align-right m-dropdown--mobile-full-width m-dropdown--skin-light" m-dropdown-toggle="click">
-                                <a href="#" class="m-nav__link m-dropdown__toggle">
+                <div class="row">
+                    <div class="col-8 col-xxl-10">
+                        <div id="alerts-container">
+                            <div id="alerts-text" class="w-100 position-relative">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 col-xxl-2">
+                        <!-- BEGIN: Horizontal Menu -->
+                        <button class="m-aside-header-menu-mobile-close  m-aside-header-menu-mobile-close--skin-dark " id="m_aside_header_menu_mobile_close_btn">
+                            <i class="la la-close"></i>
+                        </button>
+                        <!-- BEGIN: Topbar -->
+                        <div id="m_header_topbar" class="m-topbar  m-stack m-stack--ver m-stack--general">
+                            <div class="m-stack__item m-topbar__nav-wrapper">
+                                <ul class="m-topbar__nav m-nav m-nav--inline">
+                                    <li class="m-nav__item m-topbar__notifications m-topbar__notifications--img m-dropdown m-dropdown--large m-dropdown--header-bg-fill m-dropdown--arrow m-dropdown--align-center 	m-dropdown--mobile-full-width" m-dropdown-toggle="click" m-dropdown-persistent="1">
+                                        <a href="#" class="m-nav__link m-dropdown__toggle" id="m_topbar_notification_icon">
+                                            <span class="m-nav__link-icon"><i class="flaticon-music-2"></i></span>
+                                        </a>
+                                        @include('notifications.notifications')
+                                    </li>
+                                    <?php $user = Auth::user(); ?>
+                                    <li class="m-nav__item m-topbar__user-profile m-topbar__user-profile--img  m-dropdown m-dropdown--medium m-dropdown--arrow m-dropdown--header-bg-fill m-dropdown--align-right m-dropdown--mobile-full-width m-dropdown--skin-light" m-dropdown-toggle="click">
+                                        <a href="#" class="m-nav__link m-dropdown__toggle">
                                     <span class="m-topbar__userpic">
                                         <img style="width: 41px; height: 41px; object-fit: cover;" src="{{(isset(Auth::user()->image) && !empty(Auth::user()->image))?asset('user_images/'.Auth::user()->image):asset('user_images/user.png')}}" class="m--img-rounded m--marginless m--img-centered" alt="{{Auth::user()->full_name}}"/>
                                     </span>
-                                    <span class="m-topbar__username m--hide">
+                                            <span class="m-topbar__username m--hide">
                                         {{Auth::user()->full_name}}
                                     </span>
-                                </a>
-                                <div class="m-dropdown__wrapper">
-                                    <span class="m-dropdown__arrow m-dropdown__arrow--right m-dropdown__arrow--adjust"></span>
-                                    <div class="m-dropdown__inner">
-                                        <div class="m-dropdown__header m--align-center" style="background: url({{asset('assets/app/media/img/misc/user_profile_bg.jpg')}}); background-size: cover;">
-                                            <div class="m-card-user m-card-user--skin-dark position-relative">
-                                                <div class="m-card-user__pic">
-                                                    <img style="width: 70px; height: 70px; object-fit: cover;" src="{{(isset(Auth::user()->image) && !empty(Auth::user()->image))?asset('user_images/'.Auth::user()->image):asset('user_images/user.png')}}" class="m--img-rounded m--marginless m--img-centered" alt="{{Auth::user()->full_name}}"/>
-                                                </div>
-                                                <div class="m-card-user__details">
+                                        </a>
+                                        <div class="m-dropdown__wrapper">
+                                            <span class="m-dropdown__arrow m-dropdown__arrow--right m-dropdown__arrow--adjust"></span>
+                                            <div class="m-dropdown__inner">
+                                                <div class="m-dropdown__header m--align-center" style="background: url({{asset('assets/app/media/img/misc/user_profile_bg.jpg')}}); background-size: cover;">
+                                                    <div class="m-card-user m-card-user--skin-dark position-relative">
+                                                        <div class="m-card-user__pic">
+                                                            <img style="width: 70px; height: 70px; object-fit: cover;" src="{{(isset(Auth::user()->image) && !empty(Auth::user()->image))?asset('user_images/'.Auth::user()->image):asset('user_images/user.png')}}" class="m--img-rounded m--marginless m--img-centered" alt="{{Auth::user()->full_name}}"/>
+                                                        </div>
+                                                        <div class="m-card-user__details">
                                                     <span class="m-card-user__name m--font-weight-500">
                                                         {{$user->full_name}}
                                                     </span>
-                                                    <a href="" class="m-card-user__email m--font-weight-300 m-link">
-                                                        {{$user->email}}
-                                                    </a>
+                                                            <a href="" class="m-card-user__email m--font-weight-300 m-link">
+                                                                {{$user->email}}
+                                                            </a>
+                                                        </div>
+                                                        @php $employee_id = get_employee_id(Auth::user()->user_id) @endphp
+                                                        @if(Auth::user()->user_type == 'Employee')
+                                                            @if($employee_id != 0)
+                                                                <div class="m-card-user__edit position-absolute">
+                                                                    <a href="{{route('employee_data_view',['employee_id' => $employee_id])}}" id="{{$employee_id}}" class="btn btn-info">
+                                                                        <i class="la la-edit"></i>
+                                                                    </a>
+                                                                </div>
+                                                            @else
+                                                                <div class="m-card-user__edit position-absolute">
+                                                                    <a href="{{route('employee_form')}}" id="{{$employee_id}}" class="btn btn-info">
+                                                                        <i class="la la-edit"></i>
+                                                                    </a>
+                                                                </div>
+                                                            @endif
+                                                        @endif
+                                                    </div>
                                                 </div>
-                                                @php $employee_id = get_employee_id(Auth::user()->user_id) @endphp
-                                                @if(Auth::user()->user_type == 'Employee')
-                                                    @if($employee_id != 0)
-                                                        <div class="m-card-user__edit position-absolute">
-                                                            <a href="{{route('employee_data_view',['employee_id' => $employee_id])}}" id="{{$employee_id}}" class="btn btn-info">
-                                                                <i class="la la-edit"></i>
-                                                            </a>
-                                                        </div>
-                                                    @else
-                                                        <div class="m-card-user__edit position-absolute">
-                                                            <a href="{{route('employee_form')}}" id="{{$employee_id}}" class="btn btn-info">
-                                                                <i class="la la-edit"></i>
-                                                            </a>
-                                                        </div>
-                                                    @endif
-                                                @endif
+                                                <div class="m-dropdown__body">
+                                                    <div class="m-dropdown__content">
+                                                        <ul class="m-nav m-nav--skin-light">
+                                                            <li class="m-nav__section m--hide">
+                                                                <span class="m-nav__section-text">Section</span>
+                                                            </li>
+                                                            <li class="m-nav__separator m-nav__separator--fit"></li>
+                                                            <li class="m-nav__item">
+                                                                <button type="button" class="btn m-btn--pill btn-info m-btn m-btn--label-brand m-btn--bolder" data-toggle="modal" data-target="#change_password" value="{{Auth::user()->user_id}}">
+                                                                    Change Password
+                                                                </button>
+                                                                <a href="{{route('logout')}}" class="float-right btn m-btn--pill btn-danger m-btn m-btn--label-brand m-btn--bolder">
+                                                                    Logout
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="m-dropdown__body">
-                                            <div class="m-dropdown__content">
-                                                <ul class="m-nav m-nav--skin-light">
-                                                    <li class="m-nav__section m--hide">
-                                                        <span class="m-nav__section-text">Section</span>
-                                                    </li>
-                                                    <li class="m-nav__separator m-nav__separator--fit"></li>
-                                                    <li class="m-nav__item">
-                                                        <button type="button" class="btn m-btn--pill btn-info m-btn m-btn--label-brand m-btn--bolder" data-toggle="modal" data-target="#change_password" value="{{Auth::user()->user_id}}">
-                                                            Change Password
-                                                        </button>
-                                                        <a href="{{route('logout')}}" class="float-right btn m-btn--pill btn-danger m-btn m-btn--label-brand m-btn--bolder">
-                                                            Logout
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                            <li id="m_quick_sidebar_toggle" class="m-nav__item">
-                                <a href="#" class="m-nav__link m-dropdown__toggle">
-                                    <span class="m-nav__link-icon"><i class="flaticon-grid-menu"></i></span>
-                                </a>
-                            </li>
-                            {{--                            <li id="chat_sidebar_toggler" class="m-nav__item">--}}
-                            {{--                                <a href="javascript:toggle_chat();" class="m-nav__link m-dropdown__toggle">--}}
-                            {{--                                    <span class="m-nav__link-icon"><i class="flaticon-chat-1"></i></span>--}}
-                            {{--                                </a>--}}
-                            {{--                            </li>--}}
-                        </ul>
+                                    </li>
+                                    <li id="m_quick_sidebar_toggle" class="m-nav__item">
+                                        <a href="#" class="m-nav__link m-dropdown__toggle">
+                                            <span class="m-nav__link-icon"><i class="flaticon-grid-menu"></i></span>
+                                        </a>
+                                    </li>
+                                    <li id="chat_sidebar_toggler" class="m-nav__item position-relative">
+                                        <span class="chat_sidebar_unread d-flex justify-content-center align-items-center"></span>
+                                        <a href="javascript:toggle_chat();" class="m-nav__link m-dropdown__toggle">
+                                            <span class="m-nav__link-icon"><i class="flaticon-chat-1"></i></span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- END: Topbar -->
                     </div>
                 </div>
-                <!-- END: Topbar -->
             </div>
         </div>
     </div>
@@ -147,7 +158,7 @@
             <div class="modal-body">
                 <form id="change_pass" action="javascript:change_password();" method="POST">
                     @csrf
-                    <input type="hidden" name="user_id" value="{{Auth::user()->user_id}}">
+                    <input type="hidden" name="user_id" id="c_user_id" value="{{Auth::user()->user_id}}">
                     <div class="row">
                         <div class="col-6">
                             <div class="form-group">
@@ -187,4 +198,14 @@
         let arr = [a];
         call_ajax_with_functions('','{{route('change_pass')}}',data,arr);
     }
+    // function toggleAlert(){
+    //     $("#braodcast_alert").toggleClass('in out');
+    //     return false; // Keep close.bs.alert event from removing from DOM
+    // }
+
+    // document.addEventListener("DOMContentLoaded", function(event) {
+    //     // $("#btn").on("click", toggleAlert);
+    //     $('#braodcast_alert').on('close.bs.alert', toggleAlert)
+    // });
+
 </script>

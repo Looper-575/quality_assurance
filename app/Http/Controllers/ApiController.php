@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\GroupChat;
+use App\Models\UserChats;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use App\Models\CallRecording;
 use Illuminate\Http\Request;
@@ -62,4 +65,65 @@ class ApiController extends Controller
         }
         return $response;
     }
+
+
+    public function send_chat_msg(Request $request){
+        $msg = new UserChats();
+        $msg->to_user = $request->to_user;
+        $msg->from_user = $request->from_user;
+        $msg->msg = $request->msg;
+        $current = Carbon::now()->format('YmdHms');
+        $files = [];
+        if($request->hasfile('chat_file'))
+        {
+            $i =1;
+            foreach($request->file('chat_file') as $file)
+            {
+                $name= $current.'_'.$i.'.'.$file->getClientOriginalExtension();
+                $file->move(public_path('chat_files'), $name);
+                $files[] = $name;
+                $i++;
+            }
+        }
+        $msg->attachment = implode(',',$files);
+        $msg->added_by = $request->from_user;
+        $msg->save();
+
+
+
+//        $response['chat_id'] = $msg->id;
+//        $response['to_user'] = $request->to_user;
+//        $response['from_user'] = $request->from_user;
+//        $response['msg'] = $request->msg;
+//        $response['attachment'] = implode(',',$files);
+//        $response['status'] = 'Success';
+//        $response['result'] = 'Sent Successfully';
+        return $msg->chat_id;
+    }
+
+
+    public function send_group_msg(Request $request){
+        $msg = new GroupChat();
+        $msg->from_user = $request->from_user;
+        $msg->group_id = $request->group_id;
+        $msg->msg = $request->group_msg;
+        $current = Carbon::now()->format('YmdHms');
+        $files = [];
+        if($request->hasfile('group_chat_file'))
+        {
+            $i =1;
+            foreach($request->file('group_chat_file') as $file)
+            {
+                $name= $current.'_'.$i.'.'.$file->getClientOriginalExtension();
+                $file->move(public_path('chat_files'), $name);
+                $files[] = $name;
+                $i++;
+            }
+        }
+        $msg->attachment = implode(',',$files);
+        $msg->save();
+
+        return $msg->group_chat_id;
+    }
+
 }
