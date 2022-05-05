@@ -25,9 +25,9 @@
             </div>
             <div class="m-accordion__item-body collapse" id="m_section_1_content_2_body{{$note->note_id}}" role="tabpanel" aria-labelledby="m_section_1_content_2_head{{$note->note_id}}" data-parent="#m_section_1_content{{$note->note_id}}">
                 <div class="m-accordion__item-content">
-                    <p>
-                        {{$note->description}}
-                    </p>
+
+                        {!!$note->description!!}
+
                 </div>
             </div>
         </div>

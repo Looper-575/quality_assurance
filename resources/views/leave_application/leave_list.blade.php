@@ -75,27 +75,21 @@
                                     <td>{{$leave_list->reason }}</td>
                                     <td>{{$leave_list->approved_by_manager == NULL ? 'Pending' :( $leave_list->approved_by_manager == 1 ? 'Approved' : 'Not Approved')}}</td>
                                     <td>{{$leave_list->approved_by_hr == NULL ? 'Pending' :( $leave_list->approved_by_hr == 1 ? 'Approved' : 'Not Approved')}}</td>
-
+                                    <td>
                                     @if(Auth::user()->role_id == $manager_id && $leave_list->approved_by_manager == NULL && $leave_list->added_by != Auth::user()->user_id )
-                                        <td>
                                             <div class="btn-group btn-group-sm">
                                                 <button title="Reject" class="btn btn-danger p-3"  onclick="reject_application(this);" value="{{$leave_list->leave_id}}"><i class="fa fa-times"></i></button>
                                                 <button title="Approve" class="btn btn-success p-3" onclick="approve_application(this);" value="{{$leave_list->leave_id}}"><i class="fa fa-check"></i></button>
                                             </div>
-                                        </td>
                                     @elseif(Auth::user()->role_id == 5)
                                         @if($leave_list->approved_by_hr == NULL && $leave_list->approved_by_manager != NULL)
-                                            <td>
                                                 <div class="btn-group btn-group-sm">
                                                     <button title="Reject" class="btn btn-danger p-3" onclick="reject_application(this);" value="{{$leave_list->leave_id}}"><i class="fa fa-times"></i></button>
                                                     <button title="Approve" class="btn btn-success p-3" onclick="approve_application(this);" value="{{$leave_list->leave_id}}"><i class="fa fa-check"></i></button>
                                                 </div>
-                                            </td>
                                         @endif
                                     @endif
-
                                     @if(Auth::user()->user_id == $leave_list->added_by && ($leave_list->approved_by_manager == NULL && $leave_list->approved_by_hr == NULL))
-                                        <td>
                                             <div class="btn-group btn-group-sm">
                                                 @if($has_permissions->update == 1)
                                                     <a href="{{route('leave_form_edit',$leave_list->leave_id)}}" title="Edit"  class="edit_application btn btn-primary p-3" ><i class="fa fa-edit"></i></a>
@@ -104,18 +98,15 @@
                                                     <button title="Delete" class="btn btn-danger p-3" onclick="delete_leave(this);" value="{{$leave_list->leave_id}}">
                                                         <i class="fa fa-trash"></i>
                                                     </button>
-
                                                 @endif
                                             </div>
-                                        </td>
                                     @endif
                                     @if(Auth::user()->role_id == 1)
-                                        <td>
                                             <button title="Delete" class="btn btn-danger p-3" onclick="delete_leave(this);" value="{{$leave_list->leave_id}}">
                                                 <i class="fa fa-trash"></i>
                                             </button>
-                                        </td>
                                     @endif
+                                    </td>
                                 </tr>
                             @endforeach
                             </tbody>

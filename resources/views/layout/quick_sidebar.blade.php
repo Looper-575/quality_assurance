@@ -1,4 +1,11 @@
 <!-- begin::Quick Sidebar -->
+
+<style>
+    .note-editor.note-frame .note-editing-area .note-editable{
+        height: 200px;
+        padding: 30px !important;
+    }
+</style>
 <div id="m_quick_sidebar" class="of-hide m-quick-sidebar m-quick-sidebar--tabbed m-quick-sidebar--skin-light">
     <div class="m-quick-sidebar__content m--hide">
         <span id="m_quick_sidebar_close" class="m-quick-sidebar__close">
@@ -58,7 +65,10 @@
                     <div id="note_div_id">
                         <input type="hidden" name="note_id" id="note_list_edit_id">
                         <input type="text" name="title" placeholder="Title" class="form-control my-2" id="note_title_id" required>
-                        <textarea name="description" id="discription_id" placeholder="Description" class="form-control" rows="10" required></textarea>
+                        <div class="summernote" id="discription_id">
+
+                        </div>
+{{--                        <textarea name="description" id="discription_id" placeholder="Description" class="form-control" rows="10" required></textarea>--}}
                         <button type="submit" id="btn_check" title="Save Note" class="btn btn-success btn-social mb-2 m-btn m-btn--icon m-btn--icon-only float-right">
                             <i class="la la-check"></i>
                         </button>
@@ -71,6 +81,10 @@
     </div>
 </div>
 <!-- end::Quick Sidebar -->
+<link href="{{asset('assets/vendors/base/vendors.bundle.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{asset('assets/demo/default/base/style.bundle.css')}}" rel="stylesheet" type="text/css" />
+<link href="summernote-bs5.css" rel="stylesheet">
+<script src="summernote-bs5.js"></script>
 <script type="text/javascript">
     function hide_note_form() {
         var form = document.getElementById("note_div_id");
@@ -162,7 +176,7 @@
             type:'get',
             url:"{{ route('get_pending_todos') }}",
             success: function( msg ) {
-                document.getElementById('todo_list_id').innerHTML = msg;
+                document.getElementById('todo_list_id').innerHTML =htmlspecialchars(msg);
             }
         });
     }
@@ -174,7 +188,9 @@
             type:'get',
             url:"{{ route('get_note_data') }}",
             success: function( msg ) {
-                document.getElementById('note_list_id').innerHTML = msg;
+                document.getElementById('note_list_id').innerHTML =  msg;
+                console.log(msg);
+
             }
         });
     }
@@ -186,7 +202,8 @@
                 if(resp.draft_notes){
                     $('#note_list_edit_id').val(resp.draft_notes.note_id);
                     $('#note_title_id').val(resp.draft_notes.title);
-                    $('#discription_id').val(resp.draft_notes.description);
+                    $('#discription_id').siblings('.note-editor').find('.note-editable').html(resp.draft_notes.description);
+                   // $('#discription_id').val(resp.draft_notes.description);
                 }
             }
         });
@@ -227,13 +244,15 @@
             success: function( resp ) {
                 document.getElementById('note_list_edit_id').value = resp.data.note_id;
                 document.getElementById('note_title_id').value = resp.data.title;
-                document.getElementById('discription_id').value = resp.data.description;
+                $('#discription_id').siblings('.note-editor').find('.note-editable').html(resp.data.description);
+                //document.getElementById('discription_id').value = resp.data.description;
                 document.getElementById('note_form').scrollIntoView();
                 show_note_form();
             }
         });
     }
     document.addEventListener("DOMContentLoaded", function(event) {
+        $('.summernote').summernote();
         get_pendiing_todos();
         get_done_todos();
         remove_scroller();
@@ -258,10 +277,13 @@
             let data = new FormData(this);
             data.append('type', type);
             data.append('status', '1');
+            data.append('description', $('#discription_id').siblings('.note-editor').find('.note-editable').html());
+
             let a = function(){
                 document.getElementById('note_list_edit_id').value = '';
                 document.getElementById('note_title_id').value = '';
-                document.getElementById('discription_id').value = '';
+                //document.getElementById('discription_id').value = '';
+                $('#discription_id').siblings('.note-editor').find('.note-editable').html('');
             };
             let arr = [a];
             call_ajax_with_functions('note_list_id','{{route('save_note_form')}}',data,arr);
