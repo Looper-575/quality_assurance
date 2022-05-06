@@ -184,7 +184,7 @@ class EmployeeController extends Controller
             <input data-response="Success" type="hidden" id="employee_id" value="<?=$employee->employee_id?>">
             <?php
         } else{
-            $response['status'] = 'failure';
+            $response['status']= 'failure';
             $response['result'] = $validator->errors()->toJson();
             return response()->json($response);
         }

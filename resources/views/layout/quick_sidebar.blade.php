@@ -176,7 +176,7 @@
             type:'get',
             url:"{{ route('get_pending_todos') }}",
             success: function( msg ) {
-                document.getElementById('todo_list_id').innerHTML =htmlspecialchars(msg);
+                document.getElementById('todo_list_id').innerHTML =msg;
             }
         });
     }

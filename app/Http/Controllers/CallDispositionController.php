@@ -197,7 +197,8 @@ class CallDispositionController extends Controller
                     $call_disp->services_sold = $services_sold;
                     $call_disp->save();
                     $customer_id=0;
-                    if($request->has('new_customer')){
+                    $customer_data = Customers::where('email',$request->email)->first();
+                    if(!$customer_data){
                         $customer = new Customers();
                         $customer->name = $request->customer_name;
                         $customer->disposition_id =  $call_disp->call_id;
@@ -208,9 +209,11 @@ class CallDispositionController extends Controller
                         $customer->added_by = Auth::user()->user_id;
                         $customer->save();
                         $customer_id = $customer->customer_id;
+                        $customer_data = Customers::where('email',$request->email)->first();
+                    }else{
+                        $customer_id = $customer_data->customer_id;
                     }
-                    $customer_data = Customers::where('email',$request->email)->first();
-                    $customer_id = $customer_data->customer_id;
+
                     if($request->has('new_number')){
                         if( $customer_data->alternate_numbers){
                             $numbers = explode(',',$customer_data->alternate_numbers);

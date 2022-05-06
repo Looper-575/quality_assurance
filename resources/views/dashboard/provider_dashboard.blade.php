@@ -845,6 +845,53 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-6">
+            <!--begin::Portlet-->
+            <div class="m-portlet m-portlet--tab">
+                <div class="m-portlet__head">
+                    <div class="m-portlet__head-caption">
+                        <div class="m-portlet__head-title">
+												<span class="m-portlet__head-icon m--hide">
+													<i class="la la-gear"></i>
+												</span>
+                            <h3 class="m-portlet__head-text">
+                                SPECTRUM INTERNET AND MOBILE RATIO DAILY
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="m-portlet__body">
+                    <div id="piechart_3d_daily" style="width: 100%; height: 500px;"></div>
+                </div>
+            </div>
+            <!--end::Portlet-->
+        </div>
+        <div class="col-6">
+            <!--begin::Portlet-->
+            <div class="m-portlet m-portlet--tab">
+                <div class="m-portlet__head">
+                    <div class="m-portlet__head-caption">
+                        <div class="m-portlet__head-title">
+												<span class="m-portlet__head-icon m--hide">
+													<i class="la la-gear"></i>
+												</span>
+                            <h3 class="m-portlet__head-text">
+                                SPECTRUM INTERNET AND MOBILE RATIO MONTHLY
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="m-portlet__body">
+                    <div id="piechart_3d" style="width: 100%; height: 500px;"></div>
+                </div>
+            </div>
+            <!--end::Portlet-->
+        </div>
+    </div>
+
+
+
 {{--    <div class="daily sales_container">--}}
 {{--        <div class="sale_boxes">--}}
 {{--            <div class="sale_boxe_row1 daily-sales" id="daily_sales">--}}
@@ -1267,12 +1314,38 @@
     <!--Begin::Section-->
     <!--end::Portlet-->
 
-
+    <?php
+    foreach($providers_monthly as $provider){
+        if($provider->provider_name == 'spectrum'){
+            $spectrum = $provider;
+        }
+    }
+    foreach($providers_daily as $provider){
+        if($provider->provider_name == 'spectrum'){
+            $spectrum_daily = $provider;
+        }
+    }
+    ?>
 @endsection
 
 
 @section('footer_scripts')
+    <!-- Page Specific JS File -->
+    <script src="https://www.google.com/jsapi" type="text/javascript"></script>
+    {{--//GOOGLE CHART--}}
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script>
+        google.charts.load('current', {'packages':['corechart','bar'],});
+        google.charts.setOnLoadCallback(drawChart);
+
+        let spectrum = <?php
+            if(isset($spectrum)){
+                print_r(json_encode($spectrum));
+            }else echo 0;?>;
+        let spectrum_daily = <?php
+            if(isset($spectrum_daily)){
+                print_r(json_encode($spectrum_daily));
+            }else echo 0;?>;
 
         $('#sales_type').change(function() {
             if($(this).val() == "all"){
@@ -1305,7 +1378,36 @@
             var reports_state = localStorage.getItem("reports_state");
             $('#sales_type').val(reports_state);
             $('#sales_type').trigger('change');
+
         });
+        function drawChart() {
+            // PIE CHART
+            var dt = google.visualization.arrayToDataTable([
+                ['Service', 'Sales per month'],
+                ['Mobile: '+parseInt(spectrum['mobile']),  parseInt(spectrum['mobile']) ],
+                ['Internet: '+ parseInt(spectrum['internet']),  (parseInt(spectrum['internet']) - parseInt(spectrum['mobile']))]
+            ]);
+            var pie_options = {
+                title: 'Total : '+(parseInt(spectrum['mobile']) + parseInt(spectrum['internet'])),
+                is3D: true,
+            };
+            var pie_chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
+            pie_chart.draw(dt, pie_options);
+
+
+            // PIE CHART DAILY
+            var dt = google.visualization.arrayToDataTable([
+                ['Service', 'Sales per month'],
+                ['Mobile: '+parseInt(spectrum_daily['mobile']),  parseInt(spectrum_daily['mobile']) ],
+                ['Internet: '+ parseInt(spectrum_daily['internet']),  parseInt(spectrum_daily['internet'])]
+            ]);
+            var pie_options = {
+                title: 'Total : '+(parseInt(spectrum_daily['mobile']) + parseInt(spectrum_daily['internet'])),
+                is3D: true,
+            };
+            var pie_chart = new google.visualization.PieChart(document.getElementById('piechart_3d_daily'));
+            pie_chart.draw(dt, pie_options);
+        }
     </script>
 
 @endsection

@@ -523,9 +523,10 @@ class PayrollController extends Controller
     }
     private function calculate_deductions($user)
     {
-        $fixed_deduction = PayrollDeductionSetting::select(DB::raw('sum(value) as fixed_deduction'))
-            ->where('type', 'other')
+        $fixed_deduction_before_tax = PayrollDeductionSetting::select(DB::raw('sum(value) as fixed_deduction_before_tax'))
+            ->where('type' , 'other')
             ->where('criteria', 'Fixed')
+            ->where('before_tax', 1)
             ->where(function ($query) use($user) {
                 return $query->where('department_id', $user->department_id)
                     ->orWhere('department_id',0);
@@ -535,21 +536,55 @@ class PayrollController extends Controller
                     ->orWhere('role_id',0);
             })
             ->whereStatus(1)->get();
-        $fixed_deduction = $fixed_deduction[0]['fixed_deduction'];
-        $pct_deduction = PayrollDeductionSetting::select(DB::raw('sum(value) as pct_deduction'))
+        $fixed_deduction_before_tax = $fixed_deduction_before_tax[0]['fixed_deduction_before_tax'];
+
+        $fixed_deduction_after_tax = PayrollDeductionSetting::select(DB::raw('sum(value) as fixed_deduction_after_tax'))
+            ->where('type', 'other')
+            ->where('criteria', 'Fixed')
+            ->where('before_tax', 0)
+            ->where(function ($query) use($user) {
+                return $query->where('department_id', $user->department_id)
+                    ->orWhere('department_id',0);
+            })
+            ->where(function ($query1) use($user) {
+                return $query1->whereRaw('FIND_IN_SET("'.$user->role_id.'",role_id)')
+                    ->orWhere('role_id',0);
+            })
+            ->whereStatus(1)->get();
+
+        $fixed_deduction_after_tax = $fixed_deduction_after_tax[0]['fixed_deduction_after_tax'];
+        $pct_deduction_before_tax  = PayrollDeductionSetting::select(DB::raw('sum(value) as pct_deduction_before_tax'))
             ->where('type', 'other')
             ->where('criteria', 'Percentage')
             ->where(function ($query2) use($user) {
                 return $query2->where('department_id', $user->department_id)
                     ->orWhere('department_id',0);
             })
+            ->where('before_tax', 1)
             ->where(function ($query3) use($user) {
                 return $query3->whereRaw('FIND_IN_SET("'.$user->role_id.'",role_id)')
                     ->orWhere('role_id',0);
             })
             ->whereStatus(1)->get();
-        $pct_deduction = $user->net_salary *  $pct_deduction[0]['pct_deduction'] / 100;
-        return $fixed_deduction + $pct_deduction;
+        $pct_deduction_before_tax = $user->net_salary *  $pct_deduction_before_tax[0]['pct_deduction_before_tax'] / 100;
+        $pct_deduction_after_tax = PayrollDeductionSetting::select(DB::raw('sum(value) as pct_deduction_after_tax'))
+            ->where('type', 'other')
+            ->where('criteria', 'Percentage')
+            ->where(function ($query2) use($user) {
+                return $query2->where('department_id', $user->department_id)
+                    ->orWhere('department_id',0);
+            })
+            ->where('before_tax', 0)
+            ->where(function ($query3) use($user) {
+                return $query3->whereRaw('FIND_IN_SET("'.$user->role_id.'",role_id)')
+                    ->orWhere('role_id',0);
+            })
+            ->whereStatus(1)->get();
+        $pct_deduction_after_tax = $user->net_salary *  $pct_deduction_after_tax[0]['pct_deduction_after_tax'] / 100;
+        return [
+            'before_tax_deduction' => $pct_deduction_before_tax+$fixed_deduction_before_tax,
+            'after_tax_deduction' => $pct_deduction_after_tax+$fixed_deduction_after_tax,
+        ];
     }
     private function employee_deduction($user, $attendace_log, $allowance, $working_days, $holiday_count)
     {
@@ -605,17 +640,16 @@ class PayrollController extends Controller
             $convenience_deduction = 0;
         }
         $calculated_deductions = $this->calculate_deductions($user);
-
-        $before_tax_deduction = $unmarked_days_wage+$convenience_deduction+$calculated_deductions+$total_absents_deduction;
+        $attendance_log_deduction = $unmarked_days_wage+$convenience_deduction+$total_absents_deduction;
         // calculating tax
-        $tax_deduction_val = $this->calculate_income_tax($user, $allowance, $before_tax_deduction);
+        $tax_deduction_val = $this->calculate_income_tax($user, $allowance, $attendance_log_deduction, $calculated_deductions);
         if($tax_deduction_val != 0){
             $deduction_details[$tax_deduction_val] = 'Income Tax';
         }
-        $total_deductions =  $tax_deduction_val +  $before_tax_deduction;
+        $total_deductions =  $tax_deduction_val +  $attendance_log_deduction;
 
         return [
-            'total_deductions' => $total_deductions,
+            'total_deductions' => $total_deductions + $calculated_deductions['after_tax_deduction'],
             'deduction_bucket' => $leaves_deducted_from_bucket,
             'details' => $deduction_details,
             'leaves_of_late' => $late_absents,
@@ -780,13 +814,16 @@ class PayrollController extends Controller
             'details' => $details
         ];
     }
-    private function calculate_income_tax($user, $allowance, $deduction)
+    private function calculate_income_tax($user, $allowance, $deduction, $calculated_deductions)
     {
         if(!$user->net_salary) { die('Salary not available for employee '.$user->full_name); }
         // basic salary plus all allowances and minus all deductions
-        $salary = ($user->net_salary + $allowance) - $deduction;
+        $basic_salary = $user->net_salary;
         // total salary minus medical allowance 10%
-        $salary = ($salary)-(($salary*10)/100);
+        $salary = ($basic_salary)-(($basic_salary*10)/100);
+
+         $calculated_deductions['before_tax_deduction'];
+         $salary = ($salary + $allowance) - ($deduction + $calculated_deductions['before_tax_deduction']);
         $annul_salary = $salary*12;
         $tax_deduction = PayrollTaxSlab::whereStatus(1)
             ->where(function ($query) use ($annul_salary) {

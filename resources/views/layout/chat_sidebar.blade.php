@@ -5,21 +5,21 @@
             <i class="la la-close"></i>
         </span>
         <ul id="m_quick_sidebar_tabs" class="nav mb-1 nav-tabs m-tabs m-tabs-line m-tabs-line--brand" role="tablist">
-            <li class="nav-item m-tabs__item chat_single_tab_nav position-relative">
+            <li class="nav-item m-tabs__item chat_single_tab_nav position-relative ">
                 <span class="chat_single_unread d-flex justify-content-center align-items-center"></span>
-                <a class="nav-link m-tabs__link" data-toggle="tab" href="#one_two_one_chat_tab" role="tab">
-                    One To One Chats
+                <a class="nav-link m-tabs__link active" data-toggle="tab" href="#one_two_one_chat_tab" role="tab">
+                    <i style="font-size: 25px;" title="One To One Chats" class="fas fa-user"></i>
                 </a>
             </li>
             <li class="nav-item m-tabs__item chat_group_tab_nav position-relative">
                 <span class="chat_group_unread d-flex justify-content-center align-items-center"></span>
                 <a class="nav-link m-tabs__link get_groups_nav" data-toggle="tab" href="#group_chat_tab" role="tab">
-                    Groups
+                    <i style="font-size: 25px;" title="Groups" class="fas fa-users"></i>
                 </a>
             </li>
             <li class="nav-item m-tabs__item">
                 <a class="nav-link m-tabs__link position-relative">
-                    <i class="fa fa-search" id="search_bar"></i>
+                    <i style="font-size: 25px;" class="fa fa-search" id="search_bar"></i>
                     <div class="togglesearch">
                         <input type="text" placeholder="Type to search" id="user_search" class="form-control"/>
                     </div>
@@ -213,6 +213,7 @@
                                         <label class="form-check-label" for="users_select">Users</label><br>
                                         <select class="form-control select2" name="users[]" id="users_select" multiple="multiple" required>
                                             <option value=""> Select Users </option>
+                                            <option value="all">All Users</option>
                                             @foreach($users as $user)
                                                 <option value="{{$user->user_id}}"> {{$user->full_name}} </option>
                                             @endforeach
@@ -312,14 +313,10 @@
     </div>
 </div>
 <!--end::Modal-->
-
 @section('footer_srcipts')
     <script src="{{asset('assets/bundles/select2/dist/js/select2.full.min.js') }}" defer></script>
 @endsection
-
-<!-- end::Quick Sidebar -->
 <script src="{{asset('assets/bundles/select2/dist/js/select2.full.min.js') }}" defer></script>
-{{--<script src="{{asset('assets/js/siofu_client.js')}}"></script>--}}
 <script src="{{asset('assets/js/socket.io.min.js')}}"></script>
 <script src="{{asset('assets/js/emoji_keyboard.js') }}"></script>
 
@@ -447,7 +444,6 @@
         $('#active_chat_user_img').attr('src',$(me).find('.user_img').attr('src'));
         //animate to top
         $('#user_id_'+chat_active_user_id).fadeOut().prependTo('#chat_user_list_container').fadeIn();
-        // $("#chat_user_list_container").prepend($('#user_id_'+chat_active_user_id));
         socket.emit('get_one_to_one_chats', data);
         $("#chat_form input, #chat_form select").attr('disabled',false);
         maximize_chat('one_two_one_chat_tab');
@@ -591,7 +587,6 @@
             $('.chat_sidebar_unread,.chat_single_unread,.chat_group_unread').removeClass('unread');
         }
     }
-
     function forward_msg(me){
         let msg_id = $(me).parent().parent().attr('data-forward');
         $('#forward_message_modal').find('#selected_msg_id').val(msg_id);
@@ -601,7 +596,6 @@
         let users = $('.forward_to_users:checkbox:checked');
         let forwarded_msg_id = $('#selected_msg_id').val();
         let arr = $.map($(users), function(c){return c.value; })
-        // console.log(forwarded_msg_id,arr);
         let data = { "from_user": {{$user_id}},"to_users": arr,"forwarded_msg_id": forwarded_msg_id};
         socket.emit('forwarded_msg', data);
         $('#forward_message_modal').modal('hide');
@@ -611,7 +605,6 @@
         let msg = $(me).parent().parent().attr('data-reply');
         let msg_div = $(reply_msg_div);
         $(msg_div).attr('data-id',msg_id).attr('data-msg',msg);
-
         if(msg.indexOf('http') >= 0) {
             $(msg_div).find('.reply_msg_text').remove();
             $(msg_div).find('p').append('<img onclick="ShowLargeImage(this)" class="chat_attachment" src="'+msg+'" alt="chat Img" />');
@@ -638,12 +631,10 @@
         socket.emit('user_online', {{$user_id}});
         // getting online users
         socket.on('online_users', (online_users) => {
-            console.log(online_users);
             sync_online_users(online_users.users);
         });
         // if any user gets offline
         socket.on('user_offline', (user_offline) => {
-            console.log(user_offline);
             sync_offline_user(user_offline);
         });
 
@@ -1113,7 +1104,6 @@
             data.append('api_token', api_token);
             call_ajax_with_functions(resp_div, route, data,call_back);
         }
-
         //Send Chat MSG
         $(document).on('keypress',function(e) {
             if(e.which == 13) {
@@ -1205,7 +1195,6 @@
                 scrollToBottom = false;
             }
         })
-
         $('#users_select').select2({
             placeholder: "Select User",
             width: '100%'
@@ -1222,7 +1211,6 @@
             let arr = [a];
             call_ajax_with_functions('', '{{route('create_group')}}',formData,arr);
         });
-
         $('body').on('click', '.modal-overlay', function () {
             $(".togglesearch").fadeOut();
             $('.modal-overlay, .modal-img').remove();
@@ -1231,29 +1219,48 @@
             $(".togglesearch").fadeOut();
         });
 
-        $("#search_bar").click(function() {
+        $("#search_bar").click(function(e) {
+            e.stopPropagation();
             $(".togglesearch").toggle();
-            $("input[type='text']").focus();
+            $("#user_search").focus();
+        });
+        $("#user_search").click(function(e){
+            e.stopPropagation();
         });
         $("#user_search").on("keyup", function() {
             var value = $(this).val().toLowerCase();
             if($('#one_two_one_chat_tab').hasClass('active')){
-                $("#chat_user_list_container .m-widget4__item *").filter(function() {
-                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                $("#chat_user_list_container .m-widget4__item").each(function(){
+                    let user_name  =  $(this).find('.m-widget4__title').html();
+                    if(user_name.toLowerCase().includes(value)){
+                        $(this).addClass('d-flex');
+                        $(this).removeClass('d-none');
+                    }
+                    else{
+                        $(this).addClass('d-none');
+                        $(this).removeClass('d-flex');
+                    }
                 });
             }
             else{
-                $("#group_list_div .m-widget4__item").filter(function() {
-                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                $("#group_list_div .m-widget4__item").each(function(){
+
+                    let user_name  =  $(this).find('.m-widget4__title').html();
+                    if(user_name.includes(value)){
+                        $(this).addClass('d-flex');
+                        $(this).removeClass('d-none');
+                    }
+                    else{
+                        $(this).addClass('d-none');
+                        $(this).removeClass('d-flex');
+                    }
                 });
             }
         });
-
         $("#chat_form input, #chat_form select").attr('disabled',true);
         $("#group_chat_form input, #group_chat_form select").attr('disabled',true);
 
         $('[data-toggle="tooltip"]').tooltip();
-
         // Right Click on Message Recieved Options
         var $contextMenu = $("#contextMenu");
         $("body").on("contextmenu", "#chat_window .m-messenger__wrapper_recieved .m-messenger__message-body", function(e) {
@@ -1273,7 +1280,6 @@
             });
             return false;
         });
-
 // Right Click on Message Recieved Options
         var $contextMenu = $("#contextMenu");
         $("body").on("contextmenu", "#group_chat_window .m-messenger__wrapper_recieved .m-messenger__message-body", function(e) {
@@ -1293,12 +1299,9 @@
             });
             return false;
         });
-
-
         $('html').click(function() {
             $contextMenu.hide();
         });
-
         var emojiKeyboard =new EmojiKeyboard;
         emojiKeyboard.default_placeholder ="Search Emoji...";
         let output;
@@ -1313,37 +1316,20 @@
         emojiKeyboard.callback = (emoji, closed) => {
             output.value += emoji.emoji;
         };
-
         // Remove reply msg div
         $(document).on('click', '.close_reply_msg_div', function(){
             $('#reply_msg_div').remove();
         });
-
-
         //Updating Unread Count
         update_unread_count();
-
     });
     //Dom Ready ENd
-
-
-
     function ShowLargeImage(me) {
         let url = $(me).attr('src');
-
         $('#chat_image_modal').find('.modal_img_view').attr('src',url);
         $('#chat_image_modal').modal('show');
-
-
-
-
-        // $('body').append('<div class="modal-overlay" style="z-index:99;"><div class="modal-img"><img src="' + url + '" /></div></div>');
-        // $('.modal-img').animate({
-        //     opacity: 1
-        // },1000);
     }
     function sync_online_users(data) {
-        console.log(data);
         for(let i=0; i<data.length; i++){
             if(data[i]) {
                 $('#user_id_'+i).removeClass('chat_offline');
@@ -1431,7 +1417,6 @@
         position: absolute;
         border-radius: 50%;
     }
-
     .maximize_btn{
         bottom: 20px;
         right: 20px;
