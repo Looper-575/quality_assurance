@@ -961,6 +961,16 @@
                         let files = item.attachment.split(',');
                         msg_div = show_attachment_in_chat_msg(files, msg_div);
                     }
+                    if(item.referenced != null){
+                        if(item.reply_msg != null) {
+                            msg_div.find('.send_reply_para').html(item.reply_msg);
+                        }
+                        if(item.reply_attachment != null) {
+                            msg_div.find('.send_reply_para').prepend('<img onclick="ShowLargeImage(this)" class="chat_attachment" src="'+'{{asset('chat_files')}}/'+item.reply_attachment+'" alt="chat Img" />');
+                        }
+                    } else {
+                        msg_div.find('.send_reply_para').remove();
+                    }
                     $('#group_chat_window').append(msg_div.html());
 
                 } else if (active_group_id == item.group_id) {
@@ -975,6 +985,16 @@
                     if(item.attachment != null){
                         let files = item.attachment.split(',');
                         msg_div = show_attachment_in_chat_msg(files, msg_div);
+                    }
+                    if(item.referenced != null){
+                        if(item.reply_msg != null) {
+                            msg_div.find('.recieve_reply_para').html(item.reply_msg);
+                        }
+                        if(item.reply_attachment != null) {
+                            msg_div.find('.recieve_reply_para').prepend('<img onclick="ShowLargeImage(this)" class="chat_attachment" src="'+'{{asset('chat_files')}}/'+item.reply_attachment+'" alt="chat Img" />');
+                        }
+                    } else {
+                        msg_div.find('.recieve_reply_para').remove();
                     }
                     msg_div.find('img').attr('src',item.user_image ? '/crm/public/user_images/'+ item.user_image : '/crm/public/user_images/user.png');
                     msg_div.find('.sender_name').html(item.full_name);
@@ -1012,6 +1032,17 @@
                             msg_div.find('.message-text_send').html(item.msg);
                             msg_div.find('.msg_time').html(item.dateTime);
                         }
+                        if(item.referenced != null){
+                            if(item.reply_msg != null) {
+                                msg_div.find('.send_reply_para').html(item.reply_msg);
+                            }
+                            if(item.reply_attachment != null) {
+                                msg_div.find('.send_reply_para').prepend('<img onclick="ShowLargeImage(this)" class="chat_attachment" src="'+'{{asset('chat_files')}}/'+item.reply_attachment+'" alt="chat Img" />');
+                            }
+                        } else{
+                            msg_div.find('.send_reply_para').remove();
+                        }
+
                         if(item.attachment != null){
                             let files = item.attachment.split(',');
                             $.each(files, function (key, file) {
@@ -1023,7 +1054,6 @@
                                 }
                             });
                         }
-                        msg_div.find('.send_reply_para').remove();
                         $('#group_chat_window').prepend(msg_div.html());
                     } else if (item.group_id == active_group_id) {
                         //message recieve
@@ -1034,6 +1064,16 @@
                             msg_div.find('.message-text_recieved').html(item.msg);
                             msg_div.find('.sender_name').html(item.full_name);
                             msg_div.find('.msg_time').html(item.dateTime);
+                        }
+                        if(item.referenced != null){
+                            if(item.reply_msg != null) {
+                                msg_div.find('.recieve_reply_para').html(item.reply_msg);
+                            }
+                            if(item.reply_attachment != null) {
+                                msg_div.find('.recieve_reply_para').prepend('<img onclick="ShowLargeImage(this)" class="chat_attachment" src="'+'{{asset('chat_files')}}/'+item.reply_attachment+'" alt="chat Img" />');
+                            }
+                        } else {
+                            msg_div.find('.recieve_reply_para').remove();
                         }
                         msg_div.find('img').attr('src',item.user_image ? '/crm/public/user_images/'+ item.user_image : '/crm/public/user_images/user.png');
                         if(item.attachment != null){
@@ -1047,7 +1087,7 @@
                                 }
                             });
                         }
-                        msg_div.find('.recieve_reply_para').remove();
+                        msg_div.find('.m-messenger__wrapper_recieved').attr('data-id',item.group_chat_id);
                         $('#group_chat_window').prepend(msg_div.html());
                     }
                     if(scrollToBottom = true){
@@ -1131,8 +1171,15 @@
                             let arr = [a,b];
                             send_file(files, '{{route('send_group_msg')}}', 'group_chat_form', arr, 'resp_div_img', 'group_id', active_group_id);
                         } else {
-                            let data = { "from_user": {{$user_id}},"group_id": active_group_id,"msg": msg};
-                            socket.emit('send_group_msg', data);
+
+                            if($('#reply_msg_div').length){
+                                let data = {"from_user": {{$user_id}},"group_id": active_group_id,"msg": msg,"referenced": $('#reply_msg_div').data('id')};
+                                socket.emit('send_group_msg', data);
+                            } else {
+                                let data = { "from_user": {{$user_id}},"group_id": active_group_id,"msg": msg};
+                                socket.emit('send_group_msg', data);
+                            }
+
                             $('#group_msg').val('');
                         }
                     } else {
@@ -1226,6 +1273,28 @@
             });
             return false;
         });
+
+// Right Click on Message Recieved Options
+        var $contextMenu = $("#contextMenu");
+        $("body").on("contextmenu", "#group_chat_window .m-messenger__wrapper_recieved .m-messenger__message-body", function(e) {
+            $('#contextMenu').removeAttr('data-reply');
+            $('#contextMenu').removeAttr('data-forward');
+            let msg_id = e.target.parentNode.parentElement.parentElement.dataset.id;
+            $contextMenu.attr('data-forward',msg_id);
+            if(e.target.attributes.src){
+                $contextMenu.attr('data-reply',e.target.attributes.src.textContent);
+            }else{
+                $contextMenu.attr('data-reply',e.target.innerHTML);
+            }
+            $contextMenu.css({
+                display: "block",
+                left: e.pageX,
+                top: e.pageY
+            });
+            return false;
+        });
+
+
         $('html').click(function() {
             $contextMenu.hide();
         });
