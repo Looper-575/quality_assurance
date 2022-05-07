@@ -1,4 +1,46 @@
-<div class="table-responsive">
+
+<div class="mt-4">
+
+<table class="table table-bordered  table-striped text-center">
+    <tr>
+        <th colspan="2">Total Sales</th>
+        <th colspan="2">Total RGU</th>
+        </tr>
+    <tr>
+        <td colspan="2">
+            {{($total->single_play +$total->double_play + $total->triple_play + $total->quad_play) ?? 0}}
+        </td>
+        <td colspan="2">
+            {{($total->single_play + ($total->double_play *2 ) + ($total->triple_play*3) + ($total->quad_play*4)) ?? 0}}
+        </td>
+    </tr>
+    <tr>
+        <th>Single Play</th>
+        <th>Double Play</th>
+        <th>Triple Play</th>
+        <th>Quad Play</th>
+    </tr>
+    <tr>
+        <td>{{$total->single_play ?? 0 }}</td>
+        <td>{{$total->double_play ?? 0 }}</td>
+        <td>{{$total->triple_play ?? 0}}</td>
+        <td>{{$total->quad_play ?? 0  }}</td>
+    </tr>
+    <tr>
+        <th>Internet</th>
+        <th>Cable</th>
+        <th>Phone</th>
+        <th>Mobile</th>
+    </tr>
+    <tr>
+        <td>{{$total->internet ?? 0}}</td>
+        <td>{{$total->cable ?? 0 }}</td>
+        <td>{{$total->phone ?? 0}}</td>
+        <td>{{$total->mobile ?? 0}}</td>
+    </tr>
+</table>
+</div>
+<div class="table-responsive mt-4">
     <table class="table table-striped" id="reports_table">
         <thead>
         <tr>

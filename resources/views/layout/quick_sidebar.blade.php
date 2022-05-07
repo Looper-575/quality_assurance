@@ -1,5 +1,4 @@
 <!-- begin::Quick Sidebar -->
-
 <style>
     .note-editor.note-frame .note-editing-area .note-editable{
         height: 200px;
@@ -68,7 +67,6 @@
                         <div class="summernote" id="discription_id">
 
                         </div>
-{{--                        <textarea name="description" id="discription_id" placeholder="Description" class="form-control" rows="10" required></textarea>--}}
                         <button type="submit" id="btn_check" title="Save Note" class="btn btn-success btn-social mb-2 m-btn m-btn--icon m-btn--icon-only float-right">
                             <i class="la la-check"></i>
                         </button>
@@ -81,10 +79,6 @@
     </div>
 </div>
 <!-- end::Quick Sidebar -->
-<link href="{{asset('assets/vendors/base/vendors.bundle.css')}}" rel="stylesheet" type="text/css" />
-<link href="{{asset('assets/demo/default/base/style.bundle.css')}}" rel="stylesheet" type="text/css" />
-<link href="summernote-bs5.css" rel="stylesheet">
-<script src="summernote-bs5.js"></script>
 <script type="text/javascript">
     function hide_note_form() {
         var form = document.getElementById("note_div_id");
@@ -189,8 +183,6 @@
             url:"{{ route('get_note_data') }}",
             success: function( msg ) {
                 document.getElementById('note_list_id').innerHTML =  msg;
-                console.log(msg);
-
             }
         });
     }
@@ -203,7 +195,6 @@
                     $('#note_list_edit_id').val(resp.draft_notes.note_id);
                     $('#note_title_id').val(resp.draft_notes.title);
                     $('#discription_id').siblings('.note-editor').find('.note-editable').html(resp.draft_notes.description);
-                   // $('#discription_id').val(resp.draft_notes.description);
                 }
             }
         });
@@ -245,7 +236,6 @@
                 document.getElementById('note_list_edit_id').value = resp.data.note_id;
                 document.getElementById('note_title_id').value = resp.data.title;
                 $('#discription_id').siblings('.note-editor').find('.note-editable').html(resp.data.description);
-                //document.getElementById('discription_id').value = resp.data.description;
                 document.getElementById('note_form').scrollIntoView();
                 show_note_form();
             }
@@ -278,26 +268,23 @@
             data.append('type', type);
             data.append('status', '1');
             data.append('description', $('#discription_id').siblings('.note-editor').find('.note-editable').html());
-
             let a = function(){
                 document.getElementById('note_list_edit_id').value = '';
                 document.getElementById('note_title_id').value = '';
-                //document.getElementById('discription_id').value = '';
                 $('#discription_id').siblings('.note-editor').find('.note-editable').html('');
             };
             let arr = [a];
             call_ajax_with_functions('note_list_id','{{route('save_note_form')}}',data,arr);
         });
-        $('#discription_id').keyup(function (e) {
+        $('#discription_id').siblings('.note-editor').find('.note-editable').on('DOMSubtreeModified',function () {
             if($('#note_title_id').val() == ''){
-                alert("Note title is required");
                 return;
             }
             let data = { _token: "{{ csrf_token()}}",
                 note_id: $('#note_list_edit_id').val(),
                 type: 'note',
                 title: $('#note_title_id').val(),
-                discription: $('#discription_id').val(),
+                discription: $('#discription_id').siblings('.note-editor').find('.note-editable').html(),
                 status: 3
             };
             $.ajax({

@@ -161,11 +161,17 @@ class AttendanceController extends Controller
     }
     public function check_back_date_attendance(Request $request)
     {
+        $team = Team::where('team_id', $request->team_id)->with('team_member')->first();
+        $members = [];
+        foreach ($team->team_member as $member){
+            $members[] = $member->user_id;
+        }
+        array_push($members, $team->team_lead_id);
         $date_today = date("Y-m-d"  ,strtotime($request->attendance_date));
         $data['not_marked'] = false;
-        if(date('N', strtotime($date_today)) < 6){
-            $data['agents'] =  AttendanceLog::with('user')->where('attendance_date', $date_today)->where('added_by', $request->manager_id)->get();
-            if(count($data['agents']) == 0){
+        if(date('N', strtotime($date_today)) < 6) {
+            $data['agents'] =  AttendanceLog::with('user')->where('attendance_date', $date_today)->whereIn('user_id', $members)->get();
+            if(count($data['agents']) == 0) {
                 $data['not_marked'] = true;
             }
         } else {

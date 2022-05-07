@@ -18,11 +18,13 @@
         });
     </script>
     <link href="{{asset('assets/css/all.min.css')}}" rel="stylesheet" type="text/css"/>
+
     <link href="{{asset('assets/css/vendors.bundle.css')}}" rel="stylesheet" type="text/css" />
     <link href="{{asset('assets/css/style.bundle.css')}}" rel="stylesheet" type="text/css" />
     <!--end::Base Styles -->
     <link rel="stylesheet" href="{{asset('assets/css/style.css')}}">
     <link href="{{asset('assets/css/box_style.css')}}" rel="stylesheet" type="text/css"/>
+    <link href="{{asset('assets/vendors/base/vendors.bundle.css')}}" rel="stylesheet" type="text/css" />
     <link href="{{asset('assets/css/custom.css')}}" rel="stylesheet" type="text/css" />
     <link href="{{asset('assets/css/custom_2.css')}}" rel="stylesheet" type="text/css" />
     <link rel="shortcut icon" href="{{asset('favicon.ico')}}" />
