@@ -25,7 +25,7 @@ class LeavesBucketController extends Controller
         if(Auth::user()->role_id == 5){
             $data['is_hr'] = true;
         }
-        return view('leaves_bucket.index' , $data);
+        return view('leaves_bucket.leaves_bucket_list' , $data);
     }
     public function leaves_bucket_form(Request $request){
         $data['page_title'] = "Leaves Bucket Form - Atlantis BPO CRM";
@@ -88,6 +88,7 @@ class LeavesBucketController extends Controller
         }else{
             $data['leaves_bucket'] = false;
         }
+        $data['remaining_leaves'] = get_leave_bucket_leaves($request->user_id);
         return view('leaves_bucket.view_leaves_bucket', $data);
     }
 }

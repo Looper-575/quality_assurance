@@ -23,44 +23,48 @@
                         </div>
                     </div>
                     <div class="m-portlet__body">
-                        <div class="form-group m-form__group row">
-                            <label class="col-lg-6">
-                                Employee Name:
-                            </label>
-                            <div class="col-lg-6">
-                                <span>{{ $leaves_bucket->employee->full_name }}</span>
+                        <div class="row">
+                            <div class="col-6 pr-5">
+                                <label class="">
+                                    Employee Name:
+                                </label>
+                                <span class="float-right">{{ $leaves_bucket->employee->full_name }}</span>
+                            </div>
+                            <div class="col-6 pl-5">
+                                <label class="">
+                                    Start Date:
+                                </label>
+                                <span class="float-right">{{ $leaves_bucket->start_date }}</span>
                             </div>
                         </div>
-                        <div class="form-group m-form__group row">
-                            <label class="col-lg-6">
-                                Start Date:
-                            </label>
-                            <div class="col-lg-6">
-                                <span>{{ $leaves_bucket->start_date }}</span>
-                            </div>
-                        </div>
-                        <div class="form-group m-form__group row">
-                            <label class="col-lg-6">
-                                Annual Leaves Count:
-                            </label>
-                            <div class="col-lg-6">
+                        <h4>Total Leaves</h4>
+                        <div class="row mt-3 pl-5">
+                            <div class="col-4">
+                                <label for="">Annual Leaves Count: </label>
                                 <span>{{ $leaves_bucket->annual_leaves }}</span>
                             </div>
-                        </div>
-                        <div class="form-group m-form__group row">
-                            <label class="col-lg-6">
-                                Sick Leaves Count:
-                            </label>
-                            <div class="col-lg-6">
+                            <div class="col-4">
+                                <label for="">Sick Leaves Count: </label>
                                 <span>{{ $leaves_bucket->sick_leaves }}</span>
                             </div>
-                        </div>
-                        <div class="form-group m-form__group row">
-                            <label class="col-lg-6">
-                                Casual Leaves Count:
-                            </label>
-                            <div class="col-lg-6">
+                            <div class="col-4">
+                                <label for="">Casual Leaves Count: </label>
                                 <span>{{ $leaves_bucket->casual_leaves }}</span>
+                            </div>
+                        </div>
+                        <h4>Remaining Leaves</h4>
+                        <div class="row mt-3 pl-5">
+                            <div class="col-4">
+                                <label for="">Annual Leaves Count: </label>
+                                <span>{{ $remaining_leaves['remaining_annual'] }}</span>
+                            </div>
+                            <div class="col-4">
+                                <label for="">Sick Leaves Count: </label>
+                                <span>{{ $remaining_leaves['remaining_sick'] }}</span>
+                            </div>
+                            <div class="col-4">
+                                <label for="">Casual Leaves Count: </label>
+                                <span>{{ $remaining_leaves['remaining_casual'] }}</span>
                             </div>
                         </div>
                     </div>
