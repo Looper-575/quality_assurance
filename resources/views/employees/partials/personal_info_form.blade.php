@@ -93,12 +93,12 @@
                                     <label for="gender">* Gender</label>
                                     <div class="m-radio-inline">
                                         <label class="m-radio m-radio--solid m-radio--brand">
-                                            <input type="radio" name="gender" value="Male" {{($employee and $employee->gender == 'Male')? 'checked' : ''}} class="form-control">
+                                            <input type="radio" name="gender" value="Male" required {{($employee and $employee->gender == 'Male')? 'checked' : ''}} class="form-control">
                                             Male
                                             <span></span>
                                         </label>
                                         <label class="m-radio m-radio--solid m-radio--brand">
-                                            <input type="radio" name="gender" value="Female" {{($employee and $employee->gender == 'Female')? 'checked' : ''}} class="form-control">
+                                            <input type="radio" name="gender" value="Female" required {{($employee and $employee->gender == 'Female')? 'checked' : ''}} class="form-control">
                                             Female
                                             <span></span>
                                         </label>
@@ -110,22 +110,22 @@
                                     <label for="marital_status">* Maritial Status</label>
                                     <div class="m-radio-inline">
                                         <label class="m-radio m-radio--solid m-radio--brand">
-                                            <input type="radio" name="marital_status" value="Single" {{($employee and $employee->marital_status == 'Single')? 'checked' : ''}} class="form-control">
+                                            <input type="radio" name="marital_status" value="Single" required {{($employee and $employee->marital_status == 'Single')? 'checked' : ''}} class="form-control">
                                             Single
                                             <span></span>
                                         </label>
                                         <label class="m-radio m-radio--solid m-radio--brand">
-                                            <input type="radio" name="marital_status" value="Married" {{($employee and $employee->marital_status == 'Married')? 'checked' : ''}} class="form-control">
+                                            <input type="radio" name="marital_status" value="Married" required {{($employee and $employee->marital_status == 'Married')? 'checked' : ''}} class="form-control">
                                             Married
                                             <span></span>
                                         </label>
                                         <label class="m-radio m-radio--solid m-radio--brand">
-                                            <input type="radio" name="marital_status" value="Widowed" {{($employee and $employee->marital_status == 'Widowed')? 'checked' : ''}} class="form-control">
+                                            <input type="radio" name="marital_status" value="Widowed" required {{($employee and $employee->marital_status == 'Widowed')? 'checked' : ''}} class="form-control">
                                             Widowed
                                             <span></span>
                                         </label>
                                         <label class="m-radio m-radio--solid m-radio--brand">
-                                            <input type="radio" name="marital_status" value="Divorced" {{($employee and $employee->marital_status == 'Divorced')? 'checked' : ''}}  class="form-control">
+                                            <input type="radio" name="marital_status" value="Divorced" required {{($employee and $employee->marital_status == 'Divorced')? 'checked' : ''}}  class="form-control">
                                             Divorced
                                             <span></span>
                                         </label>
@@ -229,13 +229,13 @@
                     <div class="col-3">
                         <div class="form-group m-form__group">
                             <label for="cnic">* CNIC</label>
-                            <input name="cnic" value="{{$employee ? $employee->cnic : ''}}" required type="text" pattern="[0-9]{5}[0-9]{7}[0-9]{1}" class="form-control">
+                            <input name="cnic" value="{{$employee ? $employee->cnic : ''}}" required type="text" title="CNIC must be exactly of 13 characters." pattern="[0-9]{5}[0-9]{7}[0-9]{1}" class="form-control">
                         </div>
                     </div>
                     <div class="col-3">
                         <div class="form-group m-form__group">
                             <label for="father_cnic">* Father CNIC</label>
-                            <input name="father_cnic" value="{{$employee ? $employee->father_cnic : ''}}" id="father_cnic" type="text" pattern="[0-9]{5}[0-9]{7}[0-9]{1}" class="form-control">
+                            <input name="father_cnic" value="{{$employee ? $employee->father_cnic : ''}}" id="father_cnic" type="text" title="CNIC must be exactly of 13 characters." pattern="[0-9]{5}[0-9]{7}[0-9]{1}" class="form-control">
                         </div>
                     </div>
                 </div>
@@ -250,7 +250,12 @@
                     <div class="col-3">
                         <div class="form-group m-form__group">
                             <label for="religion">* Religion</label>
-                            <input name="religion" value="{{$employee ? $employee->religion : ''}}" required type="text" class="form-control">
+{{--                            <input name="religion" value="{{$employee ? $employee->religion : ''}}" required type="text" class="form-control">--}}
+                            <select class="form-control" name="religion" id="religion" required >
+                                <option value="">Select</option>
+                                    <option {{ ($employee && $employee->religion == 'MUSLIM') ? 'selected' : ''}} value="MUSLIM">MUSLIM</option>
+                                    <option {{ ($employee && $employee->religion == 'NON MUSLIM') ? 'selected' : ''}} value="NON MUSLIM">NON MUSLIM</option>
+                            </select>
                         </div>
                     </div>
                     <div class="col-3">

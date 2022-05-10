@@ -97,7 +97,6 @@ class ReportController extends Controller
     }
     public function generate_did_report(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
             'from' => 'required',
             'to' => 'required',
@@ -116,10 +115,25 @@ class ReportController extends Controller
                     $data['call_disp_lists'] = CallDisposition::select('*')->with(['qa_status','qa_assessment'])
                         ->whereIn('did_id', explode(',',Auth::user()->vendor_did_id))->where($where)
                         ->where([['added_on', '>=', $date_from],['added_on', '<=', $date_to]])->get();
+
+                    $data['total'] =  DB::table('call_dispositions')
+                        ->join('call_dispositions_services', 'call_dispositions.call_id', '=', 'call_dispositions_services.call_id')
+                        ->select(DB::raw('SUM(call_dispositions_services.mobile) as mobile,SUM(call_dispositions_services.internet) as internet,SUM(call_dispositions_services.cable) as cable,SUM(call_dispositions_services.phone) as phone,SUM(call_dispositions_services.mobile + call_dispositions_services.internet + call_dispositions_services.phone +call_dispositions_services.cable ) As total_sales ,count(case when call_dispositions.services_sold = "1" then 1 else null end) as single_play, count(case when call_dispositions.services_sold = "2" then 1 else null end) as double_play, count(case when call_dispositions.services_sold = "3" then 1 else null end) as triple_play, count(case when call_dispositions.services_sold = "4" then 1 else null end) as quad_play'))
+                        ->where('call_dispositions.status',1)
+                        ->whereIn('did_id', explode(',',Auth::user()->vendor_did_id))
+                        ->where([['call_dispositions.added_on', '>=', $date_from],['call_dispositions.added_on', '<=', $date_to]])->first();
+
                 } else {
                     $data['call_disp_lists'] = CallDisposition::select('*')->with(['qa_status','qa_assessment'])
                         ->whereIn('did_id', $request->did_id)->where($where)
                         ->where([['added_on', '>=', $date_from],['added_on', '<=', $date_to]])->get();
+
+                    $data['total'] =  DB::table('call_dispositions')
+                        ->join('call_dispositions_services', 'call_dispositions.call_id', '=', 'call_dispositions_services.call_id')
+                        ->select(DB::raw('SUM(call_dispositions_services.mobile) as mobile,SUM(call_dispositions_services.internet) as internet,SUM(call_dispositions_services.cable) as cable,SUM(call_dispositions_services.phone) as phone,SUM(call_dispositions_services.mobile + call_dispositions_services.internet + call_dispositions_services.phone +call_dispositions_services.cable ) As total_sales ,count(case when call_dispositions.services_sold = "1" then 1 else null end) as single_play, count(case when call_dispositions.services_sold = "2" then 1 else null end) as double_play, count(case when call_dispositions.services_sold = "3" then 1 else null end) as triple_play, count(case when call_dispositions.services_sold = "4" then 1 else null end) as quad_play'))
+                        ->where('call_dispositions.status',1)
+                        ->whereIn('did_id', $request->did_id)
+                        ->where([['call_dispositions.added_on', '>=', $date_from],['call_dispositions.added_on', '<=', $date_to]])->first();
                 }
                 return view('reports.partials.lead_report_list', $data);
             }
@@ -127,10 +141,23 @@ class ReportController extends Controller
                 $data['call_disp_lists'] = CallDisposition::select('*')->with(['qa_status','qa_assessment'])
                     ->where($where)
                     ->where([['added_on', '>=', $date_from],['added_on', '<=', $date_to]])->get();
+
+                $data['total'] =  DB::table('call_dispositions')
+                    ->join('call_dispositions_services', 'call_dispositions.call_id', '=', 'call_dispositions_services.call_id')
+                    ->select(DB::raw('SUM(call_dispositions_services.mobile) as mobile,SUM(call_dispositions_services.internet) as internet,SUM(call_dispositions_services.cable) as cable,SUM(call_dispositions_services.phone) as phone,SUM(call_dispositions_services.mobile + call_dispositions_services.internet + call_dispositions_services.phone +call_dispositions_services.cable ) As total_sales ,count(case when call_dispositions.services_sold = "1" then 1 else null end) as single_play, count(case when call_dispositions.services_sold = "2" then 1 else null end) as double_play, count(case when call_dispositions.services_sold = "3" then 1 else null end) as triple_play, count(case when call_dispositions.services_sold = "4" then 1 else null end) as quad_play'))
+                    ->where('call_dispositions.status',1)
+                    ->where([['call_dispositions.added_on', '>=', $date_from],['call_dispositions.added_on', '<=', $date_to]])->first();
             } else {
                 $data['call_disp_lists'] = CallDisposition::select('*')->with(['qa_status','qa_assessment'])
                     ->whereIn('did_id', $request->did_id)->where($where)
                     ->where([['added_on', '>=', $date_from],['added_on', '<=', $date_to]])->get();
+
+                $data['total'] =  DB::table('call_dispositions')
+                    ->join('call_dispositions_services', 'call_dispositions.call_id', '=', 'call_dispositions_services.call_id')
+                    ->select(DB::raw('SUM(call_dispositions_services.mobile) as mobile,SUM(call_dispositions_services.internet) as internet,SUM(call_dispositions_services.cable) as cable,SUM(call_dispositions_services.phone) as phone,SUM(call_dispositions_services.mobile + call_dispositions_services.internet + call_dispositions_services.phone +call_dispositions_services.cable ) As total_sales ,count(case when call_dispositions.services_sold = "1" then 1 else null end) as single_play, count(case when call_dispositions.services_sold = "2" then 1 else null end) as double_play, count(case when call_dispositions.services_sold = "3" then 1 else null end) as triple_play, count(case when call_dispositions.services_sold = "4" then 1 else null end) as quad_play'))
+                    ->where('call_dispositions.status',1)
+                    ->whereIn('did_id', $request->did_id)
+                    ->where([['call_dispositions.added_on', '>=', $date_from],['call_dispositions.added_on', '<=', $date_to]])->first();
             }
         } else {
             $response['status'] = "Failure!";

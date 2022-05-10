@@ -116,9 +116,6 @@
              <div class="col-12 col-sm-6 col-md-3 col-lg-3 py-3 text-center" >
                  <div class="rounded-circle profile_user_img_div mb-2" >
                      <img src="{{$image_src}}" alt="" class="rounded-circle profile_user_img">
-{{--                     <span class="rounded-circle icon-upload">--}}
-{{--                    <button class="btn p-2 pt-1 pb-1" style="color: white"><i class="fa fa-upload" ></i></button>--}}
-                </span>
                  </div>
                  <div class="name_and_designation">
                      <span class="p-12 c-gray">{{$employee->full_name}}</span><br>
@@ -421,23 +418,6 @@
                         @endforeach
                     @endif
                 </table>
-{{--                <table class="training_and_hobbies_table" style="width:25%;margin-right: 50px;">--}}
-{{--                    <tr>--}}
-{{--                        <th scope="col">Hobbies & Interset</th>--}}
-{{--                    </tr>--}}
-{{--                    <tr>--}}
-{{--                        <td class="px-4">Mark</td>--}}
-{{--                    </tr>--}}
-{{--                    <tr>--}}
-{{--                        <td class="px-4">Mark</td>--}}
-{{--                    </tr>--}}
-{{--                    <tr>--}}
-{{--                        <td class="px-4">Mark</td>--}}
-{{--                    </tr>--}}
-{{--                    <tr>--}}
-{{--                        <td class="px-4">Mark</td>--}}
-{{--                    </tr>--}}
-{{--                </table>--}}
             </div>
         </div>
          {{--  Uploaded Documents --}}

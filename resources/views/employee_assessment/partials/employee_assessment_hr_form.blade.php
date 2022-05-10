@@ -106,15 +106,15 @@
     </div>
     <div class="col-4">
         <div class="form-group m-form__group">
-            <label for="probation_extension_months"><b>* Probation Extension Months:</b> </label>
-            <input name="probation_extension_months" value="{{$EmployeeAssessment ? $EmployeeAssessment->probation_extension_months : '0'}}" required type="number" min="0" class="form-control">
+            <label for="probation_extension_to_date"><b>* Probation Extension Months:</b> </label>
+            <input name="probation_extension_to_date" value="{{$EmployeeAssessment ? $EmployeeAssessment->probation_extension_to_date : ''}}" required type="date" class="form-control">
         </div>
     </div>
 </div>
 @else
     <input type="hidden" name="confirmation_status" value="Confirmed">
     <input type="hidden" name="probation_extension" value="NO">
-    <input type="hidden" name="probation_extension_months" value="0">
+    <input type="hidden" name="probation_extension_to_date" value="">
 @endif
 <div class="row">
     <div class="col-3">

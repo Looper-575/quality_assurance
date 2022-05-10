@@ -40,7 +40,6 @@
                         @if( ( ($is_admin && $EmployeeAssessment->hr_sign == 0 && $EmployeeAssessment->manager_sign == 1) || $is_hrm ) && $EmployeeAssessment == true)
                             @include('employee_assessment.partials.employee_assessment_hr_form')
                         @endif
-{{--                        <div class="m-separator m-separator--dashed m-separator--lg"></div>--}}
                         <div class="form-group m-form__group row">
                             <div class="col-12">
                                 <div class="form-group m-form__group">
@@ -55,7 +54,7 @@
                             </div>
                         </div>
                         <div class="form-group m-form__group row">
-                            <div class="{{( ($EmployeeAssessment == true && $is_hrm) ? 'col-9 pe-0 pr-0' : 'col-12' )}}">
+                            <div class="{{( ($EmployeeAssessment == true && ( ($is_admin && $EmployeeAssessment->manager_sign == 1) || $is_hrm )) ? 'col-9 pe-0 pr-0' : 'col-12' )}}">
                                 <div class="table-responsive">
                                     <table class="table table-bordered text-center">
                                     <thead>
@@ -1028,6 +1027,7 @@
                                             </td>
                                         </tr>
                                       {{--  FOR MANAGERS ONLY --}}
+                                        @if(( $is_admin || $is_manager || $is_hrm))
                                         <tr class="text-center">
                                             <td colspan="2">
                                                 <div>
@@ -1146,17 +1146,18 @@
                                                 </div>
                                             </td>
                                         </tr>
+                                        @endif
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
-                            @if($EmployeeAssessment == true &&  $is_hrm )
+                            @if($EmployeeAssessment == true && ( $is_admin || $is_hrm ) )
                             <div class="col-3 ps-0 pl-0">
                                 @include('employee_assessment.partials.evaluation_data')
                             </div>
                             @endif
                         </div>
-                        @if($EmployeeAssessment == true && $is_hrm && !empty($previous_overall_ratings) )
+                        @if($EmployeeAssessment == true && ( $is_admin || $is_hrm ) && !empty($previous_overall_ratings) )
                         <div class="form-group m-form__group row">
                             <div class="col-6">
                                 <div class="form-group m-form__group">

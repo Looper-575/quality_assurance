@@ -95,16 +95,9 @@ class EmployeePIPController extends Controller
                $pip_id = $pip_created->pip_id;
                $staff_id = $pip_created->staff_id;
             }
-            $Notification_data = Notifications::where([
-                'reference_table' => 'performance_improvement_plans',
-                'type' => 'PIP',
-                'reference_id' => $pip_id,
-                'user_id' => $staff_id,
-            ])->first();
-            if(!$Notification_data ) {
                 $send_email = false;
-                add_notifications('performance_improvement_plans', 'PIP', $pip_id, $staff_id, 'Pending PIP Ack.',$send_email);
-            }
+                add_notifications('performance_improvement_plans', 'performance_improvement_plan', $pip_id, $staff_id, 'Pending PIP Ack.',$send_email);
+
             $response['status'] = 'success';
             $response['result'] = 'Added Successfully';
         } else{
@@ -127,7 +120,7 @@ class EmployeePIPController extends Controller
         if($staff_ack){
             $send_email = false;
             $hr_user_id = User::where('role_id', 5)->pluck('user_id')->first();
-            add_notifications('performance_improvement_plans','PIP',$request->pip_id,$hr_user_id,'Pending PIP HR Approval',$send_email);
+            add_notifications('performance_improvement_plans','performance_improvement_plan',$request->pip_id,$hr_user_id,'Pending PIP HR Approval',$send_email);
             $response['status'] = "Success";
             $response['result'] = "Staff Acknowledged Successfully";
         }else{
@@ -143,7 +136,7 @@ class EmployeePIPController extends Controller
             'hrm_approve_date' => get_date()
         ]);
         $response['status'] = "Success";
-        $response['result'] = "Approved by HRM Successfully";
+        $response['result'] = "Approved by HR Successfully";
         return response()->json($response);
     }
     public function view_pip(Request $request)

@@ -18,10 +18,12 @@
                     <tr>
                         <th>Employee Name</th>
                         <th>Salary Month</th>
+                        <th>Attendance Marked</th>
+                        <th>Holidays</th>
+                        <th>On Leave</th>
+                        <th>Absents + Unmarked</th>
+                        <th>Present</th>
                         <th>Basic Salary</th>
-                        <th>Deductions</th>
-                        <th>Income Tax</th>
-                        <th>Allowance</th>
                         <th>Gross Salary</th>
                         <th>Actions</th>
                     </tr>
@@ -31,10 +33,12 @@
                         <tr>
                             <td>{{ $pay->user->full_name }}</td>
                             <td>{{ date('M-Y', strtotime($pay->salary_month)) }}</td>
+                            <td>{{ $pay->attendance_marked }}</td>
+                            <td>{{ $pay->holiday_count }}</td>
+                            <td>{{ $pay->leaves }}</td>
+                            <td>{{ $pay->absents + $pay->attendance_not_marked }}</td>
+                            <td>{{ $pay->presents}}</td>
                             <td>{{$pay->basic_salary}}</td>
-                            <td>{{$pay->deduction_amount}}</td>
-                            <td>{{$pay->income_tax}}</td>
-                            <td>{{$pay->allowance_amount}}</td>
                             <td>{{intval($pay->gross_salary)}}</td>
                             <td>
                                 <div class="btn-group btn-group-sm">

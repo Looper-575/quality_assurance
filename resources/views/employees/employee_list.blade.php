@@ -51,12 +51,8 @@
                                 <a href="{{route('employee_data_view',['employee_id' => $employee_list->employee_id])}}" id="{{$employee_list->employee_id}}" class="btn btn-primary" data-toggle="m-tooltip" data-placement="right" data-skin="dark" data-container="body">
                                     <i class="la la-eye"></i>
                                 </a>
-{{--                                @if($has_permissions->update == 1 && ((Auth::user()->role_id == 1 || Auth::user()->role_id == 5) || (Auth::user()->role_id != 1 && Auth::user()->role_id != 5 && $isLocked == 0) ) )--}}
                                 @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5)
-
                                 <a title="Edit" class="btn btn-primary edit_employee" id="{{$employee_list->employee_id}}" href="{{route('employee_form',['employee_id' => $employee_list->employee_id])}}"><i class="fa fa-edit"></i></a>
-{{--                                @endif--}}
-{{--                                @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5)--}}
                                     @if($employee_list->locked == 0)
                                         <button title="Lock" class="btn btn-info" onclick="lock_employee_record(this);" value="{{$employee_list->employee_id}}"><i class="fa fa-lock"></i></button>
                                     @endif

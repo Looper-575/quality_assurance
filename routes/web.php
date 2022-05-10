@@ -337,15 +337,15 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
 
     // Performance Improvement Plans ROUTES
     Route::group(['middleware' => ['check-permission:performance_improvement_plan,view,0,0']], function() {
-        Route::get('/performance_improvement_plan', 'App\Http\Controllers\EmployeePIPController.php@index')->name('performance_improvement_plan');
-        Route::get('/pip_form', 'App\Http\Controllers\EmployeePIPController.php@pip_form')->name('pip_form');
-        Route::get('/view_pip', 'App\Http\Controllers\EmployeePIPController.php@view_pip')->name('view_pip');
+        Route::get('/performance_improvement_plan', 'App\Http\Controllers\EmployeePIPController@index')->name('performance_improvement_plan');
+        Route::get('/pip_form', 'App\Http\Controllers\EmployeePIPController@pip_form')->name('pip_form');
+        Route::get('/view_pip', 'App\Http\Controllers\EmployeePIPController@view_pip')->name('view_pip');
     });
-    Route::post('/pip_save', 'App\Http\Controllers\EmployeePIPController.php@pip_save')->name('pip_save');
-    Route::post('/hrm_approve_pip', 'App\Http\Controllers\EmployeePIPController.php@hrm_approve_pip')->name('hrm_approve_pip');
-    Route::post('/staff_ack_pip_with_comments', 'App\Http\Controllers\EmployeePIPController.php@staff_ack_pip_with_comments')->name('staff_ack_pip_with_comments');
-    Route::post('/staff_ack_pip', 'App\Http\Controllers\EmployeePIPController.php@staff_ack_pip')->name('staff_ack_pip');
-    Route::get('/get_om_users_data', 'App\Http\Controllers\EmployeePIPController.php@get_om_users_data')->name('get_om_users_data');
+    Route::post('/pip_save', 'App\Http\Controllers\EmployeePIPController@pip_save')->name('pip_save');
+    Route::post('/hrm_approve_pip', 'App\Http\Controllers\EmployeePIPController@hrm_approve_pip')->name('hrm_approve_pip');
+    Route::post('/staff_ack_pip_with_comments', 'App\Http\Controllers\EmployeePIPController@staff_ack_pip_with_comments')->name('staff_ack_pip_with_comments');
+    Route::post('/staff_ack_pip', 'App\Http\Controllers\EmployeePIPController@staff_ack_pip')->name('staff_ack_pip');
+    Route::get('/get_om_users_data', 'App\Http\Controllers\EmployeePIPController@get_om_users_data')->name('get_om_users_data');
 
     // Employee Assessment Routes
     Route::group(['middleware' => ['check-permission:employee_assessment,view,0,0']], function() {
@@ -440,21 +440,41 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
 
     Route::post('/get_customer_info', 'App\Http\Controllers\CallDispositionController@get_customer_info')->name('get_customer_info');
     Route::post('/save_customer_note', 'App\Http\Controllers\CallDispositionController@save_customer_note')->name('save_customer_note');
+    Route::post('/search_customer', 'App\Http\Controllers\CallDispositionController@search_customer')->name('search_customer');
+    Route::post('/update_customer_details', 'App\Http\Controllers\CallDispositionController@update_customer_details')->name('update_customer_details');
+
     //Chat Component
     Route::post('/create_group', 'App\Http\Controllers\ChatController@create_group')->name('create_group');
     Route::post('/edit_chat_group', 'App\Http\Controllers\ChatController@edit_chat_group')->name('edit_chat_group');
     Route::post('/leave_chat_group', 'App\Http\Controllers\ChatController@leave_chat_group')->name('leave_chat_group');
-
-    //Leave report
-    Route::get('/leave_report' , 'App\Http\Controllers\ReportController@leave_report')->name('leave_report');
-    Route::post('/view_leave_report' , 'App\Http\Controllers\ReportController@view_leave_report')->name('view_leave_report');
-
-    // Agent Dashboard 2.0
     Route::post('/get_customer_info', 'App\Http\Controllers\CallDispositionController@get_customer_info')->name('get_customer_info');
     Route::post('/save_customer_note', 'App\Http\Controllers\CallDispositionController@save_customer_note')->name('save_customer_note');
     Route::post('/search_customer', 'App\Http\Controllers\CallDispositionController@search_customer')->name('search_customer');
     Route::post('/update_customer_details', 'App\Http\Controllers\CallDispositionController@update_customer_details')->name('update_customer_details');
     Route::post('/update_sales_chart', 'App\Http\Controllers\DashboardController@update_sales_chart')->name('update_sales_chart');
 
+    //Leave report
+    Route::get('/leave_report' , 'App\Http\Controllers\ReportController@leave_report')->name('leave_report');
+    Route::post('/view_leave_report' , 'App\Http\Controllers\ReportController@view_leave_report')->name('view_leave_report');
 
+    // Employee Separation Module
+    Route::group(['middleware' => ['check-permission:employee_separation,view,add,update']], function() {
+        Route::get('/employee_separation', 'App\Http\Controllers\EmployeeSeparationController@index')->name('employee_separation');
+        Route::get('/separation_form', 'App\Http\Controllers\EmployeeSeparationController@separation_form')->name('separation_form');
+        Route::post('/separation_save', 'App\Http\Controllers\EmployeeSeparationController@separation_save')->name('separation_save');
+        Route::get('/separation_view', 'App\Http\Controllers\EmployeeSeparationController@separation_view')->name('separation_view');
+        Route::post('/view_undertaking_form', 'App\Http\Controllers\EmployeeSeparationController@view_undertaking_form')->name('view_undertaking_form');
+    });
+    // Employee Suspension Module
+    Route::group(['middleware' => ['check-permission:employee_suspension,view,add,update']], function() {
+        Route::get('/employee_suspension', 'App\Http\Controllers\EmployeeSuspensionController@index')->name('employee_suspension');
+        Route::get('/suspension_form', 'App\Http\Controllers\EmployeeSuspensionController@suspension_form')->name('suspension_form');
+        Route::post('/suspension_save', 'App\Http\Controllers\EmployeeSuspensionController@suspension_save')->name('suspension_save');
+        Route::get('/suspension_view', 'App\Http\Controllers\EmployeeSuspensionController@suspension_view')->name('suspension_view');
+        Route::post('/unsuspend_user_account', 'App\Http\Controllers\EmployeeSuspensionController@unsuspend_user_account')->name('unsuspend_user_account');
+    });
+
+    // Final settlement
+    Route::post('/save_final_settlement', 'App\Http\Controllers\EmployeeSeparationController@save_final_settlement')->name('save_final_settlement');
+    Route::post('/delete_final_settlement', 'App\Http\Controllers\EmployeeSeparationController@delete_final_settlement')->name('delete_final_settlement');
 });

@@ -14,10 +14,10 @@
         <div class="col-3"><p>{{$payslip->user->contact_number}}</p></div>
         <div class="col-3"><p>Department:</p></div>
         <div class="col-3"><p>{{$payslip->user->department->title}}</p></div>
-        <div class="col-3"><p>Role:</p></div>
-        <div class="col-3"><p>{{$payslip->user->role->title}}</p></div>
+        <div class="col-3"><p>Designation:</p></div>
+        <div class="col-3"><p>{{$payslip->user->employee->designation}}</p></div>
         <div class="col-3"><p>Basic Salary:</p></div>
-        <div class="col-3"><p>{{intval($payslip->user->employee->net_salary)}}</p></div>
+        <div class="col-3"><p>{{intval($payslip->basic_salary)}}</p></div>
         <div class="col-3"><p>Working Days:</p></div>
         <div class="col-3"><p>{{$payslip->working_days - $payslip->holiday_count - $payslip->leaves - $payslip->attendance_not_marked}}</p></div>
         <div class="col-3"><p>Holidays:</p></div>
@@ -66,17 +66,17 @@
             <th><strong>Total Deductions</strong></th>
             <th>{{$ded}}</th>
         </tr>
+        <tr>
+            <td colspan="2"></td>
+        </tr>
+        <tr style="border: 0px !important;">
+            <td style="border-left: 0px !important; border-bottom: 0px !important;"><h4 class="float-right">Net Salary:</h4></td>
+            <td ><h4>{{intval($payslip->gross_salary)}}</h4></td>
+        </tr>
     </table>
     <br>
-    <div class="row">
-        <div class="col-12">
-            <h4 class="float-right"> Net Salary:
-                <span class="border p-1 pr-5">{{intval($payslip->gross_salary)}}</span>
-            </h4>
-        </div>
-    </div>
     <br>
     <br>
-    <p><small>**System generated salary slip does not require signature</small></p>
+    <p><small>“This document is computer generated and does not require any signature or the Company’s stamp in order to be considered valid”.</small></p>
 </div>
 <button onclick="print_div('payslip_print')" class="btn btn-primary float-right" id="print_btn_id"> Print</button>

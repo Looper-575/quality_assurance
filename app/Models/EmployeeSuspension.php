@@ -5,14 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Notifications extends Model
+class EmployeeSuspension extends Model
 {
     use HasFactory;
 
-    protected $table = 'notifications';
-    protected $primaryKey = 'notification_id';
+    protected $table = 'employee_suspension';
+    protected $primaryKey = 'suspension_id';
     const CREATED_AT = 'added_on';
-    const UPDATED_AT = 'added_on';
+    const UPDATED_AT = 'modified_on';
 
     /**
      * The attributes that are mass assignable.
@@ -20,11 +20,11 @@ class Notifications extends Model
      * @var array
      */
     protected $fillable = [
-        'reference_table',
-        'route_name',
-        'reference_id',
         'user_id',
-        'message'
+        'from_date',
+        'to_date',
+        'reason',
+        'added_by'
     ];
 
     /**
@@ -41,5 +41,8 @@ class Notifications extends Model
      *
      * @var array
      */
-
+    public function user()
+    {
+        return $this->belongsTo(User::class , 'user_id' , 'user_id');
+    }
 }

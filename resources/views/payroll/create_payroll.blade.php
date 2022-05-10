@@ -74,7 +74,7 @@
         function save_payroll_form() {
             // reseting any search in datable
             $('#reports_table_filter input').val('');
-            data_table.search('').columns().search('').draw();
+            // data_table.search('').columns().search('').draw();
 
             let data = new FormData($('#payroll_form_id')[0]);
             data.append('_token', '{{csrf_token()}}');

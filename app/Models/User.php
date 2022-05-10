@@ -93,4 +93,12 @@ class User extends Authenticatable
     {
         return $this->hasOne(LeavesBucket::class, 'user_id', 'user_id');
     }
+    public function employee_separation()
+    {
+        return $this->hasOne(EmployeeSeparation::class, 'user_id', 'user_id');
+    }
+    public function employee_suspension()
+    {
+        return $this->hasOne(EmployeeSuspension::class, 'user_id', 'user_id');
+    }
 }

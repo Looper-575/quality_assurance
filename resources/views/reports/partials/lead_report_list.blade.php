@@ -8,7 +8,7 @@
 </style>
 
 <div class="mt-4">
-
+@if(isset($total))
 <table id="generated_lead_list" class="table table-bordered  table-striped text-center">
     <tr>
         <th>Total RGU</th>
@@ -39,27 +39,28 @@
         <td>{{$total->mobile ?? 0}}</td>
     </tr>
 </table>
+    @endif
 </div>
 <div class="table-responsive mt-4">
     <table class="table table-striped" id="reports_table">
         <thead>
         <tr>
-            <th title="Field #1">S.No.</th>
-            <th title="Field #2">Disposition Type</th>
-            <th title="Field #3">DID Name </th>
-            <th title="Field #4">Account Number</th>
-            <th title="Field #4">Confirmation Number</th>
-            <th title="Field #4">Order Number</th>
-            <th title="Field #5">Customer Name</th>
-            <th title="Field #5">Phone Number</th>
-            <th title="Field #6">Service Address</th>
-            <th title="Field #7">Provider Name</th>
-            <th title="Field #8">Services Sold</th>
-            <th title="Field #8">Services</th>
-            <th title="Field #8">QA Status</th>
-            <th title="Field #8">Call Recording</th>
-            <th title="Field #9">Agent Name</th>
-            <th title="Field #10">Added On</th>
+            <th>S.No.</th>
+            <th>Disposition Type</th>
+            <th>DID Name </th>
+            <th>Account Number</th>
+            <th>Confirmation Number</th>
+            <th>Order Number</th>
+            <th>Customer Name</th>
+            <th>Phone Number</th>
+            <th>Service Address</th>
+            <th>Provider Name</th>
+            <th>Services Sold</th>
+            <th>Services</th>
+            <th>QA Status</th>
+            <th>Call Recording</th>
+            <th>Agent Name</th>
+            <th>Added On</th>
         </tr>
         </thead>
         <tbody>

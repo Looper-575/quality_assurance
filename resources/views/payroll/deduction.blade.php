@@ -120,6 +120,16 @@
                                     <input class="form-control" type="number" name="value" value="" id="value" required>
                                 </div>
                             </div>
+                            <div class="col-6 before-tax-div">
+                                <div class="form-group">
+                                    <label class="form-check-label" for="before_tax">Before Tax</label>
+                                    <select class="form-control mt-2" name="before_tax" id="before_tax">
+                                        <option value="">Please Select</option>
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-12">
@@ -150,9 +160,6 @@
                 success: function( response ) {
                     $('#role_id').empty().append('');
                     var role_id = $('#role_id');
-                    // role_id.append(
-                    //     $('<option></option>').val('').html('Please Select')
-                    // );
                     role_id.append(
                         $('<option></option>').val(0).html('All')
                     );
@@ -164,7 +171,6 @@
                 }
             }).then(function(){
                 if(role_id != null){
-                    // $('#role_id').val(role_id);
                     $("#role_id").select2().select2('val', [role_id]);
                 }
             });
@@ -172,6 +178,18 @@
         $('#department_id').on('change', function() {
             let department_id = this.value;
             set_role(department_id);
+        });
+        $('#type').on('change', function() {
+            let type = this.value;
+            if(type == 'convenience'){
+                $('#before_tax').prop('required',false);
+                $('.before-tax-div').addClass('d-none');
+                $('.before-tax-div').removeClass('d-block');
+            } else {
+                $('#before_tax').prop('required',true);
+                $('.before-tax-div').addClass('d-block');
+                $('.before-tax-div').removeClass('d-none');
+            }
         });
         $('.detele_btn').click( function () {
             let id = this.value;
@@ -220,9 +238,19 @@
             $('#title').val(data.title);
             $('#type').val(data.type);
             $('#value').val(data.value);
+            $('#before_tax').val(data.before_tax);
             $('#criteria').val(data.criteria);
             $('#department_id').val(data.department_id);
             let roles = data.role_id.split(',');
+            if(data.type == 'convenience'){
+                $('#before_tax').prop('required',false);
+                $('.before-tax-div').addClass('d-none');
+                $('.before-tax-div').removeClass('d-block');
+            } else {
+                $('#before_tax').prop('required',true);
+                $('.before-tax-div').addClass('d-block');
+                $('.before-tax-div').removeClass('d-none');
+            }
             set_role(data.department_id, roles);
             $('#add_new_modal').modal('toggle');
         });

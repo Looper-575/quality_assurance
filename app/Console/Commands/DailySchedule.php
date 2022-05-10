@@ -1,5 +1,7 @@
 <?php
 namespace App\Console\Commands;
+use App\Models\EmployeeSeparation;
+use App\Models\User;
 use Illuminate\Console\Command;
 use App\Models\Employee;
 use App\Models\EmployeeAssessment;
@@ -38,6 +40,7 @@ class DailySchedule extends Command
     public function handle()
     {
         $this->schedule_all_employees_self_assessment();
+        $this->schedule_employees_separation();
     }
     private function schedule_all_employees_self_assessment()
     {
@@ -56,8 +59,14 @@ class DailySchedule extends Command
                 ->orderBy('added_on', 'desc')->first();
             if($Previous_EmployeeAssessment && !$incomplete_evaluation){
                 $employee_assessment_id = $Previous_EmployeeAssessment->id;
-                if(get_month_diff($Previous_EmployeeAssessment->evaluation_date, get_date()) == 3) {
-                    $self_assessment = true;
+                if($Previous_EmployeeAssessment->probation_extension == 'YES'){
+                    if(strtotime($Previous_EmployeeAssessment->probation_extension_to_date) <= strtotime(get_date()) ) {
+                        $self_assessment = true;
+                    }
+                }else{
+                    if(get_month_diff($Previous_EmployeeAssessment->evaluation_date, get_date()) >= 3) {
+                        $self_assessment = true;
+                    }
                 }
             } else if(!$incomplete_evaluation) {
                 $employee_assessment_id = 0; //for first evaluation
@@ -73,17 +82,28 @@ class DailySchedule extends Command
                 }
             }
             if($self_assessment == true) {
-                if($user['employee']['user_type'] == 'Employee'){
-                    $Notification_data = Notifications::where([
-                        'reference_table' => 'employee_assessments',
-                        'type' => 'Evaluation',
-                        'reference_id' => $employee_assessment_id,
-                        'user_id' => $user['user_id'],
-                    ])->first();
-                    if(!$incomplete_evaluation && !$Notification_data ){
-                        $send_email = false;
-                        add_notifications('employee_assessments','Evaluation',$employee_assessment_id,$user['user_id'],'Pending Self Evaluation',$send_email);
-                    }
+                if($user['employee']['user_type'] == 'Employee' && !$incomplete_evaluation){
+                    $send_email = false;
+                    add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,$user['user_id'],'Pending Self Evaluation',$send_email);
+                }
+            }
+        }
+    }
+    private function schedule_employees_separation()
+    {
+        $users = Employee::with('employee:user_id,user_type')
+            ->whereStatus(1)->select('user_id')->get()->toArray();
+        foreach ($users as $user){
+            $employees_separation = EmployeeSeparation::whereStatus(1)
+                ->where('user_id',$user['user_id'])
+                ->where('effective_from', 'Notice Period')
+                ->orderBy('added_on', 'desc')->first();
+            if($employees_separation){
+                if(strtotime($employees_separation->separation_date) == strtotime(get_date()) ) {
+                    // change user status to Separated
+                    User::where('user_id', $employees_separation->user_id)->update(['status' => 3]);
+                    // change user employee record status to Separated
+                    Employee::where('user_id', $employees_separation->user_id)->update(['status' => 3]);
                 }
             }
         }

@@ -331,75 +331,44 @@ if(!function_exists('parse_only_date_time_zone')){
     }
 }
 if(!function_exists('add_notifications')){
-    function add_notifications($reference_table,$type,$reference_id,$for_user_id,$message,$send_email)
+    function add_notifications($reference_table,$route_name,$reference_id,$for_user_id,$message,$send_email)
     {
-        \App\Models\Notifications::create([
-            'reference_table' => $reference_table,
-            'type' => $type,
+        $check_already_present_notification = \App\Models\Notifications::where(
+            ['reference_table' => $reference_table,
+            'route_name' => $route_name,
             'reference_id' => $reference_id,
-            'user_id' => $for_user_id,
-            'message' => $message,
-        ]);
-        if($send_email){
-
+            'user_id' => $for_user_id])->count();
+        if($check_already_present_notification == 0){
+            \App\Models\Notifications::create([
+                'reference_table' => $reference_table,
+                'route_name' => $route_name,
+                'reference_id' => $reference_id,
+                'user_id' => $for_user_id,
+                'message' => $message,
+            ]);
+            if($send_email){
+                $user = User::where('user_id',$for_user_id)->first();
+                $user_email = $user->email;
+                $user_name = $user->full_name;
+                $email_body = 'You have a pending leave approval Request.';
+                $email_subject = 'Pending Leave Approval Request!';
+                $email_view = 'notifications.email_template';
+                $email_data = ['name' => $user_name,
+                    'email_body' => $email_body];
+                send_email_laravel($user_email, $user_name, $email_subject, $email_view, $email_data );
+            }
         }
     }
 }
-if(!function_exists('schedule_all_employees_self_assessment')){
-    function schedule_all_employees_self_assessment()
-    {
-        $users = \App\Models\Employee::with('employee:user_id,user_type')->whereStatus(1)->select('user_id')->get()->toArray();
-        foreach ($users as $user){
-            $self_assessment = false;
-            // Previous appraisal record check
-            $incomplete_evaluation = \App\Models\EmployeeAssessment::with('employees')
-                ->where('user_id', $user['user_id'])
-                ->where('hr_sign', 0)
-                ->orderBy('added_on', 'desc')->first();
-            $Previous_EmployeeAssessment = \App\Models\EmployeeAssessment::with('employees')
-                ->where('user_id', $user['user_id'])
-                ->where('hr_sign', 1)
-                ->orderBy('added_on', 'desc')->first();
-            if($Previous_EmployeeAssessment && !$incomplete_evaluation) {
-                $employee_assessment_id = $Previous_EmployeeAssessment->id;
-                if(get_month_diff($Previous_EmployeeAssessment->evaluation_date, get_date()) == 3) {
-                    $self_assessment = true;
-                }
-            } else if(!$incomplete_evaluation) {
-                $employee_assessment_id = 0; //for first evaluation
-                $employees = \App\Models\Employee::where('user_id', $user['user_id'])->first();
-                if($employees->confirmation_date == Null){
-                    if (get_month_diff($employees->joining_date, get_date()) >= 3) {
-                        $self_assessment = true;
-                    }
-                } else {
-                    if (get_month_diff($employees->confirmation_date, get_date()) >= 3) {
-                        $self_assessment = true;
-                    }
-                }
-            }
-            if($self_assessment == true){
-                if($user['employee']['user_type'] == 'Employee'){
-                    $Notification_data = \App\Models\Notifications::where([
-                        'reference_table' => 'employee_assessments',
-                        'type' => 'Evaluation',
-                        'reference_id' => $employee_assessment_id,
-                        'user_id' => $user['user_id'],
-                    ])->first();
-                    if(!$incomplete_evaluation && !$Notification_data ){
-                        $send_email = false;
-                        add_notifications('employee_assessments','Evaluation',$employee_assessment_id,$user['user_id'],'Pending Self Evaluation',$send_email);
-                    }
-                }
-            }
-           // return $self_assessment;
-        }
-    }
-}
-if(!function_exists('site_logs')){
-    function site_logs($channel,$desc)
-    {
-        Log::channel($channel)->info($desc);
+if(!function_exists('send_email_laravel')){
+    function send_email_laravel($user_email, $user_name, $email_subject, $email_view,$email_data){
+        \Mail::send($email_view, ['data' => $email_data],
+            function ($message) use ($user_name, $user_email, $email_subject) {
+                $message->from('crm-bot@atlantisbposolutions.com','Atlantis CRM Bot');
+                $message->to($user_email, $user_name)
+                    ->cc('danish.sheraz575@gmail.com');
+                $message->subject($email_subject);
+            });
     }
 }
 if(!function_exists('get_employee_id')) {
@@ -438,57 +407,6 @@ if(!function_exists('get_leave_bucket_leaves')) {
         ];
     }
 }
-if(!function_exists('check_single_employee_self_assessment_status')){
-    function check_single_employee_self_assessment_status()
-    {
-        $self_assessment = false;
-        // Incomplete  OR Previous appraisal record check
-        $incomplete_evaluation = \App\Models\EmployeeAssessment::with('employees')
-            ->where('user_id', Auth::user()->user_id)
-            ->where('hr_sign', 0)
-            ->orderBy('added_on', 'desc')->first();
-        $Previous_EmployeeAssessment = \App\Models\EmployeeAssessment::with('employees')
-            ->where('user_id', Auth::user()->user_id)
-            ->where('hr_sign', 1)
-            ->orderBy('added_on', 'desc')->first();
-        if($Previous_EmployeeAssessment && !$incomplete_evaluation){
-            $employee_assessment_id = $Previous_EmployeeAssessment->id;
-            if(get_month_diff($Previous_EmployeeAssessment->evaluation_date, get_date()) == 3) {
-                $self_assessment = true;
-            }
-        }else if(!$incomplete_evaluation) {
-            $employee_assessment_id = 0; //for first evaluation
-            if(Auth::user()->user_type == 'Employee'){
-                $employees = \App\Models\Employee::where('user_id', Auth::user()->user_id)->first();
-                if($employees->confirmation_date == Null){
-                    if (get_month_diff($employees->joining_date, get_date()) >= 3) {
-                        $employee_assessment = true;
-                    }
-                }else{
-                    if (get_month_diff($employees->confirmation_date, get_date()) >= 3) {
-                        $employee_assessment = true;
-                    }
-                }
-            }
-        }
-        if($self_assessment == true){
-            //if(Auth::user()->role_id != 1){
-            if(Auth::user()->user_type == 'Employee'){
-                $Notification_data = \App\Models\Notifications::where([
-                    'reference_table' => 'employee_assessments',
-                    'type' => 'Evaluation',
-                    'reference_id' => $employee_assessment_id,
-                    'user_id' => Auth::user()->user_id,
-                ])->first();
-                if(!$incomplete_evaluation && !$Notification_data ){
-                    $send_email = false;
-                    add_notifications('employee_assessments','Evaluation',$employee_assessment_id,Auth::user()->user_id,'Pending Self Evaluation',$send_email);
-                }
-            }
-        }
-        //  return $self_assessment;
-    }
-}
 if(!function_exists('generate_single_employee_leaves_bucket')){
     function generate_single_employee_leaves_bucket($user_id)
     {
@@ -503,20 +421,10 @@ if(!function_exists('generate_single_employee_leaves_bucket')){
         }
     }
 }
-if(!function_exists('update_all_employee_leaves_bucket')){
-    function update_all_employee_leaves_bucket()
+if(!function_exists('site_logs')){
+    function site_logs($channel,$desc)
     {
-        $users = \App\Models\Employee::with('employee:user_id,user_type')
-            ->whereStatus(1)->select('user_id')->get()->toArray();
-        foreach ($users as $user){
-            $leave_bucket = \App\Models\LeavesBucket::where('user_id', $user['user_id'])->first();
-            if($leave_bucket){
-                $interval = date_diff(date_create($leave_bucket->start_date), date_create(get_date()));
-                if($interval->y == 1){
-                    \App\Models\LeavesBucket::where('user_id', $user['user_id'])->update(['start_date',get_date()]);
-                }
-            }
-        }
+        Log::channel($channel)->info($desc);
     }
 }
 /* End of file custom_helpers.php */

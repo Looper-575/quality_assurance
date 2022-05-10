@@ -21,7 +21,7 @@
                                     <div class="m-list-timeline__items">
                                         <div class="m-list-timeline__item">
                                             <span class="m-list-timeline__badge"></span>
-                                            <a href="{{route('read_notification',['notification_id' => $notification->notification_id, 'type' => $notification->type])}}" class="m-list-timeline__text">
+                                            <a href="{{route('read_notification',['notification_id' => $notification->notification_id, 'route_name' => $notification->route_name])}}" class="m-list-timeline__text">
                                                 {{$notification->message}}
                                             <span class="m-badge m-badge--success m-badge--wide">{{$notification_status}} </span></a>
                                             <span class="m-list-timeline__time">{{parse_date_get($notification->added_on)}}</span>
@@ -35,7 +35,7 @@
                             <div class="m-stack__item m-stack__item--center m-stack__item--middle">
                                 <div class="row">
                                     <div class="col-lg-12">
-                                        <a href="{{route('read_notification',['notification_id' => 0, 'type' => 'all'])}}" class="btn btn-success">
+                                        <a href="{{route('read_notification',['notification_id' => 0, 'route_name' => 'all'])}}" class="btn btn-success">
                                             Mark all as read
                                         </a>
                                         <a href="{{route('clear_all_notifications')}}"  class="btn btn-primary">

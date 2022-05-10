@@ -84,11 +84,11 @@ class LeaveApplicationController extends Controller
             $send_email = true;
             if($approved_by_manager == NULL){
                 $manager_id = User::where('user_id', Auth::user()->user_id)->pluck('manager_id')->first();
-                add_notifications('leave_applications','Leaves',$pending_leave_id,$manager_id,'Pending Leave Approval by Manager',$send_email);
+                add_notifications('leave_applications','leave_list',$pending_leave_id,$manager_id,'Pending Leave Approval by Manager',$send_email);
             }
             if($approved_by_manager = 1){
                 $hr_user_id = User::where('role_id', 5)->pluck('user_id')->first();
-                add_notifications('leave_applications','Leaves',$pending_leave_id,$hr_user_id,'Pending Leave Approval by HR',$send_email);
+                add_notifications('leave_applications','leave_list',$pending_leave_id,$hr_user_id,'Pending Leave Approval by HR',$send_email);
             }
             $response['status'] = "Success";
             $response['result'] = "Added Successfully";
@@ -186,13 +186,21 @@ class LeaveApplicationController extends Controller
             LeaveApplication::where('leave_id', $request->id)->update([
                 'approved_by_manager' => 2,
                 'approved_by_hr' => 2,
+                'rejection_reason' => $request->rejection_reason,
             ]);
         }
         elseif (Auth::user()->role_id == 5){
             LeaveApplication::where('leave_id', $request->id)->update([
                 'approved_by_hr' => 2,
+                'rejection_reason' => $request->rejection_reason,
             ]);
         }
+        // NOTIFICATION
+        $leave = LeaveApplication::where('leave_id', $request->id)->first();
+        $rejection_reason = 'Your Leave is rejected because '.$request->rejection_reason;
+        $send_email = false;
+        add_notifications('leave_applications','leave_list',$leave->leave_id,$leave->added_by,$rejection_reason,$send_email);
+
         $response['status'] = "Success";
         $response['result'] = "Application Rejected";
         return response()->json($response);
@@ -227,6 +235,8 @@ class LeaveApplicationController extends Controller
                      'approved_by_hr' => 1,
                  ]);
              }
+            $send_email = false;
+            add_notifications('leave_applications','leave_list',$request->id,$leave->added_by,'Your Leave is approved',$send_email);
         }
         else {
             LeaveApplication::where('leave_id', $request->id)->update([
@@ -234,7 +244,7 @@ class LeaveApplicationController extends Controller
             ]);
             $send_email = true;
             $hr_user_id = User::where('role_id', 5)->pluck('user_id')->first();
-            add_notifications('leave_applications','Leaves',$request->id,$hr_user_id,'Pending Leave Approval by HR',$send_email);
+            add_notifications('leave_applications','leave_list',$request->id,$hr_user_id,'Pending Leave Approval by HR',$send_email);
         }
         $response['status'] = "Success";
         $response['result'] = "Application Accepted";
@@ -299,7 +309,7 @@ class LeaveApplicationController extends Controller
             }
             $send_email = true;
             $hr_user_id = User::where('role_id', 5)->pluck('user_id')->first();
-            add_notifications('leave_applications','Leaves',$leave_id,$hr_user_id,'Pending Leave Approval by HR',$send_email);
+            add_notifications('leave_applications','leave_list',$leave_id,$hr_user_id,'Pending Leave Approval by HR',$send_email);
             $response['status'] = "Success";
             $response['result'] = "Added Successfully";
         } else {

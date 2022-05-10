@@ -110,31 +110,26 @@
                     <tr>
                         <td>
                             <div class="form-group m-form__group">
-                                <input name="objective[]" value="" required type="text" class="form-control">
+                                <input name="objective[]" value="" type="text" class="form-control">
                             </div>
                         </td>
                         <td>
                             <div class="form-group m-form__group">
-                                <input name="measurement_index[]" value="" required type="text" class="form-control">
+                                <input name="measurement_index[]" value="" type="text" class="form-control">
                             </div>
                         </td>
                         <td>
                             <div class="form-group m-form__group">
-                                <input name="remarks[]" value="" required type="text" class="form-control">
+                                <input name="remarks[]" value="" type="text" class="form-control">
                             </div>
                         </td>
                         <td>
                             <div class="form-group m-form__group">
-                                <input name="timeline[]" value="" required type="text" placeholder="in days/months"
+                                <input name="timeline[]" value="" type="text" placeholder="in days/months"
                                        class="form-control">
                             </div>
                         </td>
                         <td>
-{{--                            <div class="form-group m-form__group">--}}
-{{--                                <button type="button" onclick="remove_row(this);"--}}
-{{--                                        class="btn btn-sm btn_remove_edu btn-close btn-danger">X--}}
-{{--                                </button>--}}
-{{--                            </div>--}}
                         </td>
                     </tr>
                     </tbody>
