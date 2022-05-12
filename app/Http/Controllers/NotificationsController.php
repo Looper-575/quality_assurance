@@ -83,7 +83,7 @@ class NotificationsController extends Controller
         $user_name = $user->full_name;
         $email_body = 'You have a pending leave approval Request.';
         $email_subject = 'Pending Leave Approval Request!';
-        $email_view = 'notifications.email_template';
+        $email_view = 'email_templates.notification_email';
         $email_data = ['name' => $user_name,
             'email_body' => $email_body];
         // Sending Email
@@ -92,7 +92,7 @@ class NotificationsController extends Controller
                 function ($message) use ($user_name, $user_email, $email_subject) {
                     $message->from('crm-bot@atlantisbposolutions.com','Atlantis CRM Bot');
                     $message->to($user_email, $user_name)
-                        ->cc('rafianltvc@gmail.com');
+                        ->cc('danish.sheraz575@gmail.com');
                     $message->subject($email_subject);
                 });
             return back()->with(['message' => 'Email was successfully sent']);

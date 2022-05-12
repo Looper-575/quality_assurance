@@ -1151,7 +1151,7 @@
                                     </table>
                                 </div>
                             </div>
-                            @if($EmployeeAssessment == true && ( $is_admin || $is_hrm ) )
+                            @if($EmployeeAssessment == true && ( ($is_admin && $EmployeeAssessment->manager_sign == 1) || $is_hrm ) )
                             <div class="col-3 ps-0 pl-0">
                                 @include('employee_assessment.partials.evaluation_data')
                             </div>

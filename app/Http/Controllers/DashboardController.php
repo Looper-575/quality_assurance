@@ -3,8 +3,14 @@ namespace App\Http\Controllers;
 use App\Http\Middleware\PreventRequestsDuringMaintenance;
 use App\Models\CallDispositionsService;
 use App\Models\AttendanceLog;
+use App\Models\Employee;
 use App\Models\Enquiry;
+use App\Models\LeaveApplication;
+use App\Models\Notifications;
+use App\Models\Task;
 use App\Models\Team;
+use App\Models\TeamMember;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -31,16 +37,209 @@ class DashboardController extends Controller
             return $this->qa_dashboard();
         } else if($role==13) {
             return $this->vendor_dashboard();
+        } else if($role==5) {
+            return $this->hr_dashboard();
+        } else if($role==12) {
+            return $this->dev_team_dashboard();
         } else {
             return $this->default();
         }
     }
+
     public function default()
     {
+        $data['page_title'] = "Dashboard - Atlantis BPO CRM";
+        return view('dashboard.default_dashboard',$data);
+    }
+
+    private function dev_team_dashboard(){
+        $data['page_title'] = "Development Team Dashboard - Atlantis BPO CRM";
+        // Current Month Attendance Log
+        $attendance_log = AttendanceLog::with('user.employee')
+            ->select(DB::raw('sum(late) as `lates`, sum(absent) as `absents`, sum(on_leave) as `leaves` , sum(applied_leave) as `applied_leave`, sum(half_leave) as `half_leaves` , count(user_id) as `attendance_marked`, MONTH(attendance_date) as `month`, ANY_VALUE(user_id) as user_id'))
+            ->where('user_id', Auth::user()->user_id)
+            ->where(DB::raw("(DATE_FORMAT(attendance_date,'%m'))"),date('m'))
+            ->first();
+        $curr_month_working_days = working_days(date('Y-m-01', strtotime($attendance_log->month)), date('Y-m-t', strtotime($attendance_log->month)));
+        if($attendance_log){
+            if($attendance_log->lates != null){
+                $data['lates'] = $attendance_log->lates;
+            }else{
+                $data['lates'] = 0;
+            }
+            if($attendance_log->absents != null){
+                $data['absents'] = $attendance_log->absents;
+            }else{
+                $data['absents'] = 0;
+            }
+            if($attendance_log->leaves != null){
+                $data['on_leave'] = $attendance_log->leaves;
+            }else{
+                $data['on_leave'] = 0;
+            }
+            if($attendance_log->half_leaves != null){
+                $data['half_leaves'] = $attendance_log->half_leaves;
+            }else{
+                $data['half_leaves'] = 0;
+            }
+            $data['presents'] = $attendance_log->attendance_marked - $attendance_log->absents - $attendance_log->leaves;
+            $data['unmarked'] = $curr_month_working_days - $attendance_log->attendance_marked;
+        }else{
+            $data['lates'] = 0;
+            $data['absents'] = 0;
+            $data['on_leave'] = 0;
+            $data['presents'] = 0;
+            $data['unmarked'] = 0;
+            $data['half_leaves'] = 0;
+        }
+        $all_events = array();
+        // Own Tasks
+        $own_tasks = Task::where('assigned_to',Auth::user()->user_id)->whereStatus(0)->get()->toArray();
+        $my_pending_tasks = 0;
+        if($own_tasks) {
+            $my_pending_tasks = count($own_tasks);
+            $own_tasks_events[] = array();
+            foreach ($own_tasks as $task) {
+                $own_tasks_events = array(
+                    "title" => $task['title'],
+                    "start" => $task['start_date'],
+                    "end" => $task['end_date'],
+                    "className" => "m-fc-event--solid-warning",
+                    "description" => $task['description']);
+                $all_events[] = $own_tasks_events;
+            }
+        }
+        // Team Tasks
+        $my_team_id = Team::whereStatus(1)->where('team_lead_id',Auth::user()->user_id)->pluck('team_id')->first();
+        if($my_team_id){
+            $team_members = TeamMember::where('team_id',$my_team_id)->get();
+            $team_tasks_events[] = array();
+            $my_team_pending_tasks = 0;
+            foreach ($team_members as $team_member) {
+                $team_tasks = Task::whereStatus(0)->where('assigned_to',$team_member->user_id)->get()->toArray();
+                if($team_tasks) {
+                    $my_team_pending_tasks += count($team_tasks);
+                    foreach ($team_tasks as $task) {
+                        $team_tasks_events = array(
+                            "title" => $task['title'],
+                            "start" => $task['start_date'],
+                            "end" => $task['end_date'],
+                            "description" => $task['description']);
+                        if($task['added_by'] == Auth::user()->user_id){
+                            $team_tasks_events['className'] = 'm-fc-event--solid-info m-fc-event--light';
+                        }else{
+                            $team_tasks_events['className'] = 'm-fc-event--light m-fc-event--solid-primary';
+                        }
+                        $all_events[] = $team_tasks_events;
+                    }
+                }
+            }
+        }
+        // Task created by me (ASSIGNED)
+        $my_created_tasks_count = Task::where('added_by',Auth::user()->user_id)
+                                 ->whereStatus(0)->whereNotNull('assigned_to')->count();
+        // Task created by me (but Not ASSIGNED Yet)
+        $unassigned_tasks_count = 0;
+        $my_unassigned_created_tasks = Task::where('added_by',Auth::user()->user_id)
+                                 ->whereStatus(0)->whereNull('assigned_to')->get()->toArray();
+        if($my_unassigned_created_tasks){
+            $unassigned_tasks_count = count($my_unassigned_created_tasks);
+            $my_unassigned_created_tasks_events[] = array();
+            foreach($my_unassigned_created_tasks as $task) {
+                $my_unassigned_created_tasks = array(
+                    "title" => $task['title'],
+                    "start" => $task['start_date'],
+                    "end" => $task['end_date'],
+                    "className" => "m-fc-event--light m-fc-event--solid-danger",
+                    "description" => $task['description']);
+                $all_events[] = $my_unassigned_created_tasks;
+            }
+        }
+        ///////////////////////////////////////////
+        $all_events = json_encode($all_events);
+        $all_events = preg_replace('/"([^"]+)"\s*:\s*/', '$1:', $all_events);
+        $data['calendar_events'] = $all_events;
+        $data['my_pending_tasks'] = $my_pending_tasks;
+        $data['my_team_pending_tasks'] = $my_team_pending_tasks;
+        $data['my_created_tasks_count'] = $my_created_tasks_count;
+        $data['unassigned_tasks_count'] = $unassigned_tasks_count;
+        return view('dashboard.dev_team_dashboard',$data);
+    }
+    private function hr_dashboard()
+    {
         $data['page_title'] = "HR Dashboard - Atlantis BPO CRM";
+        $team_member_count = TeamMember::count();
+        $team_leads_count = Team::whereStatus(1)->count();
+        $total_users = $team_leads_count + $team_member_count;
+        $attendance_log = AttendanceLog::with('user.employee')
+            ->select(DB::raw('sum(late) as `lates`, sum(absent) as `absents`, sum(on_leave) as `leaves` , sum(applied_leave) as `applied_leave`, sum(half_leave) as `half_leaves` , count(user_id) as `attendance_marked`, ANY_VALUE(user_id) as user_id'))
+            ->where('attendance_date', get_date())
+            ->first();
+        if($attendance_log){
+            if($attendance_log->lates != null){
+                $data['lates'] = $attendance_log->lates;
+            }else{
+                $data['lates'] = 0;
+            }
+            if($attendance_log->absents != null){
+                $data['absents'] = $attendance_log->absents;
+            }else{
+                $data['absents'] = 0;
+            }
+            if($attendance_log->leaves != null){
+                $data['on_leave'] = $attendance_log->leaves;
+            }else{
+                $data['on_leave'] = 0;
+            }
+            $data['presents'] = $attendance_log->attendance_marked - $attendance_log->absents - $attendance_log->leaves;
+            $data['unmarked'] = $total_users - $attendance_log->attendance_marked;
+        }else{
+            $data['lates'] = 0;
+            $data['absents'] = 0;
+            $data['on_leave'] = 0;
+            $data['presents'] = 0;
+            $data['unmarked'] = 0;
+        }
+        // pending_leaves_for_approval
+        $pending_leaves_for_approval_by_manager = LeaveApplication::whereStatus(1)->where('approved_by_manager',NULL)->count();
+        $pending_leaves_for_approval_by_hr = LeaveApplication::whereStatus(1)->where('approved_by_hr',NULL)->count();
+        $data['pending_approval_manager'] = $pending_leaves_for_approval_by_manager;
+        $data['pending_approval_hr'] = $pending_leaves_for_approval_by_hr;
+        // Birthdays & Appraisal
+        $all_events = array();
+        $appraisals = $this->get_employees_assessment_for_calender();
+        $data['pending_appraisals'] = count($appraisals);
+        $appraisal_notifications[] = array();
+        foreach($appraisals as $appraisal) {
+            $start_date_time = $appraisal['appraisal_date'].' 00:00:00';
+            $end_date_time = $appraisal['appraisal_date'].' 23:59:59';
+            $appraisal_notifications = array(
+                "title" => $appraisal['employee_name']."'s Evaluation",
+                "start" => $start_date_time,
+                "end" => $end_date_time,
+                "className" => "m-fc-event--primary",
+                "description" => $appraisal['employee_name']."'s Evaluation");
+            $all_events[] = $appraisal_notifications;
+        }
+        $birthday = Employee::select(DB::raw("full_name , DATE_FORMAT(date_of_birth,'%m-%d') as birthday"))->whereStatus(1)->get()->toArray();
+        $birthday_events[] = array();
+        foreach($birthday as $event) {
+            $birthday_start = date("Y").'-'.$event['birthday'].' 00:00:00';
+            $birthday_end = date("Y").'-'.$event['birthday'].' 23:59:59';
+            $birthday_events = array(
+                "title" => $event['full_name']."'s Birthday",
+                "start" => $birthday_start,
+                "end" => $birthday_end,
+                "className" => "m-fc-event--solid-info m-fc-event--light",
+                "description" => $event['full_name']."'s Birthday");
+            $all_events[] = $birthday_events;
+        }
+        $all_events = json_encode($all_events);
+        $all_events = preg_replace('/"([^"]+)"\s*:\s*/', '$1:', $all_events);
+        $data['calendar_events'] = $all_events;
         return view('dashboard.hr_dashboard',$data);
     }
-    public function admin_dashboard()
+    private function admin_dashboard()
     {
         $data['page_title'] = "Admin Dashboard - Atlantis CRM";
         $data['small_nav'] = true;
@@ -78,7 +277,7 @@ class DashboardController extends Controller
         $data['provider_based_stats'] = CallDispositionsService::select('provider_name', DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile'))->where(['status' => 1])->with('call_disposition')->whereBetween('added_on', [$from_date, $to_date])->groupBy('provider_name')->get();
         return view('dashboard.dashboard', $data);
     }
-    public function team_dashboard()
+    private function team_dashboard()
     {
         $data['page_title'] = "Lead Dashboard - Atlantis CRM";
         $data['small_nav'] = true;
@@ -182,7 +381,7 @@ class DashboardController extends Controller
         $data['all_sales_stats']['total'] = $total;
         return view('dashboard.team_dashboard' , $data);
     }
-    public function csr_dashboard()
+    private function csr_dashboard()
     {
         $data['page_title'] = "CSR Dashboard - Atlantis CRM";
         $data['small_nav'] = true;
@@ -233,13 +432,13 @@ class DashboardController extends Controller
         $data['monthly_status'] = DB::select("SELECT * FROM (SELECT AVG(monitor_percentage) AS average FROM qa_with_color_badge WHERE(added_on >= '".$from_date."' AND added_on <= '".$to_date."' AND agent_id = '".$uid."') ) as avg_table INNER JOIN qa_performance_badge ON (avg_table.average >= qa_performance_badge.min AND avg_table.average <= qa_performance_badge.max)");
         return view('dashboard.agent_dashboard' , $data);
     }
-    public function qa_dashboard()
+    private function qa_dashboard()
     {
         $data['page_title'] = "QA Dashboard - Atlantis CRM";
         $data['small_nav'] = true;
         return view('dashboard.qa_dashboard' , $data);
     }
-    public function vendor_dashboard(){
+    private function vendor_dashboard(){
         $data['page_title'] = "Vendor Dashboard - Atlantis CRM";
         $data['small_nav'] = true;
         $did_id = explode(',',Auth::user()->vendor_did_id);
@@ -268,7 +467,7 @@ class DashboardController extends Controller
         $data['rgu_monthly'] = $this->get_did_wise_provider_rgo($from_date,$to_date,$did_id);
         return view('dashboard.vendor_dashboard' , $data);
     }
-    public function provider_dashboard(){
+    private function provider_dashboard(){
         $data['page_title'] = 'Provider Dashboard - Atlantis CRM';
         $data['small_nav'] = true;
         $today = get_date();
@@ -571,7 +770,7 @@ FROM all_sales  WHERE added_on>="'.$from_date.'" AND added_on<="'.$to_date.'" AN
             'mobile' => $mobile,
         ];
     }
-    function update_sales_chart(Request $request){
+    private function update_sales_chart(Request $request){
         $today = get_date();
         $datetime = new DateTime($today);
         $date_today = date("d"  ,strtotime($today));
@@ -617,5 +816,38 @@ FROM all_sales  WHERE added_on>="'.$from_date.'" AND added_on<="'.$to_date.'" AN
         }
         $data['monthly_total'] = $total_sale;
         return view('dashboard.partial.csr_sales_chart',$data);
+    }
+    private function get_employees_assessment_for_calender()
+    {
+        $data = array();
+        $employees = \App\Models\Employee::with('employee:user_id,user_type')
+            ->whereStatus(1)->select('user_id','full_name','joining_date','confirmation_date')->get()->toArray();
+        foreach ($employees as $employee){
+            $employee_assessment = false;
+            // Already Appraisal record check to get last appraisal date
+            $check_evaluation_record = \App\Models\EmployeeAssessment::with('employees')
+                ->where('user_id', $employee['user_id'])
+                ->where('hr_sign', 1)
+                ->orderBy('added_on', 'desc')->first();
+            if($check_evaluation_record != NULL){
+                if($check_evaluation_record->probation_extension == 'YES'){
+                    $new_appraisal_date = date("Y-m-d", strtotime($check_evaluation_record->probation_extension_to_date));
+                }else{
+                    $new_appraisal_date = date("Y-m-d", strtotime("+3 month", strtotime($check_evaluation_record->evaluation_date)));
+                }
+            }else{
+                $employees = \App\Models\Employee::where('user_id', $employee['user_id'])->first();
+                if($employees->confirmation_date == Null){
+                    $new_appraisal_date = date("Y-m-d", strtotime("+3 month", strtotime($employees->joining_date)));
+                }else{
+                    $new_appraisal_date = date("Y-m-d", strtotime("+3 month", strtotime($employees->confirmation_date)));
+                }
+            }
+            $data[] = array(
+                'employee_name' => $employee['full_name'],
+                'appraisal_date' => $new_appraisal_date,
+            );
+        }
+        return $data;
     }
 }

@@ -204,6 +204,8 @@ class EmployeeSeparationController extends Controller
         $response['result'] = "Deleted Successfully";
         return response()->json($response);
     }
+
+    ///////////////////////////////////////////////////
     private function check_holidays($form_date, $to_date,$department_id, $user_id)
     {
         $check_holidays = Holiday::where(function ($query_dpt) use($department_id) {
@@ -271,6 +273,7 @@ class EmployeeSeparationController extends Controller
                     ->orWhere('role_id',0);
             })
             ->whereStatus(1)->get();
+
         $fixed_deduction_after_tax = $fixed_deduction_after_tax[0]['fixed_deduction_after_tax'];
         $pct_deduction_before_tax  = PayrollDeductionSetting::select(DB::raw('sum(value) as pct_deduction_before_tax'))
             ->where('type', 'other')
@@ -374,6 +377,7 @@ class EmployeeSeparationController extends Controller
             $deduction_details['Income Tax'] = $tax_deduction_val;
         }
         $total_deductions =  $tax_deduction_val +  $attendance_log_deduction;
+
         return [
             'total_deductions' => $total_deductions + $calculated_deductions['after_tax_deduction'],
             'deduction_bucket' => $leaves_deducted_from_bucket,
@@ -438,6 +442,7 @@ class EmployeeSeparationController extends Controller
         }
         $from_date = $from_date.' 17:00:00';
         $to_date = $to_date.' 17:00:00';
+
         // manager team RGU count
         $is_manager = ManagerialRole::where('role_id',$user->role_id)->first();
         $manager_team_count = 0;
@@ -564,8 +569,8 @@ class EmployeeSeparationController extends Controller
         $annul_salary = $salary*12;
         $tax_deduction = PayrollTaxSlab::whereStatus(1)
             ->where(function ($query) use ($annul_salary) {
-                $query->where('from', '<=', $annul_salary);
-                $query->where('to', '>=', $annul_salary);
+                $query->where('from', '<', $annul_salary);
+                $query->where('to', '>', $annul_salary);
             })
             ->first();
         if(!$tax_deduction) {die('Tax Slab not found for '.$user->full_name);}

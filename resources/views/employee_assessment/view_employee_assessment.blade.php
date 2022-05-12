@@ -64,14 +64,15 @@
                                 <span>{{ $EmployeeAssessment->total_service }}</span>
                             </div>
                         </div>
+                        @if($EmployeeAssessment->hr_sign == 1)
                         <div class="row">
                             <div class="col-4">
                                 <b>Total Presents (last 3 months) : </b>
-                                <span>{{ (empty($EmployeeAssessment->attendance) ? $attendance_log['presents'] : $EmployeeAssessment->attendance)}} %</span>
+                                <span>{{ $EmployeeAssessment->attendance }} %</span>
                             </div>
                             <div class="col-4">
                                 <b>Tardiness (last 3 months): </b>
-                                <span>{{ (empty($EmployeeAssessment->tardiness) ? $attendance_log['late'] : $EmployeeAssessment->tardiness)}} %</span>
+                                <span>{{$EmployeeAssessment->tardiness}} %</span>
                             </div>
                             @if($EmployeeAssessment->probation_extension == 'YES')
                             <div class="col-4">
@@ -80,6 +81,7 @@
                             </div>
                             @endif
                         </div>
+                        @endif
                         <div class="m-separator m-separator--dashed m-separator--lg"></div>
                         <div class="row">
                             <div class="col-12">

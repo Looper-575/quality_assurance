@@ -44,13 +44,13 @@
     <div class="col-6">
         <div class="form-group m-form__group">
             <label for="attendance"><b>* Attendance (%):</b> </label>
-            <input name="attendance" value="{{($EmployeeAssessment && isset($EmployeeAssessment->attendance))  ? $EmployeeAssessment->attendance : $attendance_log['presents']}}" required type="number" min="0" class="form-control">
+            <input name="attendance" step="any" value="{{($EmployeeAssessment && isset($EmployeeAssessment->attendance))  ? $EmployeeAssessment->attendance : $attendance_log['presents']}}" required type="number" min="0" class="form-control">
         </div>
     </div>
     <div class="col-6">
         <div class="form-group m-form__group">
             <label for="tardiness"><b>* Tardiness (%):</b> </label>
-            <input name="tardiness" value="{{($EmployeeAssessment && isset($EmployeeAssessment->tardiness) ) ? $EmployeeAssessment->tardiness : $attendance_log['late']}}" required type="number" min="0" class="form-control">
+            <input name="tardiness" step="any" value="{{($EmployeeAssessment && isset($EmployeeAssessment->tardiness) ) ? $EmployeeAssessment->tardiness : $attendance_log['late']}}" required type="number" min="0" class="form-control">
         </div>
     </div>
 </div>
@@ -65,6 +65,21 @@
         <div class="form-group m-form__group">
             <label for="verbal_warning"><b>* Verbal Warning:</b> </label>
             <input name="verbal_warning" value="{{$EmployeeAssessment ? $EmployeeAssessment->verbal_warning : '0'}}" required type="number" min="0" class="form-control">
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6">
+        <div class="form-group m-form__group">
+            <label for="employee_current_status"><b>Employee Current Status: </b> </label>
+            <label for="employee_current_status"><b>{{$EmployeeAssessment->employees->employment_status}}</b> </label>
+            <input type="hidden" name="employee_current_status" value="{{$EmployeeAssessment->employees->employment_status}}">
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="form-group m-form__group">
+            <label for="increment"><b>Increment (*if any)</b></label>
+            <input type="number" name="increment" min="0" value="{{$EmployeeAssessment ? $EmployeeAssessment->increment : '0'}}">
         </div>
     </div>
 </div>
@@ -116,18 +131,6 @@
     <input type="hidden" name="probation_extension" value="NO">
     <input type="hidden" name="probation_extension_to_date" value="">
 @endif
-<div class="row">
-    <div class="col-3">
-        <div class="form-group m-form__group">
-            <label for="increment"><b>Increment (*if any)</b></label>
-        </div>
-    </div>
-    <div class="col-9">
-        <div class="form-group m-form__group">
-            <input type="number" name="increment" min="0" value="{{$EmployeeAssessment ? $EmployeeAssessment->increment : '0'}}">
-        </div>
-    </div>
-</div>
 <div class="row">
     <div class="col-3">
         <div class="form-group m-form__group">

@@ -1,7 +1,4 @@
-<button type="button" onclick="print_div('emp_undertaking_form');" class="btn btn-info m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill">
-    Print
-</button>
-<div class="row" id="emp_undertaking_form">
+<div class="container-fluid" id="emp_undertaking_form" style="margin-top: -10px;overflow-y: auto;overflow-x: hidden;height: 300px;">
     <br><br>
     <div class="row">
         <div class="col-12">
@@ -19,9 +16,9 @@
     <div class="col-12 justify-content-between">
         <h4 class="text-center font-underline">Undertaking and Indemnity</h4>
         <br><br><br>
-        <p>This deed of undertaking cum Indemnity is made at Islamabad on this <b>(___ day of ____ 2022)</b></p>
-        <p>I, _<b>{{ $separation->user->full_name }}</b>_ son/daughter of
-            _<b>{{ $separation->user->employee->father_husband }}</b>_, resident of <b>Islamabad Pakistan</b>, do hereby
+        <p>This deed of undertaking cum Indemnity is made at Islamabad on <b> {{date('F d, Y' , strtotime($separation->separation_date))}}</b></p>
+        <p>I, <b>{{ $separation->user->full_name }}</b> son/daughter of
+            <b>{{ $separation->user->employee->father_husband }}</b>, resident of <b>Islamabad Pakistan</b>, do hereby
             agree, accept and acknowledge that I have received all legal dues and benefits from
             <b>Atlantis BPO Solutions (Pvt) Ltd. Islamabad</b>, (hereinafter referred to as the “Employer”) and that as
             of the date of this deed, I have no claim whatsoever against the Employer.</p>
@@ -51,9 +48,13 @@
     <div class="row">
         <div class="col-8"></div>
         <div class="col-4">
-            <p></br></br>
-                <b>Signature</b> ______________________ </br>
+            <p><b>Signature</b></br></br></br>
+                 ______________________ </br>
                 <b>Name:</b> {{ $separation->user->full_name }}</br>
                 <b>CNIC No:</b> {{ $separation->user->employee->cnic }} </p></div>
     </div>
 </div>
+<button type="button" onclick="print_div('emp_undertaking_form');"
+        class="btn btn-info m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill">
+    Print
+</button>

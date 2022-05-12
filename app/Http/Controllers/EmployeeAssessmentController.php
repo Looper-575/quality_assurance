@@ -89,7 +89,11 @@ class EmployeeAssessmentController extends Controller
             if(count($Previous_EmployeeAssessment) > 0 && $Previous_EmployeeAssessment[0]->evaluation_date){
                 $period = get_period($Previous_EmployeeAssessment[0]->evaluation_date, get_date());
             }else{
-                $period = get_period($EmployeeAssessment->employees->joining_date, get_date());
+                if($EmployeeAssessment->employees->confimation_date != NULL){
+                    $period = get_period($EmployeeAssessment->employees->confimation_date, get_date());
+                }else{
+                    $period = get_period($EmployeeAssessment->employees->joining_date, get_date());
+                }
             }
             if(isset($Previous_EmployeeAssessment[0]->confirmation_status)) {
                 $data['prob_status'] = $Previous_EmployeeAssessment[0]->confirmation_status;
@@ -101,16 +105,35 @@ class EmployeeAssessmentController extends Controller
             $data['total_service'] = total_service($EmployeeAssessment->employees->joining_date, get_date());
             $data['previous_overall_ratings'] = [];
             $data['employee_previous_objectives'] = false;
-            if(count($Previous_EmployeeAssessment) > 0 ){
+            if(count($Previous_EmployeeAssessment) > 0){
                 foreach ($Previous_EmployeeAssessment as $Confirmations) {
                     array_push($data['previous_overall_ratings'],$Confirmations->overall_rating);
                 }
                 $data['employee_previous_objectives'] = EmployeeObjectives::where('assessment_id',$Previous_EmployeeAssessment[0]->id)
                     ->orderBy('added_on', 'desc')->get();
             }
-            $form_date = date ( "Y\-m\-d" , strtotime ( "-3 Months" ));
+          //  $from_date = date ( "Y\-m\-d" , strtotime ( "-3 Months" ));
+            if($Previous_EmployeeAssessment){
+                if($Previous_EmployeeAssessment[0]->evaluation_date != ''){
+                    $from_date = date ( "Y\-m\-d" , strtotime ( $Previous_EmployeeAssessment[0]->evaluation_date ));
+                }else{
+                    $employees = \App\Models\Employee::where('user_id', $Previous_EmployeeAssessment[0]->user_id)->first();
+                    if($employees->confirmation_date == Null){
+                        $from_date = date ( "Y\-m\-d" , strtotime ( $employees->joining_date ));
+                    }else{
+                        $from_date = date ( "Y\-m\-d" , strtotime ( $employees->confirmation_date ));
+                    }
+                }
+            }else{
+                $employees = \App\Models\Employee::where('user_id', $EmployeeAssessment->user_id)->first();
+                if($employees->confirmation_date == Null){
+                    $from_date = date ( "Y\-m\-d" , strtotime ( $employees->joining_date ));
+                }else{
+                    $from_date = date ( "Y\-m\-d" , strtotime ( $employees->confirmation_date ));
+                }
+            }
             $to_date = get_date();
-            $data['attendance_log'] = $this->get_attendance_log($form_date, $to_date,$EmployeeAssessment->user_id);
+            $data['attendance_log'] = $this->get_attendance_log($from_date, $to_date,$EmployeeAssessment->user_id);
         }else{
             // FOR ALL EMPLOYEES SELF ASSESSMENT
             $data['EmployeeAssessment'] = false;
@@ -249,23 +272,37 @@ class EmployeeAssessmentController extends Controller
                 $employee_data = Employee::with('employee')->where('user_id', $user_id)->first();
                 $employee_salary_increment = $employee_data->net_salary + $request->increment;
                 Employee::where('user_id', $user_id)->update(['net_salary' => $employee_salary_increment]);
-                if($request->confirmation_status == 'Confirmed'){
-                    Employee::where('user_id', $user_id)->update([
-                                'employment_status' => $request->confirmation_status,
-                                'confirmation_date' => get_date()
-                                ]);
-                    $Leaves_Bucket_record = LeavesBucket::where('user_id',$user_id)->count();
-                    if($Leaves_Bucket_record == 0 && ($employee_data->employment_status == 'Confirmed' || $request->employment_status == 'Confirmed')) {
-                        generate_single_employee_leaves_bucket($request->user_id);
-                    }
-                }
-                if($request->probation_extension == 'YES'){
+                if($request->employee_current_status == 'Nesting'){
+                    // if employee must pass to probation status after nesting then will be confirmd later
+                    $EmployeeAssessment_data['confirmation_status'] = 'Probation';
+                    $EmployeeAssessment_data['probation_extension'] = 'NO';
+                    $EmployeeAssessment_data['probation_extension_to_date'] = '';
                     Employee::where('user_id', $user_id)->update([
                         'employment_status' => 'Probation'
                     ]);
-                    $EmployeeAssessment_data['confirmation_status'] = 'Probation';
-                    $EmployeeAssessment_data['probation_extension'] = 'YES';
-                    $EmployeeAssessment_data['probation_extension_to_date'] = $request->probation_extension_to_date;
+                }else{
+                    if($request->confirmation_status == 'Confirmed'){
+                        Employee::where('user_id', $user_id)->update([
+                            'employment_status' => $request->confirmation_status,
+                            'confirmation_date' => get_date()
+                        ]);
+                        $Leaves_Bucket_record = LeavesBucket::where('user_id',$user_id)->count();
+                        if($Leaves_Bucket_record == 0 && ($employee_data->employment_status == 'Confirmed' || $request->employment_status == 'Confirmed')) {
+                            generate_single_employee_leaves_bucket($request->user_id);
+                        }
+                    }else{
+                        Employee::where('user_id', $user_id)->update([
+                            'employment_status' => $request->confirmation_status
+                        ]);
+                    }
+                    if($request->probation_extension == 'YES'){
+                        Employee::where('user_id', $user_id)->update([
+                            'employment_status' => 'Probation'
+                        ]);
+                        $EmployeeAssessment_data['confirmation_status'] = 'Probation';
+                        $EmployeeAssessment_data['probation_extension'] = 'YES';
+                        $EmployeeAssessment_data['probation_extension_to_date'] = $request->probation_extension_to_date;
+                    }
                 }
             }
             if($EmployeeAssessment){
@@ -395,9 +432,6 @@ class EmployeeAssessmentController extends Controller
             $data['standards_average'] = $this->calculate_overall_rating_avg($EmployeeAssessment_data->id,$EmployeeAssessment_data->user_id);
             $data['employee_objectives'] = EmployeeObjectives::where('assessment_id',$EmployeeAssessment_data->id)
                 ->orderBy('added_on', 'desc')->get();
-            $form_date = date ( "Y\-m\-d" , strtotime ( "-3 Months" ));
-            $to_date = get_date();
-            $data['attendance_log'] = $this->get_attendance_log($form_date, $to_date,$EmployeeAssessment_data->user_id);
         }else{
             $data['EmployeeAssessment'] = false;
             $data['employee_self_evaluation'] = false;
@@ -494,7 +528,7 @@ class EmployeeAssessmentController extends Controller
         $standards_average = $sum_of_overall_ratings/$avg;
         return $standards_average;
     }
-    private function check_holidays($form_date, $to_date, $user_id)
+    private function check_holidays($from_date, $to_date, $user_id)
     {
         $department_id = User::whereUserId($user_id)->whereStatus(1)->pluck('department_id')->first();
         $check_holidays = Holiday::where(function ($query_dpt) use($department_id) {
@@ -505,18 +539,18 @@ class EmployeeAssessmentController extends Controller
                 return $query->whereRaw('FIND_IN_SET("'.$user_id.'",user_id)')
                     ->orWhere('user_id',0);
             })
-            ->where(function ($query_date) use($form_date, $to_date) {
-                return $query_date->whereBetween('date_from', [$form_date, $to_date])
-                    ->orWhereBetween('date_to', [$form_date, $to_date]);
+            ->where(function ($query_date) use($from_date, $to_date) {
+                return $query_date->whereBetween('date_from', [$from_date, $to_date])
+                    ->orWhereBetween('date_to', [$from_date, $to_date]);
             })
             ->get();
         $holiday_count = 0;
         foreach ($check_holidays as $day){
             $holiday_count = 1;
-            if($day->date_from >= $form_date){
+            if($day->date_from >= $from_date){
                 $from = $day->date_from;
             } else {
-                $from = $form_date;
+                $from = $from_date;
             }
             if($day->date_to <= $to_date){
                 $to = $day->date_to;
@@ -532,12 +566,12 @@ class EmployeeAssessmentController extends Controller
         }
         return $holiday_count;
     }
-    public function get_attendance_log($form_date, $to_date, $user_id){
-        $holiday_count = $this->check_holidays($form_date, $to_date, $user_id);
-        $working_days = working_days($form_date, $to_date);
+    public function get_attendance_log($from_date, $to_date, $user_id){
+        $holiday_count = $this->check_holidays($from_date, $to_date, $user_id);
+        $working_days = working_days($from_date, $to_date);
         $attendance_log = AttendanceLog::select(DB::raw('sum(late) as `lates`, sum(absent) as `absents`, sum(on_leave) as `leaves` , sum(half_leave) as `half_leaves` , count(user_id) as `attendance_marked` , MONTH(attendance_date) month'), 'user_id')
             ->where('user_id', $user_id)
-            ->whereBetween('attendance_date', [$form_date, $to_date])
+            ->whereBetween('attendance_date', [$from_date, $to_date])
             ->groupBy('user_id','month')
             ->get();
         $presents = $lates = $total_marked_attendances = 0;

@@ -352,7 +352,7 @@ if(!function_exists('add_notifications')){
                 $user_name = $user->full_name;
                 $email_body = 'You have a pending leave approval Request.';
                 $email_subject = 'Pending Leave Approval Request!';
-                $email_view = 'notifications.email_template';
+                $email_view = 'email_templates.notification_email';
                 $email_data = ['name' => $user_name,
                     'email_body' => $email_body];
                 send_email_laravel($user_email, $user_name, $email_subject, $email_view, $email_data );

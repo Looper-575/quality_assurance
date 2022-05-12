@@ -27,13 +27,19 @@
                     <div class="col-5">
                         <div class="form-group">
                             <label class="form-check-label" for="manager_id">Team</label>
-                            <input type="hidden" name="manager_id" value="{{Auth::user()->user_id}}" id="manager_id" {{ Auth::user()->role->role_id == 1 ? 'disabled' : '' }}>
+                            <?php $team_id = 0; ?>
                             <select class="form-control select2 mt-3" name="team_id" required {{ Auth::user()->role->role_id == 1 || Auth::user()->role->role_id==5 ? '' : 'disabled' }}>
                                 <option value="">Select Team</option>
                                 @foreach($teams as $team)
+                                    <?php
+                                    if(Auth::user()->user_id == $team->team_lead_id){
+                                        $team_id = $team->team_id;
+                                    }
+                                    ?>
                                     <option {{ Auth::user()->user_id == $team->team_lead_id ? 'selected' : '' }} value="{{$team->team_id}}">{{$team->title}}</option>
                                 @endforeach
                             </select>
+                            <input type="hidden" name="team_id" value="{{$team_id}}" id="manager_id" {{ Auth::user()->role->role_id == 1 ? 'disabled' : '' }}>
                         </div>
                     </div>
                     <div class="col-2 mt-4">
