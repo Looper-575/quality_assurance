@@ -18,9 +18,9 @@
                 @csrf
                 <input type="hidden" name="suspension_id" id="suspension_id" value="{{isset($suspension) ? $suspension->suspension_id : 0}}">
                 <div class="row">
-                    <div class="col-lg-6">
+                    <div class="col-6">
                         <div class="form-group">
-                            <label for="user_id">Employee Name</label>
+                            <span class="font-bold font-14" for="user_id">Employee Name</span>
                             <select class="form-control" name="user_id" id="user_id" required >
                                 <option value="">Select</option>
                                 @foreach($users as $user)
@@ -29,26 +29,23 @@
                             </select>
                         </div>
                     </div>
-                </div>
-                <div class="row">
+                    <div class="col-6"></div>
                     <div class="col-6">
                         <div class="form-group">
-                            <label for="from_date"> From Date</label>
+                            <span class="font-bold font-14" for="from_date"> From Date</span>
                             <input  class="form-control" name="from_date" id="from_date" value="{{isset($suspension) ? $suspension->from_date : get_date()}}" type="date">
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="form-group">
-                            <label for="to_date"> To Date</label>
+                            <span class="font-bold font-14" for="to_date"> To Date</span>
                             <input  class="form-control" name="to_date" id="to_date" value="{{isset($suspension) ? $suspension->to_date : ''}}" type="date">
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-12">
                         <div class="form-group">
-                            <label for="reason"> Reason</label>
-                            <textarea class="form-control" name="reason" id="reason" cols="60" rows="20">{{isset($suspension) ? $suspension->reason : ''}}</textarea>
+                            <span class="font-bold font-14" for="reason"> Reason</span>
+                            <textarea class="form-control" name="reason" id="reason" rows="3" style="width: 100%; max-width: 100%;">{{isset($suspension) ? $suspension->reason : ''}}</textarea>
                         </div>
                     </div>
                 </div>

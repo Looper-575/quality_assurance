@@ -112,12 +112,11 @@ class EmployeeAssessmentController extends Controller
                 $data['employee_previous_objectives'] = EmployeeObjectives::where('assessment_id',$Previous_EmployeeAssessment[0]->id)
                     ->orderBy('added_on', 'desc')->get();
             }
-          //  $from_date = date ( "Y\-m\-d" , strtotime ( "-3 Months" ));
-            if($Previous_EmployeeAssessment){
+            if(count($Previous_EmployeeAssessment) > 0){
                 if($Previous_EmployeeAssessment[0]->evaluation_date != ''){
                     $from_date = date ( "Y\-m\-d" , strtotime ( $Previous_EmployeeAssessment[0]->evaluation_date ));
                 }else{
-                    $employees = \App\Models\Employee::where('user_id', $Previous_EmployeeAssessment[0]->user_id)->first();
+                    $employees = Employee::where('user_id', $Previous_EmployeeAssessment[0]->user_id)->first();
                     if($employees->confirmation_date == Null){
                         $from_date = date ( "Y\-m\-d" , strtotime ( $employees->joining_date ));
                     }else{
@@ -125,7 +124,7 @@ class EmployeeAssessmentController extends Controller
                     }
                 }
             }else{
-                $employees = \App\Models\Employee::where('user_id', $EmployeeAssessment->user_id)->first();
+                $employees = Employee::where('user_id', $EmployeeAssessment->user_id)->first();
                 if($employees->confirmation_date == Null){
                     $from_date = date ( "Y\-m\-d" , strtotime ( $employees->joining_date ));
                 }else{
@@ -263,8 +262,6 @@ class EmployeeAssessmentController extends Controller
                     'verbal_warning' => $request->verbal_warning,
                     'hr_comments' => $request->hr_comments,
                     'hr_sign' => 1,
-                    'probation_extension' => $request->probation_extension,
-                    'probation_extension_to_date' => $request->probation_extension_to_date,
                     'evaluation_date' => get_date(),
                     'confirmation_status' => $request->confirmation_status,
                     'increment' => $request->increment
@@ -275,17 +272,19 @@ class EmployeeAssessmentController extends Controller
                 if($request->employee_current_status == 'Nesting'){
                     // if employee must pass to probation status after nesting then will be confirmd later
                     $EmployeeAssessment_data['confirmation_status'] = 'Probation';
-                    $EmployeeAssessment_data['probation_extension'] = 'NO';
-                    $EmployeeAssessment_data['probation_extension_to_date'] = '';
                     Employee::where('user_id', $user_id)->update([
                         'employment_status' => 'Probation'
                     ]);
-                }else{
+                }else {
                     if($request->confirmation_status == 'Confirmed'){
-                        Employee::where('user_id', $user_id)->update([
-                            'employment_status' => $request->confirmation_status,
-                            'confirmation_date' => get_date()
-                        ]);
+                        if($employee_data->confirmation_date == NULL){
+                            Employee::where('user_id', $user_id)->update([
+                                'employment_status' => $request->confirmation_status,
+                                'confirmation_date' => get_date()
+                            ]);
+                        }
+                        $EmployeeAssessment_data['probation_extension'] = 'NO';
+                        $EmployeeAssessment_data['probation_extension_to_date'] = NULL;
                         $Leaves_Bucket_record = LeavesBucket::where('user_id',$user_id)->count();
                         if($Leaves_Bucket_record == 0 && ($employee_data->employment_status == 'Confirmed' || $request->employment_status == 'Confirmed')) {
                             generate_single_employee_leaves_bucket($request->user_id);
@@ -294,14 +293,14 @@ class EmployeeAssessmentController extends Controller
                         Employee::where('user_id', $user_id)->update([
                             'employment_status' => $request->confirmation_status
                         ]);
-                    }
-                    if($request->probation_extension == 'YES'){
-                        Employee::where('user_id', $user_id)->update([
-                            'employment_status' => 'Probation'
-                        ]);
-                        $EmployeeAssessment_data['confirmation_status'] = 'Probation';
-                        $EmployeeAssessment_data['probation_extension'] = 'YES';
-                        $EmployeeAssessment_data['probation_extension_to_date'] = $request->probation_extension_to_date;
+                        if($request->probation_extension == 'YES'){
+                            Employee::where('user_id', $user_id)->update([
+                                'employment_status' => 'Probation'
+                            ]);
+                            $EmployeeAssessment_data['confirmation_status'] = 'Probation';
+                            $EmployeeAssessment_data['probation_extension'] = 'YES';
+                            $EmployeeAssessment_data['probation_extension_to_date'] = $request->probation_extension_to_date;
+                        }
                     }
                 }
             }
@@ -321,9 +320,13 @@ class EmployeeAssessmentController extends Controller
             }
             if(isset($request->manager_comments)){
                 // Notification Tray
-                $send_email = false;
-                $hr_user_id = User::where('role_id', 5)->pluck('user_id')->first();
-                add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,$hr_user_id,'Pending HR Evaluation',$send_email);
+                $hr_user_ids = User::where('role_id', 5)->get()->pluck('user_id')->toArray();
+                if(count($hr_user_ids)>0){
+                    for($i=0; $i<count($hr_user_ids); $i++){
+                        $send_email = false;
+                        add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,$hr_user_ids[$i],'Pending HR Evaluation',$send_email);
+                    }
+                }
             }
             // if admin is doing both manager and hr evaluations
             $employee_record = Employee::with('employee')->where('user_id', $user_id)->first();
@@ -334,8 +337,13 @@ class EmployeeAssessmentController extends Controller
                 }else if(isset($request->manager_comments)){
                     $remarker_id = $employee_record->employee->manager_id;
                     // NOTIFICATION TRAY
-                    $send_email = false;
-                    add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,$HR_manager->user_id,'Pending HR Evaluation',$send_email);
+                    $hr_user_ids = User::where('role_id', 5)->get()->pluck('user_id')->toArray();
+                    if(count($hr_user_ids)>0){
+                        for($i=0; $i<count($hr_user_ids); $i++){
+                            $send_email = false;
+                            add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,$hr_user_ids[$i],'Pending HR Evaluation',$send_email);
+                        }
+                    }
                 }
             }else{
                 $remarker_id = Auth::user()->user_id;
@@ -581,7 +589,11 @@ class EmployeeAssessmentController extends Controller
             $presents += $total_presents;
             $lates += $attendance->lates;
         }
-        $lates = number_format(($lates / $presents) * 100, 1);
+        if($presents != 0){
+            $lates = number_format(($lates / $presents) * 100, 1);
+        }else{
+            $lates = 0;
+        }
         $presents = number_format((($presents + $holiday_count) / $working_days) * 100, 1);
         $attendance = ['presents' => $presents, 'late' => $lates ];
         return $attendance;

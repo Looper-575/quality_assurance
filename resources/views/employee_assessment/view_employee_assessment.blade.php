@@ -24,92 +24,75 @@
                     </div>
                     <div class="m-portlet__body">
 
-                        <div class="row">
-                            <div class="col-lg-2">
-                                <b>Employee Name:</b>
+                        <div class="row mb-2">
+                            <div class="col-4">
+                                <span class="font-bold font-14">Employee Name:</span>
+                                <span class="font-bold font-12">{{ $EmployeeAssessment->employees->full_name }}</span>
                             </div>
-                            <div class="col-lg-2">
-                                <span>{{ $EmployeeAssessment->employees->full_name }}</span>
+                            <div class="col-4">
+                                <span class="font-bold font-14">Designation:</span>
+                                <span class="font-bold font-12">{{ $EmployeeAssessment->employees->designation }}</span>
                             </div>
-                            <div class="col-lg-2">
-                                <b>Designation:</b>
-                            </div>
-                            <div class="col-lg-2">
-                                <span>{{ $EmployeeAssessment->employees->designation }}</span>
-                            </div>
-                            <div class="col-lg-2">
-                                <b>Department:</b>
-                            </div>
-                            <div class="col-lg-2">
-                                <span>{{ $EmployeeAssessment->employees->department->title }}</span>
+                            <div class="col-4">
+                                <span class="font-bold font-14">Department:</span>
+                                <span class="font-bold font-12">{{ $EmployeeAssessment->employees->department->title }}</span>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-lg-2">
-                                <b>Date of Joining:</b>
+                        <div class="row mb-2">
+                            <div class="col-4">
+                                <span class="font-bold font-14">Date of Joining:</span>
+                                <span class="font-bold font-12">{{ $EmployeeAssessment->employees->joining_date }}</span>
                             </div>
-                            <div class="col-lg-2">
-                                <span>{{ $EmployeeAssessment->employees->joining_date }}</span>
+                            <div class="col-4">
+                                <span class="font-bold font-14">Assessment Period:</span>
+                                <span class="font-bold font-12">{{ $EmployeeAssessment->period }}</span>
                             </div>
-                            <div class="col-lg-2">
-                                <b>Assessment Period:</b>
-                            </div>
-                            <div class="col-lg-2">
-                                <span>{{ $EmployeeAssessment->period }}</span>
-                            </div>
-                            <div class="col-lg-2">
-                                <b>Total Service:</b>
-                            </div>
-                            <div class="col-lg-2">
-                                <span>{{ $EmployeeAssessment->total_service }}</span>
+                            <div class="col-4">
+                                <span class="font-bold font-14">Total Service:</span>
+                                <span class="font-bold font-12">{{ $EmployeeAssessment->total_service }}</span>
                             </div>
                         </div>
                         @if($EmployeeAssessment->hr_sign == 1)
-                        <div class="row">
+                        <div class="row mb-2">
                             <div class="col-4">
-                                <b>Total Presents (last 3 months) : </b>
-                                <span>{{ $EmployeeAssessment->attendance }} %</span>
+                                <span class="font-bold font-14">Total Presents (last 3 months) : </span>
+                                <span class="font-bold font-12">{{ $EmployeeAssessment->attendance }} %</span>
                             </div>
                             <div class="col-4">
-                                <b>Tardiness (last 3 months): </b>
-                                <span>{{$EmployeeAssessment->tardiness}} %</span>
+                                <span class="font-bold font-14">Tardiness (last 3 months): </span>
+                                <span class="font-bold font-12">{{$EmployeeAssessment->tardiness}} %</span>
                             </div>
-                            @if($EmployeeAssessment->probation_extension == 'YES')
                             <div class="col-4">
-                                <b>Probation Extended Till: </b>
-                                <span>{{$EmployeeAssessment->probation_extension_to_date}}</span>
+                                @if($EmployeeAssessment->probation_extension == 'YES')
+                                    <span class="font-bold font-14">Probation Extended Till: </span>
+                                    <span class="font-bold font-12">{{$EmployeeAssessment->probation_extension_to_date}}</span>
+                                @else
+                                    <span class="font-bold font-14">Employment Status: </span>
+                                    <span class="font-bold font-12">{{$EmployeeAssessment->confirmation_status}}</span>
+                                @endif
                             </div>
-                            @endif
                         </div>
                         @endif
-                        <div class="m-separator m-separator--dashed m-separator--lg"></div>
+                       <hr>
                         <div class="row">
                             <div class="col-12">
-                                <h4>Employee Self Assessment</h4>
+                                <h5 class="m-portlet__head-text">Employee Self Assessment</h5>
                                 @if($EmployeeAssessment->employee_sign == 1)
                                     <div class="row">
-                                        <div class="col-lg-12">
-                                            <p><b>Employee's understanding of main duties, responsibilities.:</b></p>
-                                            <p>{{ $EmployeeAssessment->esa_duties }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <p><b>Employee's most important achievement during the review period:</b></p>
-                                            <p>{{ $EmployeeAssessment->esa_achievements }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <p><b>Employee's aims and tasks for future:</b></p>
-                                            <p>{{ $EmployeeAssessment->esa_future_aims }}</p>
+                                        <div class="col-12">
+                                            <p><b>Employee's understanding of main duties, responsibilities.:</b>
+                                                <br>{{ $EmployeeAssessment->esa_duties }}</p>
+                                            <p><b>Employee's most important achievement during the review period:</b>
+                                                <br>{{ $EmployeeAssessment->esa_achievements }}</p>
+                                            <p><b>Employee's aims and tasks for future:</b>
+                                                <br>{{ $EmployeeAssessment->esa_future_aims }}</p>
                                         </div>
                                     </div>
                                     @if($employee_self_evaluation)
-                                        <div class="m-separator m-separator--dashed m-separator--lg"></div>
-                                        <h4>Evaluation By Employee</h4>
+                                        <hr>
+                                        <h5 class="m-portlet__head-text">Evaluation By Employee</h5>
                                         <div class="row">
-                                            <div class="col-3">
+                                            <div class="col-sm-12 col-md-6 col-lg-3">
                                                 <div class="table-responsive">
                                                     <table class="table table-bordered" style="text-align: center;">
                                                         <thead>
@@ -159,7 +142,7 @@
                                                     </table>
                                                 </div>
                                             </div>
-                                            <div class="col-3">
+                                            <div class="col-sm-12 col-md-6 col-lg-3">
                                                 <div class="table-responsive">
                                                     <table class="table table-bordered" style="text-align: center;">
                                                         <thead>
@@ -209,7 +192,7 @@
                                                     </table>
                                                 </div>
                                             </div>
-                                            <div class="col-3">
+                                            <div class="col-sm-12 col-md-6 col-lg-3">
                                                 <div class="table-responsive">
                                                     <table class="table table-bordered" style="text-align: center;">
                                                         <thead>
@@ -259,7 +242,7 @@
                                                     </table>
                                                 </div>
                                             </div>
-                                            <div class="col-3">
+                                            <div class="col-sm-12 col-md-6 col-lg-3">
                                                 <div class="table-responsive">
                                                     <table class="table table-bordered" style="text-align: center;">
                                                         <thead>
@@ -315,27 +298,23 @@
                             </div>
                         </div>
                         @if($EmployeeAssessment->manager_sign == 1)
-                        <div class="m-separator m-separator--dashed m-separator--lg"></div>
+                        <hr>
                         <div class="row">
                             <div class="col-12">
-                                <h4>Assessment by Manager {{$manager_name}}</h4>
+                                <h5 class="m-portlet__head-text">Assessment by Manager {{$manager_name}}</h5>
                                     <div class="row">
-                                        <div class="col-lg-12">
-                                            <p><b>Please state his/her understanding of main duties and responsibilities:</b></p>
-                                            <p>{{ $EmployeeAssessment->manager_comments }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <p><b>Please state his/her Training and Development needs in understanding of future roles:</b></p>
-                                            <p>{{ $EmployeeAssessment->manager_additional_comments }}</p>
+                                        <div class="col-12">
+                                            <p><b>Please state his/her understanding of main duties and responsibilities:</b>
+                                                <br>{{ $EmployeeAssessment->manager_comments }}</p>
+                                            <p><b>Please state his/her Training and Development needs in understanding of future roles:</b>
+                                                <br>{{ $EmployeeAssessment->manager_additional_comments }}</p>
                                         </div>
                                     </div>
                                     @if($employee_objectives && count($employee_objectives)>0)
-                                    <div class="m-separator m-separator--dashed m-separator--lg"></div>
+                                    <hr>
                                     <div class="row">
                                         <div class="col-12">
-                                            <h4>Goals and Objectives</h4>
+                                            <h5 class="m-portlet__head-text">Goals and Objectives</h5>
                                             <div class="table-responsive">
                                                 <table class="table table-bordered" style="text-align: center;">
                                                     <thead>
@@ -394,10 +373,10 @@
                                     </div>
                                     @endif
                                     @if($employee_manager_evaluation)
-                                        <div class="m-separator m-separator--dashed m-separator--lg"></div>
-                                    <h4>Evaluation By Manager</h4>
+                                    <hr>
+                                    <h5 class="m-portlet__head-text">Evaluation By Manager</h5>
                                         <div class="row">
-                                            <div class="col-3">
+                                            <div class="col-sm-12 col-md-6 col-lg-3">
                                                 <div class="table-responsive">
                                                     <table class="table table-bordered" style="text-align: center;">
                                                         <thead>
@@ -447,7 +426,7 @@
                                                     </table>
                                                 </div>
                                             </div>
-                                            <div class="col-3">
+                                            <div class="col-sm-12 col-md-6 col-lg-3">
                                                 <div class="table-responsive">
                                                     <table class="table table-bordered" style="text-align: center;">
                                                         <thead>
@@ -497,7 +476,7 @@
                                                     </table>
                                                 </div>
                                             </div>
-                                            <div class="col-3">
+                                            <div class="col-sm-12 col-md-6 col-lg-3">
                                                 <div class="table-responsive">
                                                     <table class="table table-bordered" style="text-align: center;">
                                                         <thead>
@@ -547,7 +526,7 @@
                                                     </table>
                                                 </div>
                                             </div>
-                                            <div class="col-3">
+                                            <div class="col-sm-12 col-md-6 col-lg-3">
                                                 <div class="table-responsive">
                                                     <table class="table table-bordered" style="text-align: center;">
                                                         <thead>
@@ -603,51 +582,40 @@
                         </div>
                         @endif
                         @if($EmployeeAssessment->hr_sign == 1)
-                        <div class="m-separator m-separator--dashed m-separator--lg"></div>
+                        <hr>
                         <div class="row">
                             <div class="col-12">
-                                <h4>Assessment by HR Manager {{$hr_name}}</h4>
+                                <h5 class="m-portlet__head-text">Assessment by HR Manager {{$hr_name}}</h5>
                                     <div class="row">
-                                        <div class="col-lg-3">
-                                            <b>Attendance:</b>
+                                        <div class="col-3">
+                                            <span class="font-bold font-14">Attendance:</span>
+                                            <span class="font-bold font-12">{{ $EmployeeAssessment->attendance }}</span>
                                         </div>
-                                        <div class="col-lg-3">
-                                            <span>{{ $EmployeeAssessment->attendance }}</span>
+                                        <div class="col-3">
+                                            <span class="font-bold font-14">Tardiness:</span>
+                                            <span class="font-bold font-12">{{ $EmployeeAssessment->tardiness }}</span>
                                         </div>
-                                        <div class="col-lg-3">
-                                            <b>Tardiness:</b>
+                                        <div class="col-3">
+                                            <span class="font-bold font-14">Written Warning:</span>
+                                            <span class="font-bold font-12">{{ $EmployeeAssessment->written_warning }}</span>
                                         </div>
-                                        <div class="col-lg-3">
-                                            <span>{{ $EmployeeAssessment->tardiness }}</span>
+                                        <div class="col-3">
+                                            <span class="font-bold font-14">Verbal Warning:</span>
+                                            <span class="font-bold font-12">{{ $EmployeeAssessment->verbal_warning }}</span>
                                         </div>
                                     </div>
+                                <hr>
                                     <div class="row">
-                                        <div class="col-lg-3">
-                                            <b>Written Warning:</b>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <span>{{ $EmployeeAssessment->written_warning }}</span>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <b>Verbal Warning:</b>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <span>{{ $EmployeeAssessment->verbal_warning }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-lg-6">
-                                            <b>HR's Additional Comments (*if any):</b>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <span>{{ $EmployeeAssessment->hr_comments }}</span>
+                                        <div class="col-12">
+                                            <p><b>HR's Additional Comments (*if any):</b>
+                                                <br>{{ $EmployeeAssessment->hr_comments }}</p>
                                         </div>
                                     </div>
                                     @if($employee_hr_evaluation)
-                                        <div class="m-separator m-separator--dashed m-separator--lg"></div>
-                                        <h4>Evaluation By HR Manager</h4>
+                                        <hr>
+                                    <h5 class="m-portlet__head-text">Evaluation By HR Manager</h5>
                                         <div class="row">
-                                            <div class="col-3">
+                                            <div class="col-sm-12 col-md-6 col-lg-3">
                                                 <div class="table-responsive">
                                                     <table class="table table-bordered" style="text-align: center;">
                                                         <thead>
@@ -697,7 +665,7 @@
                                                     </table>
                                                 </div>
                                             </div>
-                                            <div class="col-3">
+                                            <div class="col-sm-12 col-md-6 col-lg-3">
                                                 <div class="table-responsive">
                                                     <table class="table table-bordered" style="text-align: center;">
                                                         <thead>
@@ -747,7 +715,7 @@
                                                     </table>
                                                 </div>
                                             </div>
-                                            <div class="col-3">
+                                            <div class="col-sm-12 col-md-6 col-lg-3">
                                                 <div class="table-responsive">
                                                     <table class="table table-bordered" style="text-align: center;">
                                                         <thead>
@@ -797,7 +765,7 @@
                                                     </table>
                                                 </div>
                                             </div>
-                                            <div class="col-3">
+                                            <div class="col-sm-12 col-md-6 col-lg-3">
                                                 <div class="table-responsive">
                                                     <table class="table table-bordered" style="text-align: center;">
                                                         <thead>
@@ -851,11 +819,10 @@
                                     @endif
                             </div>
                         </div>
-
-                        <div class="m-separator m-separator--dashed m-separator--lg"></div>
+                            <hr>
                         <div class="row">
                             <div class="col-12">
-                                <h4>Previous Ratings Average</h4>
+                                <h5 class="m-portlet__head-text">Previous Ratings Average</h5>
                                 <h6>{{$standards_average}}</h6>
                             </div>
                         </div>

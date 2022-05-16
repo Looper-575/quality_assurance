@@ -33,7 +33,7 @@ class TeamController extends Controller
     {
         $data['page_title'] = "Atlantis BPO CRM - Roles";
         $manager_ids = ManagerialRole::where('type', 'Team Lead')->where('status', 1)->pluck('role_id')->toArray();
-        $data['team_leads'] = User::where('status',1)->whereIn('role_id', $manager_ids)->get();
+        $data['team_leads'] = User::whereStatus(1)->where('user_type','Employee')->whereIn('role_id', $manager_ids)->get();
         $data['types'] = Department::where('status',1)->orderBy('department_id', 'DESC')->get();
         $data['shifts'] = Shift::where('status',1)->orderBy('shift_id', 'DESC')->get();
         $data['teams'] = Team::where('status',1)->orderBy('team_id', 'DESC')->get();
@@ -62,8 +62,8 @@ class TeamController extends Controller
     {
         $data['page_title'] = "Atlantis BPO CRM - Create Team";
         $manager_ids = ManagerialRole::whereIn('type', ['Team Lead', 'Manager'])->where('status', 1)->pluck('role_id')->toArray();
-        $data['agents'] = User::doesnthave('team_member')->doesnthave('user_team')->whereNotIn('role_id', $manager_ids)->where('status', 1)->get();
-        $data['team_leads'] = User::doesnthave('user_team')->where('status',1)->whereIn('role_id', $manager_ids)->get();
+        $data['agents'] = User::doesnthave('team_member')->doesnthave('user_team')->whereNotIn('role_id', $manager_ids)->whereStatus(1)->where('user_type','Employee')->get();
+        $data['team_leads'] = User::doesnthave('user_team')->whereStatus(1)->where('user_type','Employee')->whereIn('role_id', $manager_ids)->get();
         $data['types'] = Department::where('status',1)->orderBy('department_id', 'DESC')->get();
         $data['shifts'] = Shift::where('status',1)->orderBy('shift_id', 'DESC')->get();
         $data['teams'] = Team::where('status',1)->orderBy('team_id', 'DESC')->get();
@@ -77,8 +77,8 @@ class TeamController extends Controller
         $data['team_edit'] = Team::with('team_member')->where('team_id' , $id)->with('team_lead.manager_users')->get()[0];
         $manager_id = $data['team_edit']['team_lead_id'];
         $manager_ids = ManagerialRole::whereIn('type', ['Team Lead', 'Manager'])->where('status', 1)->pluck('role_id')->toArray();
-        $data['agents'] = User::doesnthave('team_member')->doesnthave('user_team')->whereNotIn('role_id', $manager_ids)->where('status', 1)->get();
-        $data['team_leads'] = User::where('user_id', $manager_id)->ordoesnthave('user_team')->where('status',1)->whereIn('role_id', $manager_ids)->get();
+        $data['agents'] = User::doesnthave('team_member')->doesnthave('user_team')->whereNotIn('role_id', $manager_ids)->whereStatus(1)->where('user_type','Employee')->get();
+        $data['team_leads'] = User::where('user_id', $manager_id)->ordoesnthave('user_team')->whereStatus(1)->where('user_type','Employee')->whereIn('role_id', $manager_ids)->get();
         $data['types'] = Department::where('status',1)->orderBy('department_id', 'DESC')->get();
         $data['shifts'] = Shift::where('status',1)->orderBy('shift_id', 'DESC')->get();
         $data['teams'] = Team::where('status',1)->orderBy('team_id', 'DESC')->get();
@@ -140,8 +140,8 @@ class TeamController extends Controller
     public function get_manager_agents($id)
     {
         $manager_ids = ManagerialRole::whereIn('type', ['Team Lead', 'Manager'])->where('status', 1)->pluck('role_id')->toArray();
-        $response['manager_agents'] = User::where('manager_id', $id)->doesnthave('team_member')->whereNotIn('role_id', $manager_ids)->where('status', 1)->get();
-        $response['agents'] = User::where('manager_id', '!=', $id)->doesnthave('team_member')->whereNotIn('role_id', $manager_ids)->where('status', 1)->get();
+        $response['manager_agents'] = User::where('manager_id', $id)->doesnthave('team_member')->whereNotIn('role_id', $manager_ids)->whereStatus(1)->where('user_type','Employee')->get();
+        $response['agents'] = User::where('manager_id', '!=', $id)->doesnthave('team_member')->whereNotIn('role_id', $manager_ids)->whereStatus(1)->where('user_type','Employee')->get();
         return response()->json($response);
     }
 

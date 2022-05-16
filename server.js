@@ -36,7 +36,7 @@ io.on('connection', (socket) => {
     socket.on('get_alerts', function (data) {
         try {
             conn.execute(
-                "SELECT group_chats.*,DATE_FORMAT(group_chats.added_on,'%H:%i %d-%m-%X') as dateTime,users.full_name,chat_group.title FROM `group_chats` JOIN chat_group on group_chats.group_id = chat_group.group_id JOIN users on users.user_id = group_chats.from_user WHERE group_chats.group_id IN (SELECT chat_group.group_id FROM `chat_group` where LOCATE(CONCAT(',', ? ,','),CONCAT(',',group_members,',')) > 0 AND chat_group.type = 2)",
+                "SELECT group_chats.*,DATE_FORMAT(group_chats.added_on,'%H:%i %d-%m-%X') as dateTime,users.full_name,chat_group.title FROM `group_chats` JOIN chat_group on group_chats.group_id = chat_group.group_id JOIN users on users.user_id = group_chats.from_user WHERE  group_chats.added_on >= ( CURDATE() - INTERVAL 2 DAY )  AND group_chats.group_id IN (SELECT chat_group.group_id FROM `chat_group` where LOCATE(CONCAT(',', ? ,','),CONCAT(',',group_members,',')) > 0 AND chat_group.type = 2)",
                 [data.user_id],
                 function (err, results, fields) {
                     socket.emit('my_alerts', {alerts: results});

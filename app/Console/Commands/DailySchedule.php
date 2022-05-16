@@ -1,5 +1,6 @@
 <?php
 namespace App\Console\Commands;
+use App\Models\EmployeePIP;
 use App\Models\EmployeeSeparation;
 use App\Models\User;
 use Illuminate\Console\Command;
@@ -41,6 +42,7 @@ class DailySchedule extends Command
     {
         $this->schedule_all_employees_self_assessment();
         $this->schedule_employees_separation();
+        $this->employees_pip_review_notification();
     }
     private function schedule_all_employees_self_assessment()
     {
@@ -104,6 +106,30 @@ class DailySchedule extends Command
                     User::where('user_id', $employees_separation->user_id)->update(['status' => 3]);
                     // change user employee record status to Separated
                     Employee::where('user_id', $employees_separation->user_id)->update(['status' => 3]);
+                }
+            }
+        }
+    }
+    private function employees_pip_review_notification()
+    {
+        $today = date('Y-m-d');
+        $one_week_from_now = date('Y-m-d', strtotime("+7 days"));
+        $users = Employee::with('employee:user_id,user_type')
+            ->whereStatus(1)->select('user_id')->get()->toArray();
+        foreach ($users as $user){
+            $pip = EmployeePIP::where('user_id', $user['user_id'])
+                              ->where('target_date','<=',$today)
+                              ->where('manager_approve',0)
+                              ->first();
+            if($pip > 0){
+                $send_email = false;
+                add_notifications('employee_pip','employee_pip',$pip->pip_id,$pip->manager_id,"Employee's PIP target duration is completed" ,$send_email);
+                $hr_user_ids = User::where('role_id', 5)->get()->pluck('user_id')->toArray();
+                if(count($hr_user_ids)>0){
+                    for($i=0; $i<count($hr_user_ids); $i++){
+                        $send_email = false;
+                        add_notifications('employee_pip','employee_pip',$pip->pip_id,$hr_user_ids[$i],"Employee's PIP target duration is completed" ,$send_email);
+                    }
                 }
             }
         }

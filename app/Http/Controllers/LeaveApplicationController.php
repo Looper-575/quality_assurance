@@ -87,8 +87,12 @@ class LeaveApplicationController extends Controller
                 add_notifications('leave_applications','leave_list',$pending_leave_id,$manager_id,'Pending Leave Approval by Manager',$send_email);
             }
             if($approved_by_manager = 1){
-                $hr_user_id = User::where('role_id', 5)->pluck('user_id')->first();
-                add_notifications('leave_applications','leave_list',$pending_leave_id,$hr_user_id,'Pending Leave Approval by HR',$send_email);
+                $hr_user_ids = User::where('role_id', 5)->get()->pluck('user_id')->toArray();
+                if(count($hr_user_ids)>0){
+                    for($i=0; $i<count($hr_user_ids); $i++){
+                        add_notifications('leave_applications','leave_list',$pending_leave_id,$hr_user_ids[$i],'Pending Leave Approval by HR',$send_email);
+                    }
+                }
             }
             $response['status'] = "Success";
             $response['result'] = "Added Successfully";
@@ -243,8 +247,12 @@ class LeaveApplicationController extends Controller
                 'approved_by_manager' => 1,
             ]);
             $send_email = true;
-            $hr_user_id = User::where('role_id', 5)->pluck('user_id')->first();
-            add_notifications('leave_applications','leave_list',$request->id,$hr_user_id,'Pending Leave Approval by HR',$send_email);
+            $hr_user_ids = User::where('role_id', 5)->get()->pluck('user_id')->toArray();
+            if(count($hr_user_ids)>0){
+                for($i=0; $i<count($hr_user_ids); $i++){
+                    add_notifications('leave_applications','leave_list',$request->id,$hr_user_ids[$i],'Pending Leave Approval by HR',$send_email);
+                }
+            }
         }
         $response['status'] = "Success";
         $response['result'] = "Application Accepted";
@@ -308,8 +316,12 @@ class LeaveApplicationController extends Controller
                 $leave_id = $new_leave_record_get->leave_id;
             }
             $send_email = true;
-            $hr_user_id = User::where('role_id', 5)->pluck('user_id')->first();
-            add_notifications('leave_applications','leave_list',$leave_id,$hr_user_id,'Pending Leave Approval by HR',$send_email);
+            $hr_user_ids = User::where('role_id', 5)->get()->pluck('user_id')->toArray();
+            if(count($hr_user_ids)>0){
+                for($i=0; $i<count($hr_user_ids); $i++){
+                    add_notifications('leave_applications','leave_list',$leave_id,$hr_user_ids[$i],'Pending Leave Approval by HR',$send_email);
+                }
+            }
             $response['status'] = "Success";
             $response['result'] = "Added Successfully";
         } else {

@@ -20,7 +20,7 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <div class="form-group">
-                            <label>Employee Name</label>
+                            <span class="font-bold font-14">Employee Name</span>
                             <select class="form-control" name="user_id" id="user_id" required >
                                 <option value="">Select</option>
                                 @foreach($users as $user)
@@ -28,80 +28,37 @@
                                 @endforeach
                             </select>
                         </div>
-                    </div>
-                    <div class="col-6">
                         <div class="form-group">
-                            <label> Resignation Date</label>
-                            <input  class="form-control" name="resignation_date" id="resignation_date" value="{{isset($separation) ? $separation->resignation_date : get_date()}}" type="date">
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-6">
-                        <div class="form-group">
-                            <label> Separation Type</label>
+                            <span class="font-bold font-14"> Separation Type</span>
                             <select name="type" id="type" required class="form-control">
                                 <option {{isset($separation) ? ($separation->type == 'Termination' ? 'selected' : '' ): ''}} value="Termination">Termination </option>
                                 <option {{isset($separation) ? ($separation->type == 'Separation' ? 'selected' : '' ): ''}} value="Separation">Separation </option>
                             </select>
                         </div>
-                    </div>
-                    <div class="col-6">
                         <div class="form-group">
-                            <label> Suspend User Account</label>
-                            <select name="disable_user_account" id="disable_user_account" required class="form-control">
-                                <option {{isset($separation) ? ($separation->type == 'Now' ? 'selected' : '' ): ''}} value="Now">Now </option>
-                                <option {{isset($separation) ? ($separation->type == 'On Separation' ? 'selected' : '' ): ''}} value="On Separation">On Separation </option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-6">
-                        <div class="form-group">
-                            <label> Effective From</label>
+                            <span class="font-bold font-14"> Effective From</span>
                             <select name="effective_from" id="effective_from" required class="form-control">
                                 <option {{isset($separation) ? ($separation->effective_from == 'Immediate' ? 'selected' : '' ): ''}} value="Immediate">Immediate </option>
                                 <option {{isset($separation) ? ($separation->effective_from == 'Notice Period' ? 'selected' : '' ): ''}} value="Notice Period">Notice Period </option>
                             </select>
                         </div>
-                    </div>
-                    <div class="col-6">
                         <div class="form-group">
-                            <label> Separation Date</label>
-                            <input  class="form-control"  name="separation_date" id="separation_date" value="{{isset($separation) ? $separation->separation_date : ''}}" type="date">
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-6">
-                        <div class="form-group">
-                            <label> Reason</label>
+                            <span class="font-bold font-14"> Reason</span>
                             <textarea class="form-control" name="reason" id="reason" cols="30" rows="10">{{isset($separation) ? $separation->reason : ''}}</textarea>
                         </div>
-                    </div>
-                    <div class="col-6">
                         <div class="form-group">
-                            <label> General Comments</label>
-                            <textarea class="form-control" name="general_comments" id="general_comments" cols="30" rows="10">{{isset($separation) ? $separation->general_comments : ''}}</textarea>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-6">
-                        <div class="form-group">
-                            <label> List of Assets (To Be Return)</label>
+                            <span class="font-bold font-14"> List of Assets (To Be Return)</span>
                             <div class="d-flex assets_div m-b-5">
-                                <label class="asset"> Asset Name</label>
-                                <label class="asset"> Asset Price</label>
+                                <span class="asset mr-5 font-14"> Asset Name</span>
+                                <span class="asset font-14"> Asset Price</span>
                                 <button type="button" onclick="add_new_asset(this)"
-                                     class="btn btn-sm btn-primary add_new_asset">+
+                                        class="btn btn-sm btn-primary add_new_asset">+
                                 </button>
                             </div>
                             <div id="assets_list">
                                 @if(isset($separation))
                                     <?php $assets_list = json_decode($separation->assets_list); ?>
-                                        @foreach ($assets_list as $key => $asset)
+                                    @foreach ($assets_list as $key => $asset)
                                         <div class="d-flex assets_div m-b-5">
                                             <input name="assets_list[]" value="{{$asset->item}}" type="text" class="form-control m-r-5 asset">
                                             <input name="assets_price[]" value="{{$asset->price}}" min="0" type="number" class="form-control m-r-5 asset">
@@ -117,30 +74,47 @@
                             </div>
                         </div>
                     </div>
-                        <div class="col-6">
-                            <div class="form-group p-3">
-                                <label class="form-check-label">Bonus Deduction</label>
-                                <div class="m-radio-inline">
-                                    <label class="m-radio m-radio--solid m-radio--brand">
-                                        <input type="radio" name="bonus_deduction" value="1" {{(isset($separation) && $separation->bonus_deduction == '1')? 'checked' : ''}} class="form-control">
-                                        Yes
-                                        <span></span>
-                                    </label>
-                                    <label class="m-radio m-radio--solid m-radio--brand">
-                                        <input type="radio" name="bonus_deduction" value="0" {{(isset($separation) && $separation->bonus_deduction == '0')? 'checked' : ''}} class="form-control">
-                                        No
-                                        <span></span>
-                                    </label>
-                                </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <span class="font-bold font-14"> Resignation Date</span>
+                            <input  class="form-control" name="resignation_date" id="resignation_date" value="{{isset($separation) ? $separation->resignation_date : get_date()}}" type="date">
+                        </div>
+                        <div class="form-group">
+                            <span class="font-bold font-14"> Suspend User Account</span>
+                            <select name="disable_user_account" id="disable_user_account" required class="form-control">
+                                <option {{isset($separation) ? ($separation->type == 'Now' ? 'selected' : '' ): ''}} value="Now">Now </option>
+                                <option {{isset($separation) ? ($separation->type == 'On Separation' ? 'selected' : '' ): ''}} value="On Separation">On Separation </option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <span class="font-bold font-14"> Separation Date</span>
+                            <input  class="form-control"  name="separation_date" id="separation_date" value="{{isset($separation) ? $separation->separation_date : ''}}" type="date">
+                        </div>
+                        <div class="form-group">
+                            <span class="font-bold font-14"> General Comments</span>
+                            <textarea class="form-control" name="general_comments" id="general_comments" cols="30" rows="10">{{isset($separation) ? $separation->general_comments : ''}}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <span class="font-bold font-14">Bonus Deduction</span>
+                            <div class="m-radio-inline mt-4">
+                                <label class="m-radio m-radio--solid m-radio--brand">
+                                    <input type="radio" name="bonus_deduction" value="1" {{(isset($separation) && $separation->bonus_deduction == '1')? 'checked' : ''}} class="form-control">
+                                    Yes
+                                    <span></span>
+                                </label>
+                                <label class="m-radio m-radio--solid m-radio--brand">
+                                    <input type="radio" name="bonus_deduction" value="0" {{(isset($separation) && $separation->bonus_deduction == '0')? 'checked' : ''}} class="form-control">
+                                    No
+                                    <span></span>
+                                </label>
                             </div>
                         </div>
                     </div>
-                <div class="row">
-                        <div class="col-12 text-right">
-                            <button class="btn btn-primary mr-1" type="submit">Submit</button>
-                            <button class="btn btn-danger" type="reset">Reset</button>
-                        </div>
+                    <div class="col-12 text-right">
+                        <button class="btn btn-primary mr-1" type="submit">Submit</button>
+                        <button class="btn btn-danger" type="reset">Reset</button>
                     </div>
+                </div>
             </form>
             <!--end::Form-->
         </div>

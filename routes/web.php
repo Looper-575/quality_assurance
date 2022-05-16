@@ -336,16 +336,16 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::post('/employees_company_reference_info_edit', 'App\Http\Controllers\EmployeeController@employees_company_reference_info_edit')->name('employees_company_reference_info_edit');
 
     // Performance Improvement Plans ROUTES
-    Route::group(['middleware' => ['check-permission:performance_improvement_plan,view,0,0']], function() {
-        Route::get('/performance_improvement_plan', 'App\Http\Controllers\EmployeePIPController@index')->name('performance_improvement_plan');
+    Route::group(['middleware' => ['check-permission:employee_pip,view,0,0']], function() {
+        Route::get('/employee_pip', 'App\Http\Controllers\EmployeePIPController@index')->name('employee_pip');
         Route::get('/pip_form', 'App\Http\Controllers\EmployeePIPController@pip_form')->name('pip_form');
         Route::get('/view_pip', 'App\Http\Controllers\EmployeePIPController@view_pip')->name('view_pip');
     });
     Route::post('/pip_save', 'App\Http\Controllers\EmployeePIPController@pip_save')->name('pip_save');
-    Route::post('/hrm_approve_pip', 'App\Http\Controllers\EmployeePIPController@hrm_approve_pip')->name('hrm_approve_pip');
-    Route::post('/staff_ack_pip_with_comments', 'App\Http\Controllers\EmployeePIPController@staff_ack_pip_with_comments')->name('staff_ack_pip_with_comments');
-    Route::post('/staff_ack_pip', 'App\Http\Controllers\EmployeePIPController@staff_ack_pip')->name('staff_ack_pip');
-    Route::get('/get_om_users_data', 'App\Http\Controllers\EmployeePIPController@get_om_users_data')->name('get_om_users_data');
+    Route::post('/hr_approve_pip', 'App\Http\Controllers\EmployeePIPController@hr_approve_pip')->name('hr_approve_pip');
+    Route::post('/employee_ack_pip_with_comments', 'App\Http\Controllers\EmployeePIPController@employee_ack_pip_with_comments')->name('employee_ack_pip_with_comments');
+    Route::post('/employee_ack_pip', 'App\Http\Controllers\EmployeePIPController@employee_ack_pip')->name('employee_ack_pip');
+    Route::get('/get_manager_users_data', 'App\Http\Controllers\EmployeePIPController@get_manager_users_data')->name('get_manager_users_data');
 
     // Employee Assessment Routes
     Route::group(['middleware' => ['check-permission:employee_assessment,view,0,0']], function() {
@@ -477,4 +477,17 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     // Final settlement
     Route::post('/save_final_settlement', 'App\Http\Controllers\EmployeeSeparationController@save_final_settlement')->name('save_final_settlement');
     Route::post('/delete_final_settlement', 'App\Http\Controllers\EmployeeSeparationController@delete_final_settlement')->name('delete_final_settlement');
+
+    // Developer Tasks
+    Route::get('/tasks_list', 'App\Http\Controllers\TaskController@list')->name('tasks_list');
+    Route::get('/task_form/{id?}', 'App\Http\Controllers\TaskController@form')->name('task_form');
+    Route::post('/save_task', 'App\Http\Controllers\TaskController@save')->name('save_task');
+    Route::get('/view_single_task/{id}', 'App\Http\Controllers\TaskController@view_single_task')->name('view_single_task');
+    Route::post('/get_modules', 'App\Http\Controllers\TaskController@get_modules')->name('get_modules');
+    Route::post('/get_users', 'App\Http\Controllers\TaskController@get_users')->name('get_users');
+    Route::get('/view_document/{id}', 'App\Http\Controllers\TaskController@view_document')->name('view_document');
+
+
+    // route for testing email
+    Route::get('/send_laravel_email', 'App\Http\Controllers\NotificationsController@send_laravel_email')->name('send_laravel_email');
 });

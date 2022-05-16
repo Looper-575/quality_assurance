@@ -2,7 +2,7 @@
 namespace App\Http\Controllers;
 use App\Models\ManagerialRole;
 use App\Models\Notifications;
-use App\Models\PIP;
+use App\Models\EmployeePIP;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -13,50 +13,50 @@ class EmployeePIPController extends Controller
     {    }
     public function index()
     {
-        $data['page_title'] = "Performance Improvement Plans List - Atlantis BPO CRM";
+        $data['page_title'] = "Employees PIP List - Atlantis BPO CRM";
         $manager_ids = ManagerialRole::whereType('Manager')->whereStatus(1)->pluck('role_id')->toArray();
         if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5){
-            $data['pip'] = PIP::orderBy('pip_id', 'DESC')->get();
-            $data['is_hrm'] = true;
-            $data['is_om'] = false;
-            $data['is_staff'] = false;
+            $data['pip'] = EmployeePIP::orderBy('pip_id', 'DESC')->get();
+            $data['is_hr'] = true;
+            $data['is_manager'] = false;
+            $data['is_employee'] = false;
         } else if(in_array(Auth::user()->role_id, $manager_ids)){
-            $data['pip'] = PIP::where('om_id', Auth::user()->user_id)->orderBy('pip_id', 'DESC')->get();
-            $data['is_hrm'] = false;
-            $data['is_om'] = true;
-            $data['is_staff'] = false;
+            $data['pip'] = EmployeePIP::where('manager_id', Auth::user()->user_id)->orderBy('pip_id', 'DESC')->get();
+            $data['is_hr'] = false;
+            $data['is_manager'] = true;
+            $data['is_employee'] = false;
         }else{
-            $data['pip'] = PIP::where('staff_id', Auth::user()->user_id)->orderBy('pip_id', 'DESC')->get();
-            $data['is_hrm'] = false;
-            $data['is_om'] = false;
-            $data['is_staff'] = true;
+            $data['pip'] = EmployeePIP::where('user_id', Auth::user()->user_id)->orderBy('pip_id', 'DESC')->get();
+            $data['is_hr'] = false;
+            $data['is_manager'] = false;
+            $data['is_employee'] = true;
         }
-        return view('performance_improvement_plan.pip_list' , $data);
+        return view('employee_pip.pip_list' , $data);
     }
     public function pip_form(Request $request)
     {
-        $data['page_title'] = "Performance Improvement Plan Form - Atlantis BPO CRM";
+        $data['page_title'] = "Employee PIP Form - Atlantis BPO CRM";
         $manager_ids = ManagerialRole::whereType('Manager')->whereStatus(1)->pluck('role_id')->toArray();
         if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5){
-            $data['staff'] = User::whereStatus(1)->get();
-            $data['is_om'] = false;
+            $data['employee'] = User::whereStatus(1)->get();
+            $data['is_manager'] = false;
         } else {
-            $data['staff'] = User::whereStatus(1)->where('manager_id', Auth::user()->user_id)->get();
-            $is_om = User::where('status',1)->whereIn('role_id',$manager_ids)->where('user_id',Auth::user()->user_id)->get();
-            $data['is_om'] = $is_om->count();
+            $data['employee'] = User::whereStatus(1)->where('manager_id', Auth::user()->user_id)->get();
+            $is_manager = User::where('status',1)->whereIn('role_id',$manager_ids)->where('user_id',Auth::user()->user_id)->get();
+            $data['is_manager'] = $is_manager->count();
         }
         $data['om'] = User::where('status',1)->whereIn('role_id',$manager_ids)->get();
         if(isset($request->pip_id)) {
-            $data['pip'] = PIP::where('pip_id', $request->pip_id)->first();
+            $data['pip'] = EmployeePIP::where('pip_id', $request->pip_id)->first();
         }else{
             $data['pip'] = false;
         }
-        return view('performance_improvement_plan.pip_form',$data);
+        return view('employee_pip.pip_form',$data);
     }
     public function pip_save(Request $request){
         $validator = Validator::make($request->all(), [
-            'staff_id' => 'required',
-            'om_id' => 'required',
+            'user_id' => 'required',
+            'manager_id' => 'required',
             'pip_from' => 'required',
             'pip_to' => 'required',
             'review_date' => 'required',
@@ -65,14 +65,14 @@ class EmployeePIPController extends Controller
             'needed_resource' => 'required',
             'target_date' => 'required',
             'recommendations' => 'required',
-            'om_comments' => 'required'
+            'manager_comments' => 'required'
         ]);
         if($validator->passes()){
-            $pip = PIP::where('pip_id', $request->pip_id)->get();
+            $pip = EmployeePIP::where('pip_id', $request->pip_id)->get();
             $pip_data = [
                 'added_by' => Auth::user()->user_id,
-                'staff_id' => $request->staff_id,
-                'om_id' => $request->om_id,
+                'user_id' => $request->user_id,
+                'manager_id' => $request->manager_id,
                 'pip_from' => $request->pip_from,
                 'pip_to' => $request->pip_to,
                 'review_date' => $request->review_date,
@@ -81,22 +81,22 @@ class EmployeePIPController extends Controller
                 'needed_resource' => $request->needed_resource,
                 'target_date' => $request->target_date,
                 'recommendations' => $request->recommendations,
-                'om_comments' => $request->om_comments,
-                'om_approve' => 1,
-                'om_approve_date' => get_date()
+                'manager_comments' => $request->manager_comments,
+                'manager_approve' => 1,
+                'manager_approve_date' => get_date()
             ];
             if(count($pip)>0){
-                PIP::where('pip_id', $pip[0]->pip_id)->update($pip_data);
+                EmployeePIP::where('pip_id', $pip[0]->pip_id)->update($pip_data);
                 $pip_id = $pip[0]->pip_id;
-                $staff_id = $pip[0]->staff_id;
+                $user_id = $pip[0]->user_id;
             } else {
-               $pip_created =  PIP::create($pip_data);
+               $pip_created =  EmployeePIP::create($pip_data);
                $pip_created->fresh();
                $pip_id = $pip_created->pip_id;
-               $staff_id = $pip_created->staff_id;
+               $user_id = $pip_created->user_id;
             }
                 $send_email = false;
-                add_notifications('performance_improvement_plans', 'performance_improvement_plan', $pip_id, $staff_id, 'Pending PIP Ack.',$send_email);
+                add_notifications('employee_pip', 'employee_pip', $pip_id, $user_id, 'Pending PIP Ack.',$send_email);
 
             $response['status'] = 'success';
             $response['result'] = 'Added Successfully';
@@ -106,34 +106,38 @@ class EmployeePIPController extends Controller
         }
         return response()->json($response);
     }
-    public function staff_ack_pip_with_comments(Request $request){
-        $data['pip'] = PIP::where('pip_id', $request->pip_id)->first();
-        return view('performance_improvement_plan.staff_ack_modal', $data);
+    public function employee_ack_pip_with_comments(Request $request){
+        $data['pip'] = EmployeePIP::where('pip_id', $request->pip_id)->first();
+        return view('employee_pip.employee_ack_modal', $data);
     }
-    public function staff_ack_pip(Request $request)
+    public function employee_ack_pip(Request $request)
     {
-        $staff_ack = PIP::where('pip_id', $request->pip_id)->update([
-            'staff_comments' => $request->staff_comments,
-            'staff_acknowledgement' => 1,
-            'staff_acknowledgement_date' => get_date()
+        $employee_ack = EmployeePIP::where('pip_id', $request->pip_id)->update([
+            'employee_comments' => $request->employee_comments,
+            'employee_acknowledgement' => 1,
+            'employee_acknowledgement_date' => get_date()
         ]);
-        if($staff_ack){
-            $send_email = false;
-            $hr_user_id = User::where('role_id', 5)->pluck('user_id')->first();
-            add_notifications('performance_improvement_plans','performance_improvement_plan',$request->pip_id,$hr_user_id,'Pending PIP HR Approval',$send_email);
+        if($employee_ack){
+            $hr_user_ids = User::where('role_id', 5)->get()->pluck('user_id')->toArray();
+            if(count($hr_user_ids)>0){
+                for($i=0; $i<count($hr_user_ids); $i++){
+                    $send_email = false;
+                    add_notifications('employee_pip','employee_pip',$request->pip_id,$hr_user_ids[$i],'Pending PIP HR Approval',$send_email);
+                }
+            }
             $response['status'] = "Success";
-            $response['result'] = "Staff Acknowledged Successfully";
+            $response['result'] = "Employee Acknowledged Successfully";
         }else{
             $response['status'] = "Failure";
             $response['result'] = "Some Error in Query";
         }
         return response()->json($response);
     }
-    public function hrm_approve_pip(Request $request)
+    public function hr_approve_pip(Request $request)
     {
-        PIP::where('pip_id', $request->pip_id)->update([
-            'hrm_approve' => 1,
-            'hrm_approve_date' => get_date()
+        EmployeePIP::where('pip_id', $request->pip_id)->update([
+            'hr_approve' => 1,
+            'hr_approve_date' => get_date()
         ]);
         $response['status'] = "Success";
         $response['result'] = "Approved by HR Successfully";
@@ -141,17 +145,17 @@ class EmployeePIPController extends Controller
     }
     public function view_pip(Request $request)
     {
-        $data['page_title'] = "View Performance Improvement Plan Details - Atlantis BPO CRM";
+        $data['page_title'] = "View Employee's PIP Detail - Atlantis BPO CRM";
         if(isset($request->pip_id)) {
-            $data['pip'] = PIP::where('pip_id', $request->pip_id)->get()[0];
+            $data['pip'] = EmployeePIP::where('pip_id', $request->pip_id)->first();
         }else{
             $data['pip'] = false;
         }
-        return view('performance_improvement_plan.view_pip', $data);
+        return view('employee_pip.view_pip', $data);
     }
-    public function get_om_users_data(Request $request)
+    public function get_manager_users_data(Request $request)
     {
-        $data['staff'] = User::whereStatus(1)->where('manager_id', $request->om_id)->get();
+        $data['employee'] = User::whereStatus(1)->where('manager_id', $request->manager_id)->get();
         return response()->json($data);
     }
 }

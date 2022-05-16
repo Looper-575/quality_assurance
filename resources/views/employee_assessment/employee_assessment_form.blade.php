@@ -3,64 +3,63 @@
     <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
 @endsection
 @section('content')
-<div class="m-content">
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="m-portlet">
-                <div class="m-portlet__head">
-                    <div class="m-portlet__head-caption">
-                        <div class="m-portlet__head-title">
-                            <span class="m-portlet__head-icon m--hide"><i class="la la-gear"></i></span>
-                            <h6 class="m-portlet__head-text">
-                                @if($is_hrm && $EmployeeAssessment == true)
-                                    HR Observations & Comments
-                                @elseif($is_manager && $EmployeeAssessment == true)
-                                    Department Head/Supervisor Evaluation and Remarks
-                                @elseif( $EmployeeAssessment == false && ($is_employee || $is_manager || $is_hrm) )
-                                    Employee Self Assesment
-                                @else
-                                    ADMIN VIEW
-                                @endif
-                                    (Employee Assessment)</h6>
-                        </div>
+<div class="m-portlet">
+    <div class="m-portlet__head">
+        <div class="m-portlet__head-caption">
+            <div class="m-portlet__head-title">
+                <span class="m-portlet__head-icon m--hide"><i class="la la-gear"></i></span>
+                <h6 class="m-portlet__head-text">
+                    @if($is_hrm && $EmployeeAssessment == true)
+                        HR Observations & Comments
+                    @elseif($is_manager && $EmployeeAssessment == true)
+                        Department Head/Supervisor Evaluation and Remarks
+                    @elseif( $EmployeeAssessment == false && ($is_employee || $is_manager || $is_hrm) )
+                        Employee Self Assesment
+                    @else
+                        ADMIN VIEW
+                    @endif
+                        (Employee Assessment)</h6>
+            </div>
+        </div>
+    </div>
+    <div class="m-portlet__body">
+        <!--begin::Form-->
+        <form id="employee_assessment_form" action="javascript:save_employee_assessment()" method="post" class="m-form m-form--fit m-form--label-align-right m-form--group-seperator-dashed">
+            @csrf
+            <input type="hidden" required name="id" value="{{$EmployeeAssessment ? $EmployeeAssessment->id : 0}}">
+            <input type="hidden" required name="employee_id" id="employee_id" >
+            @if($EmployeeAssessment == false && ($is_employee || $is_manager || $is_hrm) )
+                @include('employee_assessment.partials.employee_assessment_employee_form')
+            @endif
+            @if( ( ($is_admin && $EmployeeAssessment->manager_sign == 0) || $is_manager) && $EmployeeAssessment == true)
+                @include('employee_assessment.partials.employee_assessment_manager_form')
+            @endif
+            @if( ( ($is_admin && $EmployeeAssessment->hr_sign == 0 && $EmployeeAssessment->manager_sign == 1) || $is_hrm ) && $EmployeeAssessment == true)
+                @include('employee_assessment.partials.employee_assessment_hr_form')
+            @endif
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <p class="font-bold font-18">PERFORMANCE EVALUATION STANDARDS SCALE</p>
+                        <p class="font-bold font-14">
+                            5 Excellent/ Outstanding <small>(Consistently exceeding job requirements)</small></br>
+                            4 Good / Exceptional <small>(Exceeding job requirements)</small></br>
+                            3 Satisfactory / Meets Job Requirements <small>(Meets Standards / Job requirements)</small></br>
+                            2 Need Improvement <small>(Meets some requirements)</small></br>
+                            1 Un-Acceptable / Unsatisfactory <small>(Does not meets any job requirements)</small></br>
+                            0 Not Applicable</p>
                     </div>
                 </div>
-                <!--begin::Form-->
-                <form id="employee_assessment_form" action="javascript:save_employee_assessment()" method="post" class="m-form m-form--fit m-form--label-align-right m-form--group-seperator-dashed">
-                    @csrf
-                    <input type="hidden" required name="id" value="{{$EmployeeAssessment ? $EmployeeAssessment->id : 0}}">
-                    <input type="hidden" required name="employee_id" id="employee_id" >
-                    <div class="m-portlet__body">
-                        @if($EmployeeAssessment == false && ($is_employee || $is_manager || $is_hrm) )
-                            @include('employee_assessment.partials.employee_assessment_employee_form')
-                        @endif
-                        @if( ( ($is_admin && $EmployeeAssessment->manager_sign == 0) || $is_manager) && $EmployeeAssessment == true)
-                            @include('employee_assessment.partials.employee_assessment_manager_form')
-                        @endif
-                        @if( ( ($is_admin && $EmployeeAssessment->hr_sign == 0 && $EmployeeAssessment->manager_sign == 1) || $is_hrm ) && $EmployeeAssessment == true)
-                            @include('employee_assessment.partials.employee_assessment_hr_form')
-                        @endif
-                        <div class="form-group m-form__group row">
-                            <div class="col-12">
-                                <div class="form-group m-form__group">
-                                    <h4 class="text-center">PERFORMANCE EVALUATION STANDARDS SCALE</h4>
-                                    <h5>5 Excellent/ Outstanding <small>(Consistently exceeding job requirements)</small></h5>
-                                    <h5>4 Good / Exceptional <small>(Exceeding job requirements)</small></h5>
-                                    <h5>3 Satisfactory / Meets Job Requirements <small>(Meets Standards / Job requirements)</small></h5>
-                                    <h5>2 Need Improvement <small>(Meets some requirements)</small></h5>
-                                    <h5>1 Un-Acceptable / Unsatisfactory <small>(Does not meets any job requirements)</small></h5>
-                                    <h5>0 Not Applicable</h5>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group m-form__group row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <div class="row">
                             <div class="{{( ($EmployeeAssessment == true && ( ($is_admin && $EmployeeAssessment->manager_sign == 1) || $is_hrm )) ? 'col-9 pe-0 pr-0' : 'col-12' )}}">
                                 <div class="table-responsive">
-                                    <table class="table table-bordered text-center">
-                                    <thead>
-                                        <tr class="text-center">
-                                            <th><label for="standards"><h4>Standards</h4></label></th>
-                                            <th><label for="scale"><h4>Scale</h4></label></th>
+                                    <table class="table table-bordered">
+                                        <thead class="text-center">
+                                        <tr>
+                                            <th><h4>Standards</h4></th>
+                                            <th><h4>Scale</h4></th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -1026,168 +1025,164 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                      {{--  FOR MANAGERS ONLY --}}
+                                        {{--  FOR MANAGERS ONLY --}}
                                         @if(( $is_admin || $is_manager || $is_hrm))
-                                        <tr class="text-center">
-                                            <td colspan="2">
-                                                <div>
-                                                    <h6>TO BE FILLED BY MANAGERS ONLY</h6>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><label for="supervision"><h6>Supervision</h6></label></td>
-                                            <td>
-                                                <div class="m-radio-inline">
-                                                    <label class="m-radio m-radio--solid m-radio--brand">
-                                                        <input type="radio" name="supervision" value="5" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->supervision == 5)? 'checked' : ''}} class="form-control">
-                                                        Excellent
-                                                        <span></span>
-                                                    </label>
-                                                    <label class="m-radio m-radio--solid m-radio--brand">
-                                                        <input type="radio" name="supervision" value="4" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->supervision == 4)? 'checked' : ''}} class="form-control">
-                                                        Good
-                                                        <span></span>
-                                                    </label>
-                                                    <label class="m-radio m-radio--solid m-radio--brand">
-                                                        <input type="radio" name="supervision" value="3" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->supervision == 3)? 'checked' : ''}} class="form-control">
-                                                        Satisfactory
-                                                        <span></span>
-                                                    </label>
-                                                    <label class="m-radio m-radio--solid m-radio--brand">
-                                                        <input type="radio" name="supervision" value="2" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->supervision == 2)? 'checked' : ''}} class="form-control">
-                                                        Need Improvement
-                                                        <span></span>
-                                                    </label>
-                                                    <label class="m-radio m-radio--solid m-radio--brand">
-                                                        <input type="radio" name="supervision" value="1" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->supervision == 1)? 'checked' : ''}} class="form-control">
-                                                        Un-Acceptable
-                                                        <span></span>
-                                                    </label>
-                                                    <label class="m-radio m-radio--solid m-radio--brand">
-                                                        <input type="radio" required name="supervision" value="0" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->supervision == 0)? 'checked' : ''}} class="form-control">
-                                                        Not Applicable
-                                                        <span></span>
-                                                    </label>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><label for="leadership"><h6>Leadership</h6></label></td>
-                                            <td>
-                                                <div class="m-radio-inline">
-                                                    <label class="m-radio m-radio--solid m-radio--brand">
-                                                        <input type="radio" name="leadership" value="5" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->leadership == 5)? 'checked' : ''}} class="form-control">
-                                                        Excellent
-                                                        <span></span>
-                                                    </label>
-                                                    <label class="m-radio m-radio--solid m-radio--brand">
-                                                        <input type="radio" name="leadership" value="4" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->leadership == 4)? 'checked' : ''}} class="form-control">
-                                                        Good
-                                                        <span></span>
-                                                    </label>
-                                                    <label class="m-radio m-radio--solid m-radio--brand">
-                                                        <input type="radio" name="leadership" value="3" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->leadership == 3)? 'checked' : ''}} class="form-control">
-                                                        Satisfactory
-                                                        <span></span>
-                                                    </label>
-                                                    <label class="m-radio m-radio--solid m-radio--brand">
-                                                        <input type="radio" name="leadership" value="2" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->leadership == 2)? 'checked' : ''}} class="form-control">
-                                                        Need Improvement
-                                                        <span></span>
-                                                    </label>
-                                                    <label class="m-radio m-radio--solid m-radio--brand">
-                                                        <input type="radio" name="leadership" value="1" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->leadership == 1)? 'checked' : ''}} class="form-control">
-                                                        Un-Acceptable
-                                                        <span></span>
-                                                    </label>
-                                                    <label class="m-radio m-radio--solid m-radio--brand">
-                                                        <input type="radio" required name="leadership" value="0" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->leadership == 0)? 'checked' : ''}} class="form-control">
-                                                        Not Applicable
-                                                        <span></span>
-                                                    </label>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><label for="coaching"><h6>Coaching</h6></label></td>
-                                            <td>
-                                                <div class="m-radio-inline">
-                                                    <label class="m-radio m-radio--solid m-radio--brand">
-                                                        <input type="radio"  name="coaching" value="5" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->coaching == 5)? 'checked' : ''}} class="form-control">
-                                                        Excellent
-                                                        <span></span>
-                                                    </label>
-                                                    <label class="m-radio m-radio--solid m-radio--brand">
-                                                        <input type="radio"  name="coaching" value="4" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->coaching == 4)? 'checked' : ''}} class="form-control">
-                                                        Good
-                                                        <span></span>
-                                                    </label>
-                                                    <label class="m-radio m-radio--solid m-radio--brand">
-                                                        <input type="radio"  name="coaching" value="3" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->coaching == 3)? 'checked' : ''}} class="form-control">
-                                                        Satisfactory
-                                                        <span></span>
-                                                    </label>
-                                                    <label class="m-radio m-radio--solid m-radio--brand">
-                                                        <input type="radio"  name="coaching" value="2" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->coaching == 2)? 'checked' : ''}} class="form-control">
-                                                        Need Improvement
-                                                        <span></span>
-                                                    </label>
-                                                    <label class="m-radio m-radio--solid m-radio--brand">
-                                                        <input type="radio"  name="coaching" value="1" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->coaching == 1)? 'checked' : ''}} class="form-control">
-                                                        Un-Acceptable
-                                                        <span></span>
-                                                    </label>
-                                                    <label class="m-radio m-radio--solid m-radio--brand">
-                                                        <input type="radio" required name="coaching" value="0" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->coaching == 0)? 'checked' : ''}} class="form-control">
-                                                        Not Applicable
-                                                        <span></span>
-                                                    </label>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                            <tr class="text-center">
+                                                <td colspan="2">
+                                                    <div>
+                                                        <h6>TO BE FILLED BY MANAGERS ONLY</h6>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><label for="supervision"><h6>Supervision</h6></label></td>
+                                                <td>
+                                                    <div class="m-radio-inline">
+                                                        <label class="m-radio m-radio--solid m-radio--brand">
+                                                            <input type="radio" name="supervision" value="5" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->supervision == 5)? 'checked' : ''}} class="form-control">
+                                                            Excellent
+                                                            <span></span>
+                                                        </label>
+                                                        <label class="m-radio m-radio--solid m-radio--brand">
+                                                            <input type="radio" name="supervision" value="4" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->supervision == 4)? 'checked' : ''}} class="form-control">
+                                                            Good
+                                                            <span></span>
+                                                        </label>
+                                                        <label class="m-radio m-radio--solid m-radio--brand">
+                                                            <input type="radio" name="supervision" value="3" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->supervision == 3)? 'checked' : ''}} class="form-control">
+                                                            Satisfactory
+                                                            <span></span>
+                                                        </label>
+                                                        <label class="m-radio m-radio--solid m-radio--brand">
+                                                            <input type="radio" name="supervision" value="2" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->supervision == 2)? 'checked' : ''}} class="form-control">
+                                                            Need Improvement
+                                                            <span></span>
+                                                        </label>
+                                                        <label class="m-radio m-radio--solid m-radio--brand">
+                                                            <input type="radio" name="supervision" value="1" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->supervision == 1)? 'checked' : ''}} class="form-control">
+                                                            Un-Acceptable
+                                                            <span></span>
+                                                        </label>
+                                                        <label class="m-radio m-radio--solid m-radio--brand">
+                                                            <input type="radio" required name="supervision" value="0" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->supervision == 0)? 'checked' : ''}} class="form-control">
+                                                            Not Applicable
+                                                            <span></span>
+                                                        </label>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><label for="leadership"><h6>Leadership</h6></label></td>
+                                                <td>
+                                                    <div class="m-radio-inline">
+                                                        <label class="m-radio m-radio--solid m-radio--brand">
+                                                            <input type="radio" name="leadership" value="5" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->leadership == 5)? 'checked' : ''}} class="form-control">
+                                                            Excellent
+                                                            <span></span>
+                                                        </label>
+                                                        <label class="m-radio m-radio--solid m-radio--brand">
+                                                            <input type="radio" name="leadership" value="4" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->leadership == 4)? 'checked' : ''}} class="form-control">
+                                                            Good
+                                                            <span></span>
+                                                        </label>
+                                                        <label class="m-radio m-radio--solid m-radio--brand">
+                                                            <input type="radio" name="leadership" value="3" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->leadership == 3)? 'checked' : ''}} class="form-control">
+                                                            Satisfactory
+                                                            <span></span>
+                                                        </label>
+                                                        <label class="m-radio m-radio--solid m-radio--brand">
+                                                            <input type="radio" name="leadership" value="2" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->leadership == 2)? 'checked' : ''}} class="form-control">
+                                                            Need Improvement
+                                                            <span></span>
+                                                        </label>
+                                                        <label class="m-radio m-radio--solid m-radio--brand">
+                                                            <input type="radio" name="leadership" value="1" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->leadership == 1)? 'checked' : ''}} class="form-control">
+                                                            Un-Acceptable
+                                                            <span></span>
+                                                        </label>
+                                                        <label class="m-radio m-radio--solid m-radio--brand">
+                                                            <input type="radio" required name="leadership" value="0" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->leadership == 0)? 'checked' : ''}} class="form-control">
+                                                            Not Applicable
+                                                            <span></span>
+                                                        </label>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><label for="coaching"><h6>Coaching</h6></label></td>
+                                                <td>
+                                                    <div class="m-radio-inline">
+                                                        <label class="m-radio m-radio--solid m-radio--brand">
+                                                            <input type="radio"  name="coaching" value="5" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->coaching == 5)? 'checked' : ''}} class="form-control">
+                                                            Excellent
+                                                            <span></span>
+                                                        </label>
+                                                        <label class="m-radio m-radio--solid m-radio--brand">
+                                                            <input type="radio"  name="coaching" value="4" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->coaching == 4)? 'checked' : ''}} class="form-control">
+                                                            Good
+                                                            <span></span>
+                                                        </label>
+                                                        <label class="m-radio m-radio--solid m-radio--brand">
+                                                            <input type="radio"  name="coaching" value="3" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->coaching == 3)? 'checked' : ''}} class="form-control">
+                                                            Satisfactory
+                                                            <span></span>
+                                                        </label>
+                                                        <label class="m-radio m-radio--solid m-radio--brand">
+                                                            <input type="radio"  name="coaching" value="2" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->coaching == 2)? 'checked' : ''}} class="form-control">
+                                                            Need Improvement
+                                                            <span></span>
+                                                        </label>
+                                                        <label class="m-radio m-radio--solid m-radio--brand">
+                                                            <input type="radio"  name="coaching" value="1" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->coaching == 1)? 'checked' : ''}} class="form-control">
+                                                            Un-Acceptable
+                                                            <span></span>
+                                                        </label>
+                                                        <label class="m-radio m-radio--solid m-radio--brand">
+                                                            <input type="radio" required name="coaching" value="0" {{($EmployeeAssessment and count($EmployeeAssessment->evaluation_standards) > 0 and $EmployeeAssessment->evaluation_standards[0]->coaching == 0)? 'checked' : ''}} class="form-control">
+                                                            Not Applicable
+                                                            <span></span>
+                                                        </label>
+                                                    </div>
+                                                </td>
+                                            </tr>
                                         @endif
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
                             @if($EmployeeAssessment == true && ( ($is_admin && $EmployeeAssessment->manager_sign == 1) || $is_hrm ) )
-                            <div class="col-3 ps-0 pl-0">
-                                @include('employee_assessment.partials.evaluation_data')
-                            </div>
+                                <div class="col-3 ps-0 pl-0">
+                                    @include('employee_assessment.partials.evaluation_data')
+                                </div>
                             @endif
                         </div>
-                        @if($EmployeeAssessment == true && ( $is_admin || $is_hrm ) && !empty($previous_overall_ratings) )
-                        <div class="form-group m-form__group row">
-                            <div class="col-6">
-                                <div class="form-group m-form__group">
-                                    <label for="overall_rating">Previous Evalations Ratings : </label><br>
-                                    @foreach ($previous_overall_ratings as $overall_rating)
-                                        <label for="overall_rating">{{$overall_rating ? ($loop->index+1)." ) ".$overall_rating : ''}}</label><br>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                        @endif
                     </div>
-                    <div class="m-portlet__foot m-portlet__no-border m-portlet__foot--fit">
-                        <div class="m-form__actions m-form__actions--solid">
-                            <div class="row">
-                                <div class="col-lg-4"></div>
-                                <div class="col-lg-8">
-                                    <button type="submit" class="btn btn-success">
-                                        Submit
-                                    </button>
-                                    <a href="{{route('employee_assessment')}}"  class="btn btn-primary">
-                                        Back
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
+                </div>
             </div>
-        </div>
+            @if($EmployeeAssessment == true && ( $is_admin || $is_hrm ) && !empty($previous_overall_ratings) )
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="font-bold font-14" for="overall_rating">Previous Evalations Ratings : </label><br>
+                        @foreach ($previous_overall_ratings as $overall_rating)
+                            <label class="font-bold font-13" for="overall_rating">{{$overall_rating ? ($loop->index+1)." ) ".$overall_rating : ''}}</label><br>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            @endif
+            <div class="row">
+                <div class="col-12 text-right">
+                    <button type="submit" class="btn btn-success">
+                        Submit
+                    </button>
+                    <a href="{{route('employee_assessment')}}"  class="btn btn-primary">
+                        Back
+                    </a>
+                </div>
+            </div>
+        </form>
+    <!--end::Form-->
     </div>
 </div>
 @endsection

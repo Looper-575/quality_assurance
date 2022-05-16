@@ -57,7 +57,7 @@
                                         <a href="#" class="m-nav__link m-dropdown__toggle" id="m_topbar_notification_icon">
                                             <span class="m-nav__link-icon"><i class="flaticon-music-2"></i></span>
                                         </a>
-                                        @include('notifications.notifications')
+                                        @include('layout.partials.notifications')
                                     </li>
                                     <?php $user = Auth::user(); ?>
                                     <li class="m-nav__item m-topbar__user-profile m-topbar__user-profile--img  m-dropdown m-dropdown--medium m-dropdown--arrow m-dropdown--header-bg-fill m-dropdown--align-right m-dropdown--mobile-full-width m-dropdown--skin-light" m-dropdown-toggle="click">
