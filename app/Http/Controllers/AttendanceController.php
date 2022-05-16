@@ -179,11 +179,11 @@ class AttendanceController extends Controller
         }
         return view('attendance.partials.back_date_attendance' , $data);
     }
-    public function creat_back_date_attendance(Request $request)
+    public function create_back_date_attendance(Request $request)
     {
-        $manager_id = $request->manager_id;
         $date_today = date("Y-m-d"  ,strtotime($request->attendance_date));
-        $team = Team::with('shift')->where('team_lead_id', $manager_id)->where('status', 1)->first();
+        $team = Team::with('shift')->where('team_id', $request->team_id)->where('status', 1)->first();
+        $manager_id = $team->team_lead_id;
         if(!$team){
             return null;
         }

@@ -39,7 +39,7 @@
                                     <option {{ Auth::user()->user_id == $team->team_lead_id ? 'selected' : '' }} value="{{$team->team_id}}">{{$team->title}}</option>
                                 @endforeach
                             </select>
-                            <input type="hidden" name="team_id" value="{{$team_id}}" id="manager_id" {{ Auth::user()->role->role_id == 1 ? 'disabled' : '' }}>
+                            <input type="hidden" name="team_id" value="{{$team_id}}" id="manager_id" {{ Auth::user()->role->role_id == 1 || Auth::user()->role->role_id==5 ? 'disabled' : '' }}>
                         </div>
                     </div>
                     <div class="col-2 mt-4">
@@ -70,20 +70,12 @@
             e.preventDefault();
             let form = document.getElementById('check_attendance_form');
             let data = new FormData(form);
-            let a = function() {
-                // window.location.reload();
-            }
-            let arr = [a];
-            call_ajax_with_functions('mark_attendance_table_id', '{{route('check_back_date_attendance')}}', data, arr);
+            call_ajax('mark_attendance_table_id', '{{route('check_back_date_attendance')}}', data);
         });
         function create_attendance(){
             let form = document.getElementById('check_attendance_form');
             let data = new FormData(form);
-            let a = function() {
-                // window.location.reload();
-            }
-            let arr = [a];
-            call_ajax_with_functions('mark_attendance_table_id', '{{route('creat_back_date_attendance')}}', data, arr);
+            call_ajax('mark_attendance_table_id', '{{route('create_back_date_attendance')}}', data);
         }
         // show current and future dates
         function time_out_set(){

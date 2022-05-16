@@ -156,7 +156,7 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
         Route::get('/check_attendance','App\Http\Controllers\AttendanceController@check_attendance')->name('check_attendance');
     });
     Route::post('/check_back_date_attendance','App\Http\Controllers\AttendanceController@check_back_date_attendance')->name('check_back_date_attendance');
-    Route::post('/creat_back_date_attendance','App\Http\Controllers\AttendanceController@creat_back_date_attendance')->name('creat_back_date_attendance');
+    Route::post('/create_back_date_attendance','App\Http\Controllers\AttendanceController@create_back_date_attendance')->name('create_back_date_attendance');
     Route::get('/fill_attendance_time_out','App\Http\Controllers\AttendanceController@fill_attendance_time_out')->name('fill_attendance_time_out');
 
     // shift route
