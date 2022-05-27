@@ -61,7 +61,7 @@ class EmployeeSeparationController extends Controller
         $validator = Validator::make($request->all(), [
             'user_id' => 'required',
             'type' => 'required',
-            'effective_from' => 'required',
+            'notice_period' => 'required',
             'reason' => 'required',
             'general_comments' => 'required',
             'resignation_date' => 'required',
@@ -70,35 +70,40 @@ class EmployeeSeparationController extends Controller
             'bonus_deduction' => 'required',
         ]);
         if ($validator->passes()) {
-            for($i=0, $i_max=count($request->assets_list); $i<$i_max; $i++) {
-                $assets_list_array[] = array("item" => $request->assets_list[$i], "price" => $request->assets_price[$i]);
+            $assets_list_array = array();
+            if($request->assets_list != NULL){
+                for($i=0, $i_max=count($request->assets_list); $i<$i_max; $i++) {
+                    $assets_list_array[] = array("item" => $request->assets_list[$i], "price" => $request->assets_price[$i]);
+                }
+                $assets_list_array = json_encode($assets_list_array);
             }
-            $assets_list_array = json_encode($assets_list_array);
             $separation = EmployeeSeparation::where('separation_id', $request->separation_id)->first();
             $separation_data = [
                     'added_by' => Auth::user()->user_id,
                     'user_id' => $request->user_id,
                     'type' => $request->type,
-                    'effective_from' => $request->effective_from,
+                    'notice_period' => $request->notice_period,
                     'reason' => $request->reason,
                     'general_comments' => $request->general_comments,
                     'resignation_date' => $request->resignation_date,
                     'separation_date' => $request->separation_date,
                     'disable_user_account' => $request->disable_user_account,
-                    'assets_list' => $assets_list_array,
                     'bonus_deduction' => $request->bonus_deduction,
                 ];
+//            if(!empty($assets_list_array)){
+                $separation_data['assets_list'] = $assets_list_array;
+//            }
             if($separation){
                 EmployeeSeparation::where('separation_id', $separation->separation_id)->update($separation_data);
             } else {
                 EmployeeSeparation::create($separation_data);
             }
-            if($request->effective_from == 'Immediate'){
+            if($request->disable_user_account == 'Immediate'){
                 // change user status to Separated
-                USER::where('user_id', $request->user_id)->update(['status' => 3]);
+                User::where('user_id', $request->user_id)->update(['status' => 3]);
                 // change user employee record status to Separated
                 Employee::where('user_id', $request->user_id)->update(['status' => 3]);
-            }else if($request->effective_from == 'Notice Period'){
+            }else if($request->disable_user_account == 'Upon Separation'){
                 // change user employee record status to Notice Period
                 Employee::where('user_id', $request->user_id)->update(['status' => 2]);
             }
@@ -137,7 +142,7 @@ class EmployeeSeparationController extends Controller
                 $attendance_log[$i]->notice_period = 'No';
                 if($month == $attendance_log[$i]->month){
                     $attendance_log[$i]->notice_period = 'Yes';
-                    $to_date = $separation->separation_date;
+//                    $to_date = $separation->separation_date;
                 }
                 $attendance_log[$i]->to_date = $to_date;
                 $attendance_log[$i]->form_date = $form_date;
@@ -310,7 +315,7 @@ class EmployeeSeparationController extends Controller
     }
     private function employee_deduction($user, $attendace_log, $allowance, $working_days, $holiday_count, $to_date)
     {
-        $late_absents = ($attendace_log->lates/3>=1) ? intval($attendace_log->lates/3) : 0;
+        $late_absents = ($attendace_log->lates/4>=1) ? intval($attendace_log->lates/4) : 0;
         $half_leavs_absents = ($attendace_log->half_leaves/2>=1) ? intval($attendace_log->half_leaves/2) : 0;
         $leaves_bucket = DB::table('leave_bucket_view')->where('user_id',$user->user_id)->first();
         $total_leaves = $late_absents+$half_leavs_absents;
@@ -340,7 +345,7 @@ class EmployeeSeparationController extends Controller
         $absent_deductions = $daily_wage*$attendace_log->absents;
         $half_and_late_deductions_amount = $daily_wage*$half_and_late_deductions;
         $total_absents_deduction = $absent_deductions+$half_and_late_deductions_amount;
-        $deduction_details = PayrollDeductionSetting::where('type', '!=', 'convenience')
+        $deduction_details = PayrollDeductionSetting::where('type', '!=', 'transport')
             ->where(function ($query) use($user) {
                 return $query->where('department_id', $user->department_id)
                     ->orWhere('department_id',0);
@@ -354,18 +359,18 @@ class EmployeeSeparationController extends Controller
         if($total_absents_deduction + $unmarked_days_wage != 0){
             $deduction_details['Absent/Late/Half'] = $total_absents_deduction + $unmarked_days_wage;
         }
-        $convenience_deduction = PayrollDeductionSetting::select(DB::raw('sum(value) as convenience'))->where('type', 'convenience')->whereStatus(1)->get();
+        $convenience_deduction = PayrollDeductionSetting::select(DB::raw('sum(value) as transport'))->where('type', 'transport')->whereStatus(1)->get();
         if($user->conveyance_allowance == 1 && $convenience_deduction != null){
             $check_last_date = date("Y-m-d", strtotime($to_date));
             $from_date= date("Y-m-01", strtotime($to_date));
             if($to_date < $check_last_date){
                 $month_working_days = working_days($from_date,$check_last_date);
                 $working_days = working_days($from_date,$to_date);
-                $convenience_deduction = ($convenience_deduction[0]['convenience'] / $month_working_days) * $working_days;
+                $convenience_deduction = ($convenience_deduction[0]['transport'] / $month_working_days) * $working_days;
             }else{
-                $convenience_deduction = $convenience_deduction[0]['convenience'];
+                $convenience_deduction = $convenience_deduction[0]['transport'];
             }
-            $deduction_details['Convenience'] = $convenience_deduction;
+            $deduction_details['transport'] = $convenience_deduction;
         } else {
             $convenience_deduction = 0;
         }
@@ -569,8 +574,8 @@ class EmployeeSeparationController extends Controller
         $annul_salary = $salary*12;
         $tax_deduction = PayrollTaxSlab::whereStatus(1)
             ->where(function ($query) use ($annul_salary) {
-                $query->where('from', '<', $annul_salary);
-                $query->where('to', '>', $annul_salary);
+                $query->where('from', '<=', $annul_salary);
+                $query->where('to', '>=', $annul_salary);
             })
             ->first();
         if(!$tax_deduction) {die('Tax Slab not found for '.$user->full_name);}

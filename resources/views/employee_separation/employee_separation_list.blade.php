@@ -29,7 +29,7 @@
                     <th>S.No</th>
                     <th>Employee Name</th>
                     <th>Separation type</th>
-                    <th>Effective From</th>
+                    <th>Notice Period</th>
                     <th>Resignation Date</th>
                     <th>Separation Date</th>
                     <th>Action</th>
@@ -39,9 +39,9 @@
                 @foreach ($employee_separation as $separation)
                     <tr>
                         <td>{{ $loop->index+1 }}</td>
-                        <td>{{ $separation->user->full_name }}</td>
+                        <td><a href="{{route('employee_data_view',['employee_id' => $separation->user->employee->employee_id])}}">{{ $separation->user->full_name }} </a></td>
                         <td>{{ $separation->type }}</td>
-                        <td>{{ $separation->effective_from }}</td>
+                        <td>{{ $separation->notice_period }}</td>
                         <td>{{ $separation->resignation_date }}</td>
                         <td>{{ $separation->separation_date }}</td>
                         <td>

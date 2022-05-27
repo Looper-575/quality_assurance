@@ -119,7 +119,7 @@ class PayrollController extends Controller
                 $model->half_leaves = $request['half_leaves'][$key];
                 $model->lates = $request['lates'][$key];
                 $model->absents = $request['absents'][$key];
-                $model->leaves_of_late = $request['leaves_of_late'][$key];
+                $model->carry_forward_half_day = $request['carry_forward_half_day'][$key];
                 $model->leaves_of_half = $request['leaves_of_half'][$key];
                 $model->presents = $request['presents'][$key];
                 $model->deduction_bucket = $request['deduction_bucket'][$key];
@@ -441,7 +441,7 @@ class PayrollController extends Controller
     public function payslips()
     {
         $data['page_title'] = "Payslips - Atlantis BPO CRM";
-        if(Auth::user()->role_id == 1){
+        if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5){
             $payslips = Payroll::with('user', 'payroll_deduction', 'payroll_allowance')->whereStatus(1)->whereHrApproved(1)->orderBy('payroll_id', 'desc')->get();
             for ($i=0; $i<count($payslips); $i++){
                 $income_tax = 0;
@@ -504,7 +504,7 @@ class PayrollController extends Controller
     }
     public function convenience_allowance()
     {
-        $data['page_title'] = "Convenience Allowance - Atlantis BPO CRM";
+        $data['page_title'] = "Transport Allowance - Atlantis BPO CRM";
         $data['user_convenience'] = User::with('employee')
             ->whereHas('employee', function($q) {
                 $q->where('conveyance_allowance', 1);
@@ -602,37 +602,45 @@ class PayrollController extends Controller
     }
     private function employee_deduction($user, $attendace_log, $allowance, $working_days, $holiday_count)
     {
-        $late_absents = ($attendace_log->lates/3>=1) ? intval($attendace_log->lates/3) : 0;
-        $half_leavs_absents = ($attendace_log->half_leaves/2>=1) ? intval($attendace_log->half_leaves/2) : 0;
+        $last_payroll = Payroll::where('user_id', $user->user_id)->latest()->first();
+        if($last_payroll === NULL){
+            $last_carry_forward = 0;
+        } else {
+            $last_carry_forward = $last_payroll->carry_forward_half_day;
+        }
+        $carry_forward_and_current_month_half_days = $attendace_log->half_leaves + $last_carry_forward;
+        $carry_forward_half_day = ($carry_forward_and_current_month_half_days) % 2;
+        $number = explode('.',($carry_forward_and_current_month_half_days / 2));
+        $half_day_leave_absent = $number[0];
         $leaves_bucket = DB::table('leave_bucket_view')->where('user_id',$user->user_id)->first();
-        $total_leaves = $late_absents+$half_leavs_absents;
+        $total_leaves = $half_day_leave_absent;
+
+        $half_leaves_deducted_from_bucket = 0;
         if($leaves_bucket != null){
+            $half_leaves_deduction = 0;
             $remaining_casual_sick = ($leaves_bucket->casual_bucket+$leaves_bucket->sick_bucket)-(($leaves_bucket->casual+$leaves_bucket->sick)-$leaves_bucket->payroll_deductions);
-            if($remaining_casual_sick < ($leaves_bucket->casual_bucket+$leaves_bucket->sick_bucket)){
-                if($remaining_casual_sick >= $total_leaves){
-                    $half_and_late_deductions=0;
-                } else if($remaining_casual_sick > 0) {
-                    $half_and_late_deductions = $total_leaves-$remaining_casual_sick;
-                }
-            } else {
-                $half_and_late_deductions = $total_leaves;
+            if($remaining_casual_sick >= $total_leaves) {
+                $half_leaves_deduction = 0;
+                $half_leaves_deducted_from_bucket = $total_leaves;
+            } else{
+                $half_leaves_deduction = $total_leaves-$remaining_casual_sick;
+                $half_leaves_deducted_from_bucket = $remaining_casual_sick;
             }
         } else {
-            $half_and_late_deductions = $total_leaves;
+            $half_leaves_deduction = $total_leaves;
         }
-        // if $half_and_late_deductions > 0
-        $leaves_deducted_from_bucket=0;
-        if($half_and_late_deductions > 0 && $half_and_late_deductions < $total_leaves){
-            $leaves_deducted_from_bucket = $total_leaves - $half_and_late_deductions;
-        } else if($half_and_late_deductions == 0) {
-            $leaves_deducted_from_bucket = $total_leaves;
-        }
-        // deduction_in_salary  AND deduction_from_bucket
+
         $daily_wage = $user->net_salary/22;
+        // lates deduction from salary :- 2 lates = 1 half day
+        $lates_number_of_half_day = explode('.',($attendace_log->lates / 4));
+        $lates_number_of_half_day = $lates_number_of_half_day[0];
+        $lates_deductions = $daily_wage*($lates_number_of_half_day/2);
+
+        // Absent deduction from salary
         $absent_deductions = $daily_wage*$attendace_log->absents;
-        $half_and_late_deductions_amount = $daily_wage*$half_and_late_deductions;
-        $total_absents_deduction = $absent_deductions+$half_and_late_deductions_amount;
-        $deduction_details = PayrollDeductionSetting::where('type', '!=', 'convenience')
+        $half_day_deductions_amount = $daily_wage*$half_leaves_deduction;
+        $total_absents_deduction = $absent_deductions+$half_day_deductions_amount+$lates_deductions;
+        $deduction_details = PayrollDeductionSetting::where('type', '!=', 'transport')
             ->where(function ($query) use($user) {
                 return $query->where('department_id', $user->department_id)
                     ->orWhere('department_id',0);
@@ -646,10 +654,10 @@ class PayrollController extends Controller
         if($total_absents_deduction + $unmarked_days_wage != 0){
             $deduction_details[$total_absents_deduction + $unmarked_days_wage] = 'Absent/Late/Half';
         }
-        $convenience_deduction = PayrollDeductionSetting::select(DB::raw('sum(value) as convenience'))->where('type', 'convenience')->whereStatus(1)->get();
+        $convenience_deduction = PayrollDeductionSetting::select(DB::raw('sum(value) as transport'))->where('type', 'transport')->whereStatus(1)->get();
         if($user->conveyance_allowance == 1 && $convenience_deduction != null){
-            $convenience_deduction = $convenience_deduction[0]['convenience'];
-            $deduction_details[$convenience_deduction] = 'Convenience';
+            $convenience_deduction = $convenience_deduction[0]['transport'];
+            $deduction_details[$convenience_deduction] = 'Transport';
         } else {
             $convenience_deduction = 0;
         }
@@ -661,13 +669,12 @@ class PayrollController extends Controller
             $deduction_details[$tax_deduction_val] = 'Income Tax';
         }
         $total_deductions =  $tax_deduction_val +  $attendance_log_deduction;
-
         return [
             'total_deductions' => $total_deductions + $calculated_deductions['after_tax_deduction'],
-            'deduction_bucket' => $leaves_deducted_from_bucket,
+            'deduction_bucket' => $half_leaves_deducted_from_bucket,
             'details' => $deduction_details,
-            'leaves_of_late' => $late_absents,
-            'leaves_of_half' => $half_leavs_absents
+            'carry_forward_half_day' => $carry_forward_half_day,
+            'leaves_of_half' => $half_day_leave_absent
         ];
     }
     private function employee_allowance($user_id, $attendace_log, $month, $working_days)
@@ -733,7 +740,8 @@ class PayrollController extends Controller
         if($user->department_id == 3 && $is_manager != null){
             $team_stats = $this->get_team_detailed_counts($from_date, $to_date, $user->user_id, $user->user_id==4 ? 6 : 0);
             $manager_team_per_rgu_value = $this->get_payroll_config();
-            $manager_team_count= $team_stats->manager_team_count*$manager_team_per_rgu_value->team_lead;
+            $manager_team_count = $team_stats->manager_team_count*$manager_team_per_rgu_value->team_lead;
+            $details['Manager Team Allowance'] = $manager_team_count;
         }
         $rgu_bench_mark_allowance = PayrollAllowanceSetting::select('*','department_id', 'role_id')
             ->where('type', 'rgu-bench-mark')
@@ -753,7 +761,6 @@ class PayrollController extends Controller
             'manager_team_count'=>$manager_team_count,
         );
         $details['Medical'] = $attendace_log->medical_allowance;
-        $details['Manager Team Allowance'] = $manager_team_count;
         foreach ($rgu_bench_mark_allowance as $rgu){
             if($rgu->role_id == 0 || $user->role_id == $rgu->role_id){
                 if($rgu->bench_mark_type == 'single-play'){
@@ -805,14 +812,26 @@ class PayrollController extends Controller
                 $sales = $this->get_user_total_rgu($from_date, $to_date, $user->user_id, $rgu->provider);
                 $payroll_config = $this->get_payroll_config();
                 // over 40 rguw bonus
-                if($sales['total_rgu'] > $payroll_config->rgu_bench_mark){
+                if($sales['total_rgu'] > $payroll_config->rgu_bench_mark && $user->role_id != 22){
                     $details['RGU Bonus (over 40)'] = ($sales['total_rgu']-$payroll_config->rgu_bench_mark)*$payroll_config->per_rgu;
                     $total_allowance['rgu'] =$details['RGU Bonus (over 40)'];
                 }
-                // Mobile Bonus
-                if($rgu->bench_mark_type == 'mobile') {
+                //Total RGU bonus CSR QA role_id = 22
+                $mobile_sales = $this->get_user_play($user->user_id, $from_date, $to_date, $rgu->provider, 'mobile');
+                if($user->role_id == 22) {
+                    $details['Per RGU Bonus (CRS QA)'] = ($sales['total_rgu'] - $mobile_sales)*$payroll_config->csr_qa_per_rgu;
+                    $total_allowance['rgu'] = $details['Per RGU Bonus (CRS QA)'];
+                }
+                // Mobile Bonus for CSR QA
+                if($rgu->bench_mark_type == 'mobile' && $user->role_id == 22) {
                     $allowance_amount = 0;
-                    $mobile_sales = $this->get_user_play($user->user_id, $from_date, $to_date, $rgu->provider, 'mobile');
+                    $allowance_amount = $rgu->after * $mobile_sales;
+                    $total_allowance['mobile'] += $allowance_amount;
+                    $details[$rgu->title] = $allowance_amount;
+                }
+                // Mobile Bonus
+                if($rgu->bench_mark_type == 'mobile' && $user->role_id != 22) {
+                    $allowance_amount = 0;
                     if($sales['total_rgu'] > $payroll_config->rgu_bench_mark) {
                         $rgu_remaining_after_mobile = $sales['total_rgu'] - $mobile_sales; // 50-13 = 37
                         if($rgu_remaining_after_mobile >= $payroll_config->rgu_bench_mark) {
@@ -830,7 +849,7 @@ class PayrollController extends Controller
                     }
                     $total_allowance['mobile'] += $allowance_amount;
                     if($allowance_amount>0){
-                        $details['Mobile Allowance'] = $allowance_amount;
+                        $details[$rgu->title] = $allowance_amount;
                     }
                 }
             }

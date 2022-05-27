@@ -11,9 +11,7 @@ class SalesTransferController extends Controller
 {
     public function index(){
         $data['page_title'] = 'Sale Transfer Form - Atlantis BPO CRM';
-        $data['agents'] = User::where([
-            ['role_id','=', 4],
-        ])->orwhere('user_id','=',Auth::user()->user_id)->get();
+        $data['agents'] = User::whereIn('role_id', [4,22])->orwhere('user_id','=',Auth::user()->user_id)->get();
        return view('sale_transfer.transfer_requests',$data);
     }
     public function list(){

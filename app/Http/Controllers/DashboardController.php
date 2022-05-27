@@ -7,6 +7,7 @@ use App\Models\Employee;
 use App\Models\EmployeeAssessment;
 use App\Models\Enquiry;
 use App\Models\LeaveApplication;
+use App\Models\ManagerialRole;
 use App\Models\Notifications;
 use App\Models\Task;
 use App\Models\Team;
@@ -32,7 +33,7 @@ class DashboardController extends Controller
             return $this->provider_dashboard();
         } else if($role==2 || $role==3)  {
             return $this->team_dashboard();
-        } else if($role==4) {
+        } else if($role==4 || $role == 22) {
             return $this->csr_dashboard();
         } else if($role==10) {
             return $this->qa_dashboard();
@@ -56,6 +57,7 @@ class DashboardController extends Controller
     private function dev_team_dashboard(){
         $data['page_title'] = "Development Team Dashboard - Atlantis BPO CRM";
         // Current Month Attendance Log
+        // MY Attendance Log
         $attendance_log = AttendanceLog::with('user.employee')
             ->select(DB::raw('sum(late) as `lates`, sum(absent) as `absents`, sum(on_leave) as `leaves` , sum(applied_leave) as `applied_leave`, sum(half_leave) as `half_leaves` , count(user_id) as `attendance_marked`, ANY_VALUE(user_id) as user_id'))
             ->where('user_id', Auth::user()->user_id)
@@ -94,6 +96,7 @@ class DashboardController extends Controller
             $data['half_leaves'] = 0;
         }
         /* **************************** */
+        // MY Team Members Attendance Log
         $my_team_id = Team::whereStatus(1)->where('team_lead_id',Auth::user()->user_id)->pluck('team_id')->first();
         if($my_team_id){
             $team_members = TeamMember::where('team_id',$my_team_id)->get()->pluck('user_id');
@@ -143,7 +146,7 @@ class DashboardController extends Controller
             $own_tasks_events[] = array();
             foreach ($own_tasks as $task) {
                 $own_tasks_events = array(
-                    "title" => $task['title'],
+                    "title" => $task['title']." assigned to me",
                     "start" => $task['start_date'],
                     "end" => $task['end_date'],
                     "url" => "tasks_list",
@@ -152,33 +155,34 @@ class DashboardController extends Controller
                 $all_events[] = $own_tasks_events;
             }
         }
-        // Team Tasks
-        $my_team_pending_tasks = 0;
-        $my_team_id = Team::whereStatus(1)->where('team_lead_id',Auth::user()->user_id)->pluck('team_id')->first();
-        if($my_team_id){
-            $team_members = TeamMember::where('team_id',$my_team_id)->get();
-            $team_tasks_events[] = array();
-            foreach ($team_members as $team_member) {
-                $team_tasks = Task::whereStatus(0)->where('assigned_to',$team_member->user_id)->get()->toArray();
+        // MY Department Task or team tasks whom i manage
+        $manager = ManagerialRole::Where('type','Manager')->where('role_id', Auth::user()->role_id)->first();
+        $manager_team_pending_tasks = 0;
+        if($manager){
+            $manager_team = User::where('manager_id',Auth::user()->user_id)->get();
+            $manager_team_tasks_events[] = array();
+            foreach ($manager_team as $team_member) {
+                $team_tasks = Task::with('users')->whereStatus(0)->where('assigned_to',$team_member->user_id)->get()->toArray();
                 if($team_tasks) {
-                    $my_team_pending_tasks += count($team_tasks);
+                    $manager_team_pending_tasks += count($team_tasks);
                     foreach ($team_tasks as $task) {
-                        $team_tasks_events = array(
-                            "title" => $task['title'],
+                        $manager_team_tasks_events = array(
+                            "title" => $task['title']." assigned to ".$task['users']['full_name'],
                             "start" => $task['start_date'],
                             "end" => $task['end_date'],
                             "url" => "tasks_list",
                             "description" => $task['description']);
                         if($task['added_by'] == Auth::user()->user_id){
-                            $team_tasks_events['className'] = 'm-fc-event--solid-info m-fc-event--light';
+                            $manager_team_tasks_events['className'] = 'm-fc-event--solid-info m-fc-event--light';
                         }else{
-                            $team_tasks_events['className'] = 'm-fc-event--light m-fc-event--solid-primary';
+                            $manager_team_tasks_events['className'] = 'm-fc-event--light m-fc-event--solid-primary';
                         }
-                        $all_events[] = $team_tasks_events;
+                        $all_events[] = $manager_team_tasks_events;
                     }
                 }
             }
         }
+        /////////////////////////////////////////////////////
         // Task created by me (ASSIGNED)
         $my_created_tasks_count = Task::where('added_by',Auth::user()->user_id)
                                  ->whereStatus(0)->whereNotNull('assigned_to')->count();
@@ -205,7 +209,7 @@ class DashboardController extends Controller
         $all_events = preg_replace('/"([^"]+)"\s*:\s*/', '$1:', $all_events);
         $data['calendar_events'] = $all_events;
         $data['my_pending_tasks'] = $my_pending_tasks;
-        $data['my_team_pending_tasks'] = $my_team_pending_tasks;
+        $data['manager_team_pending_tasks'] = $manager_team_pending_tasks;
         $data['my_created_tasks_count'] = $my_created_tasks_count;
         $data['unassigned_tasks_count'] = $unassigned_tasks_count;
         return view('dashboard.dev_team_dashboard',$data);
@@ -692,21 +696,23 @@ class DashboardController extends Controller
     {
         $csr_provider = DB::table('all_sales')->select('full_name', 'provider_name', DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile'))
             ->whereIn('provider_name',['spectrum','cox','suddenlink','att','directtv','earthlink','frontier','mediacom','optimum','hughesnet'])
-            ->where('role_id', 4)
+            ->whereIn('role_id', [4,22])
             ->whereBetween('added_on', [$from_date, $to_date])
             ->groupBy('provider_name','added_by')->get();
         $csr_others_provider = DB::table('all_sales')->select('full_name', DB::raw('"others" as provider_name'), DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile'))
-            ->where('role_id', 4)
+            ->whereIn('role_id', [4,22])
             ->whereNotIn('provider_name',['spectrum','cox','suddenlink','att','directtv','earthlink','frontier','mediacom','optimum','hughesnet'])
             ->whereBetween('added_on', [$from_date, $to_date])
             ->groupBy('added_by')->get();
         $misc_provider = DB::table('all_sales')->select('provider_name', DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile'))
             ->whereIn('provider_name',['spectrum','cox','suddenlink','att','directtv','earthlink','frontier','mediacom','optimum','hughesnet'])
             ->where('role_id','!=', 4)
+            ->where('role_id','!=', 22)
             ->whereBetween('added_on', [$from_date, $to_date])
             ->groupBy('provider_name','added_by')->get();
         $misc_others_provider = DB::table('all_sales')->select( DB::raw('"others" as provider_name'), DB::raw('count(provider_name) as count, sum(internet) as internet, sum(cable) as cable, sum(phone) as phone, sum(mobile) as mobile'))
             ->where('role_id','!=', 4)
+            ->where('role_id','!=', 22)
             ->whereNotIn('provider_name',['spectrum','cox','suddenlink','att','directtv','earthlink','frontier','mediacom','optimum','hughesnet'])
             ->whereBetween('added_on', [$from_date, $to_date])
             ->groupBy('added_by')->get();

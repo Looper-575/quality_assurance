@@ -55,7 +55,7 @@
                 @foreach ($employee_suspension as $suspension)
                     <tr>
                         <td>{{ $loop->index+1 }}</td>
-                        <td>{{ $suspension->user->full_name }}</td>
+                        <td><a href="{{route('employee_data_view',['employee_id' => $suspension->user->employee->employee_id])}}">{{ $suspension->user->full_name }}</a></td>
                         <td>{{ $suspension->from_date }}</td>
                         <td>{{ $suspension->to_date }}</td>
                         <td>{{ $suspension->reason }}</td>
@@ -64,7 +64,6 @@
                                 @if($is_admin)
                                     <a href="{{route('suspension_view',['suspension_id' => $suspension->suspension_id])}}" class="btn btn-primary"><i class="la la-eye"></i></a>
                                     <a href="{{route('suspension_form',['suspension_id' => $suspension->suspension_id])}}" class="btn btn-primary" ><i class="fa fa-edit"></i></a>
-{{--                                    <a href="{{route('unsuspend_user_account',['suspended_user_id' => $suspension->user_id])}}" class="btn btn-primary" ><i class="fa fa-user-times"></i></a>--}}
                                     <button title="unsuspend_user_account" class="btn btn-warning" onclick="unsuspend_user_account(this);" value="{{$suspension->user_id}}"><i class="fa fa-user-times"></i></button>
                                 @endif
                             </div>

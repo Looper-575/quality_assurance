@@ -119,16 +119,23 @@ class AttendanceController extends Controller
                 if (count($attendance_log_check) > 0 || $check_holiday != null) {
                     //if attendance already created and user on holiday then don't create attendance
                 } else {
-                    $leave = LeaveApplication::where('added_by', $user_id)
+                    $leave = LeaveApplication::where('added_by', $user)
                         ->where(['approved_by_manager' => 1, 'approved_by_hr' => 1])
+                        ->where('leave_type_id', '!=', 4)
                         ->where('from', '<=', $date_today)
-                        ->where('to', '>=', $date_today)
+                        ->where('to','>=',$date_today)
+                        ->first();
+                    $half_leave = LeaveApplication::where('added_by', $user)
+                        ->where(['approved_by_manager' => 1, 'approved_by_hr' => 1])
+                        ->where('leave_type_id', 4)
+                        ->where('from', '=', $date_today)
                         ->first();
                     $attendance_log = new AttendanceLog;
+                    if ($half_leave) {
+                        $attendance_log->half_leave = 1;
+                    }
                     if ($leave) {
-                        if ($leave->leave_type_id == 4) {
-                            $attendance_log->half_leave = 1;
-                        } else if($leave->leave_type_id == 6) {
+                        if($leave->leave_type_id == 6) {
                             $attendance_log->absent = 1;
                         } else {
                             $attendance_log->applied_leave = 1;

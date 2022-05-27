@@ -20,7 +20,7 @@ class NotificationsController extends Controller
             ->where('status','!=',0)->orderby('status','ASC')->get();
         $data['unread_notifications'] = Notifications::where('user_id', Auth::user()->user_id)
             ->where('status',1)->count();
-        return view('layout.partials.notifications' , $data);
+        return view('notifications.notifications' , $data);
     }
     public function read_notification(Request $request)
     {
