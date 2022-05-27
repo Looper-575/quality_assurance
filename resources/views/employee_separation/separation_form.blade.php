@@ -32,14 +32,15 @@
                             <span class="font-bold font-14"> Separation Type</span>
                             <select name="type" id="type" required class="form-control">
                                 <option {{isset($separation) ? ($separation->type == 'Termination' ? 'selected' : '' ): ''}} value="Termination">Termination </option>
-                                <option {{isset($separation) ? ($separation->type == 'Separation' ? 'selected' : '' ): ''}} value="Separation">Separation </option>
+                                <option {{isset($separation) ? ($separation->type == 'Resignation' ? 'selected' : '' ): ''}} value="Resignation">Resignation </option>
+                                <option {{isset($separation) ? ($separation->type == 'Abolishment' ? 'selected' : '' ): ''}} value="Abolishment">Abolishment </option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <span class="font-bold font-14"> Effective From</span>
-                            <select name="effective_from" id="effective_from" required class="form-control">
-                                <option {{isset($separation) ? ($separation->effective_from == 'Immediate' ? 'selected' : '' ): ''}} value="Immediate">Immediate </option>
-                                <option {{isset($separation) ? ($separation->effective_from == 'Notice Period' ? 'selected' : '' ): ''}} value="Notice Period">Notice Period </option>
+                            <span class="font-bold font-14"> Notice Period</span>
+                            <select name="notice_period" id="notice_period" required class="form-control">
+                                <option {{isset($separation) ? ($separation->notice_period == 'To be Served' ? 'selected' : '' ): ''}} value="To be Served">To be Served </option>
+                                <option {{isset($separation) ? ($separation->notice_period == 'Waived Off' ? 'selected' : '' ): ''}} value="Waived Off">Waived Off</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -47,7 +48,7 @@
                             <textarea class="form-control" name="reason" id="reason" cols="30" rows="10">{{isset($separation) ? $separation->reason : ''}}</textarea>
                         </div>
                         <div class="form-group">
-                            <span class="font-bold font-14"> List of Assets (To Be Return)</span>
+                            <span class="font-bold font-14"> List of Assets (To Be Returned)</span>
                             <div class="d-flex assets_div m-b-5">
                                 <span class="asset mr-5 font-14"> Asset Name</span>
                                 <span class="asset font-14"> Asset Price</span>
@@ -82,8 +83,8 @@
                         <div class="form-group">
                             <span class="font-bold font-14"> Suspend User Account</span>
                             <select name="disable_user_account" id="disable_user_account" required class="form-control">
-                                <option {{isset($separation) ? ($separation->type == 'Now' ? 'selected' : '' ): ''}} value="Now">Now </option>
-                                <option {{isset($separation) ? ($separation->type == 'On Separation' ? 'selected' : '' ): ''}} value="On Separation">On Separation </option>
+                                <option {{isset($separation) ? ($separation->type == 'Immediate' ? 'selected' : '' ): ''}} value="Immediate">Immediate </option>
+                                <option {{isset($separation) ? ($separation->type == 'Upon Separation' ? 'selected' : '' ): ''}} value="Upon Separation">Upon Separation </option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -105,6 +106,15 @@
                                 <label class="m-radio m-radio--solid m-radio--brand">
                                     <input type="radio" name="bonus_deduction" value="0" {{(isset($separation) && $separation->bonus_deduction == '0')? 'checked' : ''}} class="form-control">
                                     No
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="m-checkbox-inline">
+                                <label class="m-checkbox m-checkbox--solid m-checkbox--brand">
+                                    <input type="checkbox" name="departmental_clearance" value="1" required>
+                                    Clearance from other departments.
                                     <span></span>
                                 </label>
                             </div>
@@ -150,51 +160,32 @@
             let month = ("0" + (now.getMonth() + 1)).slice(-2);
             let resignation_date = now.getFullYear()+"-"+(month)+"-"+(day);
             ////////////////////////////////////////////
-            if($('#effective_from').val() == 'Immediate'){
-                $('#separation_date').val(resignation_date);
-                $('#disable_user_account').val('Now');
-                $('#type').val('Termination');
-                $('input[name=bonus_deduction][value="1"]').prop("checked", true);
 
-            }else if($('#effective_from').val() == 'Notice Period'){
-                let new_date = new Date($('#resignation_date').val());
-                let month = ("0" + (new_date.getMonth() + 2)).slice(-2);
-                let nextDate = new_date.getFullYear()+"-"+(month)+"-"+(day) ;
-                if($('#separation_id').val() == 0){
-                    $('#separation_date').val(nextDate);
-                }
-                $('#disable_user_account').val('On Separation');
-                $('#type').val('Separation');
-            }
-            if($('#disable_user_account').val() == 'Now'){
-                $('#separation_date').val(resignation_date);
-                $('#type').val('Termination');
-                $('#effective_from').val('Immediate');
-                $('input[name=bonus_deduction][value="1"]').prop("checked", true);
-            }else if($('#disable_user_account').val() == 'On Separation'){
-                let new_date = new Date($('#resignation_date').val());
-                let month = ("0" + (new_date.getMonth() + 2)).slice(-2);
-                let nextDate = new_date.getFullYear()+"-"+(month)+"-"+(day) ;
-                if($('#separation_id').val() == 0){
-                    $('#separation_date').val(nextDate);
-                }
-                $('#type').val('Separation');
-                $('#effective_from').val('Notice Period');
-            }
             if($('#type').val() == 'Termination'){
                 $('#separation_date').val(resignation_date);
-                $('#effective_from').val('Immediate');
-                $('#disable_user_account').val('Now');
+                $('#notice_period').val('Waived Off');
+                $('#disable_user_account').val('Immediate');
                 $('input[name=bonus_deduction][value="1"]').prop("checked", true);
-            }else if($('#type').val() == 'Separation'){
+            }else if($('#type').val() == 'Resignation'){
                 let new_date = new Date($('#resignation_date').val());
                 let month = ("0" + (new_date.getMonth() + 2)).slice(-2);
                 let nextDate = new_date.getFullYear()+"-"+(month)+"-"+(day) ;
                 if($('#separation_id').val() == 0){
                     $('#separation_date').val(nextDate);
                 }
-                $('#effective_from').val('Notice Period');
-                $('#disable_user_account').val('On Separation');
+                $('#notice_period').val('To be Served');
+                $('#disable_user_account').val('Upon Separation');
+            }
+            if($('#disable_user_account').val() == 'Immediate'){
+                $('#separation_date').val(resignation_date);
+                $('input[name=bonus_deduction][value="1"]').prop("checked", true);
+            }else if($('#disable_user_account').val() == 'Upon Separation'){
+                let new_date = new Date($('#resignation_date').val());
+                let month = ("0" + (new_date.getMonth() + 2)).slice(-2);
+                let nextDate = new_date.getFullYear()+"-"+(month)+"-"+(day) ;
+                if($('#separation_id').val() == 0){
+                    $('#separation_date').val(nextDate);
+                }
             }
             //////////////////////////////////////////////////////////
             $('#resignation_date').change(function() {
@@ -213,49 +204,25 @@
                     }
                 }
             });
-            $('#effective_from').change(function() {
+            $('#type').change(function() {
                 // Check input( $( this ).val() ) for validity here
                 let now = new Date($('#resignation_date').val());
                 let day = ("0" + now.getDate()).slice(-2);
                 let month = ("0" + (now.getMonth() + 1)).slice(-2);
                 let resignation_date = now.getFullYear()+"-"+(month)+"-"+(day);
-                if($(this).val() == 'Immediate'){
+                if($(this).val() == 'Termination'){
                     $('#separation_date').val(resignation_date);
-                    $('#disable_user_account').val('Now');
-                    $('#type').val('Termination');
+                    $('#disable_user_account').val('Immediate');
                     $('input[name=bonus_deduction][value="1"]').prop("checked", true);
-                }else if($(this).val() == 'Notice Period'){
+                }else if($(this).val() == 'Resignation'){
+                    $('#disable_user_account').val('Upon Separation');
                     let new_date = new Date($('#resignation_date').val());
                     let month = ("0" + (new_date.getMonth() + 2)).slice(-2);
                     let nextDate = now.getFullYear()+"-"+(month)+"-"+(day) ;
                     if($('#separation_id').val() == 0){
                         $('#separation_date').val(nextDate);
                     }
-                    $('#disable_user_account').val('On Separation');
-                    $('#type').val('Separation');
                 }
-            });
-            $('#type').change(function() {
-                // Check input( $( this ).val() ) for validity here
-                if($(this).val() == 'Termination'){
-                    $('#disable_user_account').val('Now');
-                    $('#effective_from').val('Immediate');
-                }else if($(this).val() == 'Separation'){
-                    $('#disable_user_account').val('On Separation');
-                    $('#effective_from').val('Notice Period');
-                }
-                $('#effective_from').change();
-            });
-            $('#disable_user_account').change(function() {
-                // Check input( $( this ).val() ) for validity here
-                if($(this).val() == 'Now'){
-                    $('#type').val('Termination');
-                    $('#effective_from').val('Immediate');
-                }else if($(this).val() == 'On Separation'){
-                    $('#type').val('Separation');
-                    $('#effective_from').val('Notice Period');
-                }
-                $('#effective_from').change();
             });
         });
     </script>

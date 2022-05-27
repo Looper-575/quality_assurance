@@ -185,7 +185,7 @@
                                                 <i class="fa fa-dollar"></i>
                                             </div>
                                             <div class="dual_clr_circle">
-                                                <p class="p_nums">{{$six_months_sales_count['one_month']['total_rgu']}}</p>
+                                                <p class="p_nums">{{$all_sales_stats['total']}}</p>
                                             </div>
                                         </div>
                                     </div>

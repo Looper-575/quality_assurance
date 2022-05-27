@@ -41,6 +41,11 @@ class EmployeeAssessmentController extends Controller
             $data['EmployeeAssessment'] = EmployeeAssessment::with('employees')->orderBy('id', 'DESC')->get();
         }else if(Auth::user()->role_id == 5){
             $data['is_hrm'] = true;
+            // get employee under HR manager
+            $user_ids = User::where('manager_id', Auth::user()->user_id)->where('user_type','Employee')->get()->pluck('user_id')->toArray();
+            if($user_ids){
+                $data['is_manager'] = true;
+            }
             $data['EmployeeAssessment_SELF'] = EmployeeAssessment::with('employees')->where('user_id', Auth::user()->user_id)->get();
             $data['EmployeeAssessment'] = EmployeeAssessment::with('employees')->where('user_id', '!=', Auth::user()->user_id)->orderBy('id', 'DESC')->get();
         }else if(in_array(Auth::user()->role_id, $manager_ids)){
@@ -98,7 +103,7 @@ class EmployeeAssessmentController extends Controller
             if(isset($Previous_EmployeeAssessment[0]->confirmation_status)) {
                 $data['prob_status'] = $Previous_EmployeeAssessment[0]->confirmation_status;
             }else{
-                $data['prob_status'] = false;
+                $data['prob_status'] = $EmployeeAssessment->employees->employment_status;
             }
             $data['emp_manager_evaluation_standards'] = EvaluationStandards::where('assessment_id',$request->id)->get();
             $data['period'] = $period;

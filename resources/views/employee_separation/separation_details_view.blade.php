@@ -29,7 +29,7 @@
                             <tbody>
                             <tr>
                                 <td>Name:</td>
-                                <td>{{ $separation->user->full_name }}</td>
+                                <td class="text-capitalize">{{ $separation->user->full_name }}</td>
                                 <td colspan="2"></td>
                             </tr>
                             <tr>
@@ -58,7 +58,7 @@
                 <div class="row">
                     <div class="col-12 mt-2">
                         <p><b>Detail:</b> <span>{{$separation->type}}</span>
-                            <span class="m-l-100"><b>Effective From:</b> {{$separation->effective_from}}</span>
+                            <span class="m-l-100"><b>Notice Period:</b> {{$separation->notice_period}}</span>
                             </p>
                         <p class="mb-0"><b>
                             @foreach($payroll as $payroll_log)
@@ -88,24 +88,26 @@
                                     <p>{{$asset}}</p>
                                 @endforeach
                             @else
-                            <p><b>Amount to be Deducted :</b>
-                                    <input type="number" name="asset_deduction_amount" id="asset_deduction_amount" readonly></p>
-                            <div class="m-form__group form-group">
-                                <label>Please select the Assets, not returned</label>
-                                <div class="m-checkbox-list">
-                                <label class="m-checkbox">
-                                    <input type="checkbox" id="assets_not_returned" name="assets_not_returned"
-                                           data-asset="all" data-price="0" value="0">Select All <span></span>
-                                </label>
-                                    <?php $assets_list = json_decode($separation->assets_list); ?>
-                                    @foreach ($assets_list as $key => $asset)
+                                @if($separation->assets_list != NULL)
+                                    <p><b>Amount to be Deducted :</b>
+                                            <input type="number" name="asset_deduction_amount" id="asset_deduction_amount" readonly></p>
+                                    <div class="m-form__group form-group">
+                                        <label>Please select the Assets, not returned</label>
+                                        <div class="m-checkbox-list">
                                         <label class="m-checkbox">
-                                            <input type="checkbox" name="assets_not_returned[]" data-asset="{{$asset->item}}" data-price="{{$asset->price}}" class="asset_checkbox" value="{{$asset->item}}">
-                                            {{ $asset->item }} ({{ $asset->price }})<span></span>
+                                            <input type="checkbox" id="assets_not_returned" name="assets_not_returned"
+                                                   data-asset="all" data-price="0" value="0">Select All <span></span>
                                         </label>
-                                    @endforeach
-                                </div>
-                            </div>
+                                            <?php $assets_list = json_decode($separation->assets_list); ?>
+                                            @foreach ($assets_list as $key => $asset)
+                                                <label class="m-checkbox">
+                                                    <input type="checkbox" name="assets_not_returned[]" data-asset="{{$asset->item}}" data-price="{{$asset->price}}" class="asset_checkbox" value="{{$asset->item}}">
+                                                    {{ $asset->item }} ({{ $asset->price }})<span></span>
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    @endif
                             @endif
                             </div>
                         </div>

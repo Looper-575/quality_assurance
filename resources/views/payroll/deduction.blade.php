@@ -99,7 +99,7 @@
                                     <label class="form-check-label" for="type">Type</label>
                                     <select class="form-control mt-2" name="type" id="type" required>
                                         <option value="">Please Select</option>
-                                        <option value="convenience">Convenience</option>
+                                        <option value="transport">Transport</option>
                                         <option value="other">Other</option>
                                     </select>
                                 </div>
@@ -181,7 +181,7 @@
         });
         $('#type').on('change', function() {
             let type = this.value;
-            if(type == 'convenience'){
+            if(type == 'transport'){
                 $('#before_tax').prop('required',false);
                 $('.before-tax-div').addClass('d-none');
                 $('.before-tax-div').removeClass('d-block');
@@ -242,7 +242,7 @@
             $('#criteria').val(data.criteria);
             $('#department_id').val(data.department_id);
             let roles = data.role_id.split(',');
-            if(data.type == 'convenience'){
+            if(data.type == 'transport'){
                 $('#before_tax').prop('required',false);
                 $('.before-tax-div').addClass('d-none');
                 $('.before-tax-div').removeClass('d-block');

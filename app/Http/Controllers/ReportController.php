@@ -369,20 +369,21 @@ class ReportController extends Controller
             $from_date = Employee::where('user_id',$request->user_id)->pluck('joining_date')->first();// Employee Joining Date
             $today_date = get_date();
             $to_date = date("Y-m-t", strtotime($today_date));
-            $holiday_count = $this->check_holidays($from_date, $to_date, $request->user_id);
             $endDate = $to_date;
             $startDate = $from_date;
             $working_days = working_days($startDate, $endDate);
-            $data['leaves_taken'] = LeaveApplication::select('leave_type_id','from','to',
-                DB::raw('sum(no_leaves) as leaves_taken, MONTH(added_on) month'), 'added_by')
+            $data['leaves_taken'] = LeaveApplication::select(
+                DB::raw('sum(no_leaves) as leaves_taken, MONTH(added_on) month, ANY_VALUE(added_by) as added_by'))
                 ->with('user')->where(['approved_by_manager'=>1,'approved_by_hr'=>1])
                 ->where('added_by', $request->user_id)
                 ->whereBetween('from', [$startDate,$endDate])
                 ->whereBetween('to', [$startDate,$endDate])
                 ->whereStatus(1)
-                ->groupBy('month', 'added_by')
+                ->groupBy('added_by', 'month')
                 ->get();
+            $user = User::where('user_id',$request->user_id)->first();
             $data['employee_name'] = User::where('user_id',$request->user_id)->pluck('full_name')->first();
+            $holiday_count = $this->check_holidays($from_date, $to_date,$user->department_id, $user->user_id);
             $data['holiday_count'] = $holiday_count;
             $data['working_days'] = $working_days;
             $data['start_month'] = $from_date;
@@ -415,7 +416,10 @@ class ReportController extends Controller
         $data['report'] =  AttendanceLog::with('leave.leaveType')
             ->select('user_id', 'attendance_date', 'applied_leave', 'half_leave', 'late', 'absent')
             ->where('user_id', $request->user_id)
-            ->where('applied_leave', 1)
+            ->where(function ($query) {
+                return $query->where('applied_leave', 1)
+                    ->orWhere('on_leave',1);
+            })
             ->union($payroll)
             ->orderBy('attendance_date', 'ASC')
             ->get();

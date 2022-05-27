@@ -245,11 +245,13 @@ class QAController extends Controller
         $data['qa_queue'] = CallDisposition::where([
             'status' => 1,
             'disposition_type' => 1
-        ])->with(['user','call_disposition_types','call_dispositions_services'])->doesntHave('qa_assessment')->whereRaw("date(added_on)>='2021-11-29 17:00:00'")->get();
+        ])
+            ->where('added_on','>', '2022-02-07')->with(['user','call_disposition_types','call_dispositions_services'])->doesntHave('qa_assessment')->whereRaw("date(added_on)>='2021-11-29 17:00:00'")->get();
         $data['qa_done'] = QualityAssurance::where([
             'status'=> 1,
             'call_type_id' => 1
-        ])->with(['agent','call_type','qa_status','call_disposition','call_disposition.call_dispositions_services'])->whereRaw("date(added_on)>='2021-11-29 17:00:00'")->get();
+        ])
+            ->where('added_on','>', '2022-02-07')->with(['agent','call_type','qa_status','call_disposition','call_disposition.call_dispositions_services'])->whereRaw("date(added_on)>='2021-11-29 17:00:00'")->get();
         return view('qa.qa_list' , $data);
     }
     public function qa_add($id){
