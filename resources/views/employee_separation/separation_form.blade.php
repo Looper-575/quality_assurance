@@ -21,7 +21,7 @@
                     <div class="col-lg-6">
                         <div class="form-group">
                             <span class="font-bold font-14">Employee Name</span>
-                            <select class="form-control" name="user_id" id="user_id" required >
+                            <select class="form-control select2" name="user_id" id="user_id" required >
                                 <option value="">Select</option>
                                 @foreach($users as $user)
                                     <option {{ (isset($separation) && $separation->user_id == $user->user_id)  ? 'selected' : ''}} value="{{$user->user_id}}">{{$user->full_name}}</option>
@@ -48,16 +48,16 @@
                             <textarea class="form-control" name="reason" id="reason" cols="30" rows="10">{{isset($separation) ? $separation->reason : ''}}</textarea>
                         </div>
                         <div class="form-group">
-                            <span class="font-bold font-14"> List of Assets (To Be Returned)</span>
+                            <span class="font-bold font-14"> Deductions (To Be Deducted)</span>
                             <div class="d-flex assets_div m-b-5">
-                                <span class="asset mr-5 font-14"> Asset Name</span>
-                                <span class="asset font-14"> Asset Price</span>
+                                <span class="asset mr-5 font-14"> Deduction Title</span>
+                                <span class="asset font-14"> Deduction Amount</span>
                                 <button type="button" onclick="add_new_asset(this)"
                                         class="btn btn-sm btn-primary add_new_asset">+
                                 </button>
                             </div>
                             <div id="assets_list">
-                                @if(isset($separation))
+                                @if(isset($separation) && $separation->assets_list != NULL)
                                     <?php $assets_list = json_decode($separation->assets_list); ?>
                                     @foreach ($assets_list as $key => $asset)
                                         <div class="d-flex assets_div m-b-5">
@@ -121,8 +121,8 @@
                         </div>
                     </div>
                     <div class="col-12 text-right">
-                        <button class="btn btn-primary mr-1" type="submit">Submit</button>
-                        <button class="btn btn-danger" type="reset">Reset</button>
+                        <button class="btn btn-danger mr-1" type="reset">Reset</button>
+                        <button class="btn btn-primary" type="submit">Submit</button>
                     </div>
                 </div>
             </form>
@@ -132,10 +132,13 @@
 @endsection
 @section('footer_scripts')
     <script>
+        $(document).ready(function (){
+            $(".select2").select2();
+        });
         function save_separation_details(){
             let data = new FormData($('#separation_form')[0]);
             let a = function() {
-                window.location.href = "{{route('employee_separation')}}";
+           //     window.location.href = "{{route('employee_separation')}}";
             }
             let arr = [a];
             call_ajax_with_functions('', '{{route('separation_save')}}', data, arr);
@@ -229,6 +232,12 @@
     <style>
         .asset{
             width: 50%;
+        }
+        span.select2-selection.select2-selection--single {
+            height: 43px;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            top: 20px;
         }
     </style>
 @endsection

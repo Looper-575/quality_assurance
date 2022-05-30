@@ -713,7 +713,11 @@ class PayrollController extends Controller
                 }
             }
         }
+        // one month back for allowances
+        $month = date('Y-m-d', strtotime ( '-1 month' , strtotime ($month)));
         $year = date('Y', strtotime($month));
+//        var_dump([$year, $month]);
+//        die();
         $change_month = date('m', strtotime($month));
         if((0 == $year % 4) & (0 != $year % 100) | (0 == $year % 400))
         {

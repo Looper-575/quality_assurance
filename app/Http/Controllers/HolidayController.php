@@ -81,11 +81,11 @@ class HolidayController extends Controller
     public function get_selected_role_users(Request $request)
     {
         if($request->department_id == 0 && $request->role_id[0] == 0){
-            $model =  User::with('role')->where('user_type', 'Employee')->get();
+            $model =  User::with('role')->where('user_type', 'Employee')->whereStatus(1)->get();
         } else if($request->department_id != 0 && $request->role_id[0] == 0) {
-            $model =  User::with('role')->where('department_id', $request->department_id)->where('user_type', 'Employee')->get();
+            $model =  User::with('role')->where('department_id', $request->department_id)->where('user_type', 'Employee')->whereStatus(1)->get();
         } else {
-            $model =  User::with('role')->whereIn('role_id', $request->role_id)->where('user_type', 'Employee')->get();
+            $model =  User::with('role')->whereIn('role_id', $request->role_id)->where('user_type', 'Employee')->whereStatus(1)->get();
 
         }
         return response()->json($model);

@@ -132,7 +132,7 @@ if (!function_exists('working_days')) {
         if (strtotime($endDate) >= strtotime($startDate)) {
             $holidays = array();
             $date = $startDate;
-            $days = 1;
+            $days = 0;
             while ($date != $endDate) {
                 $date = date("Y-m-d", strtotime("+1 day", strtotime($date)));
                 $weekday = date("w", strtotime($date));
