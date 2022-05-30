@@ -26,7 +26,7 @@ class QAController extends Controller
     }
     public function form(){
         $data['page_title'] = "QA From - Atlantis BPO CRM";
-        $data['agents'] = User::whereIn('role_id', [1,2,3,4] )->where('status', 1)->get();
+        $data['agents'] = User::whereIn('role_id', [1,2,3,4,22] )->where('status', 1)->get();
         $data['call_types'] = CallType::get();
         return view('qa.qa_form' , $data);
     }
@@ -37,8 +37,6 @@ class QAController extends Controller
         $data['qa_lists'] = QualityAssurance::where([
             'status'=> 1,
             ])->with(['agent','call_type','qa_status'])->get();
-           // dd($data);
-        // $data['qa_single_data'] = QualityAssurance::find($id)->get();
         return view('qa.qa_list', $data);
     }
     public function show(Request $request)

@@ -205,6 +205,20 @@ class DashboardController extends Controller
             }
         }
         ///////////////////////////////////////////
+        $birthday = Employee::select(DB::raw("full_name , DATE_FORMAT(date_of_birth,'%m-%d') as birthday"))->whereStatus(1)->get()->toArray();
+        $birthday_events[] = array();
+        foreach($birthday as $event) {
+            $birthday_start = date("Y").'-'.$event['birthday'].' 00:00:00';
+            $birthday_end = date("Y").'-'.$event['birthday'].' 23:59:59';
+            $birthday_events = array(
+                "title" => $event['full_name']."'s Birthday",
+                "start" => $birthday_start,
+                "end" => $birthday_end,
+                "className" => "m-fc-event--solid-info m-fc-event--light",
+                "description" => $event['full_name']."'s Birthday");
+            $all_events[] = $birthday_events;
+        }
+        /// ////////////////////////////////////////////
         $all_events = json_encode($all_events);
         $all_events = preg_replace('/"([^"]+)"\s*:\s*/', '$1:', $all_events);
         $data['calendar_events'] = $all_events;

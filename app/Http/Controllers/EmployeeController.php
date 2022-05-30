@@ -167,8 +167,13 @@ class EmployeeController extends Controller
             $employee = Employee::where('user_id', $request->user_id)->first();
 
             if($request->employment_status == 'Confirmed'){
+                if($request->confirmation_date != null){
+                    $confirmation_date = $request->confirmation_date;
+                } else {
+                    $confirmation_date = get_date();
+                }
                 Employee::where('user_id', $request->user_id)->update([
-                    'confirmation_date' => get_date()
+                    'confirmation_date' => $confirmation_date
                 ]);
             }
             $Leaves_Bucket_record = LeavesBucket::where('user_id',$request->user_id)->count();

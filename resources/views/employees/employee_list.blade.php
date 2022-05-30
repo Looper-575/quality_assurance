@@ -26,14 +26,14 @@
             <table class="datatable table table-bordered" style="">
                 <thead>
                 <tr>
-                    <th title="Field #1">S.No</th>
-                    <th title="Field #2">Name</th>
-                    <th title="Field #3">Email</th>
-                    <th title="Field #4">Position</th>
-                    <th title="Field #5">Gender</th>
-                    <th title="Field #6">Address</th>
-                    <th title="Field #7">Contact</th>
-                    <th title="Field #9">Action</th>
+                    <th>S.No</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Position</th>
+                   <th>Gender</th>
+                    <th>Address</th>
+                    <th>Contact</th>
+                    <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>

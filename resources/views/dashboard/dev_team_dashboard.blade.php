@@ -7,138 +7,121 @@
   .m-widget24 .m-widget24__item .m-widget24__title {
     margin-left: 0.8rem !important;
   }
+  .m-widget24__item .row{
+    margin-left: 0px !important;
+  }
 </style>
 @endsection
 @section('content')
     <div class="m-portlet ">
         <div class="m-portlet__body  m-portlet__body--no-padding">
             <div class="row m-row--no-padding m-row--col-separator-xl">
-                <div class="col-md-12 col-lg-6 col-xl-7">
+                <div class="col-md-12 col-lg-6 col-xl-8">
                     <div class="m-widget24">
                         <div class="m-widget24__item">
-                            <h5 class="m-widget24__title mt-2 pt-2">Current Month Attendance</h5>
-                            <hr>
+                            <h5 class="m-widget24__title mt-2 pt-2 mb-0 pb-0">Current Month Attendance</h5>
+                            <hr style="margin-top: 0.5rem !important; margin-bottom: 0.5rem !important;">
                             <div class="row">
-                                <div class="col-md-12 col-lg-6 col-xl-2">
-                                    <div class="m-widget24">
-                                        <div class="m-widget24__item">
-                                            <h4 class="m-widget24__title mt-1 pt-1">Unmarked</h4><br>
-                                            <span class="m-widget24__desc m--font--info" style="font-size: 1.75rem; font-weight: 600;">
-                                                {{$unmarked}}</span>
-                                            <div class="m--space-20"></div>
-                                        </div>
-                                    </div>
+                                <div class="col-md-12 col-lg-12 col-xl-2">
+                                  <a href="{{route('attendance_report_single',['user_id' => Auth::user()->user_id])}}">
+                                    <h3 class="m-widget24__title mt-2" style="font-size: 1.5rem !important;">My</h3>
+                                  </a>
                                 </div>
-                                <div class="col-md-12 col-lg-6 col-xl-2">
-                                    <div class="m-widget24">
-                                        <div class="m-widget24__item">
-                                            <h4 class="m-widget24__title mt-1 pt-1">Presents</h4><br>
-                                            <span class="m-widget24__desc m--font-info" style="font-size: 1.75rem; font-weight: 600;">
-                                                {{$presents}}</span>
-                                            <div class="m--space-20"></div>
-                                        </div>
-                                    </div>
+                                <div class="col-md-3 col-lg-3 col-xl-2">
+                                     <h4 class="m-widget24__title mt-1" style="font-size: 1rem !important;">Absents</h4><br>
+                                     <span class="m-widget24__desc m--font-danger" style="font-size: 1.5rem; font-weight: 600;">
+                                        {{$absents}}</span>
                                 </div>
-                                <div class="col-md-12 col-lg-6 col-xl-2">
-                                    <div class="m-widget24">
-                                        <div class="m-widget24__item">
-                                            <h4 class="m-widget24__title mt-1 pt-1">Absents</h4><br>
-                                            <span class="m-widget24__desc m--font-danger" style="font-size: 1.75rem; font-weight: 600;">
-                                                {{$absents}}</span>
-                                            <div class="m--space-20"></div>
-                                        </div>
-                                    </div>
+                                <div class="col-md-3 col-lg-3 col-xl-2">
+                                    <h4 class="m-widget24__title mt-1" style="font-size: 1rem !important;">Lates</h4><br>
+                                    <span class="m-widget24__desc m--font-warning" style="font-size: 1.5rem; font-weight: 600;">
+                                        {{$lates}}</span>
                                 </div>
-                                <div class="col-md-12 col-lg-6 col-xl-2">
-                                    <div class="m-widget24">
-                                        <div class="m-widget24__item">
-                                            <h4 class="m-widget24__title mt-1 pt-1">Lates</h4><br>
-                                            <span class="m-widget24__desc m--font-warning" style="font-size: 1.75rem; font-weight: 600;">
-                                                {{$lates}}</span>
-                                            <div class="m--space-20"></div>
-                                        </div>
-                                    </div>
+                                <div class="col-md-3 col-lg-3 col-xl-2 px-0">
+                                    <h4 class="m-widget24__title mt-1" style="font-size: 1rem !important;">Half Leaves</h4><br>
+                                    <span class="m-widget24__desc m--font-brand" style="font-size: 1.5rem; font-weight: 600;">
+                                        {{$half_leaves}}</span>
                                 </div>
-                                <div class="col-md-12 col-lg-6 col-xl-2 px-0">
-                                    <div class="m-widget24">
-                                        <div class="m-widget24__item">
-                                            <h4 class="m-widget24__title mt-1 pt-1">Half Leaves</h4><br>
-                                            <span class="m-widget24__desc m--font-brand" style="font-size: 1.75rem; font-weight: 600;">
-                                                {{$half_leaves}}</span>
-                                            <div class="m--space-20"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12 col-lg-6 col-xl-2 px-0">
-                                    <div class="m-widget24">
-                                        <div class="m-widget24__item">
-                                            <h4 class="m-widget24__title mt-1 pt-1">On Leave</h4><br>
-                                            <span class="m-widget24__desc m--font-inverse-warning" style="font-size: 1.75rem; font-weight: 600;">
-                                                {{$on_leave}}</span>
-                                            <div class="m--space-20"></div>
-                                        </div>
-                                    </div>
+                                <div class="col-md-3 col-lg-3 col-xl-3 px-0">
+                                    <h4 class="m-widget24__title mt-1" style="font-size: 1rem !important;">On Leave</h4><br>
+                                    <span class="m-widget24__desc m--font-inverse-warning" style="font-size: 1.5rem; font-weight: 600;">
+                                        {{$on_leave}}</span>
                                 </div>
                             </div>
+                            <hr style="margin-top: 0.5rem !important; margin-bottom: 0.5rem !important;">
+                            <div class="row">
+                                <div class="col-md-12 col-lg-12 col-xl-2">
+                                     @if($have_team)
+                                    <a href="{{route('attendance_report_monthly',['user_id' => Auth::user()->user_id])}}">
+                                        <h3 class="m-widget24__title mt-2" style="font-size: 1.5rem !important;">Team's</h3>
+                                    </a>
+                                    @else
+                                        <h3 class="m-widget24__title mt-2" style="font-size: 1.5rem !important;">Team's</h3>
+                                    @endif
+                                </div>
+                                @if($have_team)
+                                    <div class="col-md-3 col-lg-3 col-xl-2">
+                                        <h4 class="m-widget24__title mt-1" style="font-size: 1rem !important;">Absents</h4><br>
+                                        <span class="m-widget24__desc m--font-danger" style="font-size: 1.5rem; font-weight: 600;">
+                                                    {{$team_absents}}</span>
+                                    </div>
+                                    <div class="col-md-3 col-lg-3 col-xl-2">
+                                        <h4 class="m-widget24__title mt-1" style="font-size: 1rem !important;">Lates</h4><br>
+                                        <span class="m-widget24__desc m--font-warning" style="font-size: 1.5rem; font-weight: 600;">
+                                                    {{$team_lates}}</span>
+                                    </div>
+                                    <div class="col-md-3 col-lg-3 col-xl-2 px-0">
+                                        <h4 class="m-widget24__title mt-1" style="font-size: 1rem !important;">Half Leaves</h4><br>
+                                        <span class="m-widget24__desc m--font-brand" style="font-size: 1.5rem; font-weight: 600;">
+                                                    {{$team_half_leaves}}</span>
+                                    </div>
+                                    <div class="col-md-3 col-lg-3 col-xl-3 px-0">
+                                        <h4 class="m-widget24__title mt-1" style="font-size: 1rem !important;">On Leave</h4><br>
+                                        <span class="m-widget24__desc m--font-inverse-warning" style="font-size: 1.5rem; font-weight: 600;">
+                                                    {{$team_on_leave}}</span>
+                                    </div>
+                                @else
+                                 <div class="col-md-6 col-lg-6 col-xl-8">
+                                    <p class="mt-2">Currently No Team under you (for Attendance)</p>
+                                 </div>
+                                @endif
+                            </div>
                         </div>
+                        <div class="m--space-10"></div>
                     </div>
                 </div>
-                <div class="col-md-12 col-lg-6 col-xl-2">
+                <div class="col-md-12 col-lg-6 col-xl-4">
                     <div class="m-widget24">
                         <div class="m-widget24__item">
-                            <h5 class="m-widget24__title mt-2 pt-2" >Pending Tasks</h5>
-                            <hr>
-                                <div class="row">
-                                    <div class="col-12">
-                                         <div class="m-widget24">
-                                            <div class="m-widget24__item">
-                                                <div class="row">
-                                                    <div class="col-6">
-                                                        <h5 class="m-widget24__title mt-1 pt-1 px-1">Own</h5><br>
-                                                        <span class="m-widget24__desc m--font-danger" style="font-size: 1.75rem; font-weight: 600;">
-                                                    {{$my_pending_tasks}}</span>
-                                                    </div>
-                                                    <div class="col-6">
-                                                        <h5 class="m-widget24__title mt-1 pt-1 px-1">Team's</h5><br>
-                                                        <span class="m-widget24__desc m--font-warning" style="font-size: 1.75rem; font-weight: 600;">
-                                                            {{$my_team_pending_tasks}}</span>
-                                                    </div>
-                                                </div>
-                                                <div class="m--space-10"></div>
-                                            </div>
-                                        </div>
-                                    </div>
+                            <h5 class="m-widget24__title mt-2 pt-2 mb-0 pb-0" >Pending Tasks</h5>
+                            <hr style="margin-top: 0.5rem !important; margin-bottom: 0.5rem !important;">
+                            <div class="row">
+                                <div class="col-md-6 col-lg-6 col-xl-6">
+                                    <h5 class="m-widget24__title mt-1  style=font-size: 1rem !important;px-1">Own</h5><br>
+                                    <span class="m-widget24__desc m--font-danger" style="font-size: 1.5rem; font-weight: 600;">
+                                    <a class="m--font-danger" href="{{route('tasks_list')}}">{{$my_pending_tasks}}</a></span>
                                 </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-12 col-lg-6 col-xl-3">
-                    <div class="m-widget24">
-                        <div class="m-widget24__item">
-                            <h5 class="m-widget24__title mt-2 pt-2" >My Created Tasks</h5>
-                            <hr>
-                                <div class="row">
-                                    <div class="col-12">
-                                         <div class="m-widget24">
-                                            <div class="m-widget24__item">
-                                                <div class="row">
-                                                    <div class="col-6">
-                                                        <h5 class="m-widget24__title mt-1 pt-1">UnAssigned</h5><br>
-                                                        <span class="m-widget24__desc m--font-danger" style="font-size: 1.75rem; font-weight: 600;">
-                                                    {{$unassigned_tasks_count}}</span>
-                                                    </div>
-                                                    <div class="col-6">
-                                                        <h5 class="m-widget24__title mt-1 pt-1">Assigned</h5><br>
-                                                        <span class="m-widget24__desc m--font-warning" style="font-size: 1.75rem; font-weight: 600;">
-                                                            {{$my_created_tasks_count}}</span>
-                                                    </div>
-                                                </div>
-                                                <div class="m--space-10"></div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div class="col-md-6 col-lg-6 col-xl-6">
+                                    <h5 class="m-widget24__title mt-1  style=font-size: 1rem !important;px-1">Team's</h5><br>
+                                    <span class="m-widget24__desc m--font-warning" style="font-size: 1.5rem; font-weight: 600;">
+                                    <a class="m--font-warning" href="{{route('tasks_list')}}">{{$manager_team_pending_tasks}}</a></span>
                                 </div>
+                            </div>
+                            <hr style="margin-top: 0.5rem !important; margin-bottom: 0.5rem !important;">
+                            <div class="row">
+                                 <div class="col-md-6 col-lg-6 col-xl-6">
+                                        <h5 class="m-widget24__title mt-1" style="font-size: 1rem !important;">My UnAssigned</h5><br>
+                                        <span class="m-widget24__desc m--font-brand" style="font-size: 1.5rem; font-weight: 600;">
+                                        <a class="m--font-brand" href="{{route('tasks_list')}}">{{$unassigned_tasks_count}}</a></span>
+                                    </div>
+                                 <div class="col-md-6 col-lg-6 col-xl-6">
+                                        <h5 class="m-widget24__title mt-1" style="font-size: 1rem !important;">My Assigned</h5><br>
+                                        <span class="m-widget24__desc m--font-inverse-warning" style="font-size: 1.5rem; font-weight: 600;">
+                                        <a class="m--font-inverse-warning" href="{{route('tasks_list')}}">{{$my_created_tasks_count}}</a></span>
+                                    </div>
+                            </div>
                         </div>
+                        <div class="m--space-10"></div>
                     </div>
                 </div>
             </div>
