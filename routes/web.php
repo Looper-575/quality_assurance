@@ -486,8 +486,30 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::post('/get_modules', 'App\Http\Controllers\TaskController@get_modules')->name('get_modules');
     Route::post('/get_users', 'App\Http\Controllers\TaskController@get_users')->name('get_users');
     Route::get('/view_document/{id}', 'App\Http\Controllers\TaskController@view_document')->name('view_document');
-
-
     // route for testing email
     Route::get('/send_laravel_email', 'App\Http\Controllers\NotificationsController@send_laravel_email')->name('send_laravel_email');
+    // Developer Tasks
+    Route::get('/tasks_list', 'App\Http\Controllers\TaskController@list')->name('tasks_list');
+    Route::get('/task_form/{id?}', 'App\Http\Controllers\TaskController@form')->name('task_form');
+    Route::post('/save_task', 'App\Http\Controllers\TaskController@save')->name('save_task');
+    Route::get('/view_single_task/{id}', 'App\Http\Controllers\TaskController@view_single_task')->name('view_single_task');
+    Route::post('/get_modules', 'App\Http\Controllers\TaskController@get_modules')->name('get_modules');
+
+    // project module routes
+    Route::group(['middleware' => ['check-permission:modules_list,view,0,0']], function() {
+        Route::get('modules_list', 'App\Http\Controllers\ModuleController@modules_list')->name('modules_list');
+        Route::get('single_module_detail/{id}', 'App\Http\Controllers\ModuleController@single_module_detail')->name('single_module_detail');
+    });
+    Route::group(['middleware' => ['check-permission:modules_list,0,add,0']], function() {
+        Route::get('module_form/{id?}/{task_id?}', 'App\Http\Controllers\ModuleController@module_form')->name('module_form');
+    });
+    Route::group(['middleware' => ['check-permission:modules_list,0,0,update']], function() {
+        Route::get('/projects_list', 'App\Http\Controllers\ProjectController@projects_list')->name('projects_list');
+        Route::post('/project_delete', 'App\Http\Controllers\ProjectController@project_delete')->name('project_delete');
+        Route::post('/project_save', 'App\Http\Controllers\ProjectController@project_save')->name('project_save');
+    });
+    Route::post('save_module_info', 'App\Http\Controllers\ModuleController@save_module_info')->name('save_module_info');
+    Route::post('approve_module', 'App\Http\Controllers\ModuleController@approve_module')->name('approve_module');
+    Route::post('project_modules', 'App\Http\Controllers\ModuleController@project_modules')->name('project_modules');
+
 });

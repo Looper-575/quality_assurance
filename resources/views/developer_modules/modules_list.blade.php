@@ -39,13 +39,6 @@
                         </a>
                     </li>
                     @endif
-                    @if($has_permissions->update == 1)
-                        <li class="nav-item m-tabs__item">
-                            <a class="nav-link m-tabs__link" href="{{route('projects_list')}}">
-                                Projects List
-                            </a>
-                        </li>
-                    @endif
                 </ul>
             </div>
         </div>
@@ -65,27 +58,26 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @foreach($unapproved_modules as $unapproved)
-                                <tr>
-                                    <td>{{$loop->index+1}}</td>
-                                    <td>{{$unapproved->projects->title}}</td>
-                                    <td>{{ $unapproved->module_name}}</td>
-                                    <td>{{$unapproved->users->full_name}}</td>
-                                    <td>{{ parse_datetime_get($unapproved->added_on)}}</td>
-                                    <td>
-                                        @if($has_permissions->view == 1)
-                                            <a href="{{route('single_module_detail',$unapproved->id)}}" class="btn btn-primary">View</a>
-                                        @endif
-                                        @if($unapproved->added_by == Auth::user()->user_id)
-                                            <a href="{{route('module_form',['id'=>$unapproved->id])}}" class="btn btn-info">Edit</a>
-                                        @endif
+                            @if($unapproved_modules)
+                                @foreach($unapproved_modules as $unapproved)
+                                    <tr>
+                                        <td>{{$loop->index+1}}</td>
+                                        <td>{{$unapproved->projects->title??''}}</td>
+                                        <td>{{ $unapproved->task->title??''}}</td>
+                                        <td>{{$unapproved->users->full_name??''}}</td>
+                                        <td>{{ parse_datetime_get($unapproved->added_on)}}</td>
+                                        <td>
+                                            @if($has_permissions->view == 1)
+                                                <a href="{{route('single_module_detail',$unapproved->id)}}" class="btn btn-primary">View</a>
+                                            @endif
+                                            @if($unapproved->added_by == Auth::user()->user_id)
+                                                <a href="{{route('module_form',['id'=>$unapproved->id])}}" class="btn btn-info">Edit</a>
+                                            @endif
 
-                                        @if($has_permissions->update == 1)
-                                            <button id="{{$unapproved->id}}" onclick="approveModule(this)"  class="btn btn-success">Approve</button>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endif
                             </tbody>
                         </table>
                     </div>
@@ -104,20 +96,22 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @foreach($approved_modules as $approved)
-                                <tr>
-                                    <td>{{$loop->index+1}}</td>
-                                    <td>{{$approved->projects->title}}</td>
-                                    <td>{{ $approved->module_name}}</td>
-                                    <td>{{$approved->users->full_name}}</td>
-                                    <td>{{ parse_datetime_get($approved->added_on)}}</td>
-                                    <td>
-                                        @if($has_permissions->view == 1)
-                                            <a href="{{route('single_module_detail',$approved->id)}}" class="btn btn-primary">View</a>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
+                            @if($approved_modules)
+                                @foreach($approved_modules as $approved)
+                                    <tr>
+                                        <td>{{$loop->index+1}}</td>
+                                        <td>{{$approved->projects->title??''}}</td>
+                                        <td>{{ $approved->task->title??''}}</td>
+                                        <td>{{$approved->users->full_name??''}}</td>
+                                        <td>{{ parse_datetime_get($approved->added_on)}}</td>
+                                        <td>
+                                            @if($has_permissions->view == 1)
+                                                <a href="{{route('single_module_detail',$approved->id)}}" class="btn btn-primary">View</a>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endif
                             </tbody>
                         </table>
                     </div>

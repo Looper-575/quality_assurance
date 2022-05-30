@@ -51,5 +51,8 @@ class Task extends Model
     public function department(){
         return $this->belongsTo(Department::class,'department_id','department_id');
     }
+    public function  comments(){
+        return $this->hasMany(ModuleComments::class,'task_id','task_id');
+    }
 
 }

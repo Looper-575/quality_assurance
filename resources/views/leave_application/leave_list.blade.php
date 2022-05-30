@@ -83,13 +83,13 @@
                                     <td>
                                     @if(Auth::user()->role_id == $manager_id && $leave_list->approved_by_manager == NULL && $leave_list->added_by != Auth::user()->user_id )
                                             <div class="btn-group btn-group-sm">
-                                                <button title="Reject" class="btn btn-danger p-3"  onclick="reject_application(this);" value="{{$leave_list->leave_id}}"><i class="fa fa-times"></i></button>
+                                                <button title="Reject" class="btn btn-warning text-white btn-danger p-3"  onclick="reject_application(this);" value="{{$leave_list->leave_id}}"><i class="fa fa-times"></i></button>
                                                 <button title="Approve" class="btn btn-success p-3" onclick="approve_application(this);" value="{{$leave_list->leave_id}}"><i class="fa fa-check"></i></button>
                                             </div>
                                     @elseif(Auth::user()->role_id == 5)
                                         @if($leave_list->approved_by_hr == NULL && $leave_list->approved_by_manager != NULL)
                                                 <div class="btn-group btn-group-sm">
-                                                    <button title="Reject" class="btn btn-danger p-3" onclick="reject_application(this);" value="{{$leave_list->leave_id}}"><i class="fa fa-times"></i></button>
+                                                    <button title="Reject" class="btn btn-warning text-white btn-danger p-3" onclick="reject_application(this);" value="{{$leave_list->leave_id}}"><i class="fa fa-times"></i></button>
                                                     <button title="Approve" class="btn btn-success p-3" onclick="approve_application(this);" value="{{$leave_list->leave_id}}"><i class="fa fa-check"></i></button>
                                                 </div>
                                         @endif
@@ -131,7 +131,6 @@
                                 <th>Half Type</th>
                                 <th>No of Leaves</th>
                                 <th>Reason</th>
-                                <th>Status</th>
                                 <th>Manager Approval</th>
                                 <th>HR Approval</th>
                             </tr>
@@ -147,7 +146,6 @@
                                     <td>{{$leave_list->half_type }}</td>
                                     <td>{{$leave_list->no_leaves}}</td>
                                     <td>{{$leave_list->reason }}</td>
-                                    <td>{{$leave_list->status}}</td>
                                     <td>{{$leave_list->approved_by_manager == 1 ? 'Approved' : 'Not Approved'}}</td>
                                     <td>{{$leave_list->approved_by_hr == 1 ? 'Approved' : 'Not Approved'}}</td>
                                 </tr>

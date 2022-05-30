@@ -18,7 +18,7 @@ $has_permissions = get_route_permissions( Auth::user()->role->role_id, 'modules_
             <tr>
                 <td>{{$loop->index+1}}</td>
                 <td>{{$module->projects->title}}</td>
-                <td>{{ $module->module_name}}</td>
+                <td>{{ $module->task->title}}</td>
                 <td>{{$module->users->full_name}}</td>
                 <td>{{ parse_datetime_get($module->added_on)}}</td>
                 <td>{{$module->approved == 1?'Approved':'Pending'}}</td>
@@ -28,10 +28,6 @@ $has_permissions = get_route_permissions( Auth::user()->role->role_id, 'modules_
                     @endif
                     @if($module->approved !== 1 && $module->added_by == Auth::user()->user_id)
                         <a href="{{route('module_form',['id'=>$module->id])}}" class="btn btn-info">Edit</a>
-                    @endif
-
-                    @if($has_permissions->update == 1 && $module->approved !== 1)
-                        <button id="{{$module->id}}" onclick="approveModule(this)"  class="btn btn-success">Approve</button>
                     @endif
                 </td>
             </tr>

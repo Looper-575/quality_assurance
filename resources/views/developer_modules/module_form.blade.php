@@ -41,19 +41,30 @@
                     <div class="col-12 col-md-6">
                         <div class="form-group">
                             <label class="form-check-label" for="project">Project</label>
-                            <select class="form-control" name="project" id="project" required >
+                            <select style="{{isset($module)?'pointer-events: none;':''}}" class="form-control" name="project" id="project" required   >
                                    <option value="">Select Project</option>
-                                @foreach($projects as $project)
-                                    <option {{isset($module) ? ($module->project == $project->id ? 'selected' : '' ): ''}}
-                                            value="{{$project->id}}">{{$project->title}}
-                                    </option>
-                                @endforeach
+                                        @foreach($projects as $project)
+                                            @if(isset($module))
+                                                <option {{$module->project == $project->id ? 'selected' : ''}}
+                                                        value="{{$project->id}}">{{$project->title}}
+                                                </option>
+                                            @else
+                                                <option value="{{$project->id}}">{{$project->title}}</option>
+                                            @endif
+                                      @endforeach
+
                             </select>
                         </div>
                     </div>
                     <div class="col-12 col-md-6">
                         <label for="module" class="form-check-label">Module Name</label>
-                        <input required  type="text"  class="form-control" name="module" id="module" value="{{isset($module)?$module->module_name:''}}">
+                            <select style="{{isset($module)?'pointer-events: none;':''}}" class="form-control" name="task_id" id="module" required>
+                                @if(isset($module))
+                                    <option {{$module->module_name == $task->task_id? 'selected' : ''}}
+                                            value="{{$task->task_id}}">{{$task->title}}
+                                      </option>
+                                @endif
+                            </select>
                     </div>
                 </div>
                 <div class="row">
@@ -90,21 +101,26 @@
                         </div>
 
                     </div>
+                    <div class="col-12  mt-4">
+                        <label for="test_cases" class="form-check-label">Test Cases</label>
+                        <div class="summernote" id="test_cases">
+                            {!! isset($module)?$module->test_cases:''!!}
+                        </div>
+
+                    </div>
                     @if(isset($module))
                         <input name="module_id" type="hidden" value="{{$module->id}}">
                     @endif
                 </div>
                 <div class="form-group mt-3">
-                    <button type="submit" class="btn btn-primary"> Submit </button>
-
+                    <button type="submit" class="btn btn-primary float-right"> Submit </button>
                 </div>
             </form>
         </div>
     </div>
 @endsection
 @section('footer_scripts')
-    <link href="summernote-bs5.css" rel="stylesheet">
-    <script src="summernote-bs5.js"></script>
+
     <!--end::Base Scripts -->
     <!--begin::Page Resources -->
     <script>
@@ -120,6 +136,8 @@
             data.append('models', $('#models').siblings('.note-editor').find('.note-editable').html());
             data.append('views', $('#views').siblings('.note-editor').find('.note-editable').html());
             data.append('module_usage', $('#usage').siblings('.note-editor').find('.note-editable').html());
+            data.append('test_cases', $('#test_cases').siblings('.note-editor').find('.note-editable').html());
+
 
 
 
@@ -129,5 +147,15 @@
             let arr = [a];
             call_ajax_with_functions('','{{route('save_module_info')}}',data,arr);
         }
+
+        $('#project').change(function(){
+
+            let data = new FormData();
+            data.append('project_id', $(this).val());
+            data.append('_token', "{{csrf_token()}}");
+
+            $('#module').html('');
+            call_ajax('module',"{{route('get_modules')}}",data);
+        });
     </script>
 @endsection

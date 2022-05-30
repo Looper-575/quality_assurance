@@ -21,4 +21,11 @@ class ProjectModule extends  Model
     public function  users(){
         return $this->belongsTo(User::class,'added_by','user_id');
     }
+    public function  comments(){
+        return $this->hasMany(ModuleComments::class,'module_id','id');
+    }
+    public function  task(){
+        return $this->belongsTo(Task::class,'task_id','task_id');
+    }
+
 }
