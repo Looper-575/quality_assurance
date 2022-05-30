@@ -184,7 +184,7 @@
                     <div class="col-3 is_confirmed d-none">
                         <div class="form-group">
                             <label for="confirmation_date"> Confirmation Date</label>
-                            <input name="confirmation_date" type="date" id="confirmation_date" value="{{($employee and $employee->confirmation_date == null) ? '' : $employee->confirmation_date}}" class="form-control">
+                            <input name="confirmation_date" type="date" id="confirmation_date" value="{{$employee ? $employee->confirmation_date : ''}}" class="form-control">
                         </div>
                     </div>
                         <div class="col-3">
