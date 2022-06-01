@@ -12,15 +12,18 @@
                 <div class="m-portlet__head-title float-left">
                     <h3 class="m-portlet__head-text">Employee Separations List</h3>
                 </div>
-                @if($is_admin == TRUE)
-                    <div class="float-right mt-3">
-                        <a  href="{{route('separation_form')}}" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill">
+            </div>
+            @if($is_admin == TRUE)
+            <div class="m-portlet__head-tools">
+                <ul class="nav nav-tabs m-tabs-line m-tabs-line--success m-tabs-line--2x m-tabs-line--right" role="tablist">
+                    <li class="nav-item m-tabs__item">
+                        <a class="nav-link m-tabs__link" href="{{route('separation_form')}}">
                             Add Employee Separation
                         </a>
-                        <div class="m-separator m-separator--dashed d-xl-none"></div>
-                    </div>
-                @endif
+                    </li>
+                </ul>
             </div>
+            @endif
         </div>
         <div class="m-portlet__body">
             <table class="datatable table table-bordered" style="">

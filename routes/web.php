@@ -352,10 +352,12 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
         Route::get('/employee_assessment', 'App\Http\Controllers\EmployeeAssessmentController@index')->name('employee_assessment');
         Route::get('/employee_assessment_form', 'App\Http\Controllers\EmployeeAssessmentController@employee_assessment_form')->name('employee_assessment_form');
         Route::get('/view_employee_assessment', 'App\Http\Controllers\EmployeeAssessmentController@view_employee_assessment')->name('view_employee_assessment');
+        Route::post('/initiate_employee_assessment_form', 'App\Http\Controllers\EmployeeAssessmentController@initiate_employee_assessment_form')->name('initiate_employee_assessment_form');
     });
     Route::post('/employee_assessment_save', 'App\Http\Controllers\EmployeeAssessmentController@employee_assessment_save')->name('employee_assessment_save');
     Route::get('/get_employee_details', 'App\Http\Controllers\EmployeeAssessmentController@get_employee_details')->name('get_employee_details');
     Route::get('/schedule_self_assessment', 'App\Http\Controllers\EmployeeAssessmentController@schedule_self_assessment')->name('schedule_self_assessment');
+    Route::post('/employee_assessment_initiate', 'App\Http\Controllers\EmployeeAssessmentController@employee_assessment_initiate')->name('employee_assessment_initiate');
 
     // Notification Tray
     Route::get('/get_pending_notifications', 'App\Http\Controllers\NotificationsController@get_pending_notifications')->name('get_pending_notifications');
@@ -388,6 +390,7 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     //    Payslips
     Route::get('/payslips', 'App\Http\Controllers\PayrollController@payslips')->name('payslips');
     Route::post('/view_payslip', 'App\Http\Controllers\PayrollController@view_payslip')->name('view_payslip');
+    Route::post('/search_payslips', 'App\Http\Controllers\PayrollController@search_payslips')->name('search_payslips');
     // Payroll routes
     Route::group(['middleware' => ['check-permission:create_payroll,view,0,0']], function() { // generation module
         Route::post('/generate_pay_role','App\Http\Controllers\PayrollController@generate_pay_role')->name('generate_pay_role');

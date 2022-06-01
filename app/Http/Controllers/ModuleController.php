@@ -76,6 +76,7 @@ class ModuleController  extends Controller
                         'models' =>  $request->models,
                         'views' =>  $request->views,
                         'module_usage' =>  $request->module_usage,
+                        'test_cases' => trim($request->test_cases),
                     ]);
                     Task::where('task_id',$request->task_id)->update([
                         'status' => 2

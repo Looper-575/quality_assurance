@@ -12,17 +12,42 @@
             </div>
         </div>
         <div class="m-portlet__body">
-            <div class="table-responsive">
-                <table class="table table-striped" id="payroll_table">
+            @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5)
+                <form method="post" id="payslips_report_form" enctype="multipart/form-data">
+                @csrf
+                <div class="row">
+                    <div class="col-5">
+                        <div class="form-group">
+                            <label class="form-check-label" for="year_month">Payslip Month</label>
+                            <input class="form-control mt-2" type="month" name="year_month" id="year_month" required>
+                        </div>
+                    </div>
+                    <div class="col-5">
+                        <div class="form-group">
+                            <label class="form-check-label mb-3" for="user">Users</label>
+                            <select class="form-control select2 mt-2" name="user[]" id="user" multiple="multiple" required>
+                                <option value="0">All</option>
+                                @foreach($users as $agent)
+                                    <option value="{{$agent->user_id}}">{{$agent->full_name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-2 mt-4">
+                        <button type="submit" class="btn btn-primary float-right px-5 mt-3">Search</button>
+                    </div>
+                </div>
+            </form>
+            @endif
+            <div class="table-responsive" id="payslips_report_data">
+                <table class="table datatble table-striped" id="payroll_table">
                     <thead>
                     <tr>
                         <th>Employee Name</th>
                         <th>Salary Month</th>
-                        <th>Attendance Marked</th>
-                        <th>Holidays</th>
-                        <th>On Leave</th>
-                        <th>Absents + Unmarked</th>
-                        <th>Present</th>
+                        <th>EOBI Deduction</th>
+                        <th>Income Tax Deduction</th>
+                        <th>Other Deductions</th>
                         <th>Basic Salary</th>
                         <th>Gross Salary</th>
                         <th>Actions</th>
@@ -33,11 +58,9 @@
                         <tr>
                             <td>{{ $pay->user->full_name }}</td>
                             <td>{{ date('M-Y', strtotime($pay->salary_month)) }}</td>
-                            <td>{{ $pay->attendance_marked }}</td>
-                            <td>{{ $pay->holiday_count }}</td>
-                            <td>{{ $pay->leaves }}</td>
-                            <td>{{ $pay->absents + $pay->attendance_not_marked }}</td>
-                            <td>{{ $pay->presents}}</td>
+                            <td>{{ $pay->eobi }}</td>
+                            <td>{{ $pay->income_tax }}</td>
+                            <td>{{ $pay->deduction_amount }}</td>
                             <td>{{$pay->basic_salary}}</td>
                             <td>{{intval($pay->gross_salary)}}</td>
                             <td>
@@ -59,8 +82,28 @@
     <script src="{{ asset('assets/bundles/select2/dist/js/select2.full.min.js') }}"></script>
     <script>
         $(document).ready(function() {
-            $('#payroll_table').DataTable( {
+            $(".select2").select2();
+            $('#payroll_table').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy', 'csv', 'excel', 'pdf','print',
+                ]
             });
+        });
+        $('#payslips_report_form').submit(function (e) {
+            e.preventDefault();
+            let data = new FormData(this);
+            data.append('_token', "{{csrf_token()}}")
+            let a = function () {
+                $('#payroll_search_table').DataTable({
+                    dom: 'Bfrtip',
+                    buttons: [
+                        'copy', 'csv', 'excel', 'pdf','print',
+                    ]
+                });
+            };
+            let arr = [a];
+            call_ajax_with_functions('payslips_report_data', '{{route('search_payslips')}}', data, arr);
         });
         function view_payroll (me) {
             let id = me.value;

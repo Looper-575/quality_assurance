@@ -81,7 +81,7 @@ class PayrollController extends Controller
                     unset($user_ids[$key]);
                 }
             }
-            $attendance_list = AttendanceLog::with('user.employee')->select(DB::raw('sum(late) as `lates`, sum(absent) as `absents`, sum(on_leave) as `leaves` , sum(applied_leave) as `applied_leave`, sum(half_leave) as `half_leaves` , count(user_id) as `attendance_marked` , MONTH(attendance_date) month'), 'user_id')
+            $attendance_list = AttendanceLog::with('user.employee')->select(DB::raw('sum(late) as `lates`, sum(absent) as `absents`, sum(on_leave+applied_leave) as `leaves` , sum(applied_leave) as `applied_leave`, sum(half_leave) as `half_leaves` , count(user_id) as `attendance_marked` , MONTH(attendance_date) month'), 'user_id')
                 ->whereIn('user_id', $user_ids)
                 ->whereYear('attendance_date', $year)
                 ->whereMonth('attendance_date', $month)
@@ -441,19 +441,24 @@ class PayrollController extends Controller
     public function payslips()
     {
         $data['page_title'] = "Payslips - Atlantis BPO CRM";
+        $data['users'] = User::whereStatus(1)->whereUserType('Employee')->get();
         if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5){
             $payslips = Payroll::with('user', 'payroll_deduction', 'payroll_allowance')->whereStatus(1)->whereHrApproved(1)->orderBy('payroll_id', 'desc')->get();
             for ($i=0; $i<count($payslips); $i++){
                 $income_tax = 0;
+                $eobi = 0;
                 $deduction_amount = 0;
                 foreach ($payslips[$i]->payroll_deduction as $ded)
                 {
                     if($ded->title == 'Income Tax'){
                         $income_tax = $ded->amount;
+                    } else if($ded->title == 'EOBI') {
+                        $eobi = $ded->amount;
                     } else {
                         $deduction_amount += $ded->amount;
                     }
                 }
+                $payslips[$i]->eobi = $eobi;
                 $payslips[$i]->income_tax = $income_tax;
                 $payslips[$i]->deduction_amount = $deduction_amount;
                 $allowance_amount = 0;
@@ -468,15 +473,20 @@ class PayrollController extends Controller
             $payslips = Payroll::with('user', 'payroll_deduction', 'payroll_allowance')->whereUserId(Auth::user()->user_id)->whereStatus(1)->whereHrApproved(1)->orderBy('payroll_id', 'desc')->get();
             for ($i=0; $i<count($payslips); $i++){
                 $income_tax = 0;
+                $eobi = 0;
                 $deduction_amount = 0;
                 foreach ($payslips[$i]->payroll_deduction as $ded)
                 {
                     if($ded->title == 'Income Tax'){
                         $income_tax = $ded->amount;
-                    } else {
+                    } else if($ded->title == 'EOBI') {
+                        $eobi = $ded->amount;
+                    }
+                    else {
                         $deduction_amount += $ded->amount;
                     }
                 }
+                $payslips[$i]->eobi = $eobi;
                 $payslips[$i]->income_tax = $income_tax;
                 $payslips[$i]->deduction_amount = $deduction_amount;
                 $allowance_amount = 0;
@@ -501,6 +511,77 @@ class PayrollController extends Controller
         $payslip->holiday_count = $this->check_holidays(date('Y-m-01', strtotime($payslip->salary_month)), date('Y-m-t', strtotime($payslip->salary_month)), $payslip->user->department_id, $payslip->user->user_id);
         $data['payslip'] = $payslip;
         return view('payroll.partials.view_payslip', $data);
+    }
+    public function search_payslips(Request $request)
+    {
+        $validator = Validator::make($request->all(),[
+            'year_month' => 'required',
+            'user' => 'required',
+        ]);
+        if($validator->passes()) {
+            if($request->user[0] == 0) {
+                $payslips = Payroll::with('user', 'payroll_deduction', 'payroll_allowance')->where('salary_month',date('Y-m-t', strtotime($request->year_month)).' 23:59:59')->whereStatus(1)->whereHrApproved(1)->orderBy('payroll_id', 'desc')->get();
+                for ($i=0; $i<count($payslips); $i++){
+                    $eobi = 0;
+                    $deduction_amount = 0;
+                    foreach ($payslips[$i]->payroll_deduction as $ded)
+                    {
+                        if($ded->title == 'Income Tax'){
+                            $income_tax = $ded->amount;
+                        } else if($ded->title == 'EOBI') {
+                            $eobi = $ded->amount;
+                        } else {
+                            $deduction_amount += $ded->amount;
+                        }
+                    }
+                    $payslips[$i]->eobi = $eobi;
+                    $payslips[$i]->income_tax = $income_tax;
+                    $payslips[$i]->deduction_amount = $deduction_amount;
+                    $allowance_amount = 0;
+                    foreach ($payslips[$i]->payroll_allowance as $allowance)
+                    {
+                        $allowance_amount += $allowance->amount;
+                    }
+                    $payslips[$i]->allowance_amount = $allowance_amount;
+                    $payslips[$i]->holiday_count = $this->check_holidays(date('Y-m-01', strtotime($payslips[$i]->salary_month)), date('Y-m-t', strtotime($payslips[$i]->salary_month)), $payslips[$i]->user->department_id, $payslips[$i]->user->user_id);
+                }
+            } else {
+                $user_ids = $request->user;
+                $payslips = Payroll::with('user', 'payroll_deduction', 'payroll_allowance')->where('salary_month',date('Y-m-t', strtotime($request->year_month)).' 23:59:59')->whereStatus(1)->whereHrApproved(1)->whereIn('user_id', $user_ids)->orderBy('payroll_id', 'desc')->get();
+                for ($i=0; $i<count($payslips); $i++){
+                    $income_tax = 0;
+                    $eobi = 0;
+                    $deduction_amount = 0;
+                    foreach ($payslips[$i]->payroll_deduction as $ded)
+                    {
+                        if($ded->title == 'Income Tax'){
+                            $income_tax = $ded->amount;
+                        } else if($ded->title == 'EOBI') {
+                            $eobi = $ded->amount;
+                        } else {
+                            $deduction_amount += $ded->amount;
+                        }
+                    }
+                    $payslips[$i]->eobi = $eobi;
+                    $payslips[$i]->income_tax = $income_tax;
+                    $payslips[$i]->deduction_amount = $deduction_amount;
+                    $allowance_amount = 0;
+                    foreach ($payslips[$i]->payroll_allowance as $allowance)
+                    {
+                        $allowance_amount += $allowance->amount;
+                    }
+                    $payslips[$i]->allowance_amount = $allowance_amount;
+                    $payslips[$i]->holiday_count = $this->check_holidays(date('Y-m-01', strtotime($payslips[$i]->salary_month)), date('Y-m-t', strtotime($payslips[$i]->salary_month)), $payslips[$i]->user->department_id, $payslips[$i]->user->user_id);
+                }
+            }
+            $response['status'] = "Success";
+            $response['result'] = "Get Payslips Successfully!";
+        } else{
+            $response['status'] = "Failure!";
+            $response['result'] = $validator->errors()->toJson();
+        }
+        $data['payslips'] = $payslips;
+        return view('payroll.partials.search_payslips', $data);
     }
     public function convenience_allowance()
     {
@@ -632,10 +713,11 @@ class PayrollController extends Controller
 
         $daily_wage = $user->net_salary/22;
         // lates deduction from salary :- 2 lates = 1 half day
-        $lates_number_of_half_day = explode('.',($attendace_log->lates / 4));
+        $lates_calc = (($attendace_log->lates / 4)/.5);
+        $lates_number_of_half_day = explode('.',$lates_calc);
+        //var_dump($lates_number_of_half_day[0]);
         $lates_number_of_half_day = $lates_number_of_half_day[0];
         $lates_deductions = $daily_wage*($lates_number_of_half_day/2);
-
         // Absent deduction from salary
         $absent_deductions = $daily_wage*$attendace_log->absents;
         $half_day_deductions_amount = $daily_wage*$half_leaves_deduction;

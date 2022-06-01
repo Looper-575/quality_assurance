@@ -22,7 +22,6 @@ class EmployeeAssessment extends Model
     protected $fillable = [
         'user_id',
         'employee_id',
-        'period',
         'total_service',
         'evaluation_date',
         'confirmation_status',
@@ -35,17 +34,19 @@ class EmployeeAssessment extends Model
         'manager_comments',
         'manager_additional_comments',
         'manager_sign',
-        'ESA_duties',
-        'ESA_achievements',
-        'ESA_future_aims',
+        'esa_duties',
+        'esa_achievements',
+        'esa_future_aims',
         'employee_comments',
         'employee_sign',
         'employee_sign_date',
         'probation_extension',
-        'probation_extension_months',
+        'probation_extension_to_date',
         'overall_rating',
         'increment',
-        'added_by'
+        'added_by',
+        'from_date',
+        'to_date'
     ];
 
     /**

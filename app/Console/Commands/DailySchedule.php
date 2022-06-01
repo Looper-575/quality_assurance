@@ -50,6 +50,7 @@ class DailySchedule extends Command
             ->whereStatus(1)->select('user_id')->get()->toArray();
         foreach ($users as $user){
             $self_assessment = false;
+            $employees = Employee::where('user_id', $user['user_id'])->first();
             // Previous appraisal record check
             $incomplete_evaluation = EmployeeAssessment::with('employees')
                 ->where('user_id', $user['user_id'])
@@ -64,29 +65,49 @@ class DailySchedule extends Command
                 if($Previous_EmployeeAssessment->probation_extension == 'YES'){
                     if(strtotime($Previous_EmployeeAssessment->probation_extension_to_date) <= strtotime(get_date()) ) {
                         $self_assessment = true;
+                        $from_date = date ( "Y-m-d" , strtotime ( $Previous_EmployeeAssessment->probation_extension_to_date));
                     }
                 }else{
                     if(get_month_diff($Previous_EmployeeAssessment->evaluation_date, get_date()) >= 3) {
                         $self_assessment = true;
+                        $from_date = date ( "Y-m-d" , strtotime ( $Previous_EmployeeAssessment->evaluation_date));
                     }
                 }
             } else if(!$incomplete_evaluation) {
                 $employee_assessment_id = 0; //for first evaluation
-                $employees = Employee::where('user_id', $user['user_id'])->first();
                 if($employees->confirmation_date == Null){
                     if (get_month_diff($employees->joining_date, get_date()) >= 3) {
                         $self_assessment = true;
+                        $from_date = date ( "Y-m-d" , strtotime ( $employees->joining_date));
                     }
                 }else{
                     if (get_month_diff($employees->confirmation_date, get_date()) >= 3) {
                         $self_assessment = true;
+                        $from_date = date ( "Y-m-d" , strtotime ( $employees->confirmation_date));
                     }
                 }
             }
             if($self_assessment == true) {
-                if($user['employee']['user_type'] == 'Employee' && !$incomplete_evaluation){
-                    $send_email = false;
-                    add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,$user['user_id'],'Pending Self Evaluation',$send_email);
+            ////////////////////////////////////////////////
+                $EmployeeAssessment_data = [
+                    'added_by' => Auth::user()->user_id,
+                    'user_id' => $user['user_id'],
+                    'employee_id' => $employees->employee_id,
+                    'hr_sign' => 0,
+                    'manager_sign' => 0,
+                    'employee_sign' => 0,
+                    'from_date' => $from_date,
+                    'to_date' => get_date()
+                ];
+                if($employees->confirmation_status == 'Confirmed'){
+                    $EmployeeAssessment_data['confirmation_status'] = $employees->confirmation_status;
+                }
+                $employee_assessment_initiate = EmployeeAssessment::create($EmployeeAssessment_data);
+                if($employee_assessment_initiate){
+                  if($user['employee']['user_type'] == 'Employee' && !$incomplete_evaluation){
+                        $send_email = false;
+                        add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,$user['user_id'],'Pending Self Evaluation',$send_email);
+                    }
                 }
             }
         }
