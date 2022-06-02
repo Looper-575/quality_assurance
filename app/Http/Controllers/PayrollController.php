@@ -443,7 +443,7 @@ class PayrollController extends Controller
         $data['page_title'] = "Payslips - Atlantis BPO CRM";
         $data['users'] = User::whereStatus(1)->whereUserType('Employee')->get();
         if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5){
-            $payslips = Payroll::with('user', 'payroll_deduction', 'payroll_allowance')->whereStatus(1)->whereHrApproved(1)->orderBy('payroll_id', 'desc')->get();
+            $payslips = Payroll::with('user.employee', 'payroll_deduction', 'payroll_allowance')->whereStatus(1)->whereHrApproved(1)->orderBy('payroll_id', 'desc')->get();
             for ($i=0; $i<count($payslips); $i++){
                 $income_tax = 0;
                 $eobi = 0;
@@ -470,7 +470,7 @@ class PayrollController extends Controller
                 $payslips[$i]->holiday_count = $this->check_holidays(date('Y-m-01', strtotime($payslips[$i]->salary_month)), date('Y-m-t', strtotime($payslips[$i]->salary_month)), $payslips[$i]->user->department_id, $payslips[$i]->user->user_id);
             }
         } else {
-            $payslips = Payroll::with('user', 'payroll_deduction', 'payroll_allowance')->whereUserId(Auth::user()->user_id)->whereStatus(1)->whereHrApproved(1)->orderBy('payroll_id', 'desc')->get();
+            $payslips = Payroll::with('user.employee', 'payroll_deduction', 'payroll_allowance')->whereUserId(Auth::user()->user_id)->whereStatus(1)->whereHrApproved(1)->orderBy('payroll_id', 'desc')->get();
             for ($i=0; $i<count($payslips); $i++){
                 $income_tax = 0;
                 $eobi = 0;
@@ -520,7 +520,7 @@ class PayrollController extends Controller
         ]);
         if($validator->passes()) {
             if($request->user[0] == 0) {
-                $payslips = Payroll::with('user', 'payroll_deduction', 'payroll_allowance')->where('salary_month',date('Y-m-t', strtotime($request->year_month)).' 23:59:59')->whereStatus(1)->whereHrApproved(1)->orderBy('payroll_id', 'desc')->get();
+                $payslips = Payroll::with('user.employee', 'payroll_deduction', 'payroll_allowance')->where('salary_month',date('Y-m-t', strtotime($request->year_month)).' 23:59:59')->whereStatus(1)->whereHrApproved(1)->orderBy('payroll_id', 'desc')->get();
                 for ($i=0; $i<count($payslips); $i++){
                     $eobi = 0;
                     $deduction_amount = 0;
@@ -547,7 +547,7 @@ class PayrollController extends Controller
                 }
             } else {
                 $user_ids = $request->user;
-                $payslips = Payroll::with('user', 'payroll_deduction', 'payroll_allowance')->where('salary_month',date('Y-m-t', strtotime($request->year_month)).' 23:59:59')->whereStatus(1)->whereHrApproved(1)->whereIn('user_id', $user_ids)->orderBy('payroll_id', 'desc')->get();
+                $payslips = Payroll::with('user.employee', 'payroll_deduction', 'payroll_allowance')->where('salary_month',date('Y-m-t', strtotime($request->year_month)).' 23:59:59')->whereStatus(1)->whereHrApproved(1)->whereIn('user_id', $user_ids)->orderBy('payroll_id', 'desc')->get();
                 for ($i=0; $i<count($payslips); $i++){
                     $income_tax = 0;
                     $eobi = 0;

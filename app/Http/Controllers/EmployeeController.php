@@ -27,10 +27,10 @@ class EmployeeController extends Controller
     {
         $data['page_title'] = "Employees List - Atlantis BPO CRM";
         if(Auth::user()->role_id == 1 or Auth::user()->role_id == 5){
-            $data['employee_lists'] = Employee::where('status' , 1)->orderBy('added_on', 'desc')->get();
+            $data['employee_lists'] = Employee::where('status' , 1)->orderBy('employee_id', 'DESC')->get();
             $data['isLocked']  = false;
         } else {
-            $data['employee_lists'] = Employee::where('user_id' , Auth::user()->user_id)->get();
+            $data['employee_lists'] = Employee::where('user_id' , Auth::user()->user_id)->orderBy('employee_id', 'DESC')->get();
             $data['isLocked'] = Employee::where('user_id' , Auth::user()->user_id)->pluck('locked')->first();
         }
         return view('employees.employee_list', $data);
@@ -140,8 +140,10 @@ class EmployeeController extends Controller
                 'blood_group' => $request->blood_group,
                 'native_lang' => $request->native_lang,
                 'joining_date' => $request->joining_date,
-                'hobbies_interest' => $request->hobbies_interest
+                'hobbies_interest' => $request->hobbies_interest,
+                'account_number' => $request->account_number
             ];
+            User::where('user_id', $request->user_id)->update(['full_name' => $request->full_name]);
             if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5){
                     $employee_info_data['net_salary'] = $request->net_salary;
                     $employee_info_data['conveyance_allowance'] = $request->conveyance_allowance;

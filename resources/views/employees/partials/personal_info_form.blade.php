@@ -39,7 +39,7 @@
                         <div class="row">
                             <div class="col-6">
                                 <div class="form-group m-form__group">
-                                    <label for="user_id">* Users</label>
+                                    <label for="user_id">* User</label>
                                     <?php
                                     $user_ddl_perm = ( (Auth::user()->role->role_id != '5' && Auth::user()->role->role_id != '1')  || (Auth::user()->role->role_id == '5' or Auth::user()->role->role_id == '1') && $employee );
                                     $full_name = '';
@@ -60,8 +60,8 @@
                             </div>
                             <div class="col-6">
                                 <div class="form-group m-form__group">
-                                    <label for="full_name">* Full Name</label>
-                                    <input name="full_name" value="{{$full_name}}" readonly required type="text" id="full_name_id" class="form-control">
+                                    <label for="full_name">* Full Name (As per CNIC)</label>
+                                    <input name="full_name" value="{{$full_name}}" required type="text" id="full_name_id" class="form-control">
                                 </div>
                             </div>
                         </div>
@@ -213,8 +213,14 @@
                     </div>
                     <div class="col-3">
                         <div class="form-group m-form__group">
-                            <label for="contact_number" for="contact_number">Contact Number</label>
+                            <label for="contact_number">Contact Number</label>
                             <input name="contact_number" id="contact_number_id" value="{{$employee ? $employee->contact_number : ''}}" required type="tel" placeholder="03001234567" pattern="[0-9]{4}[0-9]{7}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group m-form__group">
+                            <label for="account_number">Account Number</label>
+                            <input name="account_number" id="account_number_id" value="{{$employee ? $employee->account_number : ''}}" type="text" placeholder="" class="form-control">
                         </div>
                     </div>
                 </div>
@@ -228,7 +234,7 @@
                     </div>
                     <div class="col-3">
                         <div class="form-group m-form__group">
-                            <label for="father_husband">* Father/Husband's Name</label>
+                            <label for="father_husband">* Father/Husband's Name (As per CNIC)</label>
                             <input name="father_husband" value="{{$employee ? $employee->father_husband : ''}}" required type="text" class="form-control">
                         </div>
                     </div>

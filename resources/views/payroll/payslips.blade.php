@@ -50,6 +50,7 @@
                         <th>Other Deductions</th>
                         <th>Basic Salary</th>
                         <th>Gross Salary</th>
+                        <th>Account Number</th>
                         <th>Actions</th>
                     </tr>
                     </thead>
@@ -63,6 +64,7 @@
                             <td>{{ $pay->deduction_amount }}</td>
                             <td>{{$pay->basic_salary}}</td>
                             <td>{{intval($pay->gross_salary)}}</td>
+                            <td>{{$pay->user->employee->account_number}}</td>
                             <td>
                                 <div class="btn-group btn-group-sm">
                                     <button title="Reject" class="btn btn-primary" onclick="view_payroll(this);" value="{{$pay->payroll_id}}"><i class="fa fa-eye"></i></button>

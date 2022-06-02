@@ -13,17 +13,20 @@
                     <h3 class="m-portlet__head-text">Employees List</h3>
                 </div>
                 @if( Auth::user()->role_id == 1 || Auth::user()->role_id == 5 || ($has_permissions->add == 1 && (Auth::user()->role_id != 1 && Auth::user()->role_id != 5 && count($employee_lists) == 0) ))
-                <div class="float-right mt-3">
-                    <a href="{{route('employee_form')}}" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill">
-                        <span><i class="la la-phone-square"></i><span>Add New Employee</span></span>
-                    </a>
-                    <div class="m-separator m-separator--dashed d-xl-none"></div>
+                <div class="m-portlet__head-tools float-right">
+                    <ul class="nav nav-tabs m-tabs-line m-tabs-line--success m-tabs-line--2x m-tabs-line--right" role="tablist">
+                        <li class="nav-item m-tabs__item">
+                            <a class="nav-link m-tabs__link" href="{{route('employee_form')}}">
+                                Add New Employee
+                            </a>
+                        </li>
+                    </ul>
                 </div>
                 @endif
             </div>
         </div>
         <div class="m-portlet__body">
-            <table class="datatable table table-bordered" style="">
+            <table class="table table-bordered" id="employee_table_id">
                 <thead>
                 <tr>
                     <th>S.No</th>
@@ -52,7 +55,7 @@
                                     <i class="la la-eye"></i>
                                 </a>
                                 @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5)
-                                <a title="Edit" class="btn btn-primary edit_employee" id="{{$employee_list->employee_id}}" href="{{route('employee_form',['employee_id' => $employee_list->employee_id])}}"><i class="fa fa-edit"></i></a>
+                                <a title="Edit" class="btn text-white bg-warning edit_employee" id="{{$employee_list->employee_id}}" href="{{route('employee_form',['employee_id' => $employee_list->employee_id])}}"><i class="fa fa-edit"></i></a>
                                     @if($employee_list->locked == 0)
                                         <button title="Lock" class="btn btn-info" onclick="lock_employee_record(this);" value="{{$employee_list->employee_id}}"><i class="fa fa-lock"></i></button>
                                     @endif
@@ -71,6 +74,10 @@
     <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script>
+        $(document).ready(function() {
+            $('#employee_table_id').DataTable( {
+            });
+        });
         function delete_employee (me) {
             let id = me.value;
             let data = new FormData();

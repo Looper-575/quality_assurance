@@ -39,7 +39,7 @@
                     @foreach ($payroll as $pay)
                         <tr>
                             <td> <input type="checkbox" name="payroll_id[]" class="payroll_ids" value="{{$pay->payroll_id}}"></td>
-                            <td>{{ $pay->user->full_name }}</td>
+                            <td>{{ $pay->user->full_name }} ({{$pay->user->employee->designation}})</td>
                             <td>{{ date('M-Y', strtotime($pay->salary_month)) }}</td>
                             <td>{{ $pay->attendance_marked }}</td>
                             <td>{{ $pay->holiday_count }}</td>

@@ -48,7 +48,8 @@ class Employee extends Model
         'locked',
         'conveyance_allowance',
         'employment_status',
-        'confirmation_date'
+        'confirmation_date',
+        'account_number'
     ];
 
     /**

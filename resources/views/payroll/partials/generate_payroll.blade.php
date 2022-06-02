@@ -88,7 +88,7 @@
         @endforeach
         @foreach($payroll_exists as $user)
             <tr>
-                <td>{{$user->full_name}}</td>
+                <td>{{$user->full_name}} ({{$user->employee->designation}})</td>
                 <td colspan="10">Payroll Already Created!</td>
             </tr>
         @endforeach
