@@ -57,6 +57,8 @@
         <div class="form-group" id="new_phone_div" style="display: none">
             <label class="form-check-label" for="new_phone">New Phone Number</label>
             <input type="tel" class="form-control" name="new_phone_number" id="new_phone">
+            <label class="form-check-label mt-4 pt-1" for="new_tpv">New TPV Number</label>
+            <input type="tel" class="form-control" name="new_tpv_number" id="new_tpv">
         </div>
         <div class="form-group" id="new_lines_div" style="display: none">
             <label class="form-check-label" for="new_lines">Number of Mobile Lines</label>

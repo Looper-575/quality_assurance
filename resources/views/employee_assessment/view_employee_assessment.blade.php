@@ -53,11 +53,11 @@
                 @if($EmployeeAssessment->hr_sign == 1)
                 <div class="row mb-2">
                     <div class="col-4">
-                        <span class="font-bold font-14">Total Presents (last 3 months) : </span>
+                        <span class="font-bold font-14">Total Presents (In assessment period) : </span>
                         <span class="font-bold font-12">{{ $EmployeeAssessment->attendance }} %</span>
                     </div>
                     <div class="col-4">
-                        <span class="font-bold font-14">Tardiness (last 3 months): </span>
+                        <span class="font-bold font-14">Tardiness (In assessment period): </span>
                         <span class="font-bold font-12">{{$EmployeeAssessment->tardiness}} %</span>
                     </div>
                     <div class="col-4">

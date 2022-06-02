@@ -6,8 +6,6 @@ use App\Models\EmployeeObjectives;
 use App\Models\EvaluationStandards;
 use App\Models\Holiday;
 use App\Models\LeavesBucket;
-use App\Models\ManagerialRole;
-use App\Models\Notifications;
 use App\Models\EmployeeAssessment;
 use App\Models\User;
 use App\Models\Employee;
@@ -30,37 +28,29 @@ class EmployeeAssessmentController extends Controller
                 return redirect('/employee_form_wizard')->with($data);
             }
         }
-        $manager_ids = ManagerialRole::whereType('Manager')->whereStatus(1)->pluck('role_id')->toArray();
+        $manager_id = User::where('manager_id', Auth::user()->user_id)->where('user_type','Employee')->get()->pluck('manager_id')->toArray();
         $data['is_admin'] = false;
         $data['is_hrm'] = false;
         $data['is_manager'] = false;
         $data['is_employee'] = false;
+        $data['EmployeeAssessment_SELF'] = EmployeeAssessment::with('employees.employee', 'evaluation_standards')->where('user_id', Auth::user()->user_id)->get();
         if(Auth::user()->role_id == 1){
             $data['is_admin'] = true;
             $data['EmployeeAssessment_SELF'] = false;
-            $data['EmployeeAssessment'] = EmployeeAssessment::with('employees.employee')->orderBy('id', 'DESC')->get();
+            $data['EmployeeAssessment'] = EmployeeAssessment::with('employees.employee', 'evaluation_standards')->orderBy('id', 'DESC')->get();
         }else if(Auth::user()->role_id == 5){
             $data['is_hrm'] = true;
             // get employee under HR manager
-            $user_ids = User::where('manager_id', Auth::user()->user_id)->where('user_type','Employee')->get()->pluck('user_id')->toArray();
-            if($user_ids){
-                $data['is_manager'] = true;
-            }
-            $data['EmployeeAssessment_SELF'] = EmployeeAssessment::with('employees.employee')->where('user_id', Auth::user()->user_id)->get();
-            $data['EmployeeAssessment'] = EmployeeAssessment::with('employees.employee')->where('user_id', '!=', Auth::user()->user_id)->orderBy('id', 'DESC')->get();
-        }else if(in_array(Auth::user()->role_id, $manager_ids)){
+            $data['EmployeeAssessment'] = EmployeeAssessment::with('employees.employee', 'evaluation_standards')->where('user_id', '!=', Auth::user()->user_id)->orderBy('id', 'DESC')->get();
+        }else if(in_array(Auth::user()->user_id, $manager_id)){
             $data['is_manager'] = true;
-            $data['EmployeeAssessment_SELF'] = EmployeeAssessment::with('employees.employee')->where('user_id', Auth::user()->user_id)->get();
-            $login_manager_id = Auth::user()->user_id;
             // get employee under logged in manager
-            $user_ids = User::where('manager_id', $login_manager_id)->where('user_type','Employee')->get()->pluck('user_id')->toArray();
-            $data['EmployeeAssessment'] = EmployeeAssessment::with('employees.employee')->whereIn('user_id', $user_ids)->orderBy('id', 'DESC')->get();
+            $user_ids = User::where('manager_id', Auth::user()->user_id)->where('user_type','Employee')->get()->pluck('user_id')->toArray();
+            $data['EmployeeAssessment'] = EmployeeAssessment::with('employees.employee', 'evaluation_standards')->whereIn('user_id', $user_ids)->orderBy('id', 'DESC')->get();
         }else{
             $data['is_employee'] = true;
-            $data['EmployeeAssessment_SELF'] = EmployeeAssessment::with('employees.employee')->where('user_id', Auth::user()->user_id)->get();
             $data['EmployeeAssessment'] = false;
         }
-        $data['self_assessment'] = $this->self_assessment_button_enable();
         $Initiated_EmployeeAssessment = EmployeeAssessment::with('employees.employee')
             ->where('user_id', Auth::user()->user_id)
             ->where('employee_sign', 0)
@@ -82,12 +72,12 @@ class EmployeeAssessmentController extends Controller
         $data['is_manager'] = false;
         $data['is_employee'] = false;
         $data['initiated_employee_assessment'] = false;
-        $manager_ids = ManagerialRole::whereType('Manager')->whereStatus(1)->pluck('role_id')->toArray();
+        $manager_id = User::where('manager_id', Auth::user()->user_id)->where('user_type','Employee')->get()->pluck('manager_id')->toArray();
         if(Auth::user()->role_id == 1){
             $data['is_admin'] = true;
         }else if(Auth::user()->role_id == 5){
             $data['is_hrm'] = true;
-        } else if(in_array(Auth::user()->role_id, $manager_ids)){
+        } else if(in_array(Auth::user()->user_id, $manager_id)){
             $data['is_manager'] = true;
         } else{
             $data['is_employee'] = true;
@@ -107,7 +97,24 @@ class EmployeeAssessmentController extends Controller
             }else{
                 $data['prob_status'] = $EmployeeAssessment->employees->employment_status;
             }
-            $data['emp_manager_evaluation_standards'] = EvaluationStandards::where('assessment_id',$request->id)->get();
+            $empolyee_filled_evaluation_standards = EvaluationStandards::where('assessment_id',$request->id)
+                ->where('remarker_id', $EmployeeAssessment->user_id)->first();
+            $user_manager = User::where('user_id', $EmployeeAssessment->user_id)->first();
+            if($empolyee_filled_evaluation_standards){
+                $data['empolyee_filled_evaluation_standards'] = $empolyee_filled_evaluation_standards;
+            }else{
+                $data['empolyee_filled_evaluation_standards'] = false;
+            }
+            $manager_filled_evaluation_standards = EvaluationStandards::where([
+                'remarker_id' => $user_manager->manager_id,
+                'assessment_id' => $request->id
+            ])->first();
+            if($manager_filled_evaluation_standards){
+                $data['manager_filled_evaluation_standards'] = $manager_filled_evaluation_standards;
+            }else{
+                $data['manager_filled_evaluation_standards'] = false;
+            }
+            //dd($data['empolyee_filled_evaluation_standards'],$data['manager_filled_evaluation_standards']);
             $data['total_service'] = total_service($EmployeeAssessment->employees->joining_date, get_date());
             $data['previous_overall_ratings'] = [];
             $data['employee_previous_objectives'] = false;
@@ -403,8 +410,8 @@ class EmployeeAssessmentController extends Controller
             }
             if(isset($request->hr_comments)) {
                 // check employee is manager or not
-                $manager_ids = ManagerialRole::whereType('Manager')->whereStatus(1)->pluck('role_id')->toArray();
-                if(in_array($employee_record->employee->role_id, $manager_ids)){
+                $manager_id = User::where('manager_id', Auth::user()->user_id)->where('user_type','Employee')->get()->pluck('manager_id')->toArray();
+                if(in_array($employee_record->employee->user_id, $manager_id)){
                     $is_manager = 1;
                 }else{
                     $is_manager = 0;
@@ -434,7 +441,7 @@ class EmployeeAssessmentController extends Controller
     public function view_employee_assessment(Request $request)
     {
         $data['page_title'] = "View Performance Improvement Plan Details - Atlantis BPO CRM";
-        $manager_ids = ManagerialRole::whereType('Manager')->whereStatus(1)->pluck('role_id')->toArray();
+        $manager_id = User::where('manager_id', Auth::user()->user_id)->where('user_type','Employee')->get()->pluck('manager_id')->toArray();
         $data['is_admin'] = false;
         $data['is_hrm'] = false;
         $data['is_manager'] = false;
@@ -443,12 +450,7 @@ class EmployeeAssessmentController extends Controller
             $data['is_admin'] = true;
         } else if(Auth::user()->role_id == 5) {
             $data['is_hrm'] = true;
-            // get employee under HR manager
-            $user_ids = User::where('manager_id', Auth::user()->user_id)->where('user_type','Employee')->get()->pluck('user_id')->toArray();
-            if($user_ids){
-                $data['is_manager'] = true;
-            }
-        } else if(in_array(Auth::user()->role_id, $manager_ids)) {
+        } else if(in_array(Auth::user()->user_id, $manager_id)) {
             $data['is_manager'] = true;
         } else {
             $data['is_employee'] = true;
@@ -490,52 +492,6 @@ class EmployeeAssessmentController extends Controller
     {
         $data = Employee::with('department')->where('user_id', $request->user_id)->first();
         return response()->json($data);
-    }
-    public function self_assessment_button_enable()
-    {
-        $self_assessment = false;
-        // Incomplete  OR Previous appraisal record check
-        $incomplete_evaluation = EmployeeAssessment::with('employees')
-            ->where('user_id', Auth::user()->user_id)
-            ->where('hr_sign', 0)
-            ->orderBy('added_on', 'desc')->first();
-        $Previous_EmployeeAssessment = EmployeeAssessment::with('employees')
-            ->where('user_id', Auth::user()->user_id)
-            ->where('hr_sign', 1)
-            ->orderBy('added_on', 'desc')->first();
-        if($Previous_EmployeeAssessment && !$incomplete_evaluation){
-            $employee_assessment_id = $Previous_EmployeeAssessment->id;
-            if($Previous_EmployeeAssessment->probation_extension == 'YES'){
-                if(strtotime($Previous_EmployeeAssessment->probation_extension_to_date) <= strtotime(get_date()) ) {
-                    $self_assessment = true;
-                }
-            }else{
-                if(get_month_diff($Previous_EmployeeAssessment->evaluation_date, get_date()) >= 3) {
-                    $self_assessment = true;
-                }
-            }
-        } else if(!$incomplete_evaluation) {
-            $employee_assessment_id = 0; //for first evaluation
-            if(Auth::user()->user_type == 'Employee'){
-                $employees = Employee::where('user_id', Auth::user()->user_id)->first();
-                if($employees->confirmation_date == Null){
-                    if (get_month_diff($employees->joining_date, get_date()) >= 3) {
-                        $self_assessment = true;
-                    }
-                } else {
-                    if (get_month_diff($employees->confirmation_date, get_date()) >= 3) {
-                        $self_assessment = true;
-                    }
-                }
-            }
-        }
-        if($self_assessment == true){
-            if(Auth::user()->role_id != 1 && !$incomplete_evaluation){
-                $send_email = false;
-                add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,Auth::user()->user_id,'Pending Self Evaluation',$send_email);
-            }
-        }
-        return $self_assessment;
     }
     public function calculate_rating($data,$is_manager)
     {
@@ -642,7 +598,7 @@ class EmployeeAssessmentController extends Controller
             ->orwhere('hr_sign',0)
             ->pluck('user_id')->toArray();
         if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5){
-            $data['users'] = User::whereStatus(1)->whereNotIn('user_id',$user_ids)->where('user_type','Employee')->get();
+            $data['users'] = User::has('employee')->whereStatus(1)->whereNotIn('user_id',$user_ids)->where('user_type','Employee')->get();
         }
         return view('employee_assessment.initiate_employee_assessment_form', $data);
     }
@@ -677,6 +633,8 @@ class EmployeeAssessmentController extends Controller
         if($employee_assessment_initiate){
             $send_email = false;
             add_notifications('employee_assessments','employee_assessment',$employee_assessment_initiate->id,$user_id,'Pending Self Evaluation',$send_email);
+            $manager_id = User::where('user_id', $user_id)->where('user_type','Employee')->pluck('manager_id')->first();
+            add_notifications('employee_assessments','employee_assessment',$employee_assessment_initiate->id,$manager_id,'Pending Manager Evaluation',$send_email);
             $response['status'] = "Success";
             $response['result'] = "Employee Assessment Initiated Successfully";
         }else{

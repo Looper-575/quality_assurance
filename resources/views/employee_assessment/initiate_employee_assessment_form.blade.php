@@ -4,7 +4,7 @@
         <div class="col-6">
             <div class="form-group">
                 <label class="font-bold font-14" for="user_id">Employee Name<span class="text-danger">*</span></label>
-                <select class="form-control" name="user_id" id="user_id" required >
+                <select class="form-control select2" name="user_id" id="user_id" required >
                     <option value="">Select</option>
                     @foreach($users as $user)
                         <option value="{{$user->user_id}}">{{$user->full_name}}</option>
@@ -16,7 +16,7 @@
         <div class="col-6">
             <div class="form-group">
                 <label class="font-bold font-14" for="from_date">From Date<span class="text-danger">*</span></label>
-                <input  class="form-control" name="from_date" id="from_date_id" value="" type="date">
+                <input  class="form-control" name="from_date" id="from_date" value="" type="date">
             </div>
         </div>
         <div class="col-6">
@@ -33,3 +33,11 @@
         </div>
     </div>
 </form>
+<style>
+    span.select2-selection.select2-selection--single {
+        height: 43px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        top: 20px;
+    }
+</style>

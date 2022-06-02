@@ -107,10 +107,10 @@
                                     <td>
                                         <div class="btn-group btn-group-sm">
                                             <a href="{{route('view_employee_assessment',['id' => $employee_assessment_detail->id])}}" id="{{$employee_assessment_detail->id}}" class="btn btn-primary"><i class="la la-eye"></i></a>
-                                             @if(($is_admin || $employee_assessment_detail->employees->employee->manager_id == Auth::user()->user_id) && $employee_assessment_detail->employee_sign == 1 &&  $employee_assessment_detail->manager_sign == 0)
+                                             @if(($is_admin || $employee_assessment_detail->employees->employee->manager_id == Auth::user()->user_id)  &&  $employee_assessment_detail->manager_sign == 0)
                                                 <a title="fill" class="btn text-white btn-warning fill_employee_assessment hover_color" id="{{$employee_assessment_detail->id}}" href="{{route('employee_assessment_form',['id' => $employee_assessment_detail->id])}}"><i class="fa fa-edit"></i></a>
                                             @endif
-                                            @if(($is_admin || $is_hrm) && $employee_assessment_detail->manager_sign == 1 && $employee_assessment_detail->hr_sign == 0)
+                                            @if(($is_admin || $is_hrm) && $employee_assessment_detail->employee_sign == 1 && $employee_assessment_detail->manager_sign == 1 && $employee_assessment_detail->hr_sign == 0)
                                                 <a title="fill" class="btn btn-info fill_employee_assessment hover_color" id="{{$employee_assessment_detail->id}}" href="{{route('employee_assessment_form',['id' => $employee_assessment_detail->id])}}"><i class="fa fa-edit"></i></a>
                                             @endif
                                         </div>
@@ -132,14 +132,22 @@
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script>
         $(document).ready(function (){
-            var today = new Date().toISOString().split("T")[0];
-            $('#from_date').attr('max', today);
-            $('#to_date').attr('max', today);
+
         });
         function initiate_employee_assessment() {
             let data = new FormData();
             data.append('_token', "{{csrf_token()}}");
-            call_ajax_modal('POST', '{{route('initiate_employee_assessment_form')}}', data, 'Initiate Employee Assessment');
+            let a = function () {
+                let today = new Date().toISOString().split("T")[0];
+                $('#from_date').attr('max', today);
+                $('#to_date').attr('max', today);
+                $('#user_id').select2();
+                $('.ajax_modal').removeClass('modal-sm');
+                $('.ajax_modal').addClass('modal-lg');
+                $('.select2').select2({width: '100%'});
+            }
+            let arr = [a];
+            call_ajax_modal_with_functions('{{route('initiate_employee_assessment_form')}}', data, 'Initiate Employee Assessment', arr);
         }
         function employee_assessment_initiate () {
             let a = function () {

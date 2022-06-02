@@ -89,24 +89,34 @@ class DailySchedule extends Command
             }
             if($self_assessment == true) {
             ////////////////////////////////////////////////
-                $EmployeeAssessment_data = [
-                    'added_by' => Auth::user()->user_id,
-                    'user_id' => $user['user_id'],
-                    'employee_id' => $employees->employee_id,
-                    'hr_sign' => 0,
-                    'manager_sign' => 0,
-                    'employee_sign' => 0,
-                    'from_date' => $from_date,
-                    'to_date' => get_date()
-                ];
-                if($employees->confirmation_status == 'Confirmed'){
-                    $EmployeeAssessment_data['confirmation_status'] = $employees->confirmation_status;
-                }
-                $employee_assessment_initiate = EmployeeAssessment::create($EmployeeAssessment_data);
-                if($employee_assessment_initiate){
-                  if($user['employee']['user_type'] == 'Employee' && !$incomplete_evaluation){
-                        $send_email = false;
-                        add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,$user['user_id'],'Pending Self Evaluation',$send_email);
+                $Initiated_EmployeeAssessment = EmployeeAssessment::with('employees.employee')
+                    ->where('user_id', $user['user_id'])
+                    ->where('employee_sign', 0)
+                    ->orwhere('manager_sign', 0)
+                    ->orwhere('hr_sign', 0)
+                    ->orderBy('added_on', 'desc')->first();
+                if(!$Initiated_EmployeeAssessment){
+                    $EmployeeAssessment_data = [
+                        'added_by' => Auth::user()->user_id,
+                        'user_id' => $user['user_id'],
+                        'employee_id' => $employees->employee_id,
+                        'hr_sign' => 0,
+                        'manager_sign' => 0,
+                        'employee_sign' => 0,
+                        'from_date' => $from_date,
+                        'to_date' => get_date()
+                    ];
+                    if($employees->confirmation_status == 'Confirmed'){
+                        $EmployeeAssessment_data['confirmation_status'] = $employees->confirmation_status;
+                    }
+                    $employee_assessment_initiate = EmployeeAssessment::create($EmployeeAssessment_data);
+                    if($employee_assessment_initiate){
+                      if($user['employee']['user_type'] == 'Employee' && !$incomplete_evaluation){
+                            $send_email = false;
+                            add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,$user['user_id'],'Pending Self Evaluation',$send_email);
+                            $manager_id = User::where('user_id', $user['user_id'])->where('user_type','Employee')->pluck('manager_id')->first();
+                            add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,$manager_id,'Pending Manager Evaluation',$send_email);
+                        }
                     }
                 }
             }

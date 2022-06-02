@@ -145,13 +145,14 @@ class DashboardController extends Controller
             $my_pending_tasks = count($own_tasks);
             $own_tasks_events[] = array();
             foreach ($own_tasks as $task) {
+                $task_description = strip_tags(htmlspecialchars_decode($task['description']));
                 $own_tasks_events = array(
                     "title" => $task['title']." assigned to me",
                     "start" => $task['start_date'],
                     "end" => $task['end_date'],
                     "url" => "tasks_list",
                     "className" => "m-fc-event--solid-warning",
-                    "description" => $task['description']);
+                    "description" => substr_replace($task_description, "...", 70));
                 $all_events[] = $own_tasks_events;
             }
         }
@@ -166,12 +167,13 @@ class DashboardController extends Controller
                 if($team_tasks) {
                     $manager_team_pending_tasks += count($team_tasks);
                     foreach ($team_tasks as $task) {
+                        $task_description = strip_tags(htmlspecialchars_decode($task['description']));
                         $manager_team_tasks_events = array(
                             "title" => $task['title']." assigned to ".$task['users']['full_name'],
                             "start" => $task['start_date'],
                             "end" => $task['end_date'],
                             "url" => "tasks_list",
-                            "description" => $task['description']);
+                            "description" => substr_replace($task_description, "...", 70));
                         if($task['added_by'] == Auth::user()->user_id){
                             $manager_team_tasks_events['className'] = 'm-fc-event--solid-info m-fc-event--light';
                         }else{
@@ -194,13 +196,14 @@ class DashboardController extends Controller
             $unassigned_tasks_count = count($my_unassigned_created_tasks);
             $my_unassigned_created_tasks_events[] = array();
             foreach($my_unassigned_created_tasks as $task) {
+                $task_description = strip_tags(htmlspecialchars_decode($task['description']));
                 $my_unassigned_created_tasks = array(
                     "title" => $task['title'],
                     "start" => $task['start_date'],
                     "end" => $task['end_date'],
                     "url" => "tasks_list",
                     "className" => "m-fc-event--light m-fc-event--solid-danger",
-                    "description" => $task['description']);
+                    "description" => substr_replace($task_description, "...", 70));
                 $all_events[] = $my_unassigned_created_tasks;
             }
         }
