@@ -36,16 +36,16 @@ class EmployeePIPController extends Controller
     public function pip_form(Request $request)
     {
         $data['page_title'] = "Employee PIP Form - Atlantis BPO CRM";
-        $manager_ids = ManagerialRole::whereType('Manager')->whereStatus(1)->pluck('role_id')->toArray();
+        $manager_ids = User::select('manager_id')->whereStatus(1)->where('user_type','Employee')->where('manager_id', '!=', null)->groupBy('manager_id')->get()->pluck('manager_id')->toArray();
         if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5){
             $data['employee'] = User::whereStatus(1)->get();
             $data['is_manager'] = false;
         } else {
             $data['employee'] = User::whereStatus(1)->where('manager_id', Auth::user()->user_id)->get();
-            $is_manager = User::where('status',1)->whereIn('role_id',$manager_ids)->where('user_id',Auth::user()->user_id)->get();
+            $is_manager = User::where('status',1)->whereIn('user_id',$manager_ids)->where('user_id',Auth::user()->user_id)->get();
             $data['is_manager'] = $is_manager->count();
         }
-        $data['om'] = User::where('status',1)->whereIn('role_id',$manager_ids)->get();
+        $data['om'] = User::where('status',1)->whereIn('user_id',$manager_ids)->get();
         if(isset($request->pip_id)) {
             $data['pip'] = EmployeePIP::where('pip_id', $request->pip_id)->first();
         }else{
@@ -155,7 +155,7 @@ class EmployeePIPController extends Controller
     }
     public function get_manager_users_data(Request $request)
     {
-        $data['employee'] = User::whereStatus(1)->where('manager_id', $request->manager_id)->get();
+        $data['employee'] = User::whereStatus(1)->where('user_type','Employee')->where('manager_id', $request->manager_id)->get();
         return response()->json($data);
     }
 }
