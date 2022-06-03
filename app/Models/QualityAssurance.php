@@ -75,4 +75,8 @@ class QualityAssurance extends Authenticatable
         return $this->belongsTo(CallDisposition::class,'call_id','call_id');
     }
 
+    public function qa_done_by(){
+        return $this->belongsTo(User::class,'added_by','user_id');
+    }
+
 }

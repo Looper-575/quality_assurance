@@ -43,7 +43,7 @@ class QAController extends Controller
     {
         $data['qa_data'] = QualityAssurance::where([
             'qa_id' => $request->qa_id,
-        ])->with(['agent', 'call_type'])->get()[0];
+        ])->with(['agent', 'call_type', 'qa_done_by'])->first();
         return view('qa.qa_single', $data);
     }
     public function save(Request $request)
@@ -249,7 +249,7 @@ class QAController extends Controller
             'status'=> 1,
             'call_type_id' => 1
         ])
-            ->where('added_on','>', '2022-02-07')->with(['agent','call_type','qa_status','call_disposition','call_disposition.call_dispositions_services'])->whereRaw("date(added_on)>='2021-11-29 17:00:00'")->get();
+            ->where('added_on','>', '2022-02-07')->with(['agent','call_type','qa_status','call_disposition','call_disposition.call_dispositions_services', 'qa_done_by'])->whereRaw("date(added_on)>='2021-11-29 17:00:00'")->get();
         return view('qa.qa_list' , $data);
     }
     public function qa_add($id){
