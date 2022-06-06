@@ -30,7 +30,7 @@ class HolidayController extends Controller
         }
         $data['holidays'] = $holidays;
         $data['departments'] = Department::where('status', 1)->get();
-        return view('holiday.index' , $data);
+        return view('holiday.holiday_list' , $data);
     }
     public function save_holiday(Request $request)
     {

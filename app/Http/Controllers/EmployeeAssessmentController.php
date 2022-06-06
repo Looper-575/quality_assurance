@@ -114,8 +114,15 @@ class EmployeeAssessmentController extends Controller
             }else{
                 $data['manager_filled_evaluation_standards'] = false;
             }
-            //dd($data['empolyee_filled_evaluation_standards'],$data['manager_filled_evaluation_standards']);
-            $data['total_service'] = total_service($EmployeeAssessment->employees->joining_date, get_date());
+
+
+            $diff = abs(strtotime($EmployeeAssessment->employees->joining_date) - strtotime(get_date()));
+            $years = floor($diff / (365*60*60*24));
+            $months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24));
+            $days = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24)/ (60*60*24));
+
+            $total_service = $years." Year ".$months." Months ". $days." Days";
+            $data['total_service'] = $total_service;
             $data['previous_overall_ratings'] = [];
             $data['employee_previous_objectives'] = false;
             $to_date = null;

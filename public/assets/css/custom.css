@@ -561,3 +561,15 @@ button.buttons-pdf{
 .select2-container--open {
     z-index: 2147483647 !important;
 }
+span.select2-selection.select2-selection--single {
+    height: 40px;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    top: 20px;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 20px;
+}
+.nav-link:hover > .add-new-button i{
+    color: #34bfa3 !important;
+}

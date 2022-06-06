@@ -17,14 +17,20 @@
                 <div class="m-portlet__head-title float-left">
                     <h3 class="m-portlet__head-text">Holidays</h3>
                 </div>
-                @if($has_permissions->add == 1)
                 <div class="float-right mt-3">
-                    <a id="add_new_btn" href="javascript:;" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill">
-                        <span><i class="la la-phone-square"></i><span>Add New</span></span>
-                    </a>
+                    @if($has_permissions->add == 1)
+                        <div class="m-portlet__head-tools float-right">
+                            <ul class="nav nav-tabs m-tabs-line m-tabs-line--success m-tabs-line--2x m-tabs-line--right" role="tablist">
+                                <li class="nav-item m-tabs__item">
+                                    <a id="add_new_btn" class="nav-link m-tabs__link" href="javascript:;">
+                                        <span class="add-new-button"><i class="la la-plus"></i><span>Add New</span></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    @endif
                     <div class="m-separator m-separator--dashed d-xl-none"></div>
                 </div>
-                @endif
             </div>
         </div>
         <div class="m-portlet__body">
@@ -52,10 +58,10 @@
                         <td>
                             <div class="btn-group btn-group-sm">
                                 @if($has_permissions->update == 1)
-                                <button type="button" class="btn btn-primary edit_btn" title="Edit Menu" value="{{json_encode($item)}}"><i class="fa fa-edit"></i></button>
+                                <button type="button" class="btn btn-primary btn-sm edit_btn" title="Edit Menu" value="{{json_encode($item)}}"><i class="fa fa-edit"></i></button>
                                 @endif
                                 @if(Auth::user()->role_id == 1)
-                                <button type="button" class="btn btn-danger detele_btn" title="Delete Menu" value="{{$item->holiday_id}}"><i class="fa fa-trash"></i></button>
+                                <button type="button" class="btn btn-danger btn-sm detele_btn" title="Delete Menu" value="{{$item->holiday_id}}"><i class="fa fa-trash"></i></button>
                                 @endif
                             </div>
                         </td>
@@ -178,32 +184,34 @@
             user_temp = [];
             set_role(department_id);
         });
-        function get_selected_role_users(role_id, user_id){
+        function get_selected_role_users(role_id, user_id) {
             let department_id = $('#department_id').val();
-            $.ajax({
-                type:'get',
-                url:'get_selected_role_users',
-                data:{
-                    role_id: role_id,
-                    department_id:department_id,
-                },
-                success: function( response ) {
-                    $('#user_id').empty().append('');
-                    var user_id = $('#user_id');
-                    user_id.append(
-                        $('<option></option>').val(0).html('All')
-                    );
-                    $.each(response, function(val, data) {
+            if (department_id != '') {
+                $.ajax({
+                    type: 'get',
+                    url: 'get_selected_role_users',
+                    data: {
+                        role_id: role_id,
+                        department_id: department_id,
+                    },
+                    success: function (response) {
+                        $('#user_id').empty().append('');
+                        var user_id = $('#user_id');
                         user_id.append(
-                            $('<option></option>').val(data.user_id).html(data.full_name)
+                            $('<option></option>').val(0).html('All')
                         );
-                    });
-                }
-            }).then(function(){
-                if(user_id != null){
-                    $("#user_id").select2().select2('val', [user_id]);
-                }
-            });
+                        $.each(response, function (val, data) {
+                            user_id.append(
+                                $('<option></option>').val(data.user_id).html(data.full_name)
+                            );
+                        });
+                    }
+                }).then(function () {
+                    if (user_id != null) {
+                        $("#user_id").select2().select2('val', [user_id]);
+                    }
+                });
+            }
         }
 
         $('#role_id').change( function () {
@@ -241,8 +249,8 @@
         $('#add_new_btn').click(function () {
             $('#holiday_form_id').resetForm();
             user_temp = [];
-            $("#role_id").select2().select2('val', [' ']);
-            $("#user_id").select2().select2('val', [' ']);
+            $("#role_id").select2().select2('val', ['']);
+            $("#user_id").select2().select2('val', ['']);
             $('#add_new_modal').modal('toggle');
         });
 

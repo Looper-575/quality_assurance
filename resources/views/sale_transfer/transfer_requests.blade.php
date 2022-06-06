@@ -44,7 +44,7 @@
                         </div>
                         <div class="col-6">
                             <label for="agents" class="form-check-label">Transfer to</label>
-                            <select class="form-control" name="agents" id="agents" required>
+                            <select class="form-control select2" name="agents" id="agents" required>
                                 @foreach($agents as $agent)
                                     <option value="{{ $agent->user_id }}"> {{ $agent->full_name  }}</option>
                                 @endforeach
@@ -68,7 +68,9 @@
     <script src="{{ asset('assets/bundles/select2/dist/js/select2.full.min.js') }}"></script>
     <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
     <script>
-
+        $(document).ready(function (){
+            $('.select2').select2();
+        });
         $('#sales_list').change(function (e) {
             let agent_id = this.options[this.selectedIndex].getAttribute('data-id');
             $('#agents_from').attr('disabled',false);

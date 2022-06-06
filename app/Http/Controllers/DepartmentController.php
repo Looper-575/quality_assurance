@@ -33,7 +33,7 @@ class DepartmentController extends Controller
     {
         $data['page_title'] = "Atlantis BPO CRM - Team Type";
         $data['types'] = Department::with('added_by_user')->where('status',1)->with(['added_by_user'])->orderBy('department_id', 'DESC')->get();
-        return view('department.index' , $data);
+        return view('department.department_list' , $data);
     }
 
     public function team_type_save(Request $request)

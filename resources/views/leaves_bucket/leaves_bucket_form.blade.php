@@ -62,12 +62,12 @@
                     </div>
                     <div class="row">
                         <div class="col-12 text-right">
-                            <button type="submit" class="btn btn-success">
-                                Submit
-                            </button>
                             <a href="{{route('leaves_bucket')}}"  class="btn btn-primary">
                                 Back
                             </a>
+                            <button type="submit" class="btn btn-success">
+                                Submit
+                            </button>
                         </div>
                     </div>
             </form>

@@ -347,15 +347,26 @@ if(!function_exists('add_notifications')){
                 'message' => $message,
             ]);
             if($send_email){
-                $user = User::where('user_id',$for_user_id)->first();
-                $user_email = $user->email;
-                $user_name = $user->full_name;
-                $email_body = 'You have a pending leave approval Request.';
-                $email_subject = 'Pending Leave Approval Request!';
-                $email_view = 'email_templates.notification_email';
-                $email_data = ['name' => $user_name,
-                    'email_body' => $email_body];
-                send_email_laravel($user_email, $user_name, $email_subject, $email_view, $email_data );
+                if($reference_table == 'leave_applications'){
+                    $leaveApplication_details = \App\Models\LeaveApplication::where('leave_id',$reference_id)->first();
+                    $user = User::where('user_id',$for_user_id)->first();
+                    $user_email = $user->email;
+                    $user_name = $user->full_name;
+                    $request_from = "You have a pending leave approval Request from ".$leaveApplication_details->user->full_name.".\n";
+                    $leave_reason = "Reason: ".$leaveApplication_details->reason.".\n";
+                    if($leaveApplication_details->leave_type_id == 4){
+                        $leave_duration = "On: ".$leaveApplication_details->from." For: ".$leaveApplication_details->half_type;
+                    }else{
+                        $leave_duration = "From: ".$leaveApplication_details->from." To: ".$leaveApplication_details->to;
+                    }
+                    $email_subject = 'Pending Leave Approval Request!';
+                    $email_view = 'email_templates.notification_email';
+                    $email_data = ['name' => $user_name,
+                        'request_from' => $request_from,
+                        'leave_reason' => $leave_reason,
+                        'leave_duration' => $leave_duration];
+                    send_email_laravel($user_email, $user_name, $email_subject, $email_view, $email_data );
+                }
             }
         }
     }

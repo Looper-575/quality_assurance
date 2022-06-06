@@ -29,7 +29,7 @@ class MenuController extends Controller
     {
         $data['page_title'] = "Atlantis BPO CRM - Side Menus";
         $data['menus'] = SideMenu::with('parent', 'children.parent')->where('parent_id', 0)->where('status', 1)->orderBy('sort_order', 'ASC')->get();
-        return view('menu.index' , $data);
+        return view('menu.menu_list' , $data);
     }
 
     public function save(Request $request)
@@ -73,7 +73,6 @@ class MenuController extends Controller
     public function menus()
     {
         $data['page_title'] = "Atlantis BPO CRM - Side Menus";
-//        dd(get_child_urls(1, 1));
         $data['menus'] = SideMenu::with('parent', 'children.parent')->where('parent_id', 0)->where('status', 1)->orderBy('sort_order', 'ASC')->get();
         return view('menu.menus' , $data);
     }
