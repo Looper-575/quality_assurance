@@ -1,82 +1,117 @@
 @extends('layout.template')
 @section('header_scripts')
-    <link href="{{asset('assets/css/datatables.min.css')}}" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
+    <?php
+    $has_permissions = get_route_permissions( Auth::user()->role->role_id, 'shift');
+    ?>
     <div class="m-portlet m-portlet--mobile">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
                 <div class="m-portlet__head-title float-left">
-                    <h3 class="m-portlet__head-text">Shift List</h3>
+                    <h3 class="m-portlet__head-text">Shifts</h3>
                 </div>
                 <div class="float-right mt-3">
-                    <a href="{{route('shift')}}" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill">
-                        <span><i class="la la-phone-square"></i><span>Add New</span></span>
-                    </a>
+                    @if($has_permissions->add == 1)
+                        <div class="m-portlet__head-tools float-right">
+                            <ul class="nav nav-tabs m-tabs-line m-tabs-line--success m-tabs-line--2x m-tabs-line--right" role="tablist">
+                                <li class="nav-item m-tabs__item">
+                                    <a id="add_new_btn" class="nav-link m-tabs__link" href="javascript:;">
+                                        <span class="add-new-button"><i class="la la-plus"></i><span>Add New</span></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    @endif
+                    <div class="m-separator m-separator--dashed d-xl-none"></div>
                 </div>
             </div>
         </div>
         <div class="m-portlet__body">
-            <div style="width: 100%">
-                <table class="datatable table table-bordered" style="width:100%">
-                    <thead>
+            <table class="datatable table table-bordered" id="html_table">
+                <thead>
+                <tr>
+                    <th>S.No.</th>
+                    <th>Title</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach ($shifts as $index => $menu)
                     <tr>
-                        <th>Sr</th>
-                        <th>Title</th>
-                        <th>Check In</th>
-                        <th>Check Out</th>
-                        <th title="Field #9">Added On</th>
-                        <th title="Field #10">Action</th>
+                        <td>{{$index+1}}</td>
+                        <td>{{$menu->title}}</td>
+                        <td>{{$menu->check_in}}</td>
+                        <td>{{$menu->check_out}}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                @if($has_permissions->update == 1)
+                                    <button type="button" class="btn btn-primary btn-sm edit_btn" title="Edit Menu" value="{{json_encode($menu)}}"><i class="fa fa-edit"></i></button>
+                                @endif
+                                @if(Auth::user()->role_id == 1)
+                                    <button type="button" class="btn btn-danger btn-sm detele_btn" title="Delete Menu" value="{{$menu->shift_id}}"><i class="fa fa-trash"></i></button>
+                                @endif
+                            </div>
+                        </td>
                     </tr>
-                    </thead>
-                    <tbody>
-                    @foreach ($shifts as $index => $list)
-                        <tr>
-                            <td>{{ ++$index}}</td>
-                            <td>{{ $list->title }}</td>
-                            <td>{{ $list->check_in }}</td>
-                            <td>{{ $list->check_out }}</td>
-                            <td>{{parse_datetime_get($list->added_on)}}</td>
-                            <td>
-                                <div class="btn-group btn-group-sm">
-                                    <a href="javascript:view_shift({{$list->shift_id}});"  class="btn btn-primary d-none"><i class="fa fa-eye"></i></a>
-                                    <a class="btn btn-info" href="{{route('shift_edit' , $list->shift_id)}}" >
-                                        <i class="la la-edit"> </i>
-                                    </a>
-                                    <button type="button" onclick="delete_shift(this);" value="{{$list->shift_id}}" class="btn btn-danger role_delete"><i class="fa fa-trash"></i></button>
+                @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- View Modal -->
+    <div class="modal fade" id="add_new_modal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="add_new_modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="add_new_modalLabel">Shift</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" id="shift_form_id" enctype="multipart/form-data">
+                        @csrf
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label class="form-check-label" for="title">Shift Title</label>
+                                    <input class="form-control" type="text" name="title" id="title" value="" required>
                                 </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                    <tfoot>
-                    <tr>
-                        <th>Sr</th>
-                        <th>Title</th>
-                        <th>Check In</th>
-                        <th>Check Out</th>
-                        <th title="Field #9">Added On</th>
-                        <th title="Field #10">Action</th>
-                    </tr>
-                    </tfoot>
-                </table>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label class="form-check-label" for="check_in" >Check In</label>
+                                    <input class="form-control" type="time" name="check_in" value="" id="check_in" required>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label class="form-check-label" for="check_out" >Check Out</label>
+                                    <input class="form-control" type="time" name="check_out" value="" id="check_out" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <input type="hidden" id="shift_id" name="shift_id" value="">
+                                <button type="submit"  class="btn btn-primary float-right"> Save</button>
+                            </div>
+                            <br>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 @endsection
 @section('footer_scripts')
-    <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
-    <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script>
-        function view_shift(shift_id) {
-            let data = new FormData();
-            data.append('shift_id', shift_id);
-            data.append('_token', '{{ csrf_token() }}');
-            call_ajax_modal('POST', '{{route('shift_single_data')}}', data, 'Shift View');
-        }
-        function delete_shift (me)
-        {
-            let id = me.value;
+        $('.detele_btn').click( function () {
+            let id = this.value;
+            let me = this;
             let data = new FormData();
             data.append('id', id);
             data.append('_token', "{{csrf_token()}}");
@@ -97,6 +132,33 @@
                     call_ajax('', '{{route('shift_delete')}}', data);
                 }
             })
-        }
+        });
+        $('#add_new_btn').click(function () {
+            $('#shift_id').val('');
+            $('#title').val('');
+            $('#check_in').val('');
+            $('#check_out').val('');
+            $('#add_new_modal').modal('toggle');
+        });
+
+        $('#shift_form_id').submit(function (e) {
+            e.preventDefault();
+            let form = document.getElementById('shift_form_id');
+            let data = new FormData(form);
+            let a = function() {
+                window.location.reload();
+            }
+            let arr = [a];
+            call_ajax_with_functions('', '{{route('save_shift_form')}}', data, arr);
+        });
+
+        $('.edit_btn').click( function () {
+            let data = JSON.parse(this.value);
+            $('#shift_id').val(data.shift_id);
+            $('#title').val(data.title);
+            $('#check_in').val(data.check_in);
+            $('#check_out').val(data.check_out);
+            $('#add_new_modal').modal('toggle');
+        });
     </script>
 @endsection

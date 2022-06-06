@@ -24,7 +24,7 @@ class ShiftController extends Controller
     {
         $data['page_title'] = "Shifts - Atlantis BPO CRM";
         $data['shifts'] = Shift::with('manager')->orderBy('shift_id', 'desc')->get();
-        return view('shift.index' , $data);
+        return view('shift.shift_list' , $data);
     }
     public function shift()
     {

@@ -15,7 +15,7 @@ class PermissionController extends Controller
         $data['roles'] = UserRole::where('status', 1)->orderBy('role_id', 'ASC')->get();
         $data['menus'] = SideMenu::with('parent', 'children.parent')->where('parent_id', 0)->where('status', 1)->orderBy('sort_order', 'ASC')->get();
         $data['permissions'] = UserRole::has('role_permission')->with('role_permission')->orderBy('role_id', 'DESC')->get();
-        return view('permissions.index' , $data);
+        return view('permissions.permission_list' , $data);
     }
 
     public function form(Request $request){

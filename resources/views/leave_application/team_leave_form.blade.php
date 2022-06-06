@@ -44,7 +44,7 @@
                     <div class="col-6">
                         <div class="form-group">
                             <label class="form-check-label" for="team_member">Team Members</label>
-                            <select class="form-control" name="team_member" id="team_member" required>
+                            <select class="form-control select2" name="team_member" id="team_member" required>
                                 <option value="">Select</option>
                                 @foreach($agents->team_member as $agent)
                                     <option value="{{$agent->user->user_id}}">{{$agent->user->full_name}}</option>
@@ -86,8 +86,8 @@
                     </div>
                     <div class="col-12">
                         <div class="form-group float-right">
-                            <button type="submit" class="btn btn-primary"> Submit </button>
                             <button type="reset" class="btn btn-danger"> Reset </button>
+                            <button type="submit" class="btn btn-primary"> Submit </button>
                         </div>
                     </div>
                 </div>
@@ -100,6 +100,9 @@
     <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script>
+        $(document).ready(function (){
+           $('.select2').select2();
+        });
         let remaining_leaves_div_html = (function () {/*<div class="row">
                 <div class="col-12">
                     <table class="table table-bordered">

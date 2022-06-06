@@ -175,9 +175,9 @@ class DashboardController extends Controller
                             "url" => "tasks_list",
                             "description" => substr_replace($task_description, "...", 70));
                         if($task['added_by'] == Auth::user()->user_id){
-                            $manager_team_tasks_events['className'] = 'm-fc-event--solid-info m-fc-event--light';
+                            $manager_team_tasks_events['className'] = 'm-fc-event--solid-info';
                         }else{
-                            $manager_team_tasks_events['className'] = 'm-fc-event--light m-fc-event--solid-primary';
+                            $manager_team_tasks_events['className'] = 'm-fc-event--solid-primary';
                         }
                         $all_events[] = $manager_team_tasks_events;
                     }
@@ -202,7 +202,7 @@ class DashboardController extends Controller
                     "start" => $task['start_date'],
                     "end" => $task['end_date'],
                     "url" => "tasks_list",
-                    "className" => "m-fc-event--light m-fc-event--solid-danger",
+                    "className" => "m-fc-event--solid-danger",
                     "description" => substr_replace($task_description, "...", 70));
                 $all_events[] = $my_unassigned_created_tasks;
             }
@@ -217,7 +217,7 @@ class DashboardController extends Controller
                 "title" => $event['full_name']."'s Birthday",
                 "start" => $birthday_start,
                 "end" => $birthday_end,
-                "className" => "m-fc-event--solid-info m-fc-event--light",
+                "className" => "m-fc-event--solid-info",
                 "description" => $event['full_name']."'s Birthday");
             $all_events[] = $birthday_events;
         }
@@ -318,7 +318,7 @@ class DashboardController extends Controller
                 "title" => $event['full_name']."'s Birthday",
                 "start" => $birthday_start,
                 "end" => $birthday_end,
-                "className" => "m-fc-event--solid-info m-fc-event--light",
+                "className" => "m-fc-event--solid-info",
                 "description" => $event['full_name']."'s Birthday");
             $all_events[] = $birthday_events;
         }
