@@ -13,7 +13,7 @@
     </div><br>
     <div class="m-separator m-separator--dashed m-separator--sm"></div>
     <br><br><br><br><br>
-    <div class="col-12 justify-content-between text-justify">
+    <div class="col-12 justify-content-between">
         <h4 class="text-center font-underline">Undertaking and Indemnity</h4>
         <br><br><br>
         <p>This deed of undertaking cum Indemnity is made at Islamabad on <b> {{date('F d, Y' , strtotime($separation->separation_date))}}</b></p>
