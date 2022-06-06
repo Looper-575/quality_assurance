@@ -51,9 +51,9 @@
                         <td>
                             @if($has_permissions->update == 1)
                                 <div class="btn-group btn-group-sm">
-                                    <button type="button" class="btn btn-primary btn-sm edit_btn" title="Edit Menu" value="{{json_encode($menu)}}"><i class="fa fa-edit"></i></button>
+                                    <button type="button" class="btn btn-primary edit_btn" title="Edit Menu" value="{{json_encode($menu)}}"><i class="fa fa-edit"></i></button>
                                     @if(count($menu->children) == 0)
-                                    <button type="button" class="btn btn-danger btn-sm detele_btn" title="Delete Menu" value="{{$menu->id}}"><i class="fa fa-trash"></i></button>
+                                    <button type="button" class="btn btn-danger detele_btn" title="Delete Menu" value="{{$menu->id}}"><i class="fa fa-trash"></i></button>
                                     @endif
                                 </div>
                             @endif
@@ -71,8 +71,8 @@
                                     @if(count($child->children) == 0)
                                         @if($has_permissions->add == 1)
                                         <div class="btn-group btn-group-sm">
-                                            <button type="button" class="btn btn-primary btn-sm edit_btn" title="Edit Menu" value="{{json_encode($child)}}"><i class="fa fa-edit"></i></button>
-                                            <button type="button" class="btn btn-danger btn-sm detele_btn" title="Delete Menu" value="{{$child->id}}"><i class="fa fa-trash"></i></button>
+                                            <button type="button" class="btn btn-primary edit_btn" title="Edit Menu" value="{{json_encode($child)}}"><i class="fa fa-edit"></i></button>
+                                            <button type="button" class="btn btn-danger detele_btn" title="Delete Menu" value="{{$child->id}}"><i class="fa fa-trash"></i></button>
                                         </div>
                                         @endif
                                     @endif

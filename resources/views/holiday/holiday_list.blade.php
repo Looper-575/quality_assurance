@@ -58,10 +58,10 @@
                         <td>
                             <div class="btn-group btn-group-sm">
                                 @if($has_permissions->update == 1)
-                                <button type="button" class="btn btn-primary btn-sm edit_btn" title="Edit Menu" value="{{json_encode($item)}}"><i class="fa fa-edit"></i></button>
+                                <button type="button" class="btn btn-primary edit_btn" title="Edit Menu" value="{{json_encode($item)}}"><i class="fa fa-edit"></i></button>
                                 @endif
                                 @if(Auth::user()->role_id == 1)
-                                <button type="button" class="btn btn-danger btn-sm detele_btn" title="Delete Menu" value="{{$item->holiday_id}}"><i class="fa fa-trash"></i></button>
+                                <button type="button" class="btn btn-danger detele_btn" title="Delete Menu" value="{{$item->holiday_id}}"><i class="fa fa-trash"></i></button>
                                 @endif
                             </div>
                         </td>

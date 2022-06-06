@@ -20,8 +20,8 @@
                 <div class="m-portlet__head-title float-left">
                     <h3 class="m-portlet__head-text">Permissions</h3>
                 </div>
+                <div class="float-right mt-3">
                 @if($has_permissions->add == 1)
-                    <div class="float-right mt-3">
                         <div class="m-portlet__head-tools float-right">
                             <ul class="nav nav-tabs m-tabs-line m-tabs-line--success m-tabs-line--2x m-tabs-line--right" role="tablist">
                                 <li class="nav-item m-tabs__item">
@@ -31,9 +31,9 @@
                                 </li>
                             </ul>
                         </div>
-                        <div class="m-separator m-separator--dashed d-xl-none"></div>
-                    </div>
                 @endif
+                <div class="m-separator m-separator--dashed d-xl-none"></div>
+                </div>
             </div>
         </div>
         <div class="m-portlet__body">
@@ -53,8 +53,8 @@
                         <td>
                             @if($has_permissions->update == 1)
                                 <div class="btn-group btn-group-sm">
-                                    <a class="btn btn-primary btn-sm edit_btn" title="Edit Menu" href="{{route('edit_permissions',['id' => $item->role_id])}}"><i class="fa fa-edit"></i></a>
-                                    <button type="button" class="btn btn-sm btn-danger detele_btn" title="Delete Menu" value="{{$item->role_id}}"><i class="fa fa-trash"></i></button>
+                                    <a class="btn btn-primary edit_btn" title="Edit Menu" href="{{route('edit_permissions',['id' => $item->role_id])}}"><i class="fa fa-edit"></i></a>
+                                    <button type="button" class="btn btn-danger detele_btn" title="Delete Menu" value="{{$item->role_id}}"><i class="fa fa-trash"></i></button>
                                 </div>
                             @endif
                         </td>

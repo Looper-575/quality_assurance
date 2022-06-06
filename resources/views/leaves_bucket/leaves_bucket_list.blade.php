@@ -47,9 +47,9 @@
                             <td>{{ $bucket->start_date }}</td>
                             <td>
                                 <div class="btn-group btn-group-sm">
-                                    <a href="{{route('view_leaves_bucket',['bucket_id' => $bucket->bucket_id, 'user_id' => $bucket->user_id])}}" id="{{$bucket->bucket_id}}" class="btn btn-sm btn-primary"><i class="la la-eye"></i></a>
+                                    <a href="{{route('view_leaves_bucket',['bucket_id' => $bucket->bucket_id, 'user_id' => $bucket->user_id])}}" id="{{$bucket->bucket_id}}" class="btn btn-primary"><i class="la la-eye"></i></a>
                                     @if($is_admin || $is_hr)
-                                        <a title="Edit" class="btn btn-warning btn-sm edit_leaves_bucket" id="{{$bucket->bucket_id}}" href="{{route('leaves_bucket_form',['bucket_id' => $bucket->bucket_id])}}"><i class="fa fa-edit text-white"></i></a>
+                                        <a title="Edit" class="btn btn-warning edit_leaves_bucket" id="{{$bucket->bucket_id}}" href="{{route('leaves_bucket_form',['bucket_id' => $bucket->bucket_id])}}"><i class="fa fa-edit text-white"></i></a>
                                     @endif
                                 </div>
                             </td>

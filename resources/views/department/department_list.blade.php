@@ -47,8 +47,8 @@
                         <td>
                             @if($has_permissions->update == 1)
                                 <div class="btn-group btn-group-sm">
-                                    <button type="button" title="Edit Team Type" class="btn btn-primary btn-sm edit_btn" value="{{json_encode($type)}}"><i class="la la-edit"></i> </button>
-                                    <button type="button" title="Delete Team Type" class="btn btn-danger btn-sm detele_btn" value="{{$type->department_id}}"><i class="la la-trash"></i> </button>
+                                    <button type="button" title="Edit Team Type" class="btn btn-primary edit_btn" value="{{json_encode($type)}}"><i class="la la-edit"></i> </button>
+                                    <button type="button" title="Delete Team Type" class="btn btn-danger detele_btn" value="{{$type->department_id}}"><i class="la la-trash"></i> </button>
                                 </div>
                             @endif
                         </td>
