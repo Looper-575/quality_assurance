@@ -177,7 +177,10 @@ class ModuleController  extends Controller
 
     public function single_module_detail($id)
     {
-        $manager = ManagerialRole::Where('type','Manager')->where('role_id', Auth::user()->role_id)->first();
+        $manager = User::select('manager_id')
+            ->whereStatus(1)
+            ->where('user_type','Employee')
+            ->where('manager_id', '=', Auth::user()->user_id)->first();
         if($manager){
             $data['manager'] = true;
         }
