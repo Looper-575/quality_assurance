@@ -153,6 +153,13 @@ class TaskController extends Controller
     function view_document($id)
     {
         $data['page_title'] = 'Module Detail';
+        $manager = User::select('manager_id')
+            ->whereStatus(1)
+            ->where('user_type','Employee')
+            ->where('manager_id', '=', Auth::user()->user_id)->first();
+        if($manager){
+            $data['manager'] = true;
+        }
         $data['module'] = ProjectModule::where('task_id',$id)->with(['projects','users','comments','task'])->first();
         return view('developer_modules.single_module_detail',$data);
     }
