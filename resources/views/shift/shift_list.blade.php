@@ -17,7 +17,7 @@
                             <ul class="nav nav-tabs m-tabs-line m-tabs-line--success m-tabs-line--2x m-tabs-line--right" role="tablist">
                                 <li class="nav-item m-tabs__item">
                                     <a id="add_new_btn" class="nav-link m-tabs__link" href="javascript:;">
-                                        <span class="add-new-button"><i class="la la-plus"></i><span>Add New</span></span>
+                                        <span class="add-new-button"><i class="fa fa-plus"></i><span>Add New</span></span>
                                     </a>
                                 </li>
                             </ul>

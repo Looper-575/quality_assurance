@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 use App\Models\AttendanceLog;
+use App\Models\Employee;
 use App\Models\ManagerialRole;
 use App\Models\Team;
 use App\Models\TeamMember;
@@ -336,5 +337,10 @@ class LeaveApplicationController extends Controller
     }
     public function get_employee_leaves_bucket(Request $request){
         return get_leave_bucket_leaves($request->team_member_id);
+    }
+    public function get_employee_record($id)
+    {
+        $data['start_date'] = Employee::whereUserId($id)->pluck('confirmation_date')->first();
+        return response()->json($data);
     }
 }

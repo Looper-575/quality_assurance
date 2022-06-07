@@ -50,9 +50,9 @@
                             <td>{{$pay->gross_salary}}</td>
                             <td>
                                 <div class="btn-group btn-group-sm">
-                                    <button title="Delete" class="btn btn-danger p-3" onclick="reject_payroll(this);" value="{{$pay->payroll_id}}"><i class="fa fa-trash"></i></button>
-                                    <button title="Approve" class="btn btn-success p-3" onclick="approve_payroll(this);" value="{{$pay->payroll_id}}"><i class="fa fa-check"></i></button>
-                                    <a title="Edit" class="btn-primary p-3 text-white" style="border-radius: 0px 3px 3px 0px;" href="{{ route('payroll_edit', $pay->payroll_id) }}"><i class="fa fa-pencil"></i></a>
+                                    <button title="Delete" class="btn btn-danger" onclick="reject_payroll(this);" value="{{$pay->payroll_id}}"><i class="fa fa-trash"></i></button>
+                                    <button title="Approve" class="btn btn-success" onclick="approve_payroll(this);" value="{{$pay->payroll_id}}"><i class="fa fa-check"></i></button>
+                                    <a title="Edit" class="btn-primary pt-2 px-3 text-white" style="border-radius: 0px 3px 3px 0px;" href="{{ route('payroll_edit', $pay->payroll_id) }}"><i class="fa fa-pencil"></i></a>
                                 </div>
                             </td>
                         </tr>

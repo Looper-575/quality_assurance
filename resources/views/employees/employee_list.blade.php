@@ -13,15 +13,18 @@
                     <h3 class="m-portlet__head-text">Employees List</h3>
                 </div>
                 @if( Auth::user()->role_id == 1 || Auth::user()->role_id == 5 || ($has_permissions->add == 1 && (Auth::user()->role_id != 1 && Auth::user()->role_id != 5 && count($employee_lists) == 0) ))
-                <div class="m-portlet__head-tools float-right">
-                    <ul class="nav nav-tabs m-tabs-line m-tabs-line--success m-tabs-line--2x m-tabs-line--right" role="tablist">
-                        <li class="nav-item m-tabs__item">
-                            <a class="nav-link m-tabs__link" href="{{route('employee_form')}}">
-                                Add New Employee
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+                    <div class="float-right mt-3">
+                        <div class="m-portlet__head-tools float-right">
+                            <ul class="nav nav-tabs m-tabs-line m-tabs-line--success m-tabs-line--2x m-tabs-line--right" role="tablist">
+                                <li class="nav-item m-tabs__item">
+                                    <a href="{{route('employee_form')}}" class="nav-link m-tabs__link">
+                                        <span class="add-new-button"><i class="fa fa-plus"></i><span>Add New Employee</span></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="m-separator m-separator--dashed d-xl-none"></div>
+                    </div>
                 @endif
             </div>
         </div>

@@ -382,6 +382,7 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
         Route::post('/leaves_bucket_save', 'App\Http\Controllers\LeavesBucketController@leaves_bucket_save')->name('leaves_bucket_save');
         Route::get('/view_leaves_bucket', 'App\Http\Controllers\LeavesBucketController@view_leaves_bucket')->name('view_leaves_bucket');
         Route::post('/get_employee_leaves_bucket', 'App\Http\Controllers\LeaveApplicationController@get_employee_leaves_bucket')->name('get_employee_leaves_bucket');
+        Route::get('/get_employee_record/{id}','App\Http\Controllers\LeaveApplicationController@get_employee_record')->name('get_employee_record');
     });
     Route::group(['middleware' => ['check-permission:leaves_taken_report_monthly,view,0,0']], function() {
         Route::get('/leaves_taken_report_monthly','App\Http\Controllers\ReportController@leaves_taken_report_monthly')->name('leaves_taken_report_monthly');
