@@ -26,9 +26,9 @@
                     </div>
                     <div class="col-5">
                         <div class="form-group">
-                            <label class="form-check-label" for="manager_id">Team</label>
+                            <label class="form-check-label mb-3" for="manager_id">Team</label>
                             <?php $team_id = 0; ?>
-                            <select class="form-control select2 mt-3" name="team_id" required {{ Auth::user()->role->role_id == 1 || Auth::user()->role->role_id==5 ? '' : 'disabled' }}>
+                            <select class="form-control select2" name="team_id" required {{ Auth::user()->role->role_id == 1 || Auth::user()->role->role_id==5 ? '' : 'disabled' }}>
                                 <option value="">Select Team</option>
                                 @foreach($teams as $team)
                                     <?php
@@ -56,6 +56,7 @@
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script>
         $(document).ready(function (){
+            $('.select2').select2();
             var today = new Date().toISOString().split("T")[0];
             three_day_ago = new Date();
             days = 86400000; //number of milliseconds in a day
