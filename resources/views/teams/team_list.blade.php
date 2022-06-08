@@ -47,12 +47,12 @@
                         <td>{{$team->title}}</td>
                         <td>{{$team->team_type->title}}</td>
                         <td>{{$team->team_lead->full_name}}</td>
-                        <td>{{@$team->shift->title}}</td>
+                        <td>{{$team->shift->title}}</td>
                         <td>
                             <div class="btn-group btn-group-sm">
                                 @if($has_permissions->update == 1)
-                                    <a class="btn btn-primary" title="Update Team" href="{{route('add_member_in_team' , $team->team_id)}}" >
-                                        <i class="la la-edit"> </i>
+                                    <a class="btn btn-warning" title="Update Team" href="{{route('add_member_in_team' , $team->team_id)}}" >
+                                        <i class="la la-edit text-white"> </i>
                                     </a>
                                 @endif
                                 @if(Auth::user()->role_id == 1)

@@ -48,7 +48,7 @@
                         <td>
                             <div class="btn-group btn-group-sm">
                                 @if($has_permissions->update == 1)
-                                    <button type="button" class="btn btn-primary edit_btn" title="Edit Menu" value="{{json_encode($menu)}}"><i class="fa fa-edit"></i></button>
+                                    <button type="button" class="btn btn-warning edit_btn" title="Edit Menu" value="{{json_encode($menu)}}"><i class="fa fa-edit text-white"></i></button>
                                 @endif
                                 @if(Auth::user()->role_id == 1)
                                     <button type="button" class="btn btn-danger detele_btn" title="Delete Menu" value="{{$menu->shift_id}}"><i class="fa fa-trash"></i></button>

@@ -14,15 +14,18 @@
                 </div>
             </div>
             @if($is_admin == TRUE)
-            <div class="m-portlet__head-tools">
-                <ul class="nav nav-tabs m-tabs-line m-tabs-line--success m-tabs-line--2x m-tabs-line--right" role="tablist">
-                    <li class="nav-item m-tabs__item">
-                        <a class="nav-link m-tabs__link" href="{{route('separation_form')}}">
-                            Add Employee Separation
-                        </a>
-                    </li>
-                </ul>
-            </div>
+                <div class="float-right mt-3">
+                    <div class="m-portlet__head-tools float-right">
+                        <ul class="nav nav-tabs m-tabs-line m-tabs-line--success m-tabs-line--2x m-tabs-line--right" role="tablist">
+                            <li class="nav-item m-tabs__item">
+                                <a href="{{route('separation_form')}}" class="nav-link m-tabs__link">
+                                    <span class="add-new-button"><i class="fa fa-plus"></i><span>Add Employee Separation</span></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="m-separator m-separator--dashed d-xl-none"></div>
+                </div>
             @endif
         </div>
         <div class="m-portlet__body">
@@ -54,9 +57,9 @@
                                     @if($separation->employee_separation)
                                         <button title="Delete Final Settlement" class="btn btn-danger" onclick="delete_final_settlement(this);" value="{{$separation->separation_id}}"><i class="fa fa-trash"></i></button>
                                     @endif
-                                    <a href="{{route('separation_form',['separation_id' => $separation->separation_id])}}" title="Employee Separation form" class="btn btn-primary" ><i class="fa fa-edit"></i></a>
+                                    <a href="{{route('separation_form',['separation_id' => $separation->separation_id])}}" title="Employee Separation form" class="btn btn-warning" ><i class="fa fa-edit text-white"></i></a>
                                 @endif
-                                    <button type="button" onclick="view_undertaking_form(this);" value="{{$separation->separation_id}}" class="btn btn-info">
+                                <button type="button" onclick="view_undertaking_form(this);" value="{{$separation->separation_id}}" class="btn btn-info">
                                     Undertaking
                                 </button>
                             </div>

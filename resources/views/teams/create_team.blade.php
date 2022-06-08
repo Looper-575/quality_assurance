@@ -50,7 +50,7 @@
                     </div>
                     <div class="col-6 pt-4">
                         <label class="form-check-label" for="all_user">All User</label>
-                        <select class="form-control" name="all_user" id="all_user">
+                        <select class="form-control select2" name="all_user" id="all_user">
                             <option value="">Select User</option>
                             @foreach($agents as $agent)
                                 <option value="{{$agent->user_id}}"> {{$agent->full_name}} </option>
@@ -86,6 +86,9 @@
     <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script>
+        $(document).ready(function (){
+            $('#all_user').select2();
+        })
         var user_ids = new Array();
         $('#team_lead_id').on('change', function() {
             var manager_id = $(this).val();
