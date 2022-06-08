@@ -129,19 +129,14 @@ if (!function_exists('send_email')) {
 if (!function_exists('working_days')) {
     function working_days($startDate, $endDate)
     {
-        if (strtotime($endDate) >= strtotime($startDate)) {
-            $holidays = array();
-            $date = $startDate;
-            $days = 0;
-            while ($date != $endDate) {
-                $date = date("Y-m-d", strtotime("+1 day", strtotime($date)));
-                $weekday = date("w", strtotime($date));
-                if ($weekday != 6 and $weekday != 0 and !in_array($date, $holidays)) $days++;
-            }
-            return $days;
-        } else {
-            return "Please check the dates.";
+        $start = strtotime($startDate);
+        $end = strtotime($endDate);
+        $count = 0;
+        while(date('Y-m-d', $start) <= date('Y-m-d', $end)){
+            $count += date('N', $start) < 6 ? 1 : 0;
+            $start = strtotime("+1 day", $start);
         }
+        return $count;
     }
 }
 if (!function_exists('total_service')) {
@@ -421,10 +416,11 @@ if(!function_exists('get_leave_bucket_leaves')) {
 if(!function_exists('generate_single_employee_leaves_bucket')){
     function generate_single_employee_leaves_bucket($user_id)
     {
+        $employee_conformation_date = \App\Models\Employee::whereUserId($user_id)->pluck('confirmation_date')->first();
         $leave_bucket = \App\Models\LeavesBucket::where('user_id', $user_id)->count();
         if($leave_bucket == 0 ){
             \App\Models\LeavesBucket::create(['user_id' => $user_id,
-                'start_date' => get_date(),
+                'start_date' => $employee_conformation_date,
                 'annual_leaves' => 10,
                 'sick_leaves' => 5,
                 'casual_leaves' => 4

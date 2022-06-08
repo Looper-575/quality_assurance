@@ -953,8 +953,7 @@ class PayrollController extends Controller
         $basic_salary = $user->net_salary;
         // total salary minus medical allowance 10%
         $salary = $basic_salary-$attendace_log->medical_allowance;
-        $calculated_deductions['before_tax_deduction'];
-        $salary = ($salary + $allowance) - ($deduction + $calculated_deductions['before_tax_deduction']);
+        $salary = ($salary + ($allowance - $attendace_log->medical_allowance)) - ($deduction + $calculated_deductions['before_tax_deduction'] + $calculated_deductions['after_tax_deduction']);
         $annul_salary = $salary*12;
         $tax_deduction = PayrollTaxSlab::whereStatus(1)
             ->where(function ($query) use ($annul_salary) {
