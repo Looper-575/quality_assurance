@@ -153,10 +153,6 @@ class EmployeeAssessmentController extends Controller
                 $data['initiated_employee_assessment'] = true;
             }
 
-            if(Auth::user()->role_id == 1){
-                $data['is_admin'] = true;
-            }
-
             if($EmployeeAssessment->employees->employee->manager_id == Auth::user()->user_id){
                 $data['is_manager'] = true;
                 if($EmployeeAssessment->manager_sign == 1 && Auth::user()->role_id == 5){
@@ -166,6 +162,23 @@ class EmployeeAssessmentController extends Controller
             } else{
                 $data['is_employee'] = true;
                 if($EmployeeAssessment->manager_sign == 1 && $EmployeeAssessment->employee_sign == 1 && Auth::user()->role_id == 5){
+                    $data['is_hrm'] = true;
+                    $data['is_manager'] = false;
+                    $data['is_employee'] = false;
+                }
+            }
+            // For admin user checks
+            if(Auth::user()->role_id == 1){
+                $data['is_admin'] = true;
+                if($EmployeeAssessment->employee_sign == 0){
+                    $data['is_employee'] = true;
+                    $data['is_hrm'] = false;
+                    $data['is_manager'] = false;
+                } else if($EmployeeAssessment->manager_sign == 0){
+                    $data['is_hrm'] = false;
+                    $data['is_manager'] = true;
+                    $data['is_employee'] = false;
+                } else if($EmployeeAssessment->hr_sign == 0){
                     $data['is_hrm'] = true;
                     $data['is_manager'] = false;
                     $data['is_employee'] = false;
@@ -352,19 +365,25 @@ class EmployeeAssessmentController extends Controller
                 $employee_assessment_id = $prob->id;
             }
             // NOTIFICATIONs and EVAL STANARDS DATA Save from here onwards
-            if(isset($request->esa_duties)) {
+            if(isset($request->esa_duties) && Auth::user()->role_id != 1) {
                 // NOTIFICATION TRAY
                 $send_email = false;
                 $manager_id = User::where('user_id', Auth::user()->user_id)->where('user_type','Employee')->pluck('manager_id')->first();
                 add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,$manager_id,'Pending Manager Evaluation',$send_email);
             }
-            if(isset($request->manager_comments)){
+            if(isset($request->manager_comments) && Auth::user()->role_id != 1){
                 // Notification Tray
                 $hr_user_ids = User::where('role_id', 5)->get()->pluck('user_id')->toArray();
-                if(count($hr_user_ids)>0){
-                    for($i=0; $i<count($hr_user_ids); $i++){
-                        $send_email = false;
-                        add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,$hr_user_ids[$i],'Pending HR Evaluation',$send_email);
+                if(in_array($EmployeeAssessment->user_id,$hr_user_ids)){
+                    $system_user_admin_id = User::where('role_id', 1)->where('user_type','System User')->pluck('user_id')->first();
+                    $send_email = false;
+                    add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,$system_user_admin_id,'Pending HR Evaluation',$send_email);
+                }else{
+                    if(count($hr_user_ids)>0){
+                        for($i=0; $i<count($hr_user_ids); $i++){
+                            $send_email = false;
+                            add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,$hr_user_ids[$i],'Pending HR Evaluation',$send_email);
+                        }
                     }
                 }
             }
@@ -378,10 +397,32 @@ class EmployeeAssessmentController extends Controller
                     $remarker_id = $employee_record->employee->manager_id;
                     // NOTIFICATION TRAY
                     $hr_user_ids = User::where('role_id', 5)->get()->pluck('user_id')->toArray();
-                    if(count($hr_user_ids)>0){
-                        for($i=0; $i<count($hr_user_ids); $i++){
-                            $send_email = false;
-                            add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,$hr_user_ids[$i],'Pending HR Evaluation',$send_email);
+                    if(in_array($EmployeeAssessment->user_id,$hr_user_ids)){
+                        $system_user_admin_id = User::where('role_id', 1)->where('user_type','System User')->pluck('user_id')->first();
+                        $send_email = false;
+                        add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,$system_user_admin_id,'Pending HR Evaluation',$send_email);
+                    }else{
+                        if(count($hr_user_ids)>0){
+                            for($i=0; $i<count($hr_user_ids); $i++){
+                                $send_email = false;
+                                add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,$hr_user_ids[$i],'Pending HR Evaluation',$send_email);
+                            }
+                        }
+                    }
+                } else if(isset($request->esa_duties)) { //when admin fill user self form
+                    $remarker_id = $request->user_id;
+                    // NOTIFICATION TRAY
+                    if($EmployeeAssessment->manager_sign == 0){
+                        $send_email = false;
+                        $manager_id = User::where('user_id',  $request->user_id)->where('user_type','Employee')->pluck('manager_id')->first();
+                        add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,$manager_id,'Pending Manager Evaluation',$send_email);
+                    } else if($EmployeeAssessment->manager_sign == 1 && $EmployeeAssessment->employee_sign == 1){
+                        $hr_user_ids = User::where('role_id', 5)->get()->pluck('user_id')->toArray();
+                        if(count($hr_user_ids)>0){
+                            for($i=0; $i<count($hr_user_ids); $i++){
+                                $send_email = false;
+                                add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,$hr_user_ids[$i],'Pending HR Evaluation',$send_email);
+                            }
                         }
                     }
                 }
@@ -485,9 +526,6 @@ class EmployeeAssessmentController extends Controller
             $data['standards_average'] = $this->calculate_overall_rating_avg($EmployeeAssessment_data->id,$EmployeeAssessment_data->user_id);
             $data['employee_objectives'] = EmployeeObjectives::where('assessment_id',$EmployeeAssessment_data->id)
                 ->orderBy('added_on', 'desc')->get();
-            if(Auth::user()->role_id == 1){
-                $data['is_admin'] = true;
-            }
 
             if($EmployeeAssessment_data->employees->employee->manager_id == Auth::user()->user_id){
                 $data['is_manager'] = true;
@@ -498,6 +536,24 @@ class EmployeeAssessmentController extends Controller
             } else{
                 $data['is_employee'] = true;
                 if($EmployeeAssessment_data->user_id != Auth::user()->user_id && Auth::user()->role_id == 5){
+                    $data['is_hrm'] = true;
+                    $data['is_manager'] = false;
+                    $data['is_employee'] = false;
+                }
+            }
+
+            // For admin user checks
+            if(Auth::user()->role_id == 1){
+                $data['is_admin'] = true;
+                if($EmployeeAssessment_data->employee_sign == 0){
+                    $data['is_employee'] = true;
+                    $data['is_hrm'] = false;
+                    $data['is_manager'] = false;
+                } else if($EmployeeAssessment_data->manager_sign == 0){
+                    $data['is_hrm'] = false;
+                    $data['is_manager'] = true;
+                    $data['is_employee'] = false;
+                } else if($EmployeeAssessment_data->hr_sign == 0){
                     $data['is_hrm'] = true;
                     $data['is_manager'] = false;
                     $data['is_employee'] = false;

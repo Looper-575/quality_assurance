@@ -13,7 +13,7 @@
                             HR Observations & Comments
                         @elseif($is_manager && $EmployeeAssessment == true || ($is_hrm && $EmployeeAssessment->manager_sign == 0))
                             Department Head/Supervisor Evaluation and Remarks
-                        @elseif( ($is_employee || $is_manager || $is_hrm) && ($EmployeeAssessment == false || $initiated_employee_assessment == true ))
+                        @elseif( ($is_employee || $is_manager || $is_hrm) && $initiated_employee_assessment == true )
                             Employee Self Assessment
                         @else
                             ADMIN VIEW
@@ -28,13 +28,11 @@
                 @csrf
                 <input type="hidden" required name="id" value="{{$EmployeeAssessment ? $EmployeeAssessment->id : 0}}">
                 <input type="hidden" required name="employee_id" id="employee_id" >
-                @if(($is_employee) && ($EmployeeAssessment == false || $initiated_employee_assessment == true ))
+                @if($is_employee && $initiated_employee_assessment == true )
                     @include('employee_assessment.partials.employee_assessment_employee_form')
-                @endif
-                @if( ( ($is_admin || ($EmployeeAssessment && $EmployeeAssessment->employees->employee->manager_id == Auth::user()->user_id)) && $EmployeeAssessment->manager_sign == 0)  && ($EmployeeAssessment == true || $initiated_employee_assessment == true))
+                @elseif( ( ($is_admin || ($EmployeeAssessment && $EmployeeAssessment->employees->employee->manager_id == Auth::user()->user_id)) && $EmployeeAssessment->manager_sign == 0)  && ($EmployeeAssessment == true || $initiated_employee_assessment == true))
                     @include('employee_assessment.partials.employee_assessment_manager_form')
-                @endif
-                @if( ( ($is_admin  || $is_hrm ) && $EmployeeAssessment->hr_sign == 0 && $EmployeeAssessment->manager_sign == 1 ) && $EmployeeAssessment == true)
+                @elseif( ( ($is_admin  || $is_hrm ) && $EmployeeAssessment->hr_sign == 0 && $EmployeeAssessment->manager_sign == 1 ) && $EmployeeAssessment == true)
                     @include('employee_assessment.partials.employee_assessment_hr_form')
                 @endif
                 @include('employee_assessment.partials.employee_assessment_standards')
@@ -67,7 +65,7 @@
         $( document ).ready(function() {
             get_employee_details();
         });
-        let user_id = {{Auth::user()->user_id}};
+        let user_id = {{$EmployeeAssessment->user_id}};
         function get_employee_details() {
             $.get("{{route('get_employee_details')}}", { user_id: user_id} )
                 .done(function( data ) {

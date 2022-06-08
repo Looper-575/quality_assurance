@@ -14,7 +14,7 @@
     <div class="col-12">
         <div class="form-group">
             <div class="row">
-                <div class="{{( ($EmployeeAssessment == true && ( ($is_admin && $EmployeeAssessment->manager_sign == 1) || $is_hrm )) ? 'col-9 pe-0 pr-0' : 'col-12' )}}">
+                <div class="{{( ( ( ($is_admin  || $is_hrm ) && $EmployeeAssessment->hr_sign == 0 && $EmployeeAssessment->manager_sign == 1 ) && $EmployeeAssessment == true) ? 'col-9 pe-0 pr-0' : 'col-12' )}}">
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead class="text-center">
@@ -987,7 +987,7 @@
                                 </td>
                             </tr>
                             {{--  FOR MANAGERS ONLY --}}
-                            @if(( $is_admin || $is_manager || $is_hrm))
+                            @if( ($is_admin && !$is_employee )|| $is_manager || $is_hrm)
                                 <tr class="text-center">
                                     <td colspan="2">
                                         <div>
@@ -1111,7 +1111,7 @@
                         </table>
                     </div>
                 </div>
-                @if($EmployeeAssessment == true && ( ($is_admin && $EmployeeAssessment->manager_sign == 1) || $is_hrm ) )
+                @if( ( ($is_admin  || $is_hrm ) && $EmployeeAssessment->hr_sign == 0 && $EmployeeAssessment->manager_sign == 1 ) && $EmployeeAssessment == true)
                     <div class="col-3 ps-0 pl-0">
                         @include('employee_assessment.partials.evaluation_data')
                     </div>
