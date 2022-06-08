@@ -948,6 +948,7 @@ class PayrollController extends Controller
     }
     private function calculate_income_tax($user, $allowance, $deduction, $calculated_deductions, $attendace_log)
     {
+        // calculation income tax
         if(!$user->net_salary) { die('Salary not available for employee '.$user->full_name); }
         // basic salary plus all allowances and minus all deductions
         $basic_salary = $user->net_salary;
