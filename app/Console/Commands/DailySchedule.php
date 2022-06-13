@@ -129,7 +129,7 @@ class DailySchedule extends Command
         foreach ($users as $user){
             $employees_separation = EmployeeSeparation::whereStatus(1)
                 ->where('user_id',$user['user_id'])
-                ->where('effective_from', 'Notice Period')
+               // ->where('notice_period', 'To be Served')
                 ->orderBy('added_on', 'desc')->first();
             if($employees_separation){
                 if(strtotime($employees_separation->separation_date) == strtotime(get_date()) ) {

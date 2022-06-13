@@ -143,17 +143,11 @@ if (!function_exists('total_service')) {
     function total_service($startDate, $endDate)
     {
         if (strtotime($endDate) >= strtotime($startDate)) {
-            $holidays = array();
-            $date = $startDate;
-            $days = 0;
-            while ($date != $endDate) {
-                $date = date("Y-m-d", strtotime("+1 day", strtotime($date)));
-                $days++;
-            }
-            $years = floor($days / 365);
-            $months = floor($days / 30);
-            $days = $days - ($months*30);
-            $total_service =  $years . " Years " . $months ." Months " . $days ." days";
+            $diff = abs(strtotime($startDate) - strtotime($endDate));
+            $years = floor($diff / (365*60*60*24));
+            $months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24));
+            $days = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24)/ (60*60*24));
+            $total_service = $years." Year ".$months." Months ". $days." Days";
             return $total_service;
         } else {
             return "Please check the dates.";

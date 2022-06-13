@@ -59,6 +59,7 @@
                     <div class="col-12 mt-2">
                         <p><b>Detail:</b> <span>{{$separation->type}}</span>
                             <span class="m-l-100"><b>Notice Period:</b> {{$separation->notice_period}}</span>
+                            <span class="m-l-100"><b>Served:</b> {{working_days($separation->resignation_date, $separation->separation_date)}} Days</span>
                             </p>
                         <p class="mb-0"><b>
                             @foreach($payroll as $payroll_log)
@@ -80,7 +81,7 @@
                 <div class="row">
                         <div class="col-6 d-flex form-check p-3">
                             <div class="w-100 p-3" style="border: 2px solid #000000 !important;">
-                            <p><b>Clearance: </b>All assets other than those listed here under have been received.</p>
+                            <p><b>Clearance: </b>All deduction items other than those listed here under have been received.</p>
                             @if($final_settlement)
                                 <p><b>Amount to be Deducted : {{$final_settlement->asset_deduction_amount}}</b>
                             <?php $assets_not_returned = explode(',',$final_settlement->assets_not_returned) ?>
@@ -92,7 +93,7 @@
                                     <p><b>Amount to be Deducted :</b>
                                             <input type="number" name="asset_deduction_amount" id="asset_deduction_amount" readonly></p>
                                     <div class="m-form__group form-group">
-                                        <label>Please select the Assets, not returned</label>
+                                        <label>Please select the Deductions</label>
                                         <div class="m-checkbox-list">
                                         <label class="m-checkbox">
                                             <input type="checkbox" id="assets_not_returned" name="assets_not_returned"
@@ -116,7 +117,7 @@
                             <p><b>Earning Dues (in Days)</b></p>
                             @foreach($payroll as $payroll_log)
                                 <p>Salary ({{date('F Y', strtotime($payroll_log->form_date))}}) : Rs {{intval($payroll_log->user->employee->net_salary)}}</p>
-                                <p>Salary ({{date('F Y', strtotime($payroll_log->form_date))}} ({{$payroll_log->attendance_marked-$payroll_log->absents}} days)) : Rs {{intval(($payroll_log->user->employee->net_salary+($separation->bonus_deduction == 0 ? $payroll_log->allowance['total_allowance']:0) ) - $payroll_log->deductions['total_deductions'])}}</p>
+                                <p>Salary ({{date('F Y', strtotime($payroll_log->form_date))}} ({{$payroll_log->attendance_marked-$payroll_log->absents}} days)) : Rs {{intval($payroll_log->user->employee->net_salary - $payroll_log->deductions['total_deductions'])}}</p>
                                 <p>Dated : {{$payroll_log->form_date}} To {{$payroll_log->to_date}}</p>
                             @endforeach
                             </div>
@@ -145,7 +146,7 @@
                                 <tr>
                                     <td class="p-3" colspan="2">
                                         Salary {{date('"F Y"', strtotime($payroll_log->to_date))}}
-                                        <span class="float-right">Rs. {{intval($payroll_log->user->employee->net_salary)}}</span>
+                                        <span class="float-right">Rs. {{intval($payroll_log->user->employee->net_salary - ($payroll_log->allowance ? $payroll_log->allowance['details']['Medical']:0))}}</span>
                                         <br>
                                         @if($payroll_log->allowance != 0)
                                             @foreach($payroll_log->allowance['details'] as $index => $allowance)
@@ -158,18 +159,27 @@
                                             {{$index}} <span class="float-right">Rs. {{intval($deduction)}}</span><br>
                                         @endforeach
                                             @if($loop_count == 0)
-                                                <span> Assets Deductions <span class="float-right">Rs.<span id="assets_deduction"> {{ ($final_settlement == null ? 0 : $final_settlement->asset_deduction_amount) }}</span></span></span>
+                                                <span>Other Deductions <span class="float-right">Rs.<span id="assets_deduction"> {{ ($final_settlement == null ? 0 : $final_settlement->asset_deduction_amount) }}</span></span></span>
                                             @endif
                                     </td>
                                     @if($loop_count != 0 || count($payroll)==1)
                                         <td class="p-3" rowspan="2" style="rowspan: 2;">
-                                            <h1 class="float-right pr-5">Rs. <span class="total_salary_id">{{intval($total_salary)}}</span></h1>
-                                            <input type="hidden" name="salary_paid" id="salary_paid" value="{{intval($total_salary)}}">
+                                            <h1 class="float-right pr-5">Rs. <span class="total_salary_id">{{intval($total_salary - ($payroll_log->allowance ? $payroll_log->allowance['details']['Medical']:0))}}</span></h1>
+                                            <input type="hidden" name="salary_paid" id="salary_paid" value="{{intval($total_salary - ($payroll_log->allowance ? $payroll_log->allowance['details']['Medical']:0))}}">
                                         </td>
                                     @else
                                     @endif
                                 </tr>
                             @endforeach
+                                <tr>
+                                    <td  class="p-3" colspan="2">
+                                        @if($payroll_log->allowance != 0)
+                                            @foreach($last_month_sales['details'] as $index => $allowance)
+                                                {{$index}} <span class="float-right">Rs. {{intval($allowance)}}</span><br>
+                                            @endforeach
+                                        @endif
+                                    </td>
+                                </tr>
                             <tr>
                                 <td colspan="2">
                                     <b class="p-3" >
