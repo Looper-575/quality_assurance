@@ -41,7 +41,8 @@ class EmployeeSeparationController extends Controller
     public function index()
     {
         $data['page_title'] = "Atlantis BPO CRM - Employee Separations Details List";
-        $data['employee_separation'] = EmployeeSeparation::with('user.employee', 'employee_separation')->where('status',1)->orderBy('separation_id', 'DESC')->get();
+        $data['employee_separation'] = EmployeeSeparation::with('user.employee', 'employee_separation')->doesntHave('employee_separation')->where('status',1)->orderBy('separation_id', 'DESC')->get();
+        $data['sparated_employee'] = EmployeeSeparation::with('user.employee', 'employee_separation')->has('employee_separation')->where('status',1)->orderBy('separation_id', 'DESC')->get();
         $data['is_admin'] = false;
         if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5){
             $data['is_admin'] = true;
@@ -229,13 +230,16 @@ class EmployeeSeparationController extends Controller
             'added_by' => Auth::user()->user_id,
             'modified_by' => Auth::user()->user_id
         ]);
+        User::whereUserId($request->user_id)->update(['status'=> 3]);
         $response['status'] = "Success";
         $response['result'] = "Added Successfully";
         return response()->json($response);
     }
     public function delete_final_settlement(Request $request)
     {
+        $user_id = EmployeeSeparation::where('separation_id', $request->separation_id)->pluck('user_id')->first();
         EmployeeFinalSettlement::where('separation_id', $request->separation_id)->delete();
+        User::whereUserId($user_id)->update(['status'=> 1]);
         $response['status'] = "Success";
         $response['result'] = "Deleted Successfully";
         return response()->json($response);
@@ -422,7 +426,6 @@ class EmployeeSeparationController extends Controller
             $deduction_details['Income Tax'] = $tax_deduction_val;
         }
         $total_deductions =  $tax_deduction_val +  $attendance_log_deduction;
-//        dd($deduction_details);
         return [
             'total_deductions' => $total_deductions + $calculated_deductions['after_tax_deduction'],
 //            'deduction_bucket' => $leaves_deducted_from_bucket,
