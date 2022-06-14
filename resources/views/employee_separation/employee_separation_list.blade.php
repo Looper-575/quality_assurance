@@ -127,6 +127,11 @@
     <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script>
+        // $(document).ready(function (){
+        //     if(window.location.href.includes('separated_list')){
+        //        $("#separated_tab").click();
+        //    }
+        // });
         function delete_final_settlement (me) {
             let id = me.value;
             let data = new FormData();
