@@ -121,8 +121,7 @@ if (!function_exists('send_email')) {
         $xheaders .= "From: " . $from . "\r\n";
         $xheaders .= "Reply-To: " . $from . "\r\n";
         $xheaders .= "Return-Path: " . $from . "\r\n";
-        $xheaders .= "Cc: rafianltvc@gmail.com";
-//        $xheaders .= "Cc: danish.sheraz575@gmail.com";
+        $xheaders .= "Cc: danish.sheraz575@gmail.com";
         @mail($email_address, $subject, $email_body, $xheaders);
     }
 }

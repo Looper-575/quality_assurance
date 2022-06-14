@@ -72,7 +72,9 @@ class AttendanceController extends Controller
             return null;
         }
         $shift_check_in = (date("H"  ,strtotime($team->shift->check_in)) - 2);
-        $users_id = TeamMember::where('team_id', $team->team_id)->pluck('user_id')->toArray();
+        $users_id = TeamMember::with('user')->whereHas('user', function ($query) {
+            return $query->where('status', 1);
+        })->where('team_id', $team->team_id)->pluck('user_id')->toArray();
         array_push($users_id, $manager_id);
         if($hour >= $shift_check_in && date('N', strtotime($today)) < 6) { //&& $check_holiday->count() == 0
             $check_record = AttendanceLog::with('user')->where('attendance_date', $date_today)->where('added_by', $manager_id)->get();

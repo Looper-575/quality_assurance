@@ -20,6 +20,7 @@
             <form id="final_settlement_form" action="javascript:save_final_settlement()" method="post">
                 <div class="container-fluid">
                 @csrf
+                <input type="hidden" id="user_id" name="user_id" value="{{$separation->user->user_id}}">
                 <input type="hidden" id="separation_id" name="separation_id" value="{{$separation->separation_id}}">
                 <input type="hidden" id="last_working_day" name="last_working_day" value="{{ $separation->separation_date }}">
                 <input type="hidden" id="length_of_service" name="length_of_service" value="{{total_service($separation->user->employee->joining_date, $separation->separation_date)}}">
@@ -61,6 +62,16 @@
                             <span class="m-l-100"><b>Notice Period:</b> {{$separation->notice_period}}</span>
                             <span class="m-l-100"><b>Served:</b> {{working_days($separation->resignation_date, $separation->separation_date)}} Days</span>
                             </p>
+                        <div class="row">
+                            <div class="col-6">
+                                <p class="mb-0"><b>Reason</b></p>
+                                <p>{{$separation->reason}}</p>
+                            </div>
+                            <div class="col-6">
+                                <p class="mb-0"><b>General Comments</b></p>
+                                <p>{{$separation->general_comments}}</p>
+                            </div>
+                        </div>
                         <p class="mb-0"><b>
                             @foreach($payroll as $payroll_log)
                                 <span>
@@ -91,7 +102,7 @@
                             @else
                                 @if($separation->assets_list != NULL)
                                     <p><b>Amount to be Deducted :</b>
-                                            <input type="number" name="asset_deduction_amount" id="asset_deduction_amount" readonly></p>
+                                            <input type="number" class="border-0" name="asset_deduction_amount" id="asset_deduction_amount" readonly></p>
                                     <div class="m-form__group form-group">
                                         <label>Please select the Deductions</label>
                                         <div class="m-checkbox-list">
@@ -239,7 +250,7 @@
         function save_final_settlement(){
             let data = new FormData($('#final_settlement_form')[0]);
             let a = function() {
-                window.location.reload();
+                window.location.href = "{{route('employee_separation')}}"+'?active_tab=separated_list';
             }
             let arr = [a];
             call_ajax_with_functions('', '{{route('save_final_settlement')}}', data, arr);
