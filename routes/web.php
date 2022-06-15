@@ -492,12 +492,6 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::get('/view_document/{id}', 'App\Http\Controllers\TaskController@view_document')->name('view_document');
     // route for testing email
     Route::get('/send_laravel_email', 'App\Http\Controllers\NotificationsController@send_laravel_email')->name('send_laravel_email');
-    // Developer Tasks
-    Route::get('/tasks_list', 'App\Http\Controllers\TaskController@list')->name('tasks_list');
-    Route::get('/task_form/{id?}', 'App\Http\Controllers\TaskController@form')->name('task_form');
-    Route::post('/save_task', 'App\Http\Controllers\TaskController@save')->name('save_task');
-    Route::get('/view_single_task/{id}', 'App\Http\Controllers\TaskController@view_single_task')->name('view_single_task');
-    Route::post('/get_modules', 'App\Http\Controllers\TaskController@get_modules')->name('get_modules');
 
     // project module routes
     Route::group(['middleware' => ['check-permission:modules_list,view,0,0']], function() {

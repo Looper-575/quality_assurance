@@ -122,10 +122,10 @@
                     </div>
                     <div class="col-12 text-right">
                         @if(isset($separation))
-                        <a href="{{route('separation_view',['separation_id' => $separation->separation_id])}}" title="Final Settlement" class="btn btn-info"><i class="fa fa-certificate"></i>View</a>
+                        <a href="{{route('separation_view',['separation_id' => $separation->separation_id])}}" title="Generate Final Settlement" class="btn btn-info">Generate Final Settlement</a>
                         @endif
                         <button class="btn btn-danger mr-1" type="reset">Reset</button>
-                        <button class="btn btn-primary" type="submit">Submit</button>
+                        <button class="btn btn-success" type="submit">Save</button>
                     </div>
                 </div>
             </form>
@@ -141,7 +141,7 @@
         function save_separation_details(){
             let data = new FormData($('#separation_form')[0]);
             let a = function() {
-                window.location.href = "{{route('employee_separation')}}";
+                window.location.reload();
             }
             let arr = [a];
             call_ajax_with_functions('', '{{route('separation_save')}}', data, arr);
