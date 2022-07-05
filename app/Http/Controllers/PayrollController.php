@@ -919,13 +919,13 @@ class PayrollController extends Controller
                 if($rgu->bench_mark_type == 'mobile' && $user->role_id != 22) {
                     $allowance_amount = 0;
                     if($sales['total_rgu'] > $payroll_config->rgu_bench_mark) {
-                        $rgu_remaining_after_mobile = $sales['total_rgu'] - $mobile_sales; // 50-13 = 37
-                        if($rgu_remaining_after_mobile >= $payroll_config->rgu_bench_mark) {
+                        $rgu_remaining_after_without_mobile = $sales['total_rgu'] - $mobile_sales; // 50-13 = 37
+                        if($rgu_remaining_after_without_mobile >= $payroll_config->rgu_bench_mark) {
                             $allowance_amount = $rgu->after * $mobile_sales; // greater then bench_mark i.e 1500
                         } else {
                             // mobile = 7, RGU = 45, after_mobile = 38
                             // if after deducting mobile rgus are less than 40
-                            $rgu_val_before = $payroll_config->rgu_bench_mark - $rgu_remaining_after_mobile; // 40 - 38 = 2
+                            $rgu_val_before = $payroll_config->rgu_bench_mark - $rgu_remaining_after_without_mobile; // 40 - 38 = 2
                             $rgu_val_after = $mobile_sales-$rgu_val_before;
                             $allowance_amount = ($rgu_val_before*$rgu->before);
                             $allowance_amount += ($rgu_val_after*$rgu->after);

@@ -68,9 +68,7 @@
                                         <td>Pending</td>
                                     @endif
                                     @if(isset($transfer_list->user->team_member->team))
-
                                         @if(($transfer_list->user->team_member->team->team_lead_id == Auth::user()->user_id && $transfer_list->approved_my_supervisor == 0) || ($transfer_list->transfer_manager_id == Auth::user()->user_id && $transfer_list->approved_transfer_supervisor == 0 ))
-
                                         <td>
                                             <div class="btn-group btn-group-sm">
                                                 <button title="Reject" class="btn btn-danger p-3" onclick="reject_transfer(this);" value="{{$transfer_list->transfer_id}}" ><i class="fa fa-times"></i></button>
