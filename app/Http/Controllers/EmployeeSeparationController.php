@@ -614,6 +614,7 @@ class EmployeeSeparationController extends Controller
                     }
                 }
             }
+//            $details['Allowance Month'] = $to_date;
         }
         return [
             'allowances' => $total_allowance,
