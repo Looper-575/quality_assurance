@@ -12,9 +12,6 @@
                 <h3 class="m-portlet__head-text">Performance Improvement Plan Details</h3>
             </div>
             <div class="float-right mt-3">
-                <a href="{{route('employee_pip')}}"  class="btn btn-primary">
-                    Back
-                </a>
                 <div class="m-separator m-separator--dashed d-xl-none"></div>
             </div>
         </div>
@@ -100,10 +97,36 @@
                     <span>{{($pip->hr_approve == 1 ? 'Approved': 'Pending')}}</span>
                 </div>
             </div>
+            <div class="row">
+                <div class="col">
+                    @if($pip->employee_acknowledgement == 0 && $pip->user_id == Auth::user()->user_id)
+                        <button class="btn btn-info float-right" style="color: white !important;" onclick="employee_ack_pip_with_comments(this);" value="{{$pip->pip_id}}">Employee Acknowledge</button>
+                        <a href="{{route('employee_pip')}}"  class="btn btn-primary float-right mr-2">Back</a>
+                    @endif
+                </div>
+            </div>
         </div>
 </div>
 <!--end::Portlet-->
 @endsection
 @section('footer_scripts')
     <script src="{{asset('assets/bundles/select2/dist/js/select2.full.min.js') }}"></script>
+    <script>
+        function employee_ack_pip_with_comments (me) {
+            let pip_id = me.value;
+            let data = new FormData();
+            data.append('pip_id', pip_id);
+            data.append('_token', "{{csrf_token()}}");
+            call_ajax_modal('POST', '{{route('employee_ack_pip_with_comments')}}', data, 'Employee Comments on PIP');
+        }
+        function employee_ack_pip () {
+            let a = function () {
+                window.location.href = '{{route('employee_pip')}}';
+            }
+            let form_data = new FormData($('#employee_comments_pip')[0]);
+            form_data.append('_token', "{{csrf_token()}}");
+            let arr = [a];
+            call_ajax_with_functions('', '{{route('employee_ack_pip')}}', form_data, arr);
+        }
+    </script>
 @endsection

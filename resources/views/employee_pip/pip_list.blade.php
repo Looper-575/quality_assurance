@@ -74,9 +74,9 @@
                         <td>
                             <div class="btn-group btn-group-sm">
                                 <a href="{{route('view_pip',['pip_id' => $pip_detail->pip_id])}}" id="{{$pip_detail->pip_id}}" class="btn btn-primary text-white"><i class="la la-eye"></i></a>
-                                @if($is_employee)
+                                @if($is_employee || $pip_detail->user_id == Auth::user()->user_id)
                                     @if($pip_detail->employee_acknowledgement == 0)
-                                        <button class="btn btn-info" style="color: white !important;" onclick="employee_ack_pip_with_comments(this);" value="{{$pip_detail->pip_id}}">Employee Ack</button>
+                                        <button class="btn btn-info d-none" style="color: white !important;" onclick="employee_ack_pip_with_comments(this);" value="{{$pip_detail->pip_id}}">Employee Ack</button>
                                     @endif
                                 @else
                                     @if( ($is_manager || $is_hr) && ($pip_detail->employee_acknowledgement == 0) )

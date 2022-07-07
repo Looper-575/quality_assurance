@@ -161,7 +161,7 @@
                                         <br>
                                         @if($payroll_log->allowance != 0)
                                             @foreach($payroll_log->allowance['details'] as $index => $allowance)
-                                                {{$index}} <span class="float-right">Rs. {{intval($allowance)}}</span><br>
+                                                {{$index}} <span class="float-right">Rs. {{$allowance}}</span><br>
                                             @endforeach
                                         @endif
                                     </td>
@@ -184,9 +184,11 @@
                             @endforeach
                                 <tr>
                                     <td  class="p-3" colspan="2">
-                                        @if($payroll_log->allowance != 0)
-                                            @foreach($last_month_sales['details'] as $index => $allowance)
-                                                {{$index}} <span class="float-right">Rs. {{intval($allowance)}}</span><br>
+
+                                        @if(isset($payroll_log) && $payroll_log->allowance != 0)
+                                            <p>{{date('"F Y"', strtotime($last_month_sales['allowance_month']))}}</p>
+                                        @foreach($last_month_sales['details'] as $index => $allowance)
+                                                {{$index}} <span class="float-right">Rs. {{$allowance}}</span><br>
                                             @endforeach
                                         @endif
                                     </td>

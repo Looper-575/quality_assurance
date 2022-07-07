@@ -449,38 +449,40 @@ class EmployeeSeparationController extends Controller
                     ->orWhere('role_id',0);
             })
             ->whereStatus(1)->get();
+        $details = array();
+        $dependability = 0;
         if($attendace_log == false){
             $total_leaves = 0;
             $medical_allowance = 0;
             $month = $month;
         } else {
-            // Bonuses for last month
+            // Bonuses for last month 73533ba679bbbde62288e6854779a15f1fbca988
             $medical_allowance = $attendace_log->medical_allowance;
-            $month = date('Y-m-01',(strtotime ( '-1 month' , strtotime ( $month) ) ));
             $unmarked = $working_days - ($attendace_log->attendance_marked + $attendace_log->holiday_count);
-            $total_leaves = $attendace_log->leaves +  $attendace_log->absents + $unmarked;
-        }
-        $details = array();
-        $dependability = 0;
-        foreach ($dependability_allowance as $depend){
-            $dependability = $depend->allowance_value;
-            if ($total_leaves == 0) {
-                $dependability = $dependability;
-                if($dependability != 0){
-                    $details[$depend->title] = $dependability;
-                }
-            } else if ($total_leaves == 1) {
-                $dependability = $dependability / 2;
-                if($dependability != 0){
-                    $details[$depend->title] = $dependability;
-                }
-            } else if ($total_leaves > 1) {
-                $dependability = 0;
-                if($dependability != 0){
-                    $details[$depend->title] = $dependability;
+            $total_leaves = $attendace_log->leaves +  $attendace_log->absents;
+            $month = $attendace_log->form_date;
+            $dependability = 0;
+            foreach ($dependability_allowance as $depend){
+                $dependability = $depend->allowance_value;
+                if ($total_leaves == 0) {
+                    $dependability = $dependability;
+                    if($dependability != 0){
+                        $details[$depend->title] = $dependability;
+                    }
+                } else if ($total_leaves == 1) {
+                    $dependability = $dependability / 2;
+                    if($dependability != 0){
+                        $details[$depend->title] = $dependability;
+                    }
+                } else if ($total_leaves > 1) {
+                    $dependability = 0;
+                    if($dependability != 0){
+                        $details[$depend->title] = $dependability;
+                    }
                 }
             }
         }
+
         $year = date('Y', strtotime($month));
         $change_month = date('m', strtotime($month));
         if((0 == $year % 4) & (0 != $year % 100) | (0 == $year % 400))
@@ -501,7 +503,6 @@ class EmployeeSeparationController extends Controller
         }
         $from_date = $from_date.' 17:00:00';
         $to_date = $to_date.' 17:00:00';
-
         // manager team RGU count
         $is_manager = ManagerialRole::where('role_id',$user->role_id)->first();
         $manager_team_count = 0;
@@ -588,18 +589,18 @@ class EmployeeSeparationController extends Controller
                     $details['RGU Bonus (over 40)'] = ($sales['total_rgu']-$payroll_config->rgu_bench_mark)*$payroll_config->per_rgu;
                     $total_allowance['rgu'] = $details['RGU Bonus (over 40)'];
                 }
-                // Mobile Bonus
+                // Mobile Bonus 20540 35558
                 if($rgu->bench_mark_type == 'mobile') {
                     $allowance_amount = 0;
                     $mobile_sales = $this->get_user_play($user->user_id, $from_date, $to_date, $rgu->provider, 'mobile');
                     if($sales['total_rgu'] > $payroll_config->rgu_bench_mark) {
-                        $rgu_remaining_after_mobile = $sales['total_rgu'] - $mobile_sales; // 50-13 = 37
-                        if($rgu_remaining_after_mobile >= $payroll_config->rgu_bench_mark) {
+                        $rgu_remaining_after_without_mobile = $sales['total_rgu'] - $mobile_sales; // 50-13 = 37
+                        if($rgu_remaining_after_without_mobile >= $payroll_config->rgu_bench_mark) {
                             $allowance_amount = $rgu->after * $mobile_sales; // greater then bench_mark i.e 1500
                         } else {
                             // mobile = 7, RGU = 45, after_mobile = 38
                             // if after deducting mobile rgus are less than 40
-                            $rgu_val_before = $payroll_config->rgu_bench_mark - $rgu_remaining_after_mobile; // 40 - 38 = 2
+                            $rgu_val_before = $payroll_config->rgu_bench_mark - $rgu_remaining_after_without_mobile; // 40 - 38 = 2
                             $rgu_val_after = $mobile_sales-$rgu_val_before;
                             $allowance_amount = ($rgu_val_before*$rgu->before);
                             $allowance_amount += ($rgu_val_after*$rgu->after);
@@ -612,13 +613,13 @@ class EmployeeSeparationController extends Controller
                         $details['Mobile Allowance'] = $allowance_amount;
                     }
                 }
-//                dd($details,$from_date, $to_date);
             }
         }
         return [
             'allowances' => $total_allowance,
             'total_allowance' => $total_allowance['sp']+$total_allowance['dp']+$total_allowance['tp']+$total_allowance['mobile']+$total_allowance['rgu']+$total_allowance['dependebility']+$total_allowance['medical']+$total_allowance['manager_team_count'],
-            'details' => $details
+            'details' => $details,
+            'allowance_month' => $to_date
         ];
     }
     private function calculate_income_tax($user, $allowance, $deduction, $calculated_deductions, $attendace_log)
