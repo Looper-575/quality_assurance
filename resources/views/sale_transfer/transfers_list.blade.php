@@ -1,7 +1,7 @@
 @extends('layout.template')
 @section('header_scripts')
-   <link href="{{asset('assets/css/datatables.min.css')}}" rel="stylesheet" type="text/css" />
-      <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}"
+    <link href="{{asset('assets/css/datatables.min.css')}}" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}"
 @endsection
 @section('content')
     <?php
@@ -27,11 +27,11 @@
                         </a>
                     </li>
                     @if($has_permissions->add == 1)
-                    <li class="nav-item m-tabs__item">
-                        <a class="nav-link m-tabs__link" href="{{route('sales_transfer_form')}}" >
-                            Sales Transfer Form
-                        </a>
-                    </li>
+                        <li class="nav-item m-tabs__item">
+                            <a class="nav-link m-tabs__link" href="{{route('sales_transfer_form')}}" >
+                                Sales Transfer Form
+                            </a>
+                        </li>
                     @endif
                 </ul>
             </div>
@@ -67,25 +67,47 @@
                                     @if($transfer_list->approved_my_supervisor == 0 || $transfer_list->approved_transfer_supervisor == 0 || $transfer_list->admin_approved == 0)
                                         <td>Pending</td>
                                     @endif
-                                    @if(isset($transfer_list->user->team_member->team))
-                                        @if(($transfer_list->user->team_member->team->team_lead_id == Auth::user()->user_id && $transfer_list->approved_my_supervisor == 0) || ($transfer_list->transfer_manager_id == Auth::user()->user_id && $transfer_list->approved_transfer_supervisor == 0 ))
-                                        <td>
-                                            <div class="btn-group btn-group-sm">
-                                                <button title="Reject" class="btn btn-danger p-3" onclick="reject_transfer(this);" value="{{$transfer_list->transfer_id}}" ><i class="fa fa-times"></i></button>
-                                                <button title="Approve" class="btn btn-success p-3" onclick="approve_transfer(this);" value="{{$transfer_list->transfer_id}}" ><i class="fa fa-check"></i></button>
-                                            </div>
-                                        </td>
-                                     @else
-                                        <td></td>
-                                    @endif
+                                    @if($transfer_list->is_team_transfer != 1)
+                                        @if(($transfer_list->user->team_member->team->team_lead_id == Auth::user()->user_id && $transfer_list->approved_my_supervisor == 0))
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button title="Reject" class="btn btn-danger p-3" onclick="reject_transfer(this);" value="{{$transfer_list->transfer_id}}" ><i class="fa fa-times"></i></button>
+                                                    <button title="Approve" class="btn btn-success p-3" onclick="approve_transfer(this, true);" value="{{$transfer_list->transfer_id}}" ><i class="fa fa-check"></i></button>
+                                                </div>
+                                            </td>
+                                        @elseif($transfer_list->transfer_manager_id == Auth::user()->user_id && $transfer_list->approved_transfer_supervisor == 0)
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button title="Reject" class="btn btn-danger p-3" onclick="reject_transfer(this);" value="{{$transfer_list->transfer_id}}" ><i class="fa fa-times"></i></button>
+                                                    <button title="Approve" class="btn btn-success p-3" onclick="approve_transfer(this, false, true);" value="{{$transfer_list->transfer_id}}" ><i class="fa fa-check"></i></button>
+                                                </div>
+                                            </td>
+                                        @endif
+                                        @if(Auth::user()->role_id == 1 && $transfer_list->approved_my_supervisor == 1 && $transfer_list->approved_transfer_supervisor == 1)
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button title="Reject" class="btn btn-danger p-3" onclick="reject_transfer(this);" value="{{$transfer_list->transfer_id}}" ><i class="fa fa-times"></i></button>
+                                                    <button title="Approve" class="btn btn-success p-3" onclick="approve_transfer(this, false, false, true);" value="{{$transfer_list->transfer_id}}" ><i class="fa fa-check"></i></button>
+                                                </div>
+                                            </td>
+                                        @endif
                                     @else
-                                        @if(Auth::user()->role_id == 1 && $transfer_list->admin_approved == 0 )
-                                        <td>
-                                            <div class="btn-group btn-group-sm">
-                                                <button title="Reject" class="btn btn-danger p-3" onclick="reject_transfer(this);" value="{{$transfer_list->transfer_id}}" ><i class="fa fa-times"></i></button>
-                                                <button title="Approve" class="btn btn-success p-3" onclick="approve_transfer(this);" value="{{$transfer_list->transfer_id}}" ><i class="fa fa-check"></i></button>
-                                            </div>
-                                        </td>
+                                        {{-- same team transfer admin approval needed --}}
+                                        @if(($transfer_list->user->team_member->team->team_lead_id == Auth::user()->user_id && $transfer_list->approved_my_supervisor == 0))
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button title="Reject" class="btn btn-danger p-3" onclick="reject_transfer(this);" value="{{$transfer_list->transfer_id}}" ><i class="fa fa-times"></i></button>
+                                                    <button title="Approve" class="btn btn-success p-3" onclick="approve_transfer(this, true);" value="{{$transfer_list->transfer_id}}" ><i class="fa fa-check"></i></button>
+                                                </div>
+                                            </td>
+                                        @endif
+                                        @if(Auth::user()->role_id == 1 && $transfer_list->approved_my_supervisor == 1)
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button title="Reject" class="btn btn-danger p-3" onclick="reject_transfer(this);" value="{{$transfer_list->transfer_id}}" ><i class="fa fa-times"></i></button>
+                                                    <button title="Approve" class="btn btn-success p-3" onclick="approve_transfer(this, false, false, true);" value="{{$transfer_list->transfer_id}}" ><i class="fa fa-check"></i></button>
+                                                </div>
+                                            </td>
                                         @endif
                                     @endif
                                 </tr>
@@ -133,61 +155,63 @@
 @section('footer_scripts')
     <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
-
-
     <script>
+        function reject_transfer (me) {
+            let id = me.value;
+            let data = new FormData();
+            data.append('id', id);
+            data.append('_token', "{{csrf_token()}}");
+            swal({
+                title: "Are you sure?",
+                text: "Do you really want to reject this application",
+                icon: "warning",
+                buttons: [
+                    'No',
+                    'Yes, Reject Application!'
+                ],
+                dangerMode: true,
+            }).then(function(isConfirm) {
+                if (isConfirm) {
 
-    function reject_transfer (me) {
-        let id = me.value;
-        let data = new FormData();
-        data.append('id', id);
-        data.append('_token', "{{csrf_token()}}");
-        swal({
-            title: "Are you sure?",
-            text: "Do you really want to reject this application",
-            icon: "warning",
-            buttons: [
-                'No',
-                'Yes, Reject Application!'
-            ],
-            dangerMode: true,
-        }).then(function(isConfirm) {
-            if (isConfirm) {
-
-                let a = function () {
-                    window.location.href = "{{route('sales_transfer_list')}}";
-                };
-                let arr = [a];
-                call_ajax_with_functions('', '{{route('sales_transfer_reject')}}', data, arr);
+                    let a = function () {
+                        window.location.href = "{{route('sales_transfer_list')}}";
+                    };
+                    let arr = [a];
+                    call_ajax_with_functions('', '{{route('sales_transfer_reject')}}', data, arr);
+                }
+            });
+        }
+        function approve_transfer (me, my_supervisor=false, transfer_supervisor=false, admin_approval=false) {
+            let id = me.value;
+            let data = new FormData();
+            data.append('id', id);
+            data.append('_token', "{{csrf_token()}}");
+            if(my_supervisor){
+                data.append('approved_my_supervisor', 1);
             }
-        });
-    }
-
-    function approve_transfer (me) {
-        let id = me.value;
-        let data = new FormData();
-        data.append('id', id);
-        data.append('_token', "{{csrf_token()}}");
-        swal({
-            title: "Are you sure?",
-            text: "Do you really want to Accept this application",
-            buttons: [
-                'No',
-                'Yes, Accept Application!'
-            ],
-            dangerMode: false,
-        }).then(function(isConfirm) {
-            if (isConfirm) {
-                let a = function () {
-                    window.location.reload();
-                };
-                let arr = [a];
-                call_ajax_with_functions('', '{{route('sales_transfer_approve')}}', data, arr);
+            if(transfer_supervisor) {
+                data.append('approved_transfer_supervisor', 1);
             }
-        });
-    }
-
-
-
-</script>
+            if(admin_approval){
+                data.append('admin_approved', 1);
+            }
+            swal({
+                title: "Are you sure?",
+                text: "Do you really want to Accept this application",
+                buttons: [
+                    'No',
+                    'Yes, Accept Application!'
+                ],
+                dangerMode: false,
+            }).then(function(isConfirm) {
+                if (isConfirm) {
+                    let a = function () {
+                        window.location.reload();
+                    };
+                    let arr = [a];
+                    call_ajax_with_functions('', '{{route('sales_transfer_approve')}}', data, arr);
+                }
+            });
+        }
+    </script>
 @endsection

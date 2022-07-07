@@ -19,10 +19,8 @@
                         <div class="form-group">
                             <label class="form-check-label" for="sale_date">Sale Date </label>
                             <input  required  type="date"  class="form-control" name="sale_date" id="sale_date">
-
                         </div>
                     </div>
-
                     <div class="col-6">
                         <label for="sales_list" class="form-check-label">Select Sale</label>
                         <select class="form-control" name="sales_list" id="sales_list" required>
@@ -30,35 +28,27 @@
                         </select>
                     </div>
                 </div>
-                    <div class="row">
-
-                        <div class="col-6">
-                            <label for="agents" class="form-check-label">Transfer From</label>
-                            <select class="form-control" name="agents_from" id="agents_from" disabled>
-                                <option value="0">Agents</option>
-                                @foreach($agents as $agent)
-                                    <option value="{{ $agent->user_id }}"> {{ $agent->full_name  }}</option>
-                                @endforeach
-
-                            </select>
-                        </div>
-                        <div class="col-6">
-                            <label for="agents" class="form-check-label">Transfer to</label>
-                            <select class="form-control select2" name="agents" id="agents" required>
-                                @foreach($agents as $agent)
-                                    <option value="{{ $agent->user_id }}"> {{ $agent->full_name  }}</option>
-                                @endforeach
-
-                            </select>
-                        </div>
+                <div class="row">
+                    <div class="col-6">
+                        <label for="agents_from" class="form-check-label">Transfer From</label>
+                        <select class="form-control" name="agents_from" id="agents_from" disabled>
+                            <option value="0">Agents</option>
+                            @foreach($agents as $agent)
+                                <option value="{{ $agent->user_id }}"> {{ $agent->full_name  }}</option>
+                            @endforeach
+                        </select>
                     </div>
-
-
-
-
+                    <div class="col-6">
+                        <label for="agents" class="form-check-label">Transfer to</label>
+                        <select class="form-control select2" name="agents" id="agents" required>
+                            @foreach($agents as $agent)
+                                <option value="{{ $agent->user_id }}"> {{ $agent->full_name  }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
                 <div class="form-group mt-5">
                     <button type="submit" class="btn btn-primary"> Submit </button>
-
                 </div>
             </form>
         </div>
@@ -84,24 +74,21 @@
             data.append('method', 'POST');
             data.append('_token', "{{csrf_token()}}");
             data.append('sale_date', sale_date);
-           // console.log(sale_date);
+            // console.log(sale_date);
             call_ajax('sales_list', '{{ route('salesmade') }}', data);
-
         });
-
-
-       $('#transfer_form').submit(function(e) {
-           e.preventDefault();
-           let data = new FormData();
-           let user_id = $('#agents').val();
-           let sales_list = $('#sales_list').val();
-           let sales_date = $('#sales_date').val();
-           data.append('_token', "{{csrf_token()}}");
-           data.append('user_id', user_id);
-           data.append('sales_list', sales_list);
-           data.append('sales_date', sales_date);
+        $('#transfer_form').submit(function(e) {
+            e.preventDefault();
+            let data = new FormData();
+            let user_id = $('#agents').val();
+            let sales_list = $('#sales_list').val();
+            let sales_date = $('#sales_date').val();
+            data.append('_token', "{{csrf_token()}}");
+            data.append('user_id', user_id);
+            data.append('sales_list', sales_list);
+            data.append('sales_date', sales_date);
             let a = function () {
-               window.location.href = "{{route('sales_transfer_list')}}";
+                window.location.href = "{{route('sales_transfer_list')}}";
             };
             let arr = [a];
             call_ajax_with_functions('','{{route('transfersave')}}',data,arr);

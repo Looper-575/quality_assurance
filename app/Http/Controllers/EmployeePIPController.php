@@ -21,7 +21,10 @@ class EmployeePIPController extends Controller
             $data['is_manager'] = false;
             $data['is_employee'] = false;
         } else if(in_array(Auth::user()->role_id, $manager_ids)){
-            $data['pip'] = EmployeePIP::where('manager_id', Auth::user()->user_id)->orderBy('pip_id', 'DESC')->get();
+            $data['pip'] = EmployeePIP::where(function ($query){
+                $query->where('manager_id', Auth::user()->user_id)
+                    ->orWhere('user_id', Auth::user()->user_id);
+            })->orderBy('pip_id', 'DESC')->get();
             $data['is_hr'] = false;
             $data['is_manager'] = true;
             $data['is_employee'] = false;
