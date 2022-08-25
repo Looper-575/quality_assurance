@@ -2,6 +2,7 @@
 namespace App\Console\Commands;
 use App\Models\EmployeePIP;
 use App\Models\EmployeeSeparation;
+use App\Models\LeavesBucket;
 use App\Models\User;
 use Illuminate\Console\Command;
 use App\Models\Employee;
@@ -43,6 +44,8 @@ class DailySchedule extends Command
         $this->schedule_all_employees_self_assessment();
         $this->schedule_employees_separation();
         $this->employees_pip_review_notification();
+        $this->create_leave_bucket();
+        echo "test\n";
     }
     private function schedule_all_employees_self_assessment()
     {
@@ -129,7 +132,6 @@ class DailySchedule extends Command
         foreach ($users as $user){
             $employees_separation = EmployeeSeparation::whereStatus(1)
                 ->where('user_id',$user['user_id'])
-               // ->where('notice_period', 'To be Served')
                 ->orderBy('added_on', 'desc')->first();
             if($employees_separation){
                 if(strtotime($employees_separation->separation_date) == strtotime(get_date()) ) {
@@ -163,6 +165,19 @@ class DailySchedule extends Command
                     }
                 }
             }
+        }
+    }
+    private function create_leave_bucket(){
+        try {
+            echo "here we test";
+            dd('valid');
+            $expire_bucket = LeavesBucket::whereDate('start_date','<', now()->subYear())->get();
+            foreach ($expire_bucket as $bucket){
+                $expiryDate = date('Y-m-d', strtotime('+1 year', strtotime($bucket->start_date)) );
+                LeavesBucket::whereUserId($bucket->user_id)->update(['start_date' => $expiryDate, 'status' => 0]);
+            }
+        } catch (Exception $e) {
+            return false;
         }
     }
 }

@@ -75,7 +75,6 @@ class AttendanceController extends Controller
         $users_id = TeamMember::with('user')->whereHas('user', function ($query) {
             return $query->where('status', 1);
         })->where('team_id', $team->team_id)->pluck('user_id')->toArray();
-//        array_push($users_id, $manager_id);
         if($hour >= $shift_check_in && date('N', strtotime($today)) < 6) { //&& $check_holiday->count() == 0
             $check_record = AttendanceLog::with('user')->where('attendance_date', $date_today)->where('added_by', $manager_id)->get();
             $att_users_id = $check_record->pluck('user_id')->toArray();
@@ -121,13 +120,13 @@ class AttendanceController extends Controller
                 if (count($attendance_log_check) > 0 || $check_holiday != null) {
                     //if attendance already created and user on holiday then don't create attendance
                 } else {
-                    $leave = LeaveApplication::where('added_by', $user)
+                    $leave = LeaveApplication::where('added_by', $user_id)
                         ->where(['approved_by_manager' => 1, 'approved_by_hr' => 1])
                         ->where('leave_type_id', '!=', 4)
                         ->where('from', '<=', $date_today)
                         ->where('to','>=',$date_today)
                         ->first();
-                    $half_leave = LeaveApplication::where('added_by', $user)
+                    $half_leave = LeaveApplication::where('added_by', $user_id)
                         ->where(['approved_by_manager' => 1, 'approved_by_hr' => 1])
                         ->where('leave_type_id', 4)
                         ->where('from', '=', $date_today)
@@ -175,7 +174,6 @@ class AttendanceController extends Controller
         foreach ($team->team_member as $member){
             $members[] = $member->user_id;
         }
-        array_push($members, $team->team_lead_id);
         $date_today = date("Y-m-d"  ,strtotime($request->attendance_date));
         $data['not_marked'] = false;
         if(date('N', strtotime($date_today)) < 6) {

@@ -402,6 +402,7 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
         Route::get('/payroll_details','App\Http\Controllers\PayrollController@payroll_details')->name('payroll_details');
         Route::get('payroll_edit/{payroll_id}','App\Http\Controllers\PayrollController@payroll_edit')->name('payroll_edit');
         Route::post('/payroll_save_edit','App\Http\Controllers\PayrollController@payroll_save_edit')->name('payroll_save_edit');
+        Route::post('/calculate_income_tax','App\Http\Controllers\PayrollController@calculate_income_tax')->name('calculate_income_tax');
         Route::post('/payroll_reject','App\Http\Controllers\PayrollController@payroll_reject')->name('payroll_reject');
         Route::post('/payroll_approve','App\Http\Controllers\PayrollController@payroll_approve')->name('payroll_approve');
     });

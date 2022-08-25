@@ -22,7 +22,7 @@ class AttendanceLog extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'user_id' , 'time_in', 'time_out' , 'late', 'on_leave', 'half_leave', 'absent', 'attendance_date', 'added_by', 'modified_by',
+        'user_id' , 'time_in', 'time_out' , 'late','applied_leave', 'on_leave', 'half_leave', 'absent', 'attendance_date', 'added_by', 'modified_by',
     ];
 
     /**

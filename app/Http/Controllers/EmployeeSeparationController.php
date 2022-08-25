@@ -219,12 +219,16 @@ class EmployeeSeparationController extends Controller
         if($request->has('assets_not_returned')){
             $asset_not_returned = implode(',', $request->assets_not_returned);
         }
+        $salary_paid = 0;
+        if($request->has('salary_paid')){
+            $salary_paid = $request->salary_paid;
+        }
         EmployeeFinalSettlement::updateOrCreate([
             'separation_id' => $request->separation_id,
         ], [
             'last_working_day' => $request->last_working_day,
             'length_of_service' => $request->length_of_service,
-            'salary_paid' => $request->salary_paid,
+            'salary_paid' => $salary_paid,
             'asset_deduction_amount' => $request->asset_deduction_amount,
             'assets_not_returned' => $asset_not_returned,
             'added_by' => Auth::user()->user_id,
@@ -264,16 +268,18 @@ class EmployeeSeparationController extends Controller
         $holiday_count = 0;
         foreach ($check_holidays as $day){
             $holiday_count = 1;
-            if($day->date_from >= $form_date){
-                $from = $day->date_from;
-            } else {
-                $from = $form_date;
-            }
-            if($day->date_to <= $to_date){
-                $to = $day->date_to;
-            } else {
-                $to = $to_date;
-            }
+//            if($day->date_from >= $form_date){
+//                $from = $day->date_from;
+//            } else {
+//                $from = $form_date;
+//            }
+//            if($day->date_to <= $to_date){
+//                $to = $day->date_to;
+//            } else {
+//                $to = $to_date;
+//            }
+            $from = $day->date_from;
+            $to = $day->date_to;
             $start = strtotime($from);
             $end = strtotime($to);
             while(date('Y-m-d', $start) < date('Y-m-d', $end)){

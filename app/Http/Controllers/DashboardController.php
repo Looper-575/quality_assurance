@@ -442,7 +442,7 @@ class DashboardController extends Controller
         }
         foreach ($all_sales[1] as $item) {
             $data['all_sales_stats'][$item->full_name]['others'] = $item;
-            $data['all_sales_stats'][$item->full_name]['total'][] += $item->cable+$item->phone+$item->internet+$item->mobile;
+            $data['all_sales_stats'][$item->full_name]['total'][] = $item->cable+$item->phone+$item->internet+$item->mobile;
             $total += $item->cable+$item->phone+$item->internet+$item->mobile;
         }
         $data['all_sales_stats']['misc'] = [];

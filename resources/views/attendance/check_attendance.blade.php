@@ -63,7 +63,7 @@
             var last_three_day = new Date(three_day_ago - (3*days));
             last_three_day = last_three_day.toISOString().split("T")[0];
             $('#attendance_date').attr('max', today);
-            <?php if(Auth::user()->role_id != 1 && Auth::user()->role_id != 5){ ?>
+            <?php if(Auth::user()->role_id != 1){ ?>
             $('#attendance_date').attr('min', last_three_day);
             <?php } ?>
         });
