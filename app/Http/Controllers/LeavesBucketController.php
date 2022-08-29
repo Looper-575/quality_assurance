@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\LeavesBucket;
+use App\Models\Notifications;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,19 +12,20 @@ use Mockery\Exception;
 
 class LeavesBucketController extends Controller
 {
+    // hassan  6b09c629b3c496e17ec8ca8dd7aa0a0cd2acdf60
     public function __construct() { }
-
     public function index()
     {
         $data['page_title'] = "Leaves Bucket - Atlantis BPO CRM";
-        $data['leaves_bucket'] = LeavesBucket::with('employee')->orderBy('bucket_id', 'DESC')->get();
+        $data['unapproved_leaves_bucket'] = LeavesBucket::with('user')->whereHas('user', function ($query){
+            $query->whereStatus(1);
+        })->whereStatus(0)->get();
+        $data['approved_leaves_bucket'] = LeavesBucket::with('user')->whereHas('user', function ($query){
+            $query->whereStatus(1);
+        })->whereStatus(1)->get();
         $data['is_admin'] = false;
-        $data['is_hr'] = false;
-        if(Auth::user()->role_id == 1){
+        if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5){
             $data['is_admin'] = true;
-        }
-        if(Auth::user()->role_id == 5){
-            $data['is_hr'] = true;
         }
         return view('leaves_bucket.leaves_bucket_list' , $data);
     }
@@ -91,7 +93,18 @@ class LeavesBucketController extends Controller
         $data['remaining_leaves'] = get_leave_bucket_leaves($request->user_id);
         return view('leaves_bucket.view_leaves_bucket', $data);
     }
+    public function leave_bucket_approve(Request $request)
+    {
+        LeavesBucket::where('bucket_id', $request->id)->update(['status' => 1]);
+        $response['status'] = "Success";
+        $response['result'] = "Leave Bucket Accepted";
+        return response()->json($response);
+    }
+    public function leave_bucket_reject(Request $request)
+    {
+        LeavesBucket::where('bucket_id', $request->id)->update(['status' => 2]);
+        $response['status'] = "Success";
+        $response['result'] = "Leave Bucket Rejected";
+        return response()->json($response);
+    }
 }
-
-
-

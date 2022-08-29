@@ -45,7 +45,6 @@ class DailySchedule extends Command
         $this->schedule_employees_separation();
         $this->employees_pip_review_notification();
         $this->create_leave_bucket();
-        echo "test\n";
     }
     private function schedule_all_employees_self_assessment()
     {
@@ -169,14 +168,21 @@ class DailySchedule extends Command
     }
     private function create_leave_bucket(){
         try {
-            echo "here we test";
-            dd('valid');
-            $expire_bucket = LeavesBucket::whereDate('start_date','<', now()->subYear())->get();
+            $expire_bucket = LeavesBucket::with('user')->whereDate('start_date','<', now()->subYear())->whereHas('user', function ($query){
+                $query->whereStatus(1);
+            })->get();
             foreach ($expire_bucket as $bucket){
                 $expiryDate = date('Y-m-d', strtotime('+1 year', strtotime($bucket->start_date)) );
                 LeavesBucket::whereUserId($bucket->user_id)->update(['start_date' => $expiryDate, 'status' => 0]);
+
+                $send_email = false;
+                // notification for hr to approve leave bucket
+                add_notifications('leaves_bucket','leaves_bucket',$bucket->bucket_id,43, "Pending Leave Bucket Approvel" ,$send_email);
+                echo "Leaves Bucket Created!\n";
             }
         } catch (Exception $e) {
+            echo "Check record for leaves bucket\n";
+            echo $e;
             return false;
         }
     }

@@ -66,17 +66,17 @@ class PayrollController extends Controller
             if((0 == $year % 4) & (0 != $year % 100) | (0 == $year % 400))
             {
                 $startDate = date('Y-m-29',(strtotime ( '-1 month' , strtotime ( $request->year_month) ) ));
-                $endDate = date('Y-m-29',(strtotime ( $request->year_month)));
+                $endDate = date('Y-m-28',(strtotime ( $request->year_month)));
             } else {
                 if($change_month == 02){
                     $startDate = date('Y-m-29',(strtotime ( '-1 month' , strtotime ( $request->year_month) ) ));
                     $endDate = date('Y-m-28',(strtotime ( '+1 month' , strtotime ( $request->year_month) ) ));
                 } elseif ($change_month == 03){
-                    $startDate = date('Y-m-28',(strtotime ( $request->year_month) ));
-                    $endDate = date('Y-m-29',(strtotime ( $request->year_month)));
+                    $startDate = date('Y-m-t',(strtotime ( $request->year_month) ));
+                    $endDate = date('Y-m-28',(strtotime ( $request->year_month)));
                 } else {
                     $startDate = date('Y-m-29',(strtotime ( '-1 month' , strtotime ( $request->year_month) ) ));
-                    $endDate = date('Y-m-29',(strtotime ( $request->year_month)));
+                    $endDate = date('Y-m-28',(strtotime ( $request->year_month)));
                 }
             }
             if($request->user[0] == 0) {
@@ -551,6 +551,7 @@ class PayrollController extends Controller
                 $payslips = Payroll::with('user.employee', 'payroll_deduction', 'payroll_allowance')->where('salary_month',date('Y-m-t', strtotime($request->year_month)).' 23:59:59')->whereStatus(1)->whereHrApproved(1)->orderBy('payroll_id', 'desc')->get();
                 for ($i=0; $i<count($payslips); $i++){
                     $eobi = 0;
+                    $income_tax = 0;
                     $deduction_amount = 0;
                     foreach ($payslips[$i]->payroll_deduction as $ded)
                     {
@@ -799,7 +800,7 @@ class PayrollController extends Controller
                     ->orWhere('role_id',0);
             })
             ->whereStatus(1)->get()->pluck('title', 'value')->toArray();
-        $unmarked_days_wage = ($working_days - ($attendace_log->attendance_marked + $holiday_count)) * ($user->net_salary/$working_days);
+        $unmarked_days_wage = ($working_days - ($attendace_log->attendance_marked + $holiday_count)) * ($user->net_salary/22);
         if($total_absents_deduction + $unmarked_days_wage != 0){
             $deduction_details[$total_absents_deduction + $unmarked_days_wage] = 'Absent/Late/Half';
         }
