@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Department;
+use App\Models\EmployeeAssessment;
 use App\Models\EmployeeCompanyReference;
 use App\Models\EmployeeDocs;
 use App\Models\EmployeeEducation;
@@ -13,6 +14,7 @@ use App\Models\EmployeeKin;
 use App\Models\LeavesBucket;
 use App\Models\User;
 use App\Models\Employee;
+use App\Models\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -33,7 +35,33 @@ class EmployeeController extends Controller
             $data['employee_lists'] = Employee::where('user_id' , Auth::user()->user_id)->orderBy('employee_id', 'DESC')->get();
             $data['isLocked'] = Employee::where('user_id' , Auth::user()->user_id)->pluck('locked')->first();
         }
+        $data['departments'] = Department::whereStatus(1)->get();
+        $data['roles'] = UserRole::whereStatus(1)->get();
         return view('employees.employee_list', $data);
+    }
+    public function employee_search(Request $request)
+    {
+        $query = Employee::with('employee')->where('status' , 1);
+        if(isset($request->full_name)){
+            $query->where('full_name', 'like', "%{$request->full_name}%");
+        }
+        if(isset($request->email)){
+            $query->where('email', 'like', "%{$request->email}%");
+        }
+        if(isset($request->employment_type)){
+            $query->where('employment_type', $request->employment_type);
+        }
+        if(isset($request->department)){
+            $query->where('department_id', $request->department);
+        }
+        if(isset($request->role) && $request->role[0] != 0){
+            $role = $request->role;
+            $query->whereHas('employee', function ($sub_query) use ($role) {
+                $sub_query->whereIn('role_id', $role);
+            });
+        }
+        $data['employee_lists'] = $query->orderBy('employee_id', 'DESC')->get();
+        return view('employees.partials.employee_data', $data);
     }
     public function employee_form(Request $request)
     {

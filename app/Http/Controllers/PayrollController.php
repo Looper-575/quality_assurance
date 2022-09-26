@@ -133,7 +133,7 @@ class PayrollController extends Controller
         DB::beginTransaction();
         try {
             foreach ($request['user_id'] as $key => $value){
-                $salary_month = date('Y-m-t', strtotime($request['salary_month'][$key])).' 23:59:59';
+                $salary_month = date('Y-m-28', strtotime($request['salary_month'][$key])).' 23:59:59';
                 $model = new Payroll;
                 $model->user_id = $value;
                 $model->salary_month = $salary_month;

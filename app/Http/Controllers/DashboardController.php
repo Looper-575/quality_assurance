@@ -59,11 +59,10 @@ class DashboardController extends Controller
         // Current Month Attendance Log
         // MY Attendance Log
         $attendance_log = AttendanceLog::with('user.employee')
-            ->select(DB::raw('sum(late) as `lates`, sum(absent) as `absents`, sum(on_leave) as `leaves` , sum(applied_leave) as `applied_leave`, sum(half_leave) as `half_leaves` , count(user_id) as `attendance_marked`, ANY_VALUE(user_id) as user_id'))
+            ->select(DB::raw('sum(late) as `lates`, sum(absent) as `absents`, sum(on_leave) as `leaves` , sum(applied_leave) as `applied_leave`, sum(half_leave) as `half_leaves` , count(user_id) as `attendance_marked`, ANY_VALUE(user_id) as user_id, ANY_VALUE(attendance_date) as attendance_date'))
             ->where('user_id', Auth::user()->user_id)
             ->where(DB::raw("(DATE_FORMAT(attendance_date,'%m'))"),date('m'))
             ->first();
-        $curr_month_working_days = working_days(date('Y-m-01', strtotime($attendance_log->month)), date('Y-m-t', strtotime($attendance_log->month)));
         if($attendance_log){
             if($attendance_log->lates != null){
                 $data['lates'] = $attendance_log->lates;
@@ -86,7 +85,6 @@ class DashboardController extends Controller
                 $data['half_leaves'] = 0;
             }
             $data['presents'] = $attendance_log->attendance_marked - $attendance_log->absents - $attendance_log->leaves;
-            $data['unmarked'] = $curr_month_working_days - $attendance_log->attendance_marked;
         }else{
             $data['lates'] = 0;
             $data['absents'] = 0;
@@ -208,7 +206,10 @@ class DashboardController extends Controller
             }
         }
         ///////////////////////////////////////////
-        $birthday = Employee::select(DB::raw("full_name , DATE_FORMAT(date_of_birth,'%m-%d') as birthday"))->whereStatus(1)->get()->toArray();
+        $birthday = Employee::select(DB::raw("full_name , DATE_FORMAT(date_of_birth,'%m-%d') as birthday"))->whereStatus(1)
+            ->whereHas('employee', function ($query){
+                $query->where('status', 1);
+            })->get()->toArray();
         $birthday_events[] = array();
         foreach($birthday as $event) {
             $birthday_start = date("Y").'-'.$event['birthday'].' 00:00:00';
@@ -309,7 +310,11 @@ class DashboardController extends Controller
         }
        // dd($data['hr_pending_appraisals'], $hr_pending_appraisals);
         /////////////////////////////////////////////////////////
-        $birthday = Employee::select(DB::raw("full_name , DATE_FORMAT(date_of_birth,'%m-%d') as birthday"))->whereStatus(1)->get()->toArray();
+        $birthday = Employee::with('employee')->select(DB::raw("full_name , DATE_FORMAT(date_of_birth,'%m-%d') as birthday"))->whereStatus(1)
+            ->whereHas('employee', function ($query){
+                $query->where('status', 1);
+            })
+            ->get()->toArray();
         $birthday_events[] = array();
         foreach($birthday as $event) {
             $birthday_start = date("Y").'-'.$event['birthday'].' 00:00:00';
@@ -910,8 +915,12 @@ FROM all_sales  WHERE added_on>="'.$from_date.'" AND added_on<="'.$to_date.'" AN
     private function get_employees_assessment_for_calender()
     {
         $data = array();
-        $employees = Employee::with('employee:user_id,user_type')
-            ->whereStatus(1)->select('user_id','full_name','joining_date','confirmation_date')->get()->toArray();
+        $employees = Employee::with('employee:user_id,user_type,status')
+            ->whereStatus(1)->select('user_id','full_name','joining_date','confirmation_date')
+            ->whereHas('employee', function ($query){
+                $query->where('status', 1);
+            })
+            ->get()->toArray();
         foreach ($employees as $employee){
             $employee_assessment = false;
             // Already Appraisal record check to get last appraisal date

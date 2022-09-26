@@ -46,7 +46,7 @@
                 </div>
                 <div class="col-4">
                     <span class="font-bold font-14">Total Service:</span>
-                    <span class="font-bold font-12">{{ $EmployeeAssessment->total_service }}</span>
+                    <span class="font-bold font-12">{{$total_service ? $total_service : ''}}</span>
                 </div>
             </div>
             @if($is_employee || $is_hrm || $is_admin)

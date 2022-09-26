@@ -181,12 +181,29 @@
                                 </div>
                             </div>
                         </div>
-                    <div class="col-3 is_confirmed d-none">
-                        <div class="form-group">
-                            <label for="confirmation_date"> Confirmation Date</label>
-                            <input name="confirmation_date" type="date" id="confirmation_date" value="{{$employee ? $employee->confirmation_date : ''}}" class="form-control">
+                        <div class="col-3 is_confirmed d-none">
+                            <div class="form-group">
+                                <label for="confirmation_date"> Confirmation Date</label>
+                                <input name="confirmation_date" type="date" id="confirmation_date" value="{{$employee ? $employee->confirmation_date : ''}}" class="form-control">
+                            </div>
                         </div>
-                    </div>
+                        <div class="col-3">
+                            <div class="form-group m-form__group">
+                                <label  for="conveyance_allowance"> Employment Type</label>
+                                <div class="m-radio-inline">
+                                    <label class="m-radio m-radio--solid m-radio--brand">
+                                        <input type="radio" name="employment_type" value="Contractual" {{($employee and $employee->employment_type == 'Contractual')? 'checked' : ''}} required class="form-control">
+                                        Contractual
+                                        <span></span>
+                                    </label>
+                                    <label class="m-radio m-radio--solid m-radio--brand">
+                                        <input type="radio" name="employment_type" value="Permanent" {{($employee and $employee->employment_type == 'Permanent')? 'checked' : ''}} required class="form-control">
+                                        Permanent
+                                        <span></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                         <div class="col-3">
                             <div class="form-group m-form__group">
                                 <label  for="conveyance_allowance"> Transport Facility</label>

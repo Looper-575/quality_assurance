@@ -127,8 +127,8 @@
                             <div class="w-100 p-3" style="border: 2px solid #000000 !important;">
                             <p><b>Earning Dues (in Days)</b></p>
                             @foreach($payroll as $payroll_log)
-                                <p>Salary ({{date('F Y', strtotime($payroll_log->form_date))}}) : Rs {{intval($payroll_log->user->employee->net_salary)}}</p>
-                                <p>Salary ({{date('F Y', strtotime($payroll_log->form_date))}} ({{$payroll_log->attendance_marked-$payroll_log->absents}} days)) : Rs {{intval($payroll_log->user->employee->net_salary - $payroll_log->deductions['total_deductions'])}}</p>
+                                <p>Salary ({{date('F Y', strtotime($payroll_log->to_date))}}) : Rs {{intval($payroll_log->user->employee->net_salary)}}</p>
+                                <p>Salary ({{date('F Y', strtotime($payroll_log->to_date))}} ({{$payroll_log->attendance_marked-$payroll_log->absents}} days)) : Rs {{intval($payroll_log->user->employee->net_salary - $payroll_log->deductions['total_deductions'])}}</p>
                                 <p>Dated : {{$payroll_log->form_date}} To {{$payroll_log->to_date}}</p>
                             @endforeach
                             </div>

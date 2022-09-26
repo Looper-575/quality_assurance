@@ -12,7 +12,6 @@ use Mockery\Exception;
 
 class LeavesBucketController extends Controller
 {
-    // hassan  6b09c629b3c496e17ec8ca8dd7aa0a0cd2acdf60
     public function __construct() { }
     public function index()
     {
@@ -86,7 +85,7 @@ class LeavesBucketController extends Controller
     {
         $data['page_title'] = "View Leaves Bucket Details - Atlantis BPO CRM";
         if(isset($request->bucket_id)) {
-            $data['leaves_bucket'] = LeavesBucket::where('bucket_id', $request->bucket_id)->get()[0];
+            $data['leaves_bucket'] = LeavesBucket::with('user')->where('bucket_id', $request->bucket_id)->get()[0];
         }else{
             $data['leaves_bucket'] = false;
         }

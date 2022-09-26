@@ -559,6 +559,14 @@ class EmployeeAssessmentController extends Controller
                     $data['is_employee'] = false;
                 }
             }
+
+            $diff = abs(strtotime($EmployeeAssessment_data->employees->joining_date) - strtotime(get_date()));
+            $years = floor($diff / (365*60*60*24));
+            $months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24));
+            $days = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24)/ (60*60*24));
+
+            $total_service = $years." Year ".$months." Months ". $days." Days";
+            $data['total_service'] = $total_service;
         }else{
             $data['EmployeeAssessment'] = false;
             $data['employee_self_evaluation'] = false;

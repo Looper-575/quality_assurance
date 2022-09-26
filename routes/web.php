@@ -312,6 +312,7 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::group(['middleware' => ['check-permission:employees,view,0,0']], function() {
         Route::get('/employees', 'App\Http\Controllers\EmployeeController@index')->name('employees');
     });
+    Route::post('/employee_search', 'App\Http\Controllers\EmployeeController@employee_search')->name('employee_search');
     Route::get('/employee_form_wizard', 'App\Http\Controllers\EmployeeController@employee_form')->name('employee_form');
     Route::post('/employee_save', 'App\Http\Controllers\EmployeeController@employee_info_save')->name('employee_save');
     Route::group(['middleware' => ['is-admin']], function() {
