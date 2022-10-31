@@ -171,6 +171,8 @@ class EmployeeController extends Controller
                     $employee_info_data['net_salary'] = $request->net_salary;
                     $employee_info_data['conveyance_allowance'] = $request->conveyance_allowance;
                     $employee_info_data['employment_status'] = $request->employment_status;
+                    $employee_info_data['transport_allowance'] = $request->transport_allowance;
+                    $employee_info_data['eobi_benefit'] = $request->eobi_benefit;
             }
             if($request->hasFile('image')) {
                 if(count($employee)>0){

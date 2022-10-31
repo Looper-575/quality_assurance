@@ -221,6 +221,18 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-3">
+                            <div class="form-group m-form__group">
+                                <label  for="transport_allowance"> Transport Allowance</label>
+                                <input name="transport_allowance" id="transport_allowance" value="{{$employee ? $employee->transport_allowance : ''}}" required type="number" placeholder="" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group m-form__group">
+                                <label  for="eobi_benefit"> EOBI Benefit</label>
+                                <input name="eobi_benefit" id="eobi_benefit" value="{{$employee ? $employee->eobi_benefit : ''}}" required type="number" placeholder="" class="form-control">
+                            </div>
+                        </div>
                     @endif
                     <div class="col-3">
                         <div class="form-group m-form__group">

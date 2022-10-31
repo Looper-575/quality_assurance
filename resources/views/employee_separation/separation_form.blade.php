@@ -48,6 +48,78 @@
                             <textarea class="form-control" name="reason" id="reason" cols="30" rows="10">{{isset($separation) ? $separation->reason : ''}}</textarea>
                         </div>
                         <div class="form-group">
+                            <span class="font-bold font-14"> Allowances (To Be Added)</span>
+                            <div class="d-flex assets_div m-b-5">
+                                <span class="asset mr-5 font-14"> Allowances Title</span>
+                                <span class="asset font-14"> Allowances Amount</span>
+                                <button type="button" onclick="add_new_allowance(this)"
+                                        class="btn btn-sm btn-primary add_new_asset">+
+                                </button>
+                            </div>
+                            <div id="allowance_list">
+                                @if(isset($separation) && $separation->allowance_list != NULL)
+                                    <?php $assets_list = json_decode($separation->allowance_list); ?>
+                                    @foreach ($assets_list as $key => $asset)
+                                        <div class="d-flex assets_allowance_div m-b-5">
+                                            <input name="allowance_list[]" value="{{$asset->item}}" type="text" class="form-control m-r-5 asset">
+                                            <input name="allowance_amount[]" value="{{$asset->price}}" min="0" type="number" class="form-control m-r-5 asset">
+                                            <button type="button" onclick="remove_allowance_row(this);" class="btn btn-sm btn_remove_edu btn-close btn-danger">X</button>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <div class="d-flex assets_div m-b-5">
+                                        <input name="allowance_list[]" value="" type="text" class="form-control m-r-5 asset">
+                                        <input name="allowance_amount[]" value="" min="0" type="number" class="form-control m-r-5 asset">
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <span class="font-bold font-14">Bonus Deduction</span>
+                            <div class="m-radio-inline mt-4">
+                                <label class="m-radio m-radio--solid m-radio--brand">
+                                    <input type="radio" name="bonus_deduction" value="1" {{(isset($separation) && $separation->bonus_deduction == '1')? 'checked' : ''}} class="form-control">
+                                    Yes
+                                    <span></span>
+                                </label>
+                                <label class="m-radio m-radio--solid m-radio--brand">
+                                    <input type="radio" name="bonus_deduction" value="0" {{(isset($separation) && $separation->bonus_deduction == '0')? 'checked' : ''}} class="form-control">
+                                    No
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="m-checkbox-inline">
+                                <label class="m-checkbox m-checkbox--solid m-checkbox--brand">
+                                    <input type="checkbox" name="departmental_clearance" value="1" required>
+                                    Clearance from other departments.
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <span class="font-bold font-14"> Resignation Date</span>
+                            <input  class="form-control" name="resignation_date" id="resignation_date" value="{{isset($separation) ? $separation->resignation_date : get_date()}}" type="date">
+                        </div>
+                        <div class="form-group">
+                            <span class="font-bold font-14"> Suspend User Account</span>
+                            <select name="disable_user_account" id="disable_user_account" required class="form-control">
+                                <option {{isset($separation) ? ($separation->type == 'Immediate' ? 'selected' : '' ): ''}} value="Immediate">Immediate </option>
+                                <option {{isset($separation) ? ($separation->type == 'Upon Separation' ? 'selected' : '' ): ''}} value="Upon Separation">Upon Separation </option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <span class="font-bold font-14"> Separation Date</span>
+                            <input  class="form-control"  name="separation_date" id="separation_date" value="{{isset($separation) ? $separation->separation_date : ''}}" type="date">
+                        </div>
+                        <div class="form-group">
+                            <span class="font-bold font-14"> General Comments</span>
+                            <textarea class="form-control" name="general_comments" id="general_comments" cols="30" rows="10">{{isset($separation) ? $separation->general_comments : ''}}</textarea>
+                        </div>
+                        <div class="form-group">
                             <span class="font-bold font-14"> Deductions (To Be Deducted)</span>
                             <div class="d-flex assets_div m-b-5">
                                 <span class="asset mr-5 font-14"> Deduction Title</span>
@@ -75,51 +147,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-6">
-                        <div class="form-group">
-                            <span class="font-bold font-14"> Resignation Date</span>
-                            <input  class="form-control" name="resignation_date" id="resignation_date" value="{{isset($separation) ? $separation->resignation_date : get_date()}}" type="date">
-                        </div>
-                        <div class="form-group">
-                            <span class="font-bold font-14"> Suspend User Account</span>
-                            <select name="disable_user_account" id="disable_user_account" required class="form-control">
-                                <option {{isset($separation) ? ($separation->type == 'Immediate' ? 'selected' : '' ): ''}} value="Immediate">Immediate </option>
-                                <option {{isset($separation) ? ($separation->type == 'Upon Separation' ? 'selected' : '' ): ''}} value="Upon Separation">Upon Separation </option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <span class="font-bold font-14"> Separation Date</span>
-                            <input  class="form-control"  name="separation_date" id="separation_date" value="{{isset($separation) ? $separation->separation_date : ''}}" type="date">
-                        </div>
-                        <div class="form-group">
-                            <span class="font-bold font-14"> General Comments</span>
-                            <textarea class="form-control" name="general_comments" id="general_comments" cols="30" rows="10">{{isset($separation) ? $separation->general_comments : ''}}</textarea>
-                        </div>
-                        <div class="form-group">
-                            <span class="font-bold font-14">Bonus Deduction</span>
-                            <div class="m-radio-inline mt-4">
-                                <label class="m-radio m-radio--solid m-radio--brand">
-                                    <input type="radio" name="bonus_deduction" value="1" {{(isset($separation) && $separation->bonus_deduction == '1')? 'checked' : ''}} class="form-control">
-                                    Yes
-                                    <span></span>
-                                </label>
-                                <label class="m-radio m-radio--solid m-radio--brand">
-                                    <input type="radio" name="bonus_deduction" value="0" {{(isset($separation) && $separation->bonus_deduction == '0')? 'checked' : ''}} class="form-control">
-                                    No
-                                    <span></span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="m-checkbox-inline">
-                                <label class="m-checkbox m-checkbox--solid m-checkbox--brand">
-                                    <input type="checkbox" name="departmental_clearance" value="1" required>
-                                    Clearance from other departments.
-                                    <span></span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
                     <div class="col-12 text-right">
                         @if(isset($separation))
                         <a href="{{route('separation_view',['separation_id' => $separation->separation_id])}}" title="Generate Final Settlement" class="btn btn-info">Generate Final Settlement</a>
@@ -141,7 +168,7 @@
         function save_separation_details(){
             let data = new FormData($('#separation_form')[0]);
             let a = function() {
-                window.location.reload();
+                // window.location.reload();
             }
             let arr = [a];
             call_ajax_with_functions('', '{{route('separation_save')}}', data, arr);
@@ -157,6 +184,20 @@
         // remove button for all added assets list
         function remove_row(me) {
             $(me).closest('.assets_div').fadeOut('slow', function () {
+                this.remove();
+            })
+        }
+        function add_new_allowance(me){
+            let new_allowance = (function () {/*<div class="d-flex m-b-5 assets_allowance_div"><input name="allowance_list[]" value="" required type="text" class="form-control m-r-5 asset">
+                                        <input name="allowance_amount[]" value="" min="0" required type="number" class="form-control m-r-5 asset">
+                                        <button type="button" onclick="remove_allowance_row(this);" class="btn btn-sm btn_remove_edu btn-close btn-danger">X</button></div>*/}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1];
+            let new_allowance_input = $(new_allowance);
+            $('#allowance_list').append(new_allowance_input);
+            $(me).closest('.assets_allowance_div').fadeIn('slow');
+        }
+        // remove button for all added allowance list
+        function remove_allowance_row(me) {
+            $(me).closest('.assets_allowance_div').fadeOut('slow', function () {
                 this.remove();
             })
         }

@@ -81,7 +81,8 @@ class PayrollController extends Controller
             }
             if($request->user[0] == 0) {
                 $user_ids = User::has('Employee')->where('user_type', 'Employee')->where('status', 1)->get()->pluck('user_id')->toArray();
-                $payroll = Payroll::where('salary_month',date('Y-m-t', strtotime($request->year_month)).' 23:59:59')
+                $payroll = Payroll::whereYear('salary_month',date('Y', strtotime($request->year_month)))
+                    ->whereMonth('salary_month',date('m', strtotime($request->year_month)))
                     ->whereStatus(1)
                     ->where(function ($query1) {
                         return $query1->where('hr_approved', 1)
@@ -90,7 +91,8 @@ class PayrollController extends Controller
                     ->get()->pluck('user_id')->toArray();
             } else {
                 $user_ids = $request->user;
-                $payroll = Payroll::where('salary_month',date('Y-m-t', strtotime($request->year_month)).' 23:59:59')
+                $payroll = Payroll::whereYear('salary_month',date('Y', strtotime($request->year_month)))
+                    ->whereMonth('salary_month',date('m', strtotime($request->year_month)))
                     ->whereStatus(1)
                     ->whereIn('user_id', $user_ids)
                     ->where(function ($query1) {
@@ -548,7 +550,7 @@ class PayrollController extends Controller
         ]);
         if($validator->passes()) {
             if($request->user[0] == 0) {
-                $payslips = Payroll::with('user.employee', 'payroll_deduction', 'payroll_allowance')->where('salary_month',date('Y-m-t', strtotime($request->year_month)).' 23:59:59')->whereStatus(1)->whereHrApproved(1)->orderBy('payroll_id', 'desc')->get();
+                $payslips = Payroll::with('user.employee', 'payroll_deduction', 'payroll_allowance')->whereYear('salary_month',date('Y', strtotime($request->year_month)))->whereMonth('salary_month',date('m', strtotime($request->year_month)))->whereStatus(1)->whereHrApproved(1)->orderBy('payroll_id', 'desc')->get();
                 for ($i=0; $i<count($payslips); $i++){
                     $eobi = 0;
                     $income_tax = 0;
@@ -779,7 +781,7 @@ class PayrollController extends Controller
             $half_leaves_deduction = $total_leaves;
         }
 
-        $daily_wage = $user->net_salary/22;
+        $daily_wage = $user->net_salary/$working_days;
         // lates deduction from salary :- 2 lates = 1 half day
         $lates_calc = (($attendace_log->lates / 4)/.5);
         $lates_number_of_half_day = explode('.',$lates_calc);
@@ -800,20 +802,19 @@ class PayrollController extends Controller
                     ->orWhere('role_id',0);
             })
             ->whereStatus(1)->get()->pluck('title', 'value')->toArray();
-        $unmarked_days_wage = ($working_days - ($attendace_log->attendance_marked + $holiday_count)) * ($user->net_salary/22);
+        $unmarked_days_wage = ($working_days - ($attendace_log->attendance_marked + $holiday_count)) * ($user->net_salary/$working_days);
         if($total_absents_deduction + $unmarked_days_wage != 0){
             $deduction_details[$total_absents_deduction + $unmarked_days_wage] = 'Absent/Late/Half';
         }
-        $convenience_deduction = PayrollDeductionSetting::select(DB::raw('sum(value) as transport'))->where('type', 'transport')->whereStatus(1)->get();
-        if($user->conveyance_allowance == 1 && $convenience_deduction != null){
-            $convenience_deduction = $convenience_deduction[0]['transport'];
-            $deduction_details[$convenience_deduction] = 'Transport';
+        if($user->eobi_benefit > 0){
+            $eobi = $user->eobi_benefit;
+            $deduction_details[$eobi] = 'EOBI';
         } else {
-            $convenience_deduction = 0;
+            $eobi = 0;
         }
         $calculated_deductions = $this->calculate_deductions($user);
 
-        $attendance_log_deduction = $unmarked_days_wage+$convenience_deduction+$total_absents_deduction;
+        $attendance_log_deduction = $unmarked_days_wage+$eobi+$total_absents_deduction;
 
         $total_deductions = $attendance_log_deduction;
         return [
@@ -842,7 +843,6 @@ class PayrollController extends Controller
 
         // set dependability wattage here
         $total_leaves = ($total_leaves*0.5) + ($attendace_log->half_leaves*0.25);
-
         $details = array();
         $dependability = 0;
         foreach ($dependability_allowance as $depend){
@@ -893,6 +893,11 @@ class PayrollController extends Controller
                     ->orWhere('department_id', 0); // for all depts
             })
             ->whereStatus(1)->get();
+        $transport_allowance = 0;
+        if($user->employee->conveyance_allowance == 1){
+            $transport_allowance = $user->employee->transport_allowance;
+            $details['Transport Allowance'] = $transport_allowance;
+        }
         $total_allowance = array(
             'sp'=>0,
             'dp'=>0,
@@ -901,6 +906,7 @@ class PayrollController extends Controller
             'mobile'=>0,
             'dependebility'=>$dependability,
             'manager_team_count'=>$manager_team_count,
+            'transport_allowance'=>$transport_allowance,
         );
         foreach ($rgu_bench_mark_allowance as $rgu){
             if($rgu->role_id == 0 || $user->role_id == $rgu->role_id || $user->role_id == 22 || $user->role_id == 3 || $user->role_id == 2){
@@ -1002,7 +1008,7 @@ class PayrollController extends Controller
         }
         return [
             'allowances' => $total_allowance,
-            'total_allowance' => $total_allowance['sp']+$total_allowance['dp']+$total_allowance['tp']+$total_allowance['mobile']+$total_allowance['rgu']+$total_allowance['dependebility']+$total_allowance['manager_team_count'],
+            'total_allowance' => $total_allowance['sp']+$total_allowance['dp']+$total_allowance['tp']+$total_allowance['mobile']+$total_allowance['rgu']+$total_allowance['dependebility']+$total_allowance['manager_team_count']+$total_allowance['transport_allowance'],
             'details' => $details
         ];
     }

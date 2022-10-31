@@ -251,6 +251,10 @@
                 </button>
             </div>
             <div class="modal-body">
+                <div class="container">
+                    <div class="row mb-3" id="alert_imges">
+                    </div>
+                </div>
                 <p class="modal_detail_msg" style="word-break: break-all;">
 
                 </p>
@@ -386,6 +390,7 @@
           <div class="w-100 position-relative">
           <img src="assets/img/icons/bullhorn.svg" width="30" alt="bullhorn"/>
             <div class="inner_div"><span class="broadcaster_name"></span> : <strong class="broadcast_msg"></strong></div>
+            <input type="hidden" class="alert_attachment"/>
           <p class="message_details"><span class="msg_time"></span></p>
           </div>
      </div>
@@ -525,6 +530,13 @@
     }
     //Alert details view modal
     function get_detail_view(me){
+       let images =  $(me).find('.alert_attachment').val().split(',');
+       if(images.length>0){
+           $('#alert_imges').html('');
+           images.forEach(function(image) {
+               $('#alert_imges').append('<div class="col-6" class="alert-img-views"><img src="http://portal.atlantisbpo.local/crm/public/chat_files/'+image+'" height="200" width="150" class="img-fluid1" alt=""></div>');
+           });
+       }
         $('#alert_detail_modal').find('.modal_detail_msg').html($(me).find('.broadcast_msg').html());
         $('#alert_detail_modal').find('.modal_detail_msg_time').html($(me).find('.msg_time').html());
         $('#alert_detail_modal').modal('show');
@@ -649,6 +661,7 @@
                     let broadcast_div = $(broadcast_alert);
                     broadcast_div.find('.broadcaster_name').html(item.full_name);
                     broadcast_div.find('.broadcast_msg').html(item.msg);
+                    broadcast_div.find('.alert_attachment').val(item.attachment);
                     broadcast_div.find('.msg_time').html(item.dateTime);
                     broadcast_div.find('.alert_div').attr('data-id',item.group_chat_id);
                     $('#alerts-text').prepend(broadcast_div.html());

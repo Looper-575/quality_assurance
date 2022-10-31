@@ -157,7 +157,7 @@
                                 <tr>
                                     <td class="p-3" colspan="2">
                                         Salary {{date('"F Y"', strtotime($payroll_log->to_date))}}
-                                        <span class="float-right">Rs. {{intval($payroll_log->user->employee->net_salary - ($payroll_log->allowance ? $payroll_log->allowance['details']['Medical']:0))}}</span>
+                                        <span class="float-right">Rs. {{intval($payroll_log->user->employee->net_salary)}}</span>
                                         <br>
                                         @if($payroll_log->allowance != 0)
                                             @foreach($payroll_log->allowance['details'] as $index => $allowance)
@@ -175,8 +175,8 @@
                                     </td>
                                     @if($loop_count != 0 || count($payroll)==1)
                                         <td class="p-3" rowspan="2" style="rowspan: 2;">
-                                            <h1 class="float-right pr-5">Rs. <span class="total_salary_id">{{intval($total_salary - ($payroll_log->allowance ? $payroll_log->allowance['details']['Medical']:0))}}</span></h1>
-                                            <input type="hidden" name="salary_paid" id="salary_paid" value="{{intval($total_salary - ($payroll_log->allowance ? $payroll_log->allowance['details']['Medical']:0))}}">
+                                            <h1 class="float-right pr-5">Rs. <span class="total_salary_id">{{intval($total_salary)}}</span></h1>
+                                            <input type="hidden" name="salary_paid" id="salary_paid" value="{{intval($total_salary)}}">
                                         </td>
                                     @else
                                     @endif
@@ -191,6 +191,15 @@
                                                 {{$index}} <span class="float-right">Rs. {{$allowance}}</span><br>
                                             @endforeach
                                         @endif
+                                            @if($separation->allowance_list != NULL)
+                                                <?php
+                                                $allowance_amount = 0;
+                                                $allowance_list = json_decode($separation->allowance_list); ?>
+                                                @foreach ($allowance_list as $key => $asset)
+                                                        <?php $allowance_amount += $asset->price; ?>
+                                                        {{$asset->item}} <span class="float-right">Rs. {{$asset->price}}</span><br>
+                                                @endforeach
+                                            @endif
                                     </td>
                                 </tr>
                             <tr>
