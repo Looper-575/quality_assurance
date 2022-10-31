@@ -231,7 +231,7 @@
             e.preventDefault();
             let data = new FormData(this);
             let a = function () {
-                {{--window.location.href = "{{route('leave_list')}}";--}}
+                window.location.href = "{{route('leave_list')}}";
             };
             let arr = [a];
             call_ajax_with_functions('','{{route('leave_save')}}',data,arr);
