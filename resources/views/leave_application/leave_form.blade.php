@@ -142,7 +142,6 @@
         //     $("#medical_report").removeAttr("required");
         // }
 
-
         // show current and future dates
         $(function(){
             var dtToday = new Date();
@@ -154,11 +153,8 @@
             if(day < 10)
                 day = '0' + day.toString();
             var maxDate = year + '-' + month + '-' + day;
-            $('#from').attr('min', maxDate);
-            $('#to').attr('min', maxDate);
-
-
-
+            // $('#from').attr('min', maxDate);
+            // $('#to').attr('min', maxDate);
         });
 
         $('#from').change(function(){
@@ -183,9 +179,7 @@
             else{
                 $("#medical_report").removeAttr('required');
             }
-
             dateDifference();
-
         });
         $('#leave_type').change(function (){
             if($(this).val() == 3 && $('#no_leaves').val() > 2 ) {
@@ -212,7 +206,6 @@
                 $('#to_date').fadeIn();
                 $('#half_day_option').val('');
                 $('#to').attr('required',true);
-
             }
         });
 
@@ -225,7 +218,6 @@
             else{
                 $("#medical_report").removeAttr('required');
             }
-
         });
         $('#leave_form').submit(function (e){
             e.preventDefault();
