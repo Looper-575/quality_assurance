@@ -28,7 +28,7 @@ class EmployeeController extends Controller
     public function index()
     {
         $data['page_title'] = "Employees List - Atlantis BPO CRM";
-        if(Auth::user()->role_id == 1 or Auth::user()->role_id == 5){
+        if(Auth::user()->role_id == 1 or Auth::user()->role_id == 5 or Auth::user()->role_id == 34){
             $data['employee_lists'] = Employee::where('status' , 1)->orderBy('employee_id', 'DESC')->get();
             $data['isLocked']  = false;
         } else {
@@ -451,7 +451,7 @@ class EmployeeController extends Controller
         $data['department'] = Department::where('status',1)->get();
         $data['users'] = User::whereStatus(1)->where('user_id', $find_user)->get();
         $data['employee_ref_users'] = User::whereStatus(1)->get();
-        if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5){
+        if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5 || Auth::user()->role_id == 34){
             $data['employee'] = Employee::with('employee_education', 'employee_family', 'employee_kin', 'employee_emergency_contact', 'employee_experience', 'employee_company_reference.user', 'employee_docs')->where('employee_id', $request->employee_id)->first();
         } else if(Auth::user()->user_id  == $find_user){
             $data['employee'] = Employee::with('employee_education', 'employee_family', 'employee_kin', 'employee_emergency_contact', 'employee_experience', 'employee_company_reference.user', 'employee_docs')->where('employee_id', $request->employee_id)->where('user_id', $find_user)->first();

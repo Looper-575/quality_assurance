@@ -426,4 +426,45 @@ class ReportController extends Controller
         $data['user_id'] = $request->user_id;
         return view('reports.partials.leave_report' , $data);
     }
+    public function qa_avg_report_form()
+    {
+        $data['page_title'] = "Atlantis BPO CRM - QA Report";
+        $data['small_nav'] = true;
+        $data['agents'] = User::where([
+            'role_id' => 4,
+            'status' => 1,
+        ])->get();
+        $data['disposition_types'] = CallType::where([
+            'status' => 1,
+        ])->get();
+//        dd($data);
+        return view('reports.qa_avg_report_form', $data);
+    }
+    public function generate_qa_avg_report(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'from' => 'required',
+            'to' => 'required',
+        ]);
+        if ($validator->passes()) {
+            $date_from = parse_datetime_store($request->from.'17:00:00');
+            $date_to = parse_datetime_store($request->to. '12:00:00');
+            $data['qa_bage'] = DB::table('qa_performance_badge')->get();
+
+            $query = QualityAssurance::selectRaw('AVG(monitor_percentage) as monitor_percentage, ANY_VALUE(agent_id) as agent_id, COUNT(qa_id) as sales_count, COUNT(case when monitor_percentage = 0 then 1 end) as fatal')
+                ->with(['agent'])
+                ->where([['added_on', '>=', $date_from],['added_on', '<=', $date_to]]);
+            if ($request->agent != "") {
+                $query = $query->whereIn('agent_id', $request->agent);
+            }
+            if($request->disposition_type != null){
+                $query = $query->where('call_type_id', $request->disposition_type);
+            }
+            $data['qa_lists'] = $query->groupBy('agent_id')->get();
+        } else {
+            $response['status'] = "Failure!";
+            $response['result'] = $validator->errors()->toJson();
+        }
+        return view('reports.partials.qa_avg_report_list', $data);
+    }
 }

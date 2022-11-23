@@ -232,6 +232,10 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
         Route::get('/qa_report_form' , 'App\Http\Controllers\ReportController@qa_report_form')->name('qa_report_form');
         Route::post('/generate_qa_report' , 'App\Http\Controllers\ReportController@generate_qa_report')->name('generate_qa_report');
     });
+
+    Route::get('/qa_avg_report_form' , 'App\Http\Controllers\ReportController@qa_avg_report_form')->name('qa_avg_report_form');
+    Route::post('/generate_qa_avg_report' , 'App\Http\Controllers\ReportController@generate_qa_avg_report')->name('generate_qa_avg_report');
+
     Route::group(['middleware' => ['check-permission:attendance_report_monthly,view,0,0']], function() {
         Route::get('/attendance_report_monthly','App\Http\Controllers\ReportController@attendance_report_monthly')->name('attendance_report_monthly');
         Route::post('/generate_monthly_attendance_report' , 'App\Http\Controllers\ReportController@generate_monthly_attendance_report')->name('generate_monthly_attendance_report');
