@@ -18,8 +18,8 @@
                 <td>{{ $qa_list->fatal }}</td>
                 <td>
                     @foreach($qa_bage as $bagde)
-                    @if($qa_list->monitor_percentage >= $bagde->min && $qa_list->monitor_percentage <= $bagde->max)
-                            <span class="badge text-white" title="{{$bagde->title}}" style="background-color:<?php echo $bagde->color; ?>;">{{ $qa_list->monitor_percentage }}</span>
+                        @if($qa_list->monitor_percentage >= $bagde->min && $qa_list->monitor_percentage <= $bagde->max)
+                            <span class="badge text-white" title="{{$bagde->title}}" style="background-color:{{$bagde->color}};">{{ round($qa_list->monitor_percentage, 1) }}</span>
                         @endif
                     @endforeach
                 </td>
