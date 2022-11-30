@@ -230,7 +230,7 @@ class PayrollController extends Controller
             ->get();
             $holiday_count = 0;
             foreach ($check_holidays as $day){
-                $holiday_count = 1;
+                $holiday_count = $holiday_count+1;
                 if($day->date_from >= $form_date){
                     $from = $day->date_from;
                 } else {
@@ -780,7 +780,6 @@ class PayrollController extends Controller
         } else {
             $half_leaves_deduction = $total_leaves;
         }
-
         $daily_wage = $user->net_salary/$working_days;
         // lates deduction from salary :- 2 lates = 1 half day
         $lates_calc = (($attendace_log->lates / 4)/.5);

@@ -39,7 +39,7 @@ class DashboardController extends Controller
             return $this->qa_dashboard();
         } else if($role==13) {
             return $this->vendor_dashboard();
-        } else if($role==5) {
+        } else if($role==5 || $role==34) {
             return $this->hr_dashboard();
         } else if($role==16 || $role==17 || $role==18 || $role==19) {
             return $this->dev_team_dashboard();
