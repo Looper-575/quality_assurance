@@ -53,12 +53,13 @@
                             @if(isset($customer))
                                 <span>
                                     <i  data-toggle="modal" data-target="#update_customer_modal"  style="cursor: pointer" class="fa fa-edit ml-3 text-warning"></i>
+                                    <span id="customer_id" class="d-none">{{$customer->customer_id}}</span>
                                 </span>
                             @endif
                         </span>
                     </div>
                     <div class="m-widget12__item">
-                        <span class="m-widget12__text2">Email: <strong>{{isset($customer) && $customer->email?$customer->email:'N/A' }}</strong></span>
+                        <span class="m-widget12__text2">Email: <strong id="email_customer">{{isset($customer) && $customer->email?$customer->email:'N/A' }}</strong></span>
                     </div>
                     <div class="m-widget12__item">
                         <span class="m-widget12__text2">Phone No#: <strong id="customer_number">{{isset($customer) && $customer->primary_number?$customer->primary_number:0 }}</strong></span>
@@ -759,6 +760,10 @@
                             </div>
                         </div>
                         <div class="col-12">
+
+                            @if(isset($customer))
+                                <input name="customer_id" type="hidden" value="{{$customer->customer_id}}">
+                            @endif
                             <button type="button" class="btn btn-danger float-right ml-3" data-dismiss="modal">Close</button>
                             <button id="sale_submit_btn" type="submit" class="btn btn-primary float-right"> Save</button>
                         </div>

@@ -18,18 +18,12 @@
                     <h3 class="m-portlet__head-text">Call Disposition List</h3>
                 </div>
                 @if($has_permissions->add == 1)
-                    <div class="float-right mt-3">
-                        <div class="m-portlet__head-tools float-right">
-                            <ul class="nav nav-tabs m-tabs-line m-tabs-line--success m-tabs-line--2x m-tabs-line--right" role="tablist">
-                                <li class="nav-item m-tabs__item">
-                                    <a  id="add_new_btn" href="javascript:;" class="nav-link m-tabs__link">
-                                        <span class="add-new-button"><i class="fa fa-plus"></i><span>Add New DID</span></span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="m-separator m-separator--dashed d-xl-none"></div>
-                    </div>
+                <div class="float-right mt-3">
+                    <a id="add_new_btn" href="javascript:;" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill">
+                        <span><i class="la la-phone-square"></i><span>Add New</span></span>
+                    </a>
+                    <div class="m-separator m-separator--dashed d-xl-none"></div>
+                </div>
                 @endif
             </div>
         </div>
@@ -50,14 +44,14 @@
                         <td>{{$did_list->title}}</td>
                         <td>{{parse_datetime_get($did_list->added_on)}}</td>
                         <td>
+                            @if($has_permissions->update == 1)
                             <div class="btn-group btn-group-sm">
-                                @if($has_permissions->update == 1)
-                                    <button type="button" class="btn btn-primary edit_btn" value="{{json_encode($did_list)}}"><i class="fa fa-edit text-white"></i></button>
-                                @endif
-                                @if(Auth::user()->role->role_id == 1)
-                                    <button type="button" class="btn btn-danger detele_btn" value="{{$did_list->did_id}}"> <i class="fa fa-trash text-white"></i> </button>
-                                @endif
+                                <button type="button" class="btn btn-primary edit_btn" value="{{json_encode($did_list)}}">Edit</button>
                             </div>
+                            @endif
+                            @if(Auth::user()->role->role_id == 1)
+                                <button type="button" class="btn btn-danger detele_btn" value="{{$did_list->did_id}}"> Delete </button>
+                            @endif
                         </td>
                     </tr>
                 @endforeach

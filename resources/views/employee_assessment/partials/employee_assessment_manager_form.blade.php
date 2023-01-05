@@ -14,12 +14,12 @@
     <div class="col-12">
         <div class="form-group">
             <label class="font-bold font-14" for="manager_comments"><b>*  Please state his/her understanding of main duties and responsibilities.</b></label>
-            <textarea type="text" required name="manager_comments" rows="3" class="form-control">{{$EmployeeAssessment ? $EmployeeAssessment->manager_comments : ''}}</textarea>
+            <textarea type="text" required name="manager_comments" rows="3" style="width: 100%; max-width: 100%;">{{$EmployeeAssessment ? $EmployeeAssessment->manager_comments : ''}}</textarea>
             <label class="font-bold font-14" for="manager_additional_comments"><b>
                     *  Please state his/her Training and Development needs in understanding of future roles.
-                    Specify training and development needs identified during this review period.
+                    Specify training and development needs indentified during this review period.
                 </b></label>
-            <textarea type="text" required name="manager_additional_comments" rows="3" class="form-control">{{$EmployeeAssessment ? $EmployeeAssessment->manager_additional_comments : ''}}</textarea>
+            <textarea type="text" required name="manager_additional_comments" rows="3" style="width: 100%; max-width: 100%;">{{$EmployeeAssessment ? $EmployeeAssessment->manager_additional_comments : ''}}</textarea>
         </div>
     </div>
     <div class="col-12">

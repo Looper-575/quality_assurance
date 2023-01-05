@@ -4,7 +4,6 @@ use App\Models\AttendanceLog;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Holiday;
-use App\Models\LeavesBucket;
 use App\Models\ManagerialRole;
 use App\Models\Payroll;
 use App\Models\PayrollAllowanceDetail;
@@ -39,14 +38,6 @@ class PayrollController extends Controller
         $data['page_title'] = "Payroll - Atlantis BPO CRM";
         $payslips = Payroll::with('user', 'added', 'payroll_deduction', 'payroll_allowance')->whereStatus(1)->whereHrApproved(2)->get();
         for ($i=0; $i<count($payslips); $i++){
-            foreach ($payslips[$i]->payroll_deduction as $payroll_deduction){
-                if($payroll_deduction->title == 'Income Tax') {
-                    $payslips[$i]['income_tax'] = $payroll_deduction->amount;
-
-                } else {
-                    $payslips[$i]['income_tax'] = 0;
-                }
-            }
             $payslips[$i]->holiday_count = $this->check_holidays(date('Y-m-01', strtotime($payslips[$i]->salary_month)), date('Y-m-t', strtotime($payslips[$i]->salary_month)), $payslips[$i]->user->department_id, $payslips[$i]->user->user_id,$payslips[$i]->user->role_id);
         }
         $data['payroll'] = $payslips;
@@ -65,20 +56,22 @@ class PayrollController extends Controller
             $change_month = date('m', strtotime($request->year_month));
             if((0 == $year % 4) & (0 != $year % 100) | (0 == $year % 400))
             {
-                $startDate = date('Y-m-29',(strtotime ( '-1 month' , strtotime ( $request->year_month) ) ));
-                $endDate = date('Y-m-29',(strtotime ( $request->year_month)));
+                $startDate = date('Y-m-28',(strtotime ( '-1 month' , strtotime ( $request->year_month) ) ));
+                $endDate = date('Y-m-28',(strtotime ( $request->year_month)));
             } else {
                 if($change_month == 02){
-                    $startDate = date('Y-m-29',(strtotime ( '-1 month' , strtotime ( $request->year_month) ) ));
-                    $endDate = date('Y-m-28',(strtotime ( '+1 month' , strtotime ( $request->year_month) ) ));
+                    $startDate = date('Y-m-28',(strtotime ( '-1 month' , strtotime ( $request->year_month) ) ));
+                    $endDate = date('Y-m-01',(strtotime ( '+1 month' , strtotime ( $request->year_month) ) ));
                 } elseif ($change_month == 03){
-                    $startDate = date('Y-m-28',(strtotime ( $request->year_month) ));
-                    $endDate = date('Y-m-29',(strtotime ( $request->year_month)));
+                    $startDate = date('Y-m-01',(strtotime ( $request->year_month) ));
+                    $endDate = date('Y-m-28',(strtotime ( $request->year_month)));
                 } else {
-                    $startDate = date('Y-m-29',(strtotime ( '-1 month' , strtotime ( $request->year_month) ) ));
-                    $endDate = date('Y-m-29',(strtotime ( $request->year_month)));
+//                    $startDate = date('Y-m-28',(strtotime ( '-1 month' , strtotime ( $request->year_month) ) ));
+                    $startDate = date('Y-m-01',(strtotime ( $request->year_month) ));
+                    $endDate = date('Y-m-28',(strtotime ( $request->year_month)));
                 }
             }
+//            dd($startDate, $endDate);
             if($request->user[0] == 0) {
                 $user_ids = User::has('Employee')->where('user_type', 'Employee')->where('status', 1)->get()->pluck('user_id')->toArray();
                 $payroll = Payroll::where('salary_month',date('Y-m-t', strtotime($request->year_month)).' 23:59:59')
@@ -110,7 +103,8 @@ class PayrollController extends Controller
             }
             $attendance_list = AttendanceLog::with('user.employee')->select(DB::raw('sum(late) as `lates`, sum(absent) as `absents`, sum(on_leave+applied_leave) as `leaves` , sum(applied_leave) as `applied_leave`, sum(half_leave) as `half_leaves` , count(user_id) as `attendance_marked`'), 'user_id')
                 ->whereIn('user_id', $user_ids)
-                ->whereBetween('attendance_date', [$startDate, $endDate])
+                ->whereDate('attendance_date', '>=' ,$startDate)
+                ->whereDate('attendance_date', '<=' ,$endDate)
                 ->groupBy('user_id')
                 ->get();
             for ($i=0; $i<count($attendance_list); $i++){
@@ -523,7 +517,7 @@ class PayrollController extends Controller
                     $allowance_amount += $allowance->amount;
                 }
                 $payslips[$i]->allowance_amount = $allowance_amount;
-                $payslips[$i]->holiday_count = $this->check_holidays(date('Y-m-01', strtotime($payslips[$i]->salary_month)), date('Y-m-t', strtotime($payslips[$i]->salary_month)), $payslips[$i]->user->department_id, $payslips[$i]->user->user_id, $payslips[$i]->user->role_id);
+                $payslips[$i]->holiday_count = $this->check_holidays(date('Y-m-01', strtotime($payslips[$i]->salary_month)), date('Y-m-t', strtotime($payslips[$i]->salary_month)), $payslips[$i]->user->department_id, $payslips[$i]->user->user_id);
             }
         }
         $data['payslips'] = $payslips;
@@ -571,7 +565,7 @@ class PayrollController extends Controller
                         $allowance_amount += $allowance->amount;
                     }
                     $payslips[$i]->allowance_amount = $allowance_amount;
-                    $payslips[$i]->holiday_count = $this->check_holidays(date('Y-m-01', strtotime($payslips[$i]->salary_month)), date('Y-m-t', strtotime($payslips[$i]->salary_month)), $payslips[$i]->user->department_id, $payslips[$i]->user->user_id, $payslips[$i]->user->role_id);
+                    $payslips[$i]->holiday_count = $this->check_holidays(date('Y-m-01', strtotime($payslips[$i]->salary_month)), date('Y-m-t', strtotime($payslips[$i]->salary_month)), $payslips[$i]->user->department_id, $payslips[$i]->user->user_id);
                 }
             } else {
                 $user_ids = $request->user;
@@ -599,7 +593,7 @@ class PayrollController extends Controller
                         $allowance_amount += $allowance->amount;
                     }
                     $payslips[$i]->allowance_amount = $allowance_amount;
-                    $payslips[$i]->holiday_count = $this->check_holidays(date('Y-m-01', strtotime($payslips[$i]->salary_month)), date('Y-m-t', strtotime($payslips[$i]->salary_month)), $payslips[$i]->user->department_id, $payslips[$i]->user->user_id, $payslips[$i]->user->role_id);
+                    $payslips[$i]->holiday_count = $this->check_holidays(date('Y-m-01', strtotime($payslips[$i]->salary_month)), date('Y-m-t', strtotime($payslips[$i]->salary_month)), $payslips[$i]->user->department_id, $payslips[$i]->user->user_id);
                 }
             }
             $response['status'] = "Success";
@@ -642,45 +636,6 @@ class PayrollController extends Controller
         ]);
         $response['status'] = "Success";
         $response['result'] = "Conveyance Allowance Removed Successfully";
-        return response()->json($response);
-    }
-    public function calculate_income_tax(Request $request)
-    {
-        $ids = explode(",", $request->id);
-        foreach ($ids  as $payroll_id){
-            $payroll = Payroll::wherePayrollId($payroll_id)->whereStatus(1)->first();
-            $eobi_deduction = PayrollDeductionDetail::wherePayrollId($payroll_id)->whereTitle('EOBI')->first();
-            $eobi_deduction_amount = $eobi_deduction == null ? 0 : $eobi_deduction->amount;
-            $medical_allowance_val = $this->get_payroll_config();
-            $allowance_sum = PayrollAllowanceDetail::wherePayrollId($payroll_id)->sum('amount');
-            $deduction_sum = PayrollDeductionDetail::wherePayrollId($payroll_id)->where('title', '!=', 'Income Tax')->where('title', '!=', 'EOBI')->sum('amount');
-            $gross_salary = $payroll->basic_salary+$allowance_sum-$deduction_sum;
-            $medical_allowance = (($gross_salary)*$medical_allowance_val->medical)/100;
-            $salary = ($gross_salary)-$medical_allowance;
-            $annul_salary = $salary*12;
-            $tax_deduction = PayrollTaxSlab::whereStatus(1)
-                ->where(function ($query) use ($annul_salary) {
-                    $query->where('from', '<=', $annul_salary);
-                    $query->where('to', '>=', $annul_salary);
-                })
-                ->first();
-            $amount = $annul_salary - $tax_deduction->from;
-            $tax_deduction_val = 0;
-            if($tax_deduction->value != 0){
-                $tax_deduction_val = (($tax_deduction->amount + ($tax_deduction->value/100) * $amount))/12;
-            }
-            Payroll::wherePayrollId( $payroll_id)->update([
-                'gross_salary' => $salary-$eobi_deduction_amount+$medical_allowance-$tax_deduction_val,
-            ]);
-            PayrollDeductionDetail::updateOrCreate([
-                'payroll_id' => $payroll_id,
-                'title' => 'Income Tax',
-            ], [
-                'amount' => $tax_deduction_val,
-            ]);
-        }
-        $response['status'] = "Success";
-        $response['result'] = 'Income Tax Created Successfully!';
         return response()->json($response);
     }
     private function calculate_deductions($user)
@@ -812,9 +767,21 @@ class PayrollController extends Controller
         }
         $calculated_deductions = $this->calculate_deductions($user);
 
-        $attendance_log_deduction = $unmarked_days_wage+$convenience_deduction+$total_absents_deduction;
+        // one day adjustment for salary cycle change
+        $salary_dues = $user->net_salary/22;
+        $deduction_details[$salary_dues] = 'Salary Dues';
 
-        $total_deductions = $attendance_log_deduction;
+        $attendance_log_deduction = $unmarked_days_wage+$convenience_deduction+$total_absents_deduction+$salary_dues;
+        // calculating tax
+        DB::table('salary_dues')->updateOrInsert(
+                ['user_id' => $user->user_id],
+                ['user_id' => $user->user_id, 'amount' => $salary_dues]
+            );
+        var_dump($attendance_log_deduction);
+        var_dump($salary_dues);
+        $total_deductions = $attendance_log_deduction + $salary_dues;
+        //var_dump($total_deductions);
+       die();
         return [
             'total_deductions' => $total_deductions + $calculated_deductions['after_tax_deduction'],
             'deduction_bucket' => $half_leaves_deducted_from_bucket,
@@ -838,20 +805,26 @@ class PayrollController extends Controller
             ->whereStatus(1)->get();
         $unmarked = $working_days - ($attendace_log->attendance_marked + $attendace_log->holiday_count);
         $total_leaves = $attendace_log->leaves +  $attendace_log->absents + $unmarked;
-
-        // set dependability wattage here
-        $total_leaves = ($total_leaves*0.5) + ($attendace_log->half_leaves*0.25);
-
         $details = array();
         $dependability = 0;
         foreach ($dependability_allowance as $depend){
             $dependability = $depend->allowance_value;
-            if($total_leaves <= 1){
-                $dependability = $dependability - ($dependability*$total_leaves);
-            }else {
+            if ($total_leaves == 0) {
+                $dependability = $dependability;
+                if($dependability != 0){
+                    $details[$depend->title] = $dependability;
+                }
+            } else if ($total_leaves == 1) {
+                $dependability = $dependability / 2;
+                if($dependability != 0){
+                    $details[$depend->title] = $dependability;
+                }
+            } else if ($total_leaves > 1) {
                 $dependability = 0;
+                if($dependability != 0){
+                    $details[$depend->title] = $dependability;
+                }
             }
-            $details[$depend->title] = $dependability;
         }
         // one month back for allowances
         $month = date('Y-m-d', strtotime ( '-1 month' , strtotime ($month)));
@@ -900,6 +873,7 @@ class PayrollController extends Controller
             'mobile'=>0,
             'dependebility'=>$dependability,
             'manager_team_count'=>$manager_team_count,
+            'eid_allowance'=>0,
         );
         foreach ($rgu_bench_mark_allowance as $rgu){
             if($rgu->role_id == 0 || $user->role_id == $rgu->role_id || $user->role_id == 22 || $user->role_id == 3 || $user->role_id == 2){
@@ -962,6 +936,14 @@ class PayrollController extends Controller
                     $details['Per RGU Bonus (CRS QA)'] = ($sales['total_rgu'] - $mobile_sales)*$payroll_config->csr_qa_per_rgu;
                     $total_allowance['rgu'] = $details['Per RGU Bonus (CRS QA)'];
                 }
+                // Eid allowance for operations and it team
+                if($user->role_id == 24 || $user->role_id == 22 || $user->role_id == 10 || $user->role_id == 4 || $user->role_id == 3 || $user->role_id == 2){
+                    $daily_salary = $user->employee->net_salary/22;
+                    // eid allowance for 2 days i.e 1.5/day
+                    $eid_allowance = $daily_salary*3;
+                    $total_allowance['eid_allowance'] += $eid_allowance;
+                    $details['Eid Allowance'] = $eid_allowance;
+                }
 
                 // Mobile allowance can be added manually
                 $total_allowance['mobile'] += 0;
@@ -1001,11 +983,11 @@ class PayrollController extends Controller
         }
         return [
             'allowances' => $total_allowance,
-            'total_allowance' => $total_allowance['sp']+$total_allowance['dp']+$total_allowance['tp']+$total_allowance['mobile']+$total_allowance['rgu']+$total_allowance['dependebility']+$total_allowance['manager_team_count'],
+            'total_allowance' => $total_allowance['sp']+$total_allowance['dp']+$total_allowance['tp']+$total_allowance['mobile']+$total_allowance['rgu']+$total_allowance['dependebility']+$total_allowance['manager_team_count']+$total_allowance['eid_allowance'],
             'details' => $details
         ];
     }
-    private function calculate_income_tax_backup($user, $allowance, $deduction, $calculated_deductions, $medical_allowance)
+    private function calculate_income_tax($user, $allowance, $deduction, $calculated_deductions, $medical_allowance)
     {
         // Medical Allowance = 10%
         $medical_allowance = 10;

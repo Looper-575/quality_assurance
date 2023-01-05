@@ -88,7 +88,7 @@
                         @endif
                     </div>
                     <div class="col-6 mb-1">
-                        <label for="recording"><strong> Recording File  </strong> </label>
+                        <label for="recording"><strong> Rcording File  </strong> </label>
                         <input class="form-control" type="file" name="recording[]" id="recording" multiple accept="audio/*">
                     </div>
                 </div>

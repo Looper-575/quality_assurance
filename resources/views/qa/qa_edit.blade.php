@@ -2,16 +2,9 @@
 @section('header_scripts')
     <link rel="stylesheet" href="{{ asset('assets/bundles/select2/dist/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
-    <style>
-        .remove-recording{
-            cursor: pointer;
-            position: relative;
-            top: -15px;
-            font-size: 30px;
-        }
-    </style>
 @endsection
 @section('content')
+
     <div class="m-portlet m-portlet--mobile">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
@@ -27,19 +20,6 @@
                 <input type="hidden" value="{{ $qa_edit->call_type_id }}" name="call_type">
                 <input type="hidden" value="{{ $qa_edit->agent_id }}" name="rep_name">
                 <input type="hidden" value="{{ $qa_edit->call_number }}" name="call_number">
-                <div class="row">
-                <div class="col-6 mb-1">
-                    <label for="recording"><strong>Recording File  </strong> </label>
-                    <input class="form-control" type="file" name="recording[]" id="recording" multiple accept="audio/*">
-                </div>
-                <div class="col-6 mb-1">
-                    <label for="recording"><strong>Attached Files</strong> </label>
-                    @foreach( explode(',', $qa_edit->recording) as $recording)
-                        <div class="attached_files"><p class="font-16 m-0">{{$recording}}</p><audio controls src="{{asset('/recordings/'.$recording)}}"></audio><i class="fa fa-times text-danger pl-2 remove-recording" title="Delete Recording" onclick="delete_file(this)"></i></div>
-                    @endforeach
-                </div>
-                </div>
-                <hr>
                 <div class="row mb-3">
                     <div class="col-6">
                         <strong CLASS="form-check-inline">Greetings</strong><br>
@@ -786,15 +766,8 @@
             //form submission;
             $('#qa_form').submit(function (e) {
                 e.preventDefault();
-                let attached_files = [];
-                $('.attached_files').each(function () {
-                    attached_files.push($(this).text());
-                })
                 let data = new FormData(this);
-                data.append('attached_files',attached_files);
-                let a = function(){
-                    window.location.reload();
-                };
+                let a = function(){ window.location.reload(); };
                 let arr = [a];
                 call_ajax_with_functions('','{{route('qa_save')}}',data,arr);
             });
@@ -890,9 +863,6 @@
                 }
             }
         });
-        function delete_file(e){
-            $(e).closest('div').remove();
-        }
     </script>
 @endsection
 

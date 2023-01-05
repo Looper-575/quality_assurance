@@ -27,18 +27,12 @@
                     <h3 class="m-portlet__head-text">Company Policies</h3>
                 </div>
                 @if($has_permissions->add == 1)
-                    <div class="float-right mt-3">
-                        <div class="m-portlet__head-tools float-right">
-                            <ul class="nav nav-tabs m-tabs-line m-tabs-line--success m-tabs-line--2x m-tabs-line--right" role="tablist">
-                                <li class="nav-item m-tabs__item">
-                                    <a id="add_new_btn" href="javascript:;" class="nav-link m-tabs__link">
-                                        <span class="add-new-button"><i class="fa fa-plus"></i><span>Add New</span></span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="m-separator m-separator--dashed d-xl-none"></div>
-                    </div>
+                <div class="float-right mt-3">
+                    <a id="add_new_btn" href="javascript:;" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill">
+                        <span><i class="la la-phone-square"></i><span>Add New</span></span>
+                    </a>
+                    <div class="m-separator m-separator--dashed d-xl-none"></div>
+                </div>
                 @endif
             </div>
         </div>

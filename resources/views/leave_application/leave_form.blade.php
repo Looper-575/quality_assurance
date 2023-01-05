@@ -231,7 +231,7 @@
             e.preventDefault();
             let data = new FormData(this);
             let a = function () {
-                {{--window.location.href = "{{route('leave_list')}}";--}}
+                window.location.href = "{{route('leave_list')}}";
             };
             let arr = [a];
             call_ajax_with_functions('','{{route('leave_save')}}',data,arr);
@@ -296,7 +296,7 @@
             iWeekday2 = (iWeekday2 > 5) ? 5 : iWeekday2;
             // calculate differnece in weeks (1000mS * 60sec * 60min * 24hrs * 7 days = 604800000)
             iWeeks = Math.floor((dDate2.getTime() - dDate1.getTime()) / 604800000)
-            if (iWeekday1 < iWeekday2) { //Equal to makes it reduce 5 days
+            if (iWeekday1 <= iWeekday2) { //Equal to makes it reduce 5 days
                 iDateDiff = (iWeeks * 5) + (iWeekday2 - iWeekday1)
             } else {
                 iDateDiff = ((iWeeks + 1) * 5) - (iWeekday1 - iWeekday2)

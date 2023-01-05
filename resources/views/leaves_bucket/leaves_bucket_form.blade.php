@@ -22,7 +22,7 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label class="form-label">Employee Name:</label>
-                                <select class="form-control select2" name="user_id" id="user_id" {{($leaves_bucket ? 'disabled' : '')}}  required>
+                                <select class="form-control" name="user_id" id="user_id" {{($leaves_bucket ? 'disabled' : '')}}  required>
                                     <option value="">Select</option>
                                     @foreach($users as $user)
                                         <option {{ ($leaves_bucket && $leaves_bucket->user_id == $user->user_id)  ? 'selected' : ''}} value="{{$user->user_id}}">{{$user->full_name}}</option>
@@ -36,7 +36,7 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label class="form-label">Start Date:</label>
-                                <input class="form-control" type="date" name="start_date" id="start_date_id" value="{{$leaves_bucket ? $leaves_bucket->start_date:''}}">
+                                <input class="form-control" type="date" name="start_date" value="{{$leaves_bucket ? $leaves_bucket->start_date:''}}">
                             </div>
                         </div>
                     </div>
@@ -62,12 +62,12 @@
                     </div>
                     <div class="row">
                         <div class="col-12 text-right">
-                            <a href="{{route('leaves_bucket')}}"  class="btn btn-primary">
-                                Back
-                            </a>
                             <button type="submit" class="btn btn-success">
                                 Submit
                             </button>
+                            <a href="{{route('leaves_bucket')}}"  class="btn btn-primary">
+                                Back
+                            </a>
                         </div>
                     </div>
             </form>
@@ -79,22 +79,6 @@
 @section('footer_scripts')
     <script src="{{asset('assets/bundles/select2/dist/js/select2.full.min.js') }}"></script>
     <script>
-        $(document).ready(function (){
-           $('.select2').select2();
-        });
-        $('#user_id').on('change', function() {
-            var user_id = $(this).val();
-            var url = '{{ route("get_employee_record",":id") }}';
-            url = url.replace(':id',user_id);
-            $.ajax({
-                type:'get',
-                url:url,
-                success: function( resp ) {
-                    $('#start_date_id').val(resp.start_date);
-                    console.log('resp = ',resp);
-                }
-            });
-        });
         function save_leaves_bucket(){
             let a = function () {
                 window.location.href = "{{route('leaves_bucket')}}";

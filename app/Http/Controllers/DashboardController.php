@@ -478,7 +478,7 @@ class DashboardController extends Controller
         $date_today = date("d"  ,strtotime($today));
         // daily rgu and paly count
         $hour = date("H"  ,strtotime(get_date_time()));
-        if($hour >= 17){
+        if($hour >= 17) {
             $from_date = date("Y-m-d"  ,strtotime($today));
             $to_date = date("Y-m-d"  ,strtotime($today));
             $from_date = $from_date.' 17:00:00';
@@ -510,8 +510,8 @@ class DashboardController extends Controller
             ->whereYear('attendance_date', $year)
             ->whereMonth('attendance_date', $month)
             ->first();
-        $data['monthly_stats'] = DB::select('SELECT call_dispositions_services.provider_name, SUM(call_dispositions_services.mobile) as mobile,SUM(call_dispositions_services.mobile + call_dispositions_services.internet + call_dispositions_services.phone +call_dispositions_services.cable ) As total_sales FROM call_dispositions JOIN call_dispositions_services ON call_dispositions.call_id =call_dispositions_services.call_id WHERE  call_dispositions.added_on>="'.$from_date.'" AND call_dispositions.added_on<="'.$to_date.'" AND call_dispositions.added_by="'.$uid.'" AND call_dispositions_services.provider_name IS NOT NULL GROUP BY call_dispositions_services.provider_name ORDER BY total_sales DESC');
-        $data["services_sold_monthly"] = DB::select('SELECT count(case when call_dispositions.services_sold = "1" then 1 else null end) as single_play, count(case when call_dispositions.services_sold = "2" then 1 else null end) as double_play, count(case when call_dispositions.services_sold = "3" then 1 else null end) as triple_play, count(case when call_dispositions.services_sold = "4" then 1 else null end) as quad_play FROM call_dispositions WHERE call_dispositions.added_on>="'.$from_date.'" AND call_dispositions.added_on<="'.$to_date.'" AND call_dispositions.added_by="'.$uid.'"');
+        $data['monthly_stats'] = DB::select('SELECT call_dispositions_services.provider_name, SUM(call_dispositions_services.mobile) as mobile,SUM(call_dispositions_services.mobile + call_dispositions_services.internet + call_dispositions_services.phone +call_dispositions_services.cable ) As total_sales FROM call_dispositions JOIN call_dispositions_services ON call_dispositions.call_id =call_dispositions_services.call_id WHERE call_dispositions.status=1 AND call_dispositions.added_on>="'.$from_date.'" AND call_dispositions.added_on<="'.$to_date.'" AND call_dispositions.added_by="'.$uid.'" AND call_dispositions_services.provider_name IS NOT NULL GROUP BY call_dispositions_services.provider_name ORDER BY total_sales DESC');
+        $data["services_sold_monthly"] = DB::select('SELECT count(case when call_dispositions.services_sold = "1" then 1 else null end) as single_play, count(case when call_dispositions.services_sold = "2" then 1 else null end) as double_play, count(case when call_dispositions.services_sold = "3" then 1 else null end) as triple_play, count(case when call_dispositions.services_sold = "4" then 1 else null end) as quad_play FROM call_dispositions WHERE call_dispositions.status=1 AND call_dispositions.added_on>="'.$from_date.'" AND call_dispositions.added_on<="'.$to_date.'" AND call_dispositions.added_by="'.$uid.'"');
         $total_sale = 0;
         foreach ($data['monthly_stats'] as $stat){
             $total_sale = $total_sale + $stat->total_sales;

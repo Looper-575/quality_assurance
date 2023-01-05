@@ -49,4 +49,8 @@ class CallDispositionsTypes extends Authenticatable
     {
         return $this->hasMany(CallDisposition::class , 'disposition_type','disposition_type_id');
     }
+    public function added_by_user()
+    {
+        return $this->belongsTo(User::class, 'added_by', 'user_id');
+    }
 }

@@ -62,7 +62,7 @@ class TeamController extends Controller
     {
         $data['page_title'] = "Atlantis BPO CRM - Create Team";
         $manager_ids = ManagerialRole::whereIn('type', ['Team Lead', 'Manager'])->where('status', 1)->pluck('role_id')->toArray();
-        $data['agents'] = User::doesnthave('team_member')->whereStatus(1)->where('user_type','Employee')->get();
+        $data['agents'] = User::doesnthave('team_member')->doesnthave('user_team')->whereNotIn('role_id', $manager_ids)->whereStatus(1)->where('user_type','Employee')->get();
         $data['team_leads'] = User::doesnthave('user_team')->whereStatus(1)->where('user_type','Employee')->whereIn('role_id', $manager_ids)->get();
         $data['types'] = Department::where('status',1)->orderBy('department_id', 'DESC')->get();
         $data['shifts'] = Shift::where('status',1)->orderBy('shift_id', 'DESC')->get();
@@ -77,7 +77,7 @@ class TeamController extends Controller
         $data['team_edit'] = Team::with('team_member')->where('team_id' , $id)->with('team_lead.manager_users')->get()[0];
         $manager_id = $data['team_edit']['team_lead_id'];
         $manager_ids = ManagerialRole::whereIn('type', ['Team Lead', 'Manager'])->where('status', 1)->pluck('role_id')->toArray();
-        $data['agents'] = User::doesnthave('team_member')->whereStatus(1)->where('user_type','Employee')->get();
+        $data['agents'] = User::doesnthave('team_member')->doesnthave('user_team')->whereNotIn('role_id', $manager_ids)->whereStatus(1)->where('user_type','Employee')->get();
         $data['team_leads'] = User::where('user_id', $manager_id)->ordoesnthave('user_team')->whereStatus(1)->where('user_type','Employee')->whereIn('role_id', $manager_ids)->get();
         $data['types'] = Department::where('status',1)->orderBy('department_id', 'DESC')->get();
         $data['shifts'] = Shift::where('status',1)->orderBy('shift_id', 'DESC')->get();

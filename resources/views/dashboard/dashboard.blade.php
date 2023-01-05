@@ -467,7 +467,6 @@
     </div>
     <!--end::Portlet-->
     <?php
-    echo '<pre>';
     foreach ($provider_based_stats as $provider){
         if($provider['provider_name'] == 'spectrum'){
             $spectrum = $provider;

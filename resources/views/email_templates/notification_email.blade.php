@@ -29,9 +29,7 @@
         <hr>
         <div class="inner_content">
             <h3>Dear {{$data['name']}},</h3>
-            <p style="font-size: 16px" >{{$data['request_from']}}</p>
-            <p style="font-size: 16px" >{{$data['leave_reason']}}</p>
-            <p style="font-size: 16px" >{{$data['leave_duration']}}</p>
+            <p style="font-size: 16px" >{{$data['email_body']}}</p>
             <br>
             <hr>
             <p style="font-size: small;">You are receiving these system generated email notification as reminders.</p>

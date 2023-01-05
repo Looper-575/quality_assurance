@@ -47,9 +47,7 @@ class Employee extends Model
         'service_bond_reason',
         'locked',
         'conveyance_allowance',
-        'employment_status',
-        'confirmation_date',
-        'account_number'
+        'employment_status'
     ];
 
     /**

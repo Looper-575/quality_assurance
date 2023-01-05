@@ -25,11 +25,6 @@
                             Approved
                         </a>
                     </li>
-                    <li class="nav-item m-tabs__item">
-                        <a class="nav-link m-tabs__link" data-toggle="tab" href="#rejected" role="tab">
-                            Rejected
-                        </a>
-                    </li>
                     @if($has_permissions->add == 1 && Auth::user()->user_type == 'Employee')
                         <li class="nav-item m-tabs__item">
                             <a class="nav-link m-tabs__link" href="{{route('leave_form')}}">
@@ -83,13 +78,13 @@
                                     <td>
                                     @if(Auth::user()->role_id == $manager_id && $leave_list->approved_by_manager == NULL && $leave_list->added_by != Auth::user()->user_id )
                                             <div class="btn-group btn-group-sm">
-                                                <button title="Reject" class="btn btn-warning text-white btn-danger p-3"  onclick="reject_application(this);" value="{{$leave_list->leave_id}}"><i class="fa fa-times"></i></button>
+                                                <button title="Reject" class="btn btn-danger p-3"  onclick="reject_application(this);" value="{{$leave_list->leave_id}}"><i class="fa fa-times"></i></button>
                                                 <button title="Approve" class="btn btn-success p-3" onclick="approve_application(this);" value="{{$leave_list->leave_id}}"><i class="fa fa-check"></i></button>
                                             </div>
                                     @elseif(Auth::user()->role_id == 5)
                                         @if($leave_list->approved_by_hr == NULL && $leave_list->approved_by_manager != NULL)
                                                 <div class="btn-group btn-group-sm">
-                                                    <button title="Reject" class="btn btn-warning text-white btn-danger p-3" onclick="reject_application(this);" value="{{$leave_list->leave_id}}"><i class="fa fa-times"></i></button>
+                                                    <button title="Reject" class="btn btn-danger p-3" onclick="reject_application(this);" value="{{$leave_list->leave_id}}"><i class="fa fa-times"></i></button>
                                                     <button title="Approve" class="btn btn-success p-3" onclick="approve_application(this);" value="{{$leave_list->leave_id}}"><i class="fa fa-check"></i></button>
                                                 </div>
                                         @endif
@@ -131,6 +126,7 @@
                                 <th>Half Type</th>
                                 <th>No of Leaves</th>
                                 <th>Reason</th>
+                                <th>Status</th>
                                 <th>Manager Approval</th>
                                 <th>HR Approval</th>
                             </tr>
@@ -146,46 +142,9 @@
                                     <td>{{$leave_list->half_type }}</td>
                                     <td>{{$leave_list->no_leaves}}</td>
                                     <td>{{$leave_list->reason }}</td>
-                                    <td>{{$leave_list->approved_by_manager == 1 ? 'Approved' : 'Not Approved'}}</td>
-                                    <td>{{$leave_list->approved_by_hr == 1 ? 'Approved' : 'Not Approved'}}</td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="tab-pane" id="rejected" role="tabpanel">
-                    <div style="width: 100%">
-                        <table class="datatable table table-bordered" id="chkbox_table">
-                            <thead>
-                            <tr>
-                                <th>S.no</th>
-                                <th>Leave Type</th>
-                                <th>Name</th>
-                                <th>From</th>
-                                <th>To</th>
-                                <th>Half Type</th>
-                                <th>No of Leaves</th>
-                                <th>Reason</th>
-                                <th>Rejection Reason</th>
-                                <th>Manager Approval</th>
-                                <th>HR Approval</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($leave_lists_rejected as $leave_list)
-                                <tr>
-                                    <td>{{$loop->index+1}}</td>
-                                    <td>{{$leave_list->leaveType->title}}</td>
-                                    <td>{{ $leave_list->user->full_name}}</td>
-                                    <td>{{$leave_list->from }}</td>
-                                    <td>{{$leave_list->to}}</td>
-                                    <td>{{$leave_list->half_type }}</td>
-                                    <td>{{$leave_list->no_leaves}}</td>
-                                    <td>{{$leave_list->reason }}</td>
-                                    <td>{{$leave_list->rejection_reason}}</td>
-                                    <td>{{$leave_list->approved_by_manager == 1 ? 'Approved' : 'Not Approved'}}</td>
-                                    <td>{{$leave_list->approved_by_hr == 1 ? 'Approved' : 'Not Approved'}}</td>
+                                    <td>{{$leave_list->status}}</td>
+                                    <td>Approved</td>
+                                    <td>Approved</td>
                                 </tr>
                             @endforeach
                             </tbody>
@@ -240,6 +199,25 @@
                 });
             }
         })()
+
+        {{--swal({--}}
+        {{--    title: "Are you sure?",--}}
+        {{--    text: "Do you really want to reject this application",--}}
+        {{--    icon: "warning",--}}
+        {{--    buttons: [--}}
+        {{--        'No',--}}
+        {{--        'Yes, Reject Application!'--}}
+        {{--    ],--}}
+        {{--    dangerMode: true,--}}
+        {{--}).then(function(isConfirm) {--}}
+        {{--    if (isConfirm) {--}}
+        {{--        let a = function () {--}}
+        {{--            window.location.href = "{{route('leave_list')}}";--}}
+        {{--        };--}}
+        {{--        let arr = [a];--}}
+        {{--        call_ajax_with_functions('', '{{route('leave_reject')}}', data, arr);--}}
+        {{--    }--}}
+        {{--});--}}
     }
     function approve_application (me) {
         let id = me.value;

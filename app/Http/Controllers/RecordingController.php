@@ -1,13 +1,18 @@
 <?php
+
 namespace App\Http\Controllers;
+use DB;
 use App\Models\CallDisposition;
 use App\Models\CallDispositionsTypes;
 use App\Models\CallRecording;
 use Illuminate\Support\Facades\Auth;
+
 class RecordingController extends Controller
 {
+
     public function recordings()
     {
+        
         $data['page_title'] = "Atlantis BPO CRM - Users List";
         if(Auth::user()->role_id == 2 || Auth::user()->role_id == 1  || Auth::user()->role_id == 3){
             $data['recording_list_outgoing'] = CallRecording::where('disposed' ,null)->has('did_numbers')->with('user')->orderBy('rec_id', 'desc')->limit(500)->get();
@@ -20,15 +25,25 @@ class RecordingController extends Controller
                 ['call_recordings.agent_id','<>',0],
             ])->orderBy('rec_id', 'desc')->limit(500)->get();
         }
+
+
         return view('call_dipositions.recording_list', $data);
     }
+
+
     public function dispose($id){
         $data['page_title'] = "Atlantis BPO CRM - Roles";
         $recording_id = CallDisposition::where('recording_id', $id)->doesntExist();
         if ($recording_id) {
+            // Updating anonymous numbers and alphabetical number to zero
+//            CallRecording::where([['rec_id','=', $id],['from_number', 'regexp', '^[A-z]+']])->update([
+//                'from_number' => '00000000',]);
+
+
             $current = CallRecording::where([
                 'rec_id'=> $id,
             ])->first();
+
             if(is_numeric($current->to_number)){
                 $data['call_data'] = CallRecording::where([
                     'rec_id'=> $id,
@@ -46,6 +61,7 @@ class RecordingController extends Controller
                     ])->with('did_numbers.disposition_did')->get();
                 }
             }
+
             $data['disposition_types'] = CallDispositionsTypes::where([
                 'status' => 1,
             ])->get();
@@ -56,4 +72,5 @@ class RecordingController extends Controller
             return response()->json($response);
         }
     }
+
 }

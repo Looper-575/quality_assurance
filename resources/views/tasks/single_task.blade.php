@@ -1,3 +1,4 @@
+
 @extends('layout.template')
 @section('header_scripts')
     <style>
@@ -46,6 +47,7 @@
         }
 
     </style>
+
     <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css')}}">
     <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js"></script>
     <script>
@@ -58,6 +60,11 @@
     </script>
     <link href="{{asset('assets/vendors/base/vendors.bundle.css')}}" rel="stylesheet" type="text/css" />
     <link href="{{asset('assets/demo/default/base/style.bundle.css')}}" rel="stylesheet" type="text/css" />
+
+
+
+
+
 @endsection
 @section('content')
     <div class="m-portlet m-portlet--mobile">
@@ -70,48 +77,36 @@
 
         </div>
         <div class="m-portlet__body">
-            <div class="row">
-                <div class="col-4">
-                    <h2>Project</h2>
-                    <p> {{$task->project->title}}</p>
-                </div>
-                <div class="col-4">
-                    <h4>Department</h4>
-                    <p>{{$task->department->title}}</p>
-                </div>
-                <div class="col-4">
-                    <h4>Assigned To</h4>
-                    <p> {{$task->users->full_name ?? 'Not Assigned Yet'}}</p>
-                </div>
-                <div class="col-4">
-                    <h4>Title </h4>
-                    <p>{{$task->title}}</p>
-                </div>
-                <div class="col-4">
-                    <h4>Start Date</h4>
-                    <p>{{ parse_datetime_get($task->start_date)}}</p>
-                </div>
-                <div class="col-4">
-                    <h4 >End Date</h4>
-                    <p> {{ parse_datetime_get($task->end_date)}}</p>
-                </div>
-                <div class="col-12">
-                    <h4 class="">Description</h4>
-                    <p class="" style="font-size: 16px;">{!! $task->description !!}</p>
-                </div>
+
+            <div class="p-2">
+                <h2 class="mt-3">Project</h2>
+                <p> {{$task->project->title}}</p>
+                <h4 class="mt-3">Title </h4>
+                <p>{{$task->title}}</p>
+                <h4 class="mt-3">Department</h4>
+                <p>{{$task->department->title}}</p>
+                <h4 class="mt-3">Assigned To</h4>
+                <p> {{$task->users->full_name ?? 'Not Assigned Yet'}}</p>
+            </div>
+            <div class="p-2">
+                <h4 class="">Description</h4>
+                <p class="" style="font-size: 16px;">{!! $task->description !!}</p>
             </div>
 
-
             @if($task->attachments)
+                <div class="">
                     <h4 class="mt-3">Attachments</h4>
-                <div class="row">
-                @foreach(explode(',',$task->attachments) as $file)
-                        <div class="col-6">
-                            <iframe class="ml-3 w-100" style="height: 400px;" class='preview_files' src='{{asset('task_attachments/'.$file)}}'></iframe>
-                        </div>
+                    @foreach(explode(',',$task->attachments) as $file)
+                        <iframe class="ml-3 w-100" style="height: 400px;" class='preview_files' src='{{asset('task_attachments/'.$file)}}'></iframe>
                     @endforeach
                 </div>
             @endif
+           <div class="p-2">
+               <h4 class="mt-3">Start Date</h4>
+               <p>{{ parse_datetime_get($task->start_date)}}</p>
+               <h4 class="mt-3" >End Date</h4>
+               <p> {{ parse_datetime_get($task->end_date)}}</p>
+           </div>
             @if(isset($task->comments))
                 <?php
                 $average = 0;
@@ -119,7 +114,7 @@
 
                 ?>
                 <hr class="my-5">
-                <div class="">
+                <div class="mb-5">
                     <h3 class="h3_txt mb-3">Logs:</h3>
                     @forelse($task->comments as $comment)
                         <?php
@@ -137,7 +132,7 @@
                         <p>No Comments </p>
                     @endforelse
                 </div>
-                <div class="">
+                <div class="mb-5">
                     <h3 class="h3_txt mb-3">Average Rating:</h3>
                     @if($average != 0 && $i != 0 )
                         <?php $average = round($average) ?>
@@ -196,16 +191,14 @@
             </div>
             <hr>
 
-            <div class="row">
-                <div class="col-12 float-right">
-                    @if($task->assigned_to == Auth::user()->user_id && $task->status !=1 && $task->department_id == 1)
-                        <a class="btn btn-info float-right" href="{{route('module_form')}}">Submit Document</a>
-                    @endif
-                    @if((Auth::user()->role_id == 1 || $task->assigned_to == Auth::user()->user_id || (isset($manager) && $manager)) && ($task->status == 1 || $task->status == 2) && $task->department_id == 1)
-                        <a href="{{route('view_document',$task->task_id)}}" class="btn btn-primary float-right mr-3">View Document</a>
-                    @endif
-                </div>
-            </div>
+
+            @if($task->assigned_to == Auth::user()->user_id && $task->status !=1 && $task->department_id == 1)
+                <a class="btn btn-info" href="{{route('module_form')}}">Submit Document</a>
+            @endif
+            @if((Auth::user()->role_id == 1 || $task->assigned_to == Auth::user()->user_id || (isset($manager) && $manager)) && ($task->status == 1 || $task->status == 2) && $task->department_id == 1)
+            <a href="{{route('view_document',$task->task_id)}}" class="btn btn-primary">View Document</a>
+            @endif
+
         </div>
     </div>
 @endsection

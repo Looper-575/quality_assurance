@@ -23,9 +23,7 @@
                             <hr style="margin-top: 0.5rem !important; margin-bottom: 0.5rem !important;">
                             <div class="row">
                                 <div class="col-md-12 col-lg-12 col-xl-2">
-                                  <a href="{{route('attendance_report_single',['user_id' => Auth::user()->user_id])}}">
                                     <h3 class="m-widget24__title mt-2" style="font-size: 1.5rem !important;">My</h3>
-                                  </a>
                                 </div>
                                 <div class="col-md-3 col-lg-3 col-xl-2">
                                      <h4 class="m-widget24__title mt-1" style="font-size: 1rem !important;">Absents</h4><br>
@@ -51,13 +49,7 @@
                             <hr style="margin-top: 0.5rem !important; margin-bottom: 0.5rem !important;">
                             <div class="row">
                                 <div class="col-md-12 col-lg-12 col-xl-2">
-                                     @if($have_team)
-                                    <a href="{{route('attendance_report_monthly',['user_id' => Auth::user()->user_id])}}">
-                                        <h3 class="m-widget24__title mt-2" style="font-size: 1.5rem !important;">Team's</h3>
-                                    </a>
-                                    @else
-                                        <h3 class="m-widget24__title mt-2" style="font-size: 1.5rem !important;">Team's</h3>
-                                    @endif
+                                    <h3 class="m-widget24__title mt-2" style="font-size: 1.5rem !important;">Team's</h3>
                                 </div>
                                 @if($have_team)
                                     <div class="col-md-3 col-lg-3 col-xl-2">
@@ -82,7 +74,7 @@
                                     </div>
                                 @else
                                  <div class="col-md-6 col-lg-6 col-xl-8">
-                                    <p class="mt-2">Currently No Team under you (for Attendance)</p>
+                                    <p class="mt-2">No Team assigned to you yet for Attendance</p>
                                  </div>
                                 @endif
                             </div>

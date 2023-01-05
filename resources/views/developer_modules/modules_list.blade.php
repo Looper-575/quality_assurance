@@ -54,6 +54,7 @@
                                 <th>Module</th>
                                 <th>Added By</th>
                                 <th>Added On</th>
+                                <th>Status</th>
                                 <th>Action</th>
                             </tr>
                             </thead>
@@ -66,6 +67,7 @@
                                         <td>{{ $unapproved->task->title??''}}</td>
                                         <td>{{$unapproved->users->full_name??''}}</td>
                                         <td>{{ parse_datetime_get($unapproved->added_on)}}</td>
+                                        <td>{{$unapproved->approved == 0 ?'Pending':'Re-Opened'}}</td>
                                         <td>
                                             @if($has_permissions->view == 1)
                                                 <a href="{{route('single_module_detail',$unapproved->id)}}" class="btn btn-primary">View</a>

@@ -12,7 +12,7 @@
                 @if(count($teams)>0)
                 <div class="m-portlet__head-title float-right">
                     <select class="form-control select2 mt-3" name="manager_id" id="manager_id">
-                        <option value="">Select Team</option>
+                        <option value="">Select Manager</option>
                         @foreach($teams as $team)
                             <option value="{{$team->team_lead_id}}">{{$team->title}}</option>
                         @endforeach
@@ -31,7 +31,7 @@
                         <th>Date</th>
                         <th>Time In</th>
                         <th>Time Out</th>
-                        <th>Action</th>
+                        <th title="Field #10">Action</th>
                     </tr>
                     </thead>
                     <tbody>

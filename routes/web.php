@@ -352,12 +352,10 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
         Route::get('/employee_assessment', 'App\Http\Controllers\EmployeeAssessmentController@index')->name('employee_assessment');
         Route::get('/employee_assessment_form', 'App\Http\Controllers\EmployeeAssessmentController@employee_assessment_form')->name('employee_assessment_form');
         Route::get('/view_employee_assessment', 'App\Http\Controllers\EmployeeAssessmentController@view_employee_assessment')->name('view_employee_assessment');
-        Route::post('/initiate_employee_assessment_form', 'App\Http\Controllers\EmployeeAssessmentController@initiate_employee_assessment_form')->name('initiate_employee_assessment_form');
     });
     Route::post('/employee_assessment_save', 'App\Http\Controllers\EmployeeAssessmentController@employee_assessment_save')->name('employee_assessment_save');
     Route::get('/get_employee_details', 'App\Http\Controllers\EmployeeAssessmentController@get_employee_details')->name('get_employee_details');
     Route::get('/schedule_self_assessment', 'App\Http\Controllers\EmployeeAssessmentController@schedule_self_assessment')->name('schedule_self_assessment');
-    Route::post('/employee_assessment_initiate', 'App\Http\Controllers\EmployeeAssessmentController@employee_assessment_initiate')->name('employee_assessment_initiate');
 
     // Notification Tray
     Route::get('/get_pending_notifications', 'App\Http\Controllers\NotificationsController@get_pending_notifications')->name('get_pending_notifications');
@@ -382,7 +380,6 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
         Route::post('/leaves_bucket_save', 'App\Http\Controllers\LeavesBucketController@leaves_bucket_save')->name('leaves_bucket_save');
         Route::get('/view_leaves_bucket', 'App\Http\Controllers\LeavesBucketController@view_leaves_bucket')->name('view_leaves_bucket');
         Route::post('/get_employee_leaves_bucket', 'App\Http\Controllers\LeaveApplicationController@get_employee_leaves_bucket')->name('get_employee_leaves_bucket');
-        Route::get('/get_employee_record/{id}','App\Http\Controllers\LeaveApplicationController@get_employee_record')->name('get_employee_record');
     });
     Route::group(['middleware' => ['check-permission:leaves_taken_report_monthly,view,0,0']], function() {
         Route::get('/leaves_taken_report_monthly','App\Http\Controllers\ReportController@leaves_taken_report_monthly')->name('leaves_taken_report_monthly');
@@ -391,7 +388,6 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     //    Payslips
     Route::get('/payslips', 'App\Http\Controllers\PayrollController@payslips')->name('payslips');
     Route::post('/view_payslip', 'App\Http\Controllers\PayrollController@view_payslip')->name('view_payslip');
-    Route::post('/search_payslips', 'App\Http\Controllers\PayrollController@search_payslips')->name('search_payslips');
     // Payroll routes
     Route::group(['middleware' => ['check-permission:create_payroll,view,0,0']], function() { // generation module
         Route::post('/generate_pay_role','App\Http\Controllers\PayrollController@generate_pay_role')->name('generate_pay_role');
@@ -402,7 +398,6 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
         Route::get('/payroll_details','App\Http\Controllers\PayrollController@payroll_details')->name('payroll_details');
         Route::get('payroll_edit/{payroll_id}','App\Http\Controllers\PayrollController@payroll_edit')->name('payroll_edit');
         Route::post('/payroll_save_edit','App\Http\Controllers\PayrollController@payroll_save_edit')->name('payroll_save_edit');
-        Route::post('/calculate_income_tax','App\Http\Controllers\PayrollController@calculate_income_tax')->name('calculate_income_tax');
         Route::post('/payroll_reject','App\Http\Controllers\PayrollController@payroll_reject')->name('payroll_reject');
         Route::post('/payroll_approve','App\Http\Controllers\PayrollController@payroll_approve')->name('payroll_approve');
     });
@@ -491,24 +486,8 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::post('/get_modules', 'App\Http\Controllers\TaskController@get_modules')->name('get_modules');
     Route::post('/get_users', 'App\Http\Controllers\TaskController@get_users')->name('get_users');
     Route::get('/view_document/{id}', 'App\Http\Controllers\TaskController@view_document')->name('view_document');
+
+
     // route for testing email
     Route::get('/send_laravel_email', 'App\Http\Controllers\NotificationsController@send_laravel_email')->name('send_laravel_email');
-
-    // project module routes
-    Route::group(['middleware' => ['check-permission:modules_list,view,0,0']], function() {
-        Route::get('modules_list', 'App\Http\Controllers\ModuleController@modules_list')->name('modules_list');
-        Route::get('single_module_detail/{id}', 'App\Http\Controllers\ModuleController@single_module_detail')->name('single_module_detail');
-    });
-    Route::group(['middleware' => ['check-permission:modules_list,0,add,0']], function() {
-        Route::get('module_form/{id?}/{task_id?}', 'App\Http\Controllers\ModuleController@module_form')->name('module_form');
-    });
-    Route::group(['middleware' => ['check-permission:modules_list,0,0,update']], function() {
-        Route::get('/projects_list', 'App\Http\Controllers\ProjectController@projects_list')->name('projects_list');
-        Route::post('/project_delete', 'App\Http\Controllers\ProjectController@project_delete')->name('project_delete');
-        Route::post('/project_save', 'App\Http\Controllers\ProjectController@project_save')->name('project_save');
-    });
-    Route::post('save_module_info', 'App\Http\Controllers\ModuleController@save_module_info')->name('save_module_info');
-    Route::post('approve_module', 'App\Http\Controllers\ModuleController@approve_module')->name('approve_module');
-    Route::post('project_modules', 'App\Http\Controllers\ModuleController@project_modules')->name('project_modules');
-
 });

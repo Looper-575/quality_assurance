@@ -223,13 +223,10 @@
                     {{$lead_data->qa_status->automatic_fail_comment}}
                 </td>
             </tr>
+            <th>Additional Comments</th>
             <tr>
-                <th>Additional Comments</th>
-                <th>QA Done By</th>
-            </tr>
-            <tr>
-                <td>{{$lead_data->qa_status->additional_comment}}</td>
-                <td>{{$lead_data->qa_assessment->qa_done_by->full_name}}</td>
+                <td colspan="2">{{$lead_data->qa_status->additional_comment}}
+                </td>
             </tr>
         </table>
     @endif

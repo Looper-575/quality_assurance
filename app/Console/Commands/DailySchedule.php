@@ -2,7 +2,6 @@
 namespace App\Console\Commands;
 use App\Models\EmployeePIP;
 use App\Models\EmployeeSeparation;
-use App\Models\LeavesBucket;
 use App\Models\User;
 use Illuminate\Console\Command;
 use App\Models\Employee;
@@ -44,8 +43,7 @@ class DailySchedule extends Command
         $this->schedule_all_employees_self_assessment();
         $this->schedule_employees_separation();
         $this->employees_pip_review_notification();
-        $this->create_leave_bucket();
-        echo "test\n";
+        echo "test";
     }
     private function schedule_all_employees_self_assessment()
     {
@@ -165,19 +163,6 @@ class DailySchedule extends Command
                     }
                 }
             }
-        }
-    }
-    private function create_leave_bucket(){
-        try {
-            echo "here we test";
-            dd('valid');
-            $expire_bucket = LeavesBucket::whereDate('start_date','<', now()->subYear())->get();
-            foreach ($expire_bucket as $bucket){
-                $expiryDate = date('Y-m-d', strtotime('+1 year', strtotime($bucket->start_date)) );
-                LeavesBucket::whereUserId($bucket->user_id)->update(['start_date' => $expiryDate, 'status' => 0]);
-            }
-        } catch (Exception $e) {
-            return false;
         }
     }
 }

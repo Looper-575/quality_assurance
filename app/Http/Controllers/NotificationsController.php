@@ -17,7 +17,7 @@ class NotificationsController extends Controller
     public function __construct() { }
     public function get_pending_notifications(){
         $data['notifications'] = Notifications::where('user_id', Auth::user()->user_id)
-            ->where('status','!=',0)->orderBy('status', 'ASC')->orderBy('added_on','DESC')->get();
+            ->where('status','!=',0)->orderby('status','ASC')->get();
         $data['unread_notifications'] = Notifications::where('user_id', Auth::user()->user_id)
             ->where('status',1)->count();
         return view('layout.partials.notifications' , $data);

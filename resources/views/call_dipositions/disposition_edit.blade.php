@@ -76,8 +76,6 @@
                             <div class="form-group" id="new_phone_div" style="display: {{$lead_edit->new_phone_number != '' ? 'block' : 'none'}}">
                                 <label class="form-check-label" for="new_phone">New Phone Number</label>
                                 <input {{$lead_edit->new_phone_number != '' ? 'required' : ''}} type="tel" class="form-control" value="{{$lead_edit->new_phone_number}}" name="new_phone_number" id="new_phone">
-                                <label class="form-check-label mt-4 pt-1" for="new_tpv">New TPV Number</label>
-                                <input {{$lead_edit->new_tpv_number != '' ? 'required' : ''}} type="tel" class="form-control" value="{{$lead_edit->new_tpv_number}}" name="new_tpv_number" id="new_tpv">
                             </div>
                             <div class="form-group" id="new_lines_div" style="display: {{$lead_edit->mobile_lines != '' ? 'block' : 'none'}}">
                                 <label class="form-check-label" for="new_lines">Number of Mobile Lines</label>

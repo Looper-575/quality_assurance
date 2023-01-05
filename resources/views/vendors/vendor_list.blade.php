@@ -27,7 +27,6 @@
                     <th>Email</th>
                     <th>Role</th>
                     <th>Did Ids</th>
-                    <th>Gender</th>
                     <th>Address</th>
                     <th>Contact</th>
                     <th>Action</th>
@@ -41,7 +40,6 @@
                         <td>{{ $user_list->email }}</td>
                         <td>{{ $user_list->role->title }}</td>
                         <td>{{ $user_list->vendor_did_id}}</td>
-                        <td>{{ $user_list->gender }}</td>
                         <td>{{ $user_list->postal_address }}</td>
                         <td>{{ $user_list->contact_number }}</td>
                         <td>

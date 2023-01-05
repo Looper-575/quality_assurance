@@ -22,7 +22,7 @@ class PayrollDeductionSetting extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'title','department_id', 'role_id', 'criteria', 'type', 'value', 'added_by' ,'modified_by',
+        'title','department_id', 'role_id', 'criteria', 'type', 'value', 'before_tax', 'added_by' ,'modified_by',
     ];
 
     /**

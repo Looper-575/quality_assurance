@@ -107,9 +107,18 @@ class SalesTransferController extends Controller
             $sales_transfer->transfer_to = $user;
             $sales_transfer->added_by = $call_agent->added_by;
             $sales_transfer->save();
+            if($sales_transfer->approved_my_supervisor == 1 && $sales_transfer->approved_transfer_supervisor == 1 && $sales_transfer->admin_approved == 1){
+                CallDisposition::where('call_id' , $sales_transfer->call_id)->update([
+                    'added_by' => $sales_transfer->transfer_to,
+                    'sale_transferred' => 1
+                ]);
+                $response['status'] = "Success";
+                $response['result'] = "Transferred Successfully";
+            } else {
+                $response['status'] = "Success";
+                $response['result'] = "Sale Transfer Requested";
+            }
             DB::commit();
-            $response['status'] = "Success";
-            $response['result'] = "Sale Transfer Requested";
         }
         catch (\Exception $ex){
             DB::rollBack();

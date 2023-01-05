@@ -1,4 +1,4 @@
-<div class="col-12 col-xl-6">
+<div id="" class="col-12 col-xl-6">
     <div class="m-portlet ">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">

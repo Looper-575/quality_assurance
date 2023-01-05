@@ -201,24 +201,6 @@
             $(".progress-bar").css('width',wid);
         }
         $(document).ready(function() {
-            let emp_status = $('input[name="employment_status"]:checked').val();
-            if(emp_status == 'Confirmed'){
-                $('.is_confirmed').removeClass('d-none');
-                $('.is_confirmed').addClass('d-block');
-            } else {
-                $('.is_confirmed').removeClass('d-block');
-                $('.is_confirmed').addClass('d-none');
-            }
-            $('input[name="employment_status"]').on('change', function (){
-                let emp_status = $('input[name="employment_status"]:checked').val();
-                if(emp_status == 'Confirmed'){
-                    $('.is_confirmed').removeClass('d-none');
-                    $('.is_confirmed').addClass('d-block');
-                } else {
-                    $('.is_confirmed').removeClass('d-block');
-                    $('.is_confirmed').addClass('d-none');
-                }
-            });
             if($('#employee_id').val() != 0){
                 $(document).on('click', '.m-wizard__step', function(){
                     let button_id = $(this).attr("id");

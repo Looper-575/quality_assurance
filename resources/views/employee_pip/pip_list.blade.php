@@ -12,24 +12,18 @@
                 <div class="m-portlet__head-title float-left">
                     <h3 class="m-portlet__head-text">Performance Improvement Plans List</h3>
                 </div>
-            </div>
-            @if($is_employee == false)
-                <div class="float-right mt-3">
-                    <div class="m-portlet__head-tools float-right">
-                        <ul class="nav nav-tabs m-tabs-line m-tabs-line--success m-tabs-line--2x m-tabs-line--right" role="tablist">
-                            <li class="nav-item m-tabs__item">
-                                <a href="{{route('pip_form')}}" class="nav-link m-tabs__link">
-                                    <span class="add-new-button"><i class="fa fa-plus"></i><span>Add New PIP</span></span>
-                                </a>
-                            </li>
-                        </ul>
+                @if($is_employee == false)
+                    <div class="float-right mt-3">
+                        <a href="{{route('pip_form')}}" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill">
+                            <span><i class="la la-phone-square"></i><span>Add New PIP</span></span>
+                        </a>
+                        <div class="m-separator m-separator--dashed d-xl-none"></div>
                     </div>
-                    <div class="m-separator m-separator--dashed d-xl-none"></div>
-                </div>
-            @endif
+                @endif
+            </div>
         </div>
         <div class="m-portlet__body">
-            <table class="table table-bordered" style="" id="pip_list_table">
+            <table class="datatable table table-bordered" style="">
                 <thead>
                 <tr>
                     <th>S.No</th>
@@ -73,19 +67,19 @@
                         </td>
                         <td>
                             <div class="btn-group btn-group-sm">
-                                <a href="{{route('view_pip',['pip_id' => $pip_detail->pip_id])}}" id="{{$pip_detail->pip_id}}" class="btn btn-primary text-white"><i class="la la-eye"></i></a>
-                                @if($is_employee || $pip_detail->user_id == Auth::user()->user_id)
-                                    @if($pip_detail->employee_acknowledgement == 0)
-                                        <button class="btn btn-info d-none" style="color: white !important;" onclick="employee_ack_pip_with_comments(this);" value="{{$pip_detail->pip_id}}">Employee Ack</button>
-                                    @endif
-                                @else
-                                    @if( ($is_manager || $is_hr) && ($pip_detail->employee_acknowledgement == 0) )
-                                        <a title="Edit" class="btn btn-info text-white" id="{{$pip_detail->pip_id}}" href="{{route('pip_form',['pip_id' => $pip_detail->pip_id])}}"><i class="fa fa-edit"></i></a>
-                                    @endif
-                                    @if($is_hr && $pip_detail->hr_approve == 0 && $pip_detail->employee_acknowledgement == 1)
-                                        <button class="btn btn-warning" style="color: white !important;" onclick="hr_approve_pip(this);" value="{{$pip_detail->pip_id}}">HR Approve</button>
-                                    @endif
+                                <a href="{{route('view_pip',['pip_id' => $pip_detail->pip_id])}}" id="{{$pip_detail->pip_id}}" class="btn btn-primary"><i class="la la-eye"></i></a>
+                            @if($is_employee)
+                                @if($pip_detail->employee_acknowledgement == 0)
+                                     <button class="btn btn-info text-white" onclick="employee_ack_pip_with_comments(this);" value="{{$pip_detail->pip_id}}">Employee Ack</button>
                                 @endif
+                            @else
+                                @if( ($is_manager || $is_hr) && ($pip_detail->employee_acknowledgement == 0) )
+                                      <a title="Edit" class="btn btn-primary edit_pip" id="{{$pip_detail->pip_id}}" href="{{route('pip_form',['pip_id' => $pip_detail->pip_id])}}"><i class="fa fa-edit"></i></a>
+                                @endif
+                                @if($is_hr && $pip_detail->hr_approve == 0 && $pip_detail->employee_acknowledgement == 1)
+                                      <button class="btn btn-warning text-white" onclick="hr_approve_pip(this);" value="{{$pip_detail->pip_id}}">HR Approve</button>
+                                @endif
+                            @endif
                             </div>
                         </td>
                     </tr>
@@ -99,9 +93,6 @@
     <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script>
-        $(document).ready(function (){
-            $('#pip_list_table').dataTable({});
-        });
         function employee_ack_pip_with_comments (me) {
             let pip_id = me.value;
             let data = new FormData();
