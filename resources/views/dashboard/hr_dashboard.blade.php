@@ -7,7 +7,7 @@
 </style>
 @endsection
 @section('content')
-    @if(Auth::user()->role_id == 5)
+    @if(Auth::user()->role_id == 5 || Auth::user()->role_id == 34)
         <div class="m-portlet ">
             <div class="m-portlet__body  m-portlet__body--no-padding">
                 <div class="row m-row--no-padding m-row--col-separator-xl">

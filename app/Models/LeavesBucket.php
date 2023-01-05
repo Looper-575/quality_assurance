@@ -48,7 +48,7 @@ class LeavesBucket extends Authenticatable
         'added_on' => 'datetime',
         'modified_on' => 'datetime',
     ];
-    public function employee()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }

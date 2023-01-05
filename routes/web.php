@@ -232,6 +232,10 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
         Route::get('/qa_report_form' , 'App\Http\Controllers\ReportController@qa_report_form')->name('qa_report_form');
         Route::post('/generate_qa_report' , 'App\Http\Controllers\ReportController@generate_qa_report')->name('generate_qa_report');
     });
+
+    Route::get('/qa_avg_report_form' , 'App\Http\Controllers\ReportController@qa_avg_report_form')->name('qa_avg_report_form');
+    Route::post('/generate_qa_avg_report' , 'App\Http\Controllers\ReportController@generate_qa_avg_report')->name('generate_qa_avg_report');
+
     Route::group(['middleware' => ['check-permission:attendance_report_monthly,view,0,0']], function() {
         Route::get('/attendance_report_monthly','App\Http\Controllers\ReportController@attendance_report_monthly')->name('attendance_report_monthly');
         Route::post('/generate_monthly_attendance_report' , 'App\Http\Controllers\ReportController@generate_monthly_attendance_report')->name('generate_monthly_attendance_report');
@@ -312,6 +316,7 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
     Route::group(['middleware' => ['check-permission:employees,view,0,0']], function() {
         Route::get('/employees', 'App\Http\Controllers\EmployeeController@index')->name('employees');
     });
+    Route::post('/employee_search', 'App\Http\Controllers\EmployeeController@employee_search')->name('employee_search');
     Route::get('/employee_form_wizard', 'App\Http\Controllers\EmployeeController@employee_form')->name('employee_form');
     Route::post('/employee_save', 'App\Http\Controllers\EmployeeController@employee_info_save')->name('employee_save');
     Route::group(['middleware' => ['is-admin']], function() {
@@ -381,6 +386,8 @@ Route::middleware(\App\Http\Middleware\EnsureLogin::class)->group(function () {
         Route::get('/view_leaves_bucket', 'App\Http\Controllers\LeavesBucketController@view_leaves_bucket')->name('view_leaves_bucket');
         Route::post('/get_employee_leaves_bucket', 'App\Http\Controllers\LeaveApplicationController@get_employee_leaves_bucket')->name('get_employee_leaves_bucket');
     });
+    Route::post('/leave_bucket_approve', 'App\Http\Controllers\LeavesBucketController@leave_bucket_approve')->name('leave_bucket_approve');
+    Route::post('/leave_bucket_reject', 'App\Http\Controllers\LeavesBucketController@leave_bucket_reject')->name('leave_bucket_reject');
     Route::group(['middleware' => ['check-permission:leaves_taken_report_monthly,view,0,0']], function() {
         Route::get('/leaves_taken_report_monthly','App\Http\Controllers\ReportController@leaves_taken_report_monthly')->name('leaves_taken_report_monthly');
     });

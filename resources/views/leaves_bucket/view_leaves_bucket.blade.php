@@ -28,7 +28,7 @@
                                 <label class="">
                                     Employee Name:
                                 </label>
-                                <span class="float-right">{{ $leaves_bucket->employee->full_name }}</span>
+                                <span class="float-right">{{ $leaves_bucket->user->full_name }}</span>
                             </div>
                             <div class="col-6 pl-5">
                                 <label class="">

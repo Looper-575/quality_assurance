@@ -47,4 +47,9 @@ class PayrollAllowanceDetail extends Authenticatable
     {
         return $this->belongsTo(Payroll::class , 'payroll_id' , 'payroll_id');
     }
+
+    public function income_tax()
+    {
+        return $this->belongsTo(Payroll::class , 'payroll_id' , 'payroll_id')->where('title', 'Income Tax');
+    }
 }

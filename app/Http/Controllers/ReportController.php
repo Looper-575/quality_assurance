@@ -238,19 +238,37 @@ class ReportController extends Controller
                 $user_ids = User::get()->pluck('user_id')->toArray();
                 array_push($user_ids, 0);
             }
-            $form_date = date($year.'-'.$month.'-01');
-            $to_date = date("Y-m-t", strtotime($request->year_month));
-            $endDate = $to_date;
-            $startDate = $form_date;
+            $month = date("m",strtotime($request->year_month));
+            $year = date("Y",strtotime($request->year_month));
+
+            $change_month = date('m', strtotime($request->year_month));
+            if((0 == $year % 4) & (0 != $year % 100) | (0 == $year % 400))
+            {
+                $startDate = date('Y-m-29',(strtotime ( '-1 month' , strtotime ( $request->year_month) ) ));
+                $endDate = date('Y-m-28',(strtotime ( $request->year_month)));
+            } else {
+                if($change_month == 02){
+                    $startDate = date('Y-m-29',(strtotime ( '-1 month' , strtotime ( $request->year_month) ) ));
+                    $endDate = date('Y-m-28',(strtotime ( '+1 month' , strtotime ( $request->year_month) ) ));
+                } elseif ($change_month == 03){
+                    $startDate = date('Y-m-t',(strtotime ( $request->year_month) ));
+                    $endDate = date('Y-m-28',(strtotime ( $request->year_month)));
+                } else {
+                    $startDate = date('Y-m-29',(strtotime ( '-1 month' , strtotime ( $request->year_month) ) ));
+                    $endDate = date('Y-m-28',(strtotime ( $request->year_month)));
+                }
+            }
+            $to_date = $endDate;
+            $form_date = $startDate;
             $working_days = working_days($startDate, $endDate);
-            $attendance_list = AttendanceLog::select(DB::raw('sum(late) as `lates`, sum(absent) as `absents`, sum(on_leave) as `leaves` , sum(half_leave) as `half_leaves` , count(user_id) as `attendance_marked` , MONTH(attendance_date) month'), 'user_id')
+            $attendance_list = AttendanceLog::select(DB::raw('count(user_id) as `attendance_marked`, sum(late) as `lates`, sum(absent) as `absents`, sum(on_leave) as `leaves` , sum(half_leave) as `half_leaves`'), 'user_id')
                 ->whereIn('user_id', $user_ids)
-                ->whereYear('attendance_date', $year)
-                ->whereMonth('attendance_date', $month)
-                ->groupBy('month', 'user_id')
+                ->where('attendance_date','>=',  $startDate)
+                ->where('attendance_date','<=',  $endDate)
+                ->groupBy('user_id')
                 ->get();
             for ($i=0; $i<count($attendance_list); $i++){
-                $attendance_list[$i]->holiday_count = $this->check_holidays($form_date, $to_date,$attendance_list[$i]->user->department_id, $attendance_list[$i]->user->user_id);
+                $attendance_list[$i]->holiday_count = $this->check_holidays($form_date, $to_date,$attendance_list[$i]->user->department_id, $attendance_list[$i]->user->user_id,$attendance_list[$i]->user->role_id);
             }
             $data['leaves'] = LeaveApplication::with('user')->where(['approved_by_manager'=>1,'approved_by_hr'=>1])
                 ->where('from', '>=', $startDate)
@@ -295,7 +313,7 @@ class ReportController extends Controller
             $form_date = $request->form_date;
             $to_date = $request->to_date;
             $user = User::whereUserId($request->user_id)->first();
-            $holiday_count = $this->check_holidays($form_date, $to_date,$user->department_id, $user->user_id);
+            $holiday_count = $this->check_holidays($form_date, $to_date,$user->department_id, $user->user_id, $user->role_id);
             $working_days = working_days($form_date, $to_date);
             $data['attendance_list'] = AttendanceLog::where('user_id', $request->user_id)->whereBetween('attendance_date', [$form_date, $to_date])->get();
             $data['agent_name'] = User::where('user_id', $request->user_id)->pluck('full_name')->first();
@@ -309,11 +327,15 @@ class ReportController extends Controller
         }
         return view('reports.partials.attendance_single_report_list' , $data);
     }
-    private function check_holidays($form_date, $to_date, $department_id, $user_id)
+    private function check_holidays($form_date, $to_date, $department_id, $user_id, $role_id)
     {
         $check_holidays = Holiday::where(function ($query_dpt) use($department_id) {
-                return $query_dpt->where('department_id', $department_id)
-                    ->orWhere('department_id',0);
+            return $query_dpt->where('department_id', $department_id)
+                ->orWhere('department_id',0);
+        })
+            ->where(function ($query_role) use($role_id) {
+                return $query_role->whereRaw('FIND_IN_SET("'.$role_id.'",role_id)')
+                    ->orWhere('role_id',0);
             })
             ->where(function ($query) use($user_id) {
                 return $query->whereRaw('FIND_IN_SET("'.$user_id.'",user_id)')
@@ -326,7 +348,7 @@ class ReportController extends Controller
             ->get();
         $holiday_count = 0;
         foreach ($check_holidays as $day){
-            $holiday_count = 1;
+            $holiday_count = $holiday_count+1;
             if($day->date_from >= $form_date){
                 $from = $day->date_from;
             } else {
@@ -383,7 +405,7 @@ class ReportController extends Controller
                 ->get();
             $user = User::where('user_id',$request->user_id)->first();
             $data['employee_name'] = User::where('user_id',$request->user_id)->pluck('full_name')->first();
-            $holiday_count = $this->check_holidays($from_date, $to_date,$user->department_id, $user->user_id);
+            $holiday_count = $this->check_holidays($from_date, $to_date,$user->department_id, $user->user_id, $user->role_id);
             $data['holiday_count'] = $holiday_count;
             $data['working_days'] = $working_days;
             $data['start_month'] = $from_date;
@@ -425,5 +447,45 @@ class ReportController extends Controller
             ->get();
         $data['user_id'] = $request->user_id;
         return view('reports.partials.leave_report' , $data);
+    }
+    public function qa_avg_report_form()
+    {
+        $data['page_title'] = "Atlantis BPO CRM - QA Report";
+        $data['small_nav'] = true;
+        $data['agents'] = User::where([
+            'role_id' => 4,
+            'status' => 1,
+        ])->get();
+        $data['disposition_types'] = CallType::where([
+            'status' => 1,
+        ])->get();
+        return view('reports.qa_avg_report_form', $data);
+    }
+    public function generate_qa_avg_report(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'from' => 'required',
+            'to' => 'required',
+        ]);
+        if ($validator->passes()) {
+            $date_from = parse_datetime_store($request->from.'17:00:00');
+            $date_to = parse_datetime_store($request->to. '12:00:00');
+            $data['qa_bage'] = DB::table('qa_performance_badge')->get();
+
+            $query = QualityAssurance::selectRaw('AVG(monitor_percentage) as monitor_percentage, ANY_VALUE(agent_id) as agent_id, COUNT(qa_id) as sales_count, COUNT(case when monitor_percentage = 0 then 1 end) as fatal')
+                ->with(['agent'])
+                ->where([['added_on', '>=', $date_from],['added_on', '<=', $date_to]]);
+            if ($request->agent != "") {
+                $query = $query->whereIn('agent_id', $request->agent);
+            }
+            if($request->disposition_type != null){
+                $query = $query->where('call_type_id', $request->disposition_type);
+            }
+            $data['qa_lists'] = $query->groupBy('agent_id')->get();
+        } else {
+            $response['status'] = "Failure!";
+            $response['result'] = $validator->errors()->toJson();
+        }
+        return view('reports.partials.qa_avg_report_list', $data);
     }
 }

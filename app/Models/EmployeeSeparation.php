@@ -29,6 +29,7 @@ class EmployeeSeparation extends Model
         'separation_date',
         'disable_user_account',
         'assets_list',
+        'allowance_list',
         'bonus_deduction',
         'assets_returned',
         'added_by'

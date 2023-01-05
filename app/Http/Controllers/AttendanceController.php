@@ -196,7 +196,7 @@ class AttendanceController extends Controller
             return null;
         }
         $users_id = TeamMember::where('team_id', $team->team_id)->pluck('user_id')->toArray();
-        array_push($users_id, $manager_id);
+//        array_push($users_id, $manager_id);
         $this->create_attendance_sheet($users_id, $date_today, $team ,$manager_id);
         $data['agents'] =  AttendanceLog::with('user')->where('attendance_date', $date_today)->where('added_by', $manager_id)->get();
         $data['not_marked'] = false;

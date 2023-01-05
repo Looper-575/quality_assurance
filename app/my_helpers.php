@@ -411,7 +411,7 @@ if(!function_exists('generate_single_employee_leaves_bucket')){
     function generate_single_employee_leaves_bucket($user_id)
     {
         $leave_bucket = \App\Models\LeavesBucket::where('user_id', $user_id)->count();
-        if($leave_bucket == 0 ){
+        if($leave_bucket == 0 && $employee_conformation_date != null){
             \App\Models\LeavesBucket::create(['user_id' => $user_id,
                 'start_date' => get_date(),
                 'annual_leaves' => 10,
