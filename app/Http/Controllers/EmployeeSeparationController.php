@@ -41,7 +41,8 @@ class EmployeeSeparationController extends Controller
     public function index()
     {
         $data['page_title'] = "Atlantis BPO CRM - Employee Separations Details List";
-        $data['employee_separation'] = EmployeeSeparation::with('user.employee', 'employee_separation')->where('status',1)->orderBy('separation_id', 'DESC')->get();
+        $data['employee_separation'] = EmployeeSeparation::with('user.employee', 'employee_separation')->doesntHave('employee_separation')->where('status',1)->orderBy('separation_id', 'DESC')->get();
+        $data['sparated_employee'] = EmployeeSeparation::with('user.employee', 'employee_separation')->has('employee_separation')->where('status',1)->orderBy('separation_id', 'DESC')->get();
         $data['is_admin'] = false;
         if(Auth::user()->role_id == 1 || Auth::user()->role_id == 5){
             $data['is_admin'] = true;
@@ -71,11 +72,18 @@ class EmployeeSeparationController extends Controller
         ]);
         if ($validator->passes()) {
             $assets_list_array = array();
-            if($request->assets_list[0] != NULL){
+            if($request->assets_list != NULL){
                 for($i=0, $i_max=count($request->assets_list); $i<$i_max; $i++) {
                     $assets_list_array[] = array("item" => $request->assets_list[$i], "price" => $request->assets_price[$i]);
                 }
                 $assets_list_array = json_encode($assets_list_array);
+            }
+            $allowance_list_array = array();
+            if($request->allowance_list != NULL){
+                for($i=0, $i_max=count($request->allowance_list); $i<$i_max; $i++) {
+                    $allowance_list_array[] = array("item" => $request->allowance_list[$i], "price" => $request->allowance_amount[$i]);
+                }
+                $allowance_list_array = json_encode($allowance_list_array);
             }
             $separation = EmployeeSeparation::where('separation_id', $request->separation_id)->first();
             $separation_data = [
@@ -90,10 +98,10 @@ class EmployeeSeparationController extends Controller
                     'disable_user_account' => $request->disable_user_account,
                     'bonus_deduction' => $request->bonus_deduction,
                 ];
-
-            if(!empty($assets_list_array)){
+//            if(!empty($assets_list_array)){
                 $separation_data['assets_list'] = $assets_list_array;
-            }
+                $separation_data['allowance_list'] = $allowance_list_array;
+//            }
             if($separation){
                 EmployeeSeparation::where('separation_id', $separation->separation_id)->update($separation_data);
             } else {
@@ -121,52 +129,74 @@ class EmployeeSeparationController extends Controller
         if(isset($request->separation_id)) {
             $separation = EmployeeSeparation::with('user.employee', 'user.department')->where('separation_id',$request->separation_id)->first();
             $check_payroll = Payroll::whereUserId($separation->user_id)->whereStatus(1)->whereHrApproved(1)->orderBy('payroll_id','DESC')->first();
-            if($check_payroll != null){
-                $form_date = date('Y-m', strtotime(date("Y-m", strtotime($check_payroll->salary_month)) . "+1 months")).'-01';
-            } else {
-                $form_date = date('Y-m-d', strtotime($separation->user->employee->joining_date));
+
+            $day = date('d ',strtotime($separation->resignation_date));
+            if($day >= 28){
+                $form_date = $this->set_from_date_for_leap_year(date("Y-m-d", strtotime($separation->resignation_date)));
+            } else{
+                $form_date = $this->set_from_date_for_leap_year(date('Y-m-d', strtotime(date("Y-m-d", strtotime($separation->resignation_date)) . "-1 months")));
             }
             $to_date = $separation->separation_date;
-            $attendance_log = AttendanceLog::with('user.employee')->select(DB::raw('sum(late) as `lates`, sum(absent) as `absents`, sum(on_leave) as `leaves` , sum(applied_leave) as `applied_leave`, sum(half_leave) as `half_leaves` , count(user_id) as `attendance_marked` , MONTH(attendance_date) month , YEAR(attendance_date) year , ANY_VALUE(user_id) as user_id'))
+            $attendance_log = AttendanceLog::with('user.employee')->select(DB::raw('sum(late) as `lates`, sum(absent) as `absents`, sum(on_leave) as `leaves` , sum(applied_leave) as `applied_leave`, sum(half_leave) as `half_leaves` , count(user_id) as `attendance_marked` , ANY_VALUE(user_id) as user_id'))
                 ->where('user_id', $separation->user_id)
                 ->whereBetween('attendance_date', [$form_date, $to_date])
-                ->groupBy('year', 'month')
+                ->groupBy('user_id')
                 ->get();
             $total_earnings = 0;
             $total_deductions = 0;
             $total_salary = 0;
             $medical_allowance_val = $this->get_payroll_config();
-            for ($i=0; $i<count($attendance_log); $i++) {
-                $form_date = date($attendance_log[$i]->year.'-'.$attendance_log[$i]->month.'-01');
-                $month=date("m",strtotime($separation->separation_date));
-                $to_date = date("Y-m-t", strtotime($form_date));
-                $attendance_log[$i]->notice_period = 'No';
-                if($month == $attendance_log[$i]->month){
-                    $attendance_log[$i]->notice_period = 'Yes';
-                    $to_date = $separation->separation_date;
-                }
-                $attendance_log[$i]->to_date = $to_date;
-                $attendance_log[$i]->form_date = $form_date;
-                $attendance_log[$i]->working_days = working_days($form_date, $to_date);
-                $attendance_log[$i]->medical_allowance = ($attendance_log[$i]->user->employee->net_salary*$medical_allowance_val->medical)/100;
-                $attendance_log[$i]->holiday_count = $this->check_holidays($form_date, $to_date, $attendance_log[$i]->user->department_id, $attendance_log[$i]->user->user_id);
-                if($separation->bonus_deduction == 0){
-                    $attendance_log[$i]->allowance = $this->employee_allowance($attendance_log[$i]->user->user_id, $attendance_log[$i], $form_date, $attendance_log[$i]->working_days);
-                    $total_allowance = $attendance_log[$i]->allowance['total_allowance'];
+            $attendance_log[0]->notice_period = 'Yes';
+            // get attendance log before resignation date :- we deduct all lates and half leaves form leave bucket before resignation date
+            $before_resignation = null;
+//            if(date("m",strtotime($separation->resignation_date)) == $attendance_log[0]->month){
+                $last_payroll = Payroll::where('user_id', $separation->user_id)->latest()->first();
+                if($last_payroll === NULL){
+                    $last_carry_forward = 0;
                 } else {
-                    $total_allowance = 0;
-                    $attendance_log[$i]->allowance = 0;
+                    $last_carry_forward = $last_payroll->carry_forward_half_day;
                 }
-                $attendance_log[$i]->deductions = $this->employee_deduction($attendance_log[$i]->user->employee, $attendance_log[$i], $total_allowance, $attendance_log[$i]->working_days, $attendance_log[$i]->holiday_count, $to_date);
-                $total_salary += ($attendance_log[$i]->user->employee->net_salary+$total_allowance)-$attendance_log[$i]->deductions['total_deductions'];
-                $total_earnings += $total_allowance + $attendance_log[$i]->user->employee->net_salary;
-                $total_deductions += $attendance_log[$i]->deductions['total_deductions'];
+                $before_resignation = AttendanceLog::select(DB::raw('sum(late) as `lates`, sum(absent) as `absents`, sum(on_leave+applied_leave) as `leaves` , sum(applied_leave) as `applied_leave`, sum(half_leave) as `half_leaves` , count(user_id) as `attendance_marked` , ANY_VALUE(user_id) as user_id'))
+                    ->where('user_id', $separation->user_id)
+                    ->whereBetween('attendance_date', [$form_date, $separation->resignation_date])
+                    ->groupBy('user_id')
+                    ->first();
+                $attendance_log[0]['half_leaves'] = $attendance_log[0]->half_leaves - $before_resignation->half_leaves;
+                $before_resignation['half_leaves'] = $before_resignation->half_leaves + $last_carry_forward;
+//            }
+
+            $attendance_log[0]->form_date = $form_date;
+            $attendance_log[0]->to_date = $to_date;
+            $attendance_log[0]->working_days = working_days($form_date, $to_date);
+            $attendance_log[0]->medical_allowance = ($attendance_log[0]->user->employee->net_salary*$medical_allowance_val->medical)/100;
+            $attendance_log[0]->holiday_count = $this->check_holidays($form_date, $to_date, $attendance_log[0]->user->department_id, $attendance_log[0]->user->user_id, $attendance_log[0]->user->role_id);
+            if($separation->bonus_deduction == 0) {
+                $attendance_log[0]->allowance = $this->employee_allowance($attendance_log[0]->user->user_id, $attendance_log[0], $form_date, $attendance_log[0]->working_days);
+                $total_allowance = $attendance_log[0]->allowance['total_allowance'];
+            } else {
+                $total_allowance = 0;
+                $attendance_log[0]->allowance = 0;
+            }
+            $attendance_log[0]->deductions = $this->employee_deduction($attendance_log[0], $before_resignation);
+            $total_salary += ($attendance_log[0]->user->employee->net_salary)-$attendance_log[0]->deductions['total_deductions'];
+            if($separation->bonus_deduction == 0){
+                $total_earnings += $total_allowance + $attendance_log[0]->user->employee->net_salary - $attendance_log[0]->medical_allowance;
+            } else {
+                $total_earnings += $total_allowance + $attendance_log[0]->user->employee->net_salary;
+            }
+            $total_deductions += $attendance_log[0]->deductions['total_deductions'];
+            $last_month_sales = [];
+            if($separation->bonus_deduction == 0){
+                $last_month_sales = $this->employee_allowance($separation->user->user_id, false, $separation->separation_date, false);
+                $total_earnings = $total_earnings + $last_month_sales['total_allowance'];
+                $total_salary = $total_salary + $last_month_sales['total_allowance'];
             }
             $data['separation'] = $separation;
             $data['payroll'] = $attendance_log;
             $data['total_earnings'] = $total_earnings;
             $data['total_salary'] = $total_salary;
             $data['total_deductions'] = $total_deductions;
+            $data['last_month_sales'] = $last_month_sales;
             $data['final_settlement'] = EmployeeFinalSettlement::where('separation_id', $request->separation_id)->first();
         }else{
             $data['separation'] = false;
@@ -188,36 +218,47 @@ class EmployeeSeparationController extends Controller
         if($request->has('assets_not_returned')){
             $asset_not_returned = implode(',', $request->assets_not_returned);
         }
+        $salary_paid = 0;
+        if($request->has('salary_paid')){
+            $salary_paid = $request->salary_paid;
+        }
         EmployeeFinalSettlement::updateOrCreate([
             'separation_id' => $request->separation_id,
         ], [
             'last_working_day' => $request->last_working_day,
             'length_of_service' => $request->length_of_service,
-            'salary_paid' => $request->salary_paid,
+            'salary_paid' => $salary_paid,
             'asset_deduction_amount' => $request->asset_deduction_amount,
             'assets_not_returned' => $asset_not_returned,
             'added_by' => Auth::user()->user_id,
             'modified_by' => Auth::user()->user_id
         ]);
+        User::whereUserId($request->user_id)->update(['status'=> 3]);
         $response['status'] = "Success";
         $response['result'] = "Added Successfully";
         return response()->json($response);
     }
     public function delete_final_settlement(Request $request)
     {
+        $user_id = EmployeeSeparation::where('separation_id', $request->separation_id)->pluck('user_id')->first();
         EmployeeFinalSettlement::where('separation_id', $request->separation_id)->delete();
+        User::whereUserId($user_id)->update(['status'=> 1]);
         $response['status'] = "Success";
         $response['result'] = "Deleted Successfully";
         return response()->json($response);
     }
 
     ///////////////////////////////////////////////////
-    private function check_holidays($form_date, $to_date,$department_id, $user_id)
+    private function check_holidays($form_date, $to_date,$department_id, $user_id, $role_id)
     {
         $check_holidays = Holiday::where(function ($query_dpt) use($department_id) {
             return $query_dpt->where('department_id', $department_id)
                 ->orWhere('department_id',0);
         })
+            ->where(function ($query_role) use($role_id) {
+                return $query_role->whereRaw('FIND_IN_SET("'.$role_id.'",role_id)')
+                    ->orWhere('role_id',0);
+            })
             ->where(function ($query) use($user_id) {
                 return $query->whereRaw('FIND_IN_SET("'.$user_id.'",user_id)')
                     ->orWhere('user_id',0);
@@ -314,39 +355,46 @@ class EmployeeSeparationController extends Controller
             'after_tax_deduction' => $pct_deduction_after_tax+$fixed_deduction_after_tax,
         ];
     }
-    private function employee_deduction($user, $attendace_log, $allowance, $working_days, $holiday_count, $to_date)
+    private function employee_deduction($attendace_log, $before_resignation)
     {
-        $late_absents = ($attendace_log->lates/3>=1) ? intval($attendace_log->lates/3) : 0;
-        $half_leavs_absents = ($attendace_log->half_leaves/2>=1) ? intval($attendace_log->half_leaves/2) : 0;
-        $leaves_bucket = DB::table('leave_bucket_view')->where('user_id',$user->user_id)->first();
-        $total_leaves = $late_absents+$half_leavs_absents;
+        $before_resignation_half_leaves = 0;
+        if($before_resignation != null){
+            $before_resignation_half_leaves = $before_resignation->half_leaves;
+        }
+        $carry_forward_half_day = ($before_resignation_half_leaves) % 2;
+        $number = explode('.',($before_resignation_half_leaves / 2));
+        $half_day_leave_absent = $number[0];
+
+        $leaves_bucket = DB::table('leave_bucket_view')->where('user_id',$attendace_log->user_id)->first();
+        $total_leaves = $half_day_leave_absent;
+
+        $half_leaves_deducted_from_bucket = 0;
         if($leaves_bucket != null){
+            $half_leaves_deduction = 0;
             $remaining_casual_sick = ($leaves_bucket->casual_bucket+$leaves_bucket->sick_bucket)-(($leaves_bucket->casual+$leaves_bucket->sick)-$leaves_bucket->payroll_deductions);
-            if($remaining_casual_sick < ($leaves_bucket->casual_bucket+$leaves_bucket->sick_bucket)){
-                if($remaining_casual_sick >= $total_leaves){
-                    $half_and_late_deductions=0;
-                } else if($remaining_casual_sick > 0) {
-                    $half_and_late_deductions = $total_leaves-$remaining_casual_sick;
-                }
-            } else {
-                $half_and_late_deductions = $total_leaves;
+            if($remaining_casual_sick >= $total_leaves) {
+                $half_leaves_deduction = 0;
+                $half_leaves_deducted_from_bucket = $total_leaves;
+            } else{
+                $half_leaves_deduction = $total_leaves-$remaining_casual_sick;
+                $half_leaves_deducted_from_bucket = $remaining_casual_sick;
             }
         } else {
-            $half_and_late_deductions = $total_leaves;
+            $half_leaves_deduction = $total_leaves;
         }
-        // if $half_and_late_deductions > 0
-        $leaves_deducted_from_bucket=0;
-        if($half_and_late_deductions > 0 && $half_and_late_deductions < $total_leaves){
-            $leaves_deducted_from_bucket = $total_leaves - $half_and_late_deductions;
-        } else if($half_and_late_deductions == 0) {
-            $leaves_deducted_from_bucket = $total_leaves;
-        }
-        // deduction_in_salary  AND deduction_from_bucket
-        $daily_wage = $user->net_salary/22;
-        $absent_deductions = $daily_wage*$attendace_log->absents;
-        $half_and_late_deductions_amount = $daily_wage*$half_and_late_deductions;
-        $total_absents_deduction = $absent_deductions+$half_and_late_deductions_amount;
-        $deduction_details = PayrollDeductionSetting::where('type', '!=', 'convenience')
+        $daily_wage = $attendace_log->user->employee->net_salary/22;
+        // lates deduction from salary :- 2 lates = 1 half day
+        $lates_calc = ((($attendace_log->lates + $carry_forward_half_day*2)/ 4)/.5);
+        $lates_number_of_half_day = explode('.',$lates_calc);
+
+        $lates_number_of_half_day = $lates_number_of_half_day[0];
+        $lates_deductions = $daily_wage*($lates_number_of_half_day/2);
+        // Absent deduction from salary
+        $absent_deductions = $daily_wage*$attendace_log->absents + $carry_forward_half_day;
+        $half_day_deductions_amount = $daily_wage*$half_leaves_deduction;
+        $total_absents_deduction = $absent_deductions+$half_day_deductions_amount+$lates_deductions;
+        $user = $attendace_log->user;
+        $deduction_details = PayrollDeductionSetting::where('type', '!=', 'transport')
             ->where(function ($query) use($user) {
                 return $query->where('department_id', $user->department_id)
                     ->orWhere('department_id',0);
@@ -356,46 +404,52 @@ class EmployeeSeparationController extends Controller
                     ->orWhere('role_id',0);
             })
             ->whereStatus(1)->get()->pluck('value','title',)->toArray();
-        $unmarked_days_wage = ($working_days - ($attendace_log->attendance_marked + $holiday_count)) * ($user->net_salary/$working_days);
-//        dd($daily_wage*12);
-//        dd(($working_days - ($attendace_log->attendance_marked + $holiday_count)), ' = ',$half_and_late_deductions,' = ',  $attendace_log);
+
+        $check_change_month = date('Y-m-d', strtotime(date("Y-m-d", strtotime($attendace_log->form_date)) . "+1 months"));
+        $working_days = 22;
+        if($check_change_month <= $attendace_log->to_date){
+            $working_days += working_days($check_change_month,$attendace_log->to_date);;
+        }else {
+            $working_days = 22;
+        }
+
+        $unmarked_days_wage = ($working_days - ($attendace_log->attendance_marked + $attendace_log->holiday_count)) * ($attendace_log->user->employee->net_salary/$working_days);
         if($total_absents_deduction + $unmarked_days_wage != 0){
             $deduction_details['Absent/Late/Half'] = $total_absents_deduction + $unmarked_days_wage;
         }
-        $convenience_deduction = PayrollDeductionSetting::select(DB::raw('sum(value) as convenience'))->where('type', 'convenience')->whereStatus(1)->get();
+        $convenience_deduction = PayrollDeductionSetting::select(DB::raw('sum(value) as transport'))->where('type', 'transport')->whereStatus(1)->get();
         if($user->conveyance_allowance == 1 && $convenience_deduction != null){
-            $check_last_date = date("Y-m-d", strtotime($to_date));
-            $from_date= date("Y-m-01", strtotime($to_date));
-            if($to_date < $check_last_date){
+            $check_last_date = date("Y-m-d", strtotime($attendace_log->to_date));
+            $from_date = $attendace_log->from_date;
+            if($attendace_log->to_date < $check_last_date){
                 $month_working_days = working_days($from_date,$check_last_date);
-                $working_days = working_days($from_date,$to_date);
-                $convenience_deduction = ($convenience_deduction[0]['convenience'] / $month_working_days) * $working_days;
+                $working_days = working_days($from_date,$attendace_log->to_date);
+                $convenience_deduction = ($convenience_deduction[0]['transport'] / $month_working_days) * $working_days;
             }else{
-                $convenience_deduction = $convenience_deduction[0]['convenience'];
+                $convenience_deduction = $convenience_deduction[0]['transport'];
             }
-            $deduction_details['Convenience'] = $convenience_deduction;
+            $deduction_details['transport'] = $convenience_deduction;
         } else {
             $convenience_deduction = 0;
         }
         $calculated_deductions = $this->calculate_deductions($user);
         $attendance_log_deduction = $unmarked_days_wage+$convenience_deduction+$total_absents_deduction;
         // calculating tax
-        $tax_deduction_val = $this->calculate_income_tax($user, $allowance, $attendance_log_deduction, $calculated_deductions, $attendace_log);
+        $tax_deduction_val = 0;
+//        $tax_deduction_val = $this->calculate_income_tax($user, $allowance, $attendance_log_deduction, $calculated_deductions, $attendace_log);
         if($tax_deduction_val != 0){
             $deduction_details['Income Tax'] = $tax_deduction_val;
         }
         $total_deductions =  $tax_deduction_val +  $attendance_log_deduction;
-//dd($total_deductions + $calculated_deductions['after_tax_deduction']);
         return [
             'total_deductions' => $total_deductions + $calculated_deductions['after_tax_deduction'],
-            'deduction_bucket' => $leaves_deducted_from_bucket,
             'details' => $deduction_details,
-            'leaves_of_late' => $late_absents,
-            'leaves_of_half' => $half_leavs_absents
         ];
     }
     private function employee_allowance($user_id, $attendace_log, $month, $working_days)
     {
+        // Bonuses for last month
+        $month = date('Y-m-01',(strtotime ( '-1 month' , strtotime ( $month) ) ));
         $user = User::with('employee')->whereUserId($user_id)->first();
         $dependability_allowance = PayrollAllowanceSetting::where('type', 'dependability')
             ->where(function ($query) use($user) {
@@ -407,29 +461,34 @@ class EmployeeSeparationController extends Controller
                     ->orWhere('role_id',0);
             })
             ->whereStatus(1)->get();
-        $unmarked = $working_days - ($attendace_log->attendance_marked + $attendace_log->holiday_count);
-        $total_leaves = $attendace_log->leaves +  $attendace_log->absents + $unmarked;
         $details = array();
         $dependability = 0;
-        foreach ($dependability_allowance as $depend){
-            $dependability = $depend->allowance_value;
-            if ($total_leaves == 0) {
-                $dependability = $dependability;
-                if($dependability != 0){
-                    $details[$depend->title] = $dependability;
+        if($attendace_log == false){
+            $total_leaves = 0;
+            $medical_allowance = 0;
+            $month = $month;
+        } else {
+            // Bonuses for last month
+            $medical_allowance = $attendace_log->medical_allowance;
+            $unmarked = $working_days - ($attendace_log->attendance_marked + $attendace_log->holiday_count);
+            $total_leaves = $attendace_log->leaves +  $attendace_log->absents + $unmarked;
+
+            // set dependability wattage here
+            $total_leaves = ($total_leaves*0.5) + ($attendace_log->half_leaves*0.25);
+
+            $month = $attendace_log->form_date;
+            $dependability = 0;
+            foreach ($dependability_allowance as $depend){
+                $dependability = $depend->allowance_value;
+                if($total_leaves <= 1){
+                    $dependability = $dependability - ($dependability*$total_leaves);
+                }else {
+                    $dependability = 0;
                 }
-            } else if ($total_leaves == 1) {
-                $dependability = $dependability / 2;
-                if($dependability != 0){
-                    $details[$depend->title] = $dependability;
-                }
-            } else if ($total_leaves > 1) {
-                $dependability = 0;
-                if($dependability != 0){
-                    $details[$depend->title] = $dependability;
-                }
+                $details[$depend->title] = $dependability;
             }
         }
+
         $year = date('Y', strtotime($month));
         $change_month = date('m', strtotime($month));
         if((0 == $year % 4) & (0 != $year % 100) | (0 == $year % 400))
@@ -450,7 +509,6 @@ class EmployeeSeparationController extends Controller
         }
         $from_date = $from_date.' 17:00:00';
         $to_date = $to_date.' 17:00:00';
-
         // manager team RGU count
         $is_manager = ManagerialRole::where('role_id',$user->role_id)->first();
         $manager_team_count = 0;
@@ -471,13 +529,15 @@ class EmployeeSeparationController extends Controller
             'dp'=>0,
             'tp'=>0,
             'rgu'=>0,
-            'mobile'=>0,
             'dependebility'=>$dependability,
-            'medical'=>$attendace_log->medical_allowance,
             'manager_team_count'=>$manager_team_count,
         );
-        $details['Medical'] = $attendace_log->medical_allowance;
-        $details['Manager Team Allowance'] = $manager_team_count;
+//        if($medical_allowance != 0){
+//            $details['Medical'] = $medical_allowance;
+//        }
+//        if($manager_team_count != 0){
+//            $details['Manager Team Allowance'] = $manager_team_count;
+//        }
         foreach ($rgu_bench_mark_allowance as $rgu){
             if($rgu->role_id == 0 || $user->role_id == $rgu->role_id){
                 if($rgu->bench_mark_type == 'single-play'){
@@ -531,49 +591,28 @@ class EmployeeSeparationController extends Controller
                 // over 40 rguw bonus
                 if($sales['total_rgu'] > $payroll_config->rgu_bench_mark){
                     $details['RGU Bonus (over 40)'] = ($sales['total_rgu']-$payroll_config->rgu_bench_mark)*$payroll_config->per_rgu;
-                    $total_allowance['rgu'] =$details['RGU Bonus (over 40)'];
+                    $total_allowance['rgu'] = $details['RGU Bonus (over 40)'];
                 }
-                // Mobile Bonus
-                if($rgu->bench_mark_type == 'mobile') {
-                    $allowance_amount = 0;
-                    $mobile_sales = $this->get_user_play($user->user_id, $from_date, $to_date, $rgu->provider, 'mobile');
-                    if($sales['total_rgu'] > $payroll_config->rgu_bench_mark) {
-                        $rgu_remaining_after_mobile = $sales['total_rgu'] - $mobile_sales; // 50-13 = 37
-                        if($rgu_remaining_after_mobile >= $payroll_config->rgu_bench_mark) {
-                            $allowance_amount = $rgu->after * $mobile_sales; // greater then bench_mark i.e 1500
-                        } else {
-                            // mobile = 7, RGU = 45, after_mobile = 38
-                            // if after deducting mobile rgus are less than 40
-                            $rgu_val_before = $payroll_config->rgu_bench_mark - $rgu_remaining_after_mobile; // 40 - 38 = 2
-                            $rgu_val_after = $mobile_sales-$rgu_val_before;
-                            $allowance_amount = ($rgu_val_before*$rgu->before);
-                            $allowance_amount += ($rgu_val_after*$rgu->after);
-                        }
-                    } else {
-                        $allowance_amount = ($mobile_sales*$rgu->before);
-                    }
-                    $total_allowance['mobile'] += $allowance_amount;
-                    if($allowance_amount>0){
-                        $details['Mobile Allowance'] = $allowance_amount;
-                    }
-                }
+// Mobile allowance can be added manually
             }
+//            $details['Allowance Month'] = $to_date;
         }
         return [
             'allowances' => $total_allowance,
-            'total_allowance' => $total_allowance['sp']+$total_allowance['dp']+$total_allowance['tp']+$total_allowance['mobile']+$total_allowance['rgu']+$total_allowance['dependebility']+$total_allowance['medical']+$total_allowance['manager_team_count'],
-            'details' => $details
+            'total_allowance' => $total_allowance['sp']+$total_allowance['dp']+$total_allowance['tp']+$total_allowance['rgu']+$total_allowance['dependebility']+$total_allowance['manager_team_count'],
+            'details' => $details,
+            'allowance_month' => $to_date
         ];
     }
     private function calculate_income_tax($user, $allowance, $deduction, $calculated_deductions, $attendace_log)
     {
+        // calculation income tax
         if(!$user->net_salary) { die('Salary not available for employee '.$user->full_name); }
         // basic salary plus all allowances and minus all deductions
         $basic_salary = $user->net_salary;
         // total salary minus medical allowance 10%
         $salary = $basic_salary-$attendace_log->medical_allowance;
-        $calculated_deductions['before_tax_deduction'];
-        $salary = ($salary + $allowance) - ($deduction + $calculated_deductions['before_tax_deduction']);
+        $salary = ($salary + ($allowance - $attendace_log->medical_allowance)) - ($deduction + $calculated_deductions['before_tax_deduction'] + $calculated_deductions['after_tax_deduction']);
         $annul_salary = $salary*12;
         $tax_deduction = PayrollTaxSlab::whereStatus(1)
             ->where(function ($query) use ($annul_salary) {
@@ -660,5 +699,22 @@ class EmployeeSeparationController extends Controller
     private function get_payroll_config(){
         $payroll_config = DB::table('payroll_config')->whereStatus(1)->first();
         return $payroll_config;
+    }
+    private function set_from_date_for_leap_year($date){
+        // to check start date for leap year or not
+        $month = date("m",strtotime($date));
+        $year = date("Y",strtotime($date));
+        $change_month = date('m', strtotime($date));
+        if((0 == $year % 4) & (0 != $year % 100) | (0 == $year % 400))
+        {
+            $date = date('Y-m-29',(strtotime ( $date) ));
+        } else {
+            if($change_month == 02){
+                $date = date('Y-m', strtotime(date("Y-m", strtotime($date)) . "+1 months")).'-01';
+            } else {
+                $date = date('Y-m-29',(strtotime ( $date) ));
+            }
+        }
+        return $date;
     }
 }

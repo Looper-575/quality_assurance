@@ -72,8 +72,9 @@ class AttendanceController extends Controller
             return null;
         }
         $shift_check_in = (date("H"  ,strtotime($team->shift->check_in)) - 2);
-        $users_id = TeamMember::where('team_id', $team->team_id)->pluck('user_id')->toArray();
-        array_push($users_id, $manager_id);
+        $users_id = TeamMember::with('user')->whereHas('user', function ($query) {
+            return $query->where('status', 1);
+        })->where('team_id', $team->team_id)->pluck('user_id')->toArray();
         if($hour >= $shift_check_in && date('N', strtotime($today)) < 6) { //&& $check_holiday->count() == 0
             $check_record = AttendanceLog::with('user')->where('attendance_date', $date_today)->where('added_by', $manager_id)->get();
             $att_users_id = $check_record->pluck('user_id')->toArray();
@@ -81,8 +82,6 @@ class AttendanceController extends Controller
             if(count($new_users_in_team)>0){
                 $this->create_attendance_sheet($new_users_in_team, $date_today, $team ,$manager_id);
             }
-
-
             if($check_record->isEmpty()) {
                 $this->create_attendance_sheet($users_id, $date_today, $team ,$manager_id);
                 return AttendanceLog::with('user')->where('attendance_date', $date_today)->WhereIn('user_id', $users_id)->get();
@@ -98,10 +97,6 @@ class AttendanceController extends Controller
 
     private function create_attendance_sheet($users_id, $date_today, $team ,$manager_id)
     {
-
-        
-
-
         DB::beginTransaction();
         try {
             foreach ($users_id as $user_id) {
@@ -127,16 +122,21 @@ class AttendanceController extends Controller
                 } else {
                     $leave = LeaveApplication::where('added_by', $user_id)
                         ->where(['approved_by_manager' => 1, 'approved_by_hr' => 1])
+                        ->where('leave_type_id', '!=', 4)
                         ->where('from', '<=', $date_today)
-                        ->where(function($q) use($date_today){
-                            $q->where('to','=',null)
-                                ->orWhere('to', '>=', $date_today);
-                        })->first();
+                        ->where('to','>=',$date_today)
+                        ->first();
+                    $half_leave = LeaveApplication::where('added_by', $user_id)
+                        ->where(['approved_by_manager' => 1, 'approved_by_hr' => 1])
+                        ->where('leave_type_id', 4)
+                        ->where('from', '=', $date_today)
+                        ->first();
                     $attendance_log = new AttendanceLog;
+                    if ($half_leave) {
+                        $attendance_log->half_leave = 1;
+                    }
                     if ($leave) {
-                        if ($leave->leave_type_id == 4) {
-                            $attendance_log->half_leave = 1;
-                        } else if($leave->leave_type_id == 6) {
+                        if($leave->leave_type_id == 6) {
                             $attendance_log->absent = 1;
                         } else {
                             $attendance_log->applied_leave = 1;
@@ -174,7 +174,6 @@ class AttendanceController extends Controller
         foreach ($team->team_member as $member){
             $members[] = $member->user_id;
         }
-        array_push($members, $team->team_lead_id);
         $date_today = date("Y-m-d"  ,strtotime($request->attendance_date));
         $data['not_marked'] = false;
         if(date('N', strtotime($date_today)) < 6) {

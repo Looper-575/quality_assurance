@@ -2,6 +2,7 @@
 namespace App\Console\Commands;
 use App\Models\EmployeePIP;
 use App\Models\EmployeeSeparation;
+use App\Models\LeavesBucket;
 use App\Models\User;
 use Illuminate\Console\Command;
 use App\Models\Employee;
@@ -43,83 +44,61 @@ class DailySchedule extends Command
         $this->schedule_all_employees_self_assessment();
         $this->schedule_employees_separation();
         $this->employees_pip_review_notification();
-        echo "test";
+        $this->create_leave_bucket();
+        $this->check_probation_period();
     }
     private function schedule_all_employees_self_assessment()
     {
-        $users = Employee::with('employee:user_id,user_type')
-            ->whereStatus(1)->select('user_id')->get()->toArray();
-        foreach ($users as $user){
+        $user_ids = User::whereUserType('Employee')->whereStatus(1)->pluck('user_id')->toArray();
+        foreach ($user_ids as $user_id){
+            $employees = Employee::where('user_id', $user_id)->first();
             $self_assessment = false;
-            $employees = Employee::where('user_id', $user['user_id'])->first();
             // Previous appraisal record check
             $incomplete_evaluation = EmployeeAssessment::with('employees')
-                ->where('user_id', $user['user_id'])
+                ->where('user_id', $user_id)
                 ->where('hr_sign', 0)
                 ->orderBy('added_on', 'desc')->first();
             $Previous_EmployeeAssessment = EmployeeAssessment::with('employees')
-                ->where('user_id', $user['user_id'])
+                ->where('user_id', $user_id)
                 ->where('hr_sign', 1)
                 ->orderBy('added_on', 'desc')->first();
-            if($Previous_EmployeeAssessment && !$incomplete_evaluation){
-                $employee_assessment_id = $Previous_EmployeeAssessment->id;
-                if($Previous_EmployeeAssessment->probation_extension == 'YES'){
-                    if(strtotime($Previous_EmployeeAssessment->probation_extension_to_date) <= strtotime(get_date()) ) {
-                        $self_assessment = true;
-                        $from_date = date ( "Y-m-d" , strtotime ( $Previous_EmployeeAssessment->probation_extension_to_date));
-                    }
-                }else{
-                    if(get_month_diff($Previous_EmployeeAssessment->evaluation_date, get_date()) >= 3) {
-                        $self_assessment = true;
-                        $from_date = date ( "Y-m-d" , strtotime ( $Previous_EmployeeAssessment->evaluation_date));
-                    }
+            if(!$incomplete_evaluation){
+                if($Previous_EmployeeAssessment && $Previous_EmployeeAssessment->probation_extension == 'YES' && strtotime($Previous_EmployeeAssessment->probation_extension_to_date) <= strtotime(get_date())){
+                    $self_assessment = true;
+                    $from_date = date ( "Y-m-d" , strtotime ( $Previous_EmployeeAssessment->probation_extension_to_date));
                 }
-            } else if(!$incomplete_evaluation) {
-                $employee_assessment_id = 0; //for first evaluation
-                if($employees->confirmation_date == Null){
-                    if (get_month_diff($employees->joining_date, get_date()) >= 3) {
-                        $self_assessment = true;
-                        $from_date = date ( "Y-m-d" , strtotime ( $employees->joining_date));
-                    }
-                }else{
-                    if (get_month_diff($employees->confirmation_date, get_date()) >= 3) {
-                        $self_assessment = true;
-                        $from_date = date ( "Y-m-d" , strtotime ( $employees->confirmation_date));
-                    }
+                else if($Previous_EmployeeAssessment && get_month_diff($Previous_EmployeeAssessment->evaluation_date, get_date()) >= 3){
+                    $self_assessment = true;
+                    $from_date = date ( "Y-m-d" , strtotime ( $Previous_EmployeeAssessment->evaluation_date));
+                } else if(!$Previous_EmployeeAssessment && $employees && $employees->confirmation_date == Null && get_month_diff($employees->joining_date, get_date()) >= 3){
+                    $employee_assessment_id = 0; //for first evaluation
+                    $self_assessment = true;
+                    $from_date = date ( "Y-m-d" , strtotime ( $employees->joining_date));
                 }
             }
-            if($self_assessment == true) {
-            ////////////////////////////////////////////////
-                $Initiated_EmployeeAssessment = EmployeeAssessment::with('employees.employee')
-                    ->where('user_id', $user['user_id'])
-                    ->where('employee_sign', 0)
-                    ->orwhere('manager_sign', 0)
-                    ->orwhere('hr_sign', 0)
-                    ->orderBy('added_on', 'desc')->first();
-                if(!$Initiated_EmployeeAssessment){
-                    $EmployeeAssessment_data = [
-                        'added_by' => Auth::user()->user_id,
-                        'user_id' => $user['user_id'],
-                        'employee_id' => $employees->employee_id,
-                        'hr_sign' => 0,
-                        'manager_sign' => 0,
-                        'employee_sign' => 0,
-                        'from_date' => $from_date,
-                        'to_date' => get_date()
-                    ];
-                    if($employees->confirmation_status == 'Confirmed'){
-                        $EmployeeAssessment_data['confirmation_status'] = $employees->confirmation_status;
-                    }
-                    $employee_assessment_initiate = EmployeeAssessment::create($EmployeeAssessment_data);
-                    if($employee_assessment_initiate){
-                      if($user['employee']['user_type'] == 'Employee' && !$incomplete_evaluation){
-                            $send_email = false;
-                            add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,$user['user_id'],'Pending Self Evaluation',$send_email);
-                            $manager_id = User::where('user_id', $user['user_id'])->where('user_type','Employee')->pluck('manager_id')->first();
-                            add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,$manager_id,'Pending Manager Evaluation',$send_email);
-                        }
-                    }
+            if($self_assessment == true){
+                $EmployeeAssessment_data = [
+                    'added_by' => 1,
+                    'user_id' => $user_id,
+                    'employee_id' => $employees->employee_id,
+                    'hr_sign' => 0,
+                    'manager_sign' => 0,
+                    'employee_sign' => 0,
+                    'from_date' => $from_date,
+                    'to_date' => get_date()
+                ];
+                if($employees->confirmation_status == 'Confirmed'){
+                    $EmployeeAssessment_data['confirmation_status'] = $employees->confirmation_status;
                 }
+                $employee_assessment_initiate = EmployeeAssessment::create($EmployeeAssessment_data);
+                $employee_assessment_id = $employee_assessment_initiate->id;
+                if($employee_assessment_initiate){
+                    $send_email = false;
+                    add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,$user_id,'Pending Self Evaluation',$send_email);
+                    $manager_id = User::where('user_id', $user_id)->where('user_type','Employee')->pluck('manager_id')->first();
+                    add_notifications('employee_assessments','employee_assessment',$employee_assessment_id,$manager_id,'Pending Manager Evaluation',$send_email);
+                }
+                echo "Employee Assessment Created!\n";
             }
         }
     }
@@ -162,6 +141,39 @@ class DailySchedule extends Command
                         add_notifications('employee_pip','employee_pip',$pip->pip_id,$hr_user_ids[$i],"Employee's PIP target duration is completed" ,$send_email);
                     }
                 }
+            }
+        }
+    }
+    private function create_leave_bucket(){
+        try {
+            $expire_bucket = LeavesBucket::with('user')->whereDate('start_date','<', now()->subYear())->whereHas('user', function ($query){
+                $query->whereStatus(1);
+            })->get();
+            foreach ($expire_bucket as $bucket){
+                $expiryDate = date('Y-m-d', strtotime('+1 year', strtotime($bucket->start_date)) );
+                LeavesBucket::whereUserId($bucket->user_id)->update(['start_date' => $expiryDate, 'status' => 0]);
+
+                $send_email = false;
+                // notification for hr to approve leave bucket
+                add_notifications('leaves_bucket','leaves_bucket',$bucket->bucket_id,43, "Pending Leave Bucket Approvel" ,$send_email);
+                echo "Leaves Bucket Created!\n";
+            }
+        } catch (Exception $e) {
+            echo "Check record for leaves bucket\n";
+            echo $e;
+            return false;
+        }
+    }
+    private function check_probation_period()
+    {
+        $employee = Employee::whereStatus(1)->where('employment_status', 'Probation')->get();
+        foreach ($employee as $emp){
+            $notification_date = date('Y-m-d', strtotime($emp->joining_date. ' + 2 months + 14 days'));
+            if($notification_date == date('Y-m-d')){
+                $send_email = false;
+                // notification for hr to create employee assessment
+                add_notifications('employee','employee_assessment',$employee->employee_id,43, "Create Employee Assessment of ".$emp->full_name ,$send_email);
+                echo "Assessment Notification Created!\n";
             }
         }
     }

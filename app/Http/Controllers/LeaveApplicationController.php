@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 use App\Models\AttendanceLog;
+use App\Models\Employee;
 use App\Models\ManagerialRole;
 use App\Models\Team;
 use App\Models\TeamMember;
@@ -41,11 +42,6 @@ class LeaveApplicationController extends Controller
         ]);
         if($validator->passes())
         {
-            $manager_id = ManagerialRole::where('role_id', Auth::user()->role_id)->whereType('Manager')->first();
-            $approved_by_manager = NULL;
-            if($manager_id != Null && Auth::user()->role_id == $manager_id->role_id){
-                $approved_by_manager = 1;
-            }
             $leave_file = "";
             if($request->file('medical_report')) {
                 $file = $request->file('medical_report');
@@ -60,7 +56,6 @@ class LeaveApplicationController extends Controller
                     'to' => $request->to,
                     'half_type' => $request->half,
                     'no_leaves' => $request->no_leaves,
-                    'approved_by_manager' => $approved_by_manager,
                     'attachement' => $leave_file,
                     'reason' => $request->reason,
                 ]);
@@ -72,7 +67,6 @@ class LeaveApplicationController extends Controller
                 $leave->from = $request->from;
                 $leave->to = $request->to;
                 $leave->half_type = $request->half;
-                $leave->approved_by_manager = $approved_by_manager;
                 $leave->attachement = $leave_file;
                 $leave->no_leaves  = $request->no_leaves;
                 $leave->reason = $request->reason;
@@ -81,19 +75,10 @@ class LeaveApplicationController extends Controller
                 $pending_leave_id = $pending_leaves->leave_id;
             }
             // NOTIFICATION for Pending Leave Approval by Manager
-            $send_email = true;
-            if($approved_by_manager == NULL){
+                $send_email = true;
                 $manager_id = User::where('user_id', Auth::user()->user_id)->pluck('manager_id')->first();
                 add_notifications('leave_applications','leave_list',$pending_leave_id,$manager_id,'Pending Leave Approval by Manager',$send_email);
-            }
-            if($approved_by_manager = 1){
-                $hr_user_ids = User::where('role_id', 5)->get()->pluck('user_id')->toArray();
-                if(count($hr_user_ids)>0){
-                    for($i=0; $i<count($hr_user_ids); $i++){
-                        add_notifications('leave_applications','leave_list',$pending_leave_id,$hr_user_ids[$i],'Pending Leave Approval by HR',$send_email);
-                    }
-                }
-            }
+
             $response['status'] = "Success";
             $response['result'] = "Added Successfully";
         } else {
@@ -134,17 +119,21 @@ class LeaveApplicationController extends Controller
             $data['leave_lists'] = LeaveApplication::where([
                 ['status','=',1], ['approved_by_manager','=', 1],
                 ['approved_by_hr','=', 1]
-            ])->with('user')->get();
+            ])->with('user')->orderBy('leave_id','DESC')->get();
+            $data['leave_lists_rejected'] = LeaveApplication::where([
+                ['status','=',1], ['approved_by_manager','=', 2],
+                ['approved_by_hr','=', 2]
+            ])->with('user')->orderBy('leave_id','DESC')->get();
             $data['leave_lists_unapproved'] = LeaveApplication::where([
                 ['status', '=' ,1],
             ])->where(function($query) {
                 $query->where('approved_by_manager','=',NULL)
                     ->orWhere('approved_by_hr','=',NULL);
-            })->with('user')->get();
+            })->with('user')->orderBy('leave_id','DESC')->get();
             if(Auth::user()->role_id == 5){
                 $data['leave_lists_unapproved'] = LeaveApplication::where([
                     ['status','=', 1],['approved_by_manager','=',1],['approved_by_hr','=',NULL]
-                ])->with('user')->get();
+                ])->with('user')->orderBy('leave_id','DESC')->get();
             }
         } else if(Auth::user()->role_id == $manager_role_id){
             $data['leave_lists'] = LeaveApplication::where([
@@ -155,7 +144,17 @@ class LeaveApplicationController extends Controller
                 $query->whereHas('user', function ($query) {
                     return $query->where('manager_id', '=', Auth::user()->user_id);
                 })->orWhere('added_by','=',Auth::user()->user_id);
-            })->get();
+            })->orderBy('leave_id','DESC')->get();
+            $data['leave_lists_rejected'] = LeaveApplication::where([
+                ['status','=',1],
+                ['approved_by_manager' ,'=',2],
+                ['approved_by_hr' ,'=',2]
+            ])->where(function($query) {
+                $query->whereHas('user', function ($query) {
+                    return $query->where('manager_id', '=', Auth::user()->user_id);
+                })->orWhere('added_by','=',Auth::user()->user_id);
+            })->orderBy('leave_id','DESC')->get();
+
             $data['leave_lists_unapproved']= LeaveApplication::where([
                 ['status','=',1],
             ])->where(function($query) {
@@ -165,20 +164,26 @@ class LeaveApplicationController extends Controller
                 $query->whereHas('user', function ($query) {
                     return $query->where('manager_id', '=', Auth::user()->user_id);
                 })->orWhere('added_by','=',Auth::user()->user_id);
-            })->get();
+            })->orderBy('leave_id','DESC')->get();
         } else {
             $data['leave_lists'] = LeaveApplication::where([
                 ['status','=', 1] ,
                 ['added_by','=',Auth::user()->user_id],
                 ['approved_by_manager' ,'=',1],
                 ['approved_by_hr' ,'=',1],
-            ])->with('user')->get();
+            ])->with('user')->orderBy('leave_id','DESC')->get();
+            $data['leave_lists_rejected'] = LeaveApplication::where([
+                ['status','=', 1] ,
+                ['added_by','=',Auth::user()->user_id],
+                ['approved_by_manager' ,'=',2],
+                ['approved_by_hr' ,'=',2],
+            ])->with('user')->orderBy('leave_id','DESC')->get();
             $data['leave_lists_unapproved'] = LeaveApplication::where([
                 ['status', '=' ,1],['added_by','=',Auth::user()->user_id]
             ])->where(function($query) {
                 $query->where('approved_by_manager','=',NULL)
                     ->orWhere('approved_by_hr','=',NULL);
-            })->with('user')->get();
+            })->with('user')->orderBy('leave_id','DESC')->get();
         }
         $data['manager_id'] = $manager_role_id;
         return view('leave_application.leave_list' , $data);
@@ -332,5 +337,10 @@ class LeaveApplicationController extends Controller
     }
     public function get_employee_leaves_bucket(Request $request){
         return get_leave_bucket_leaves($request->team_member_id);
+    }
+    public function get_employee_record($id)
+    {
+        $data['start_date'] = Employee::whereUserId($id)->pluck('confirmation_date')->first();
+        return response()->json($data);
     }
 }

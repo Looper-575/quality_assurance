@@ -121,10 +121,13 @@
                 {{$qa_data->automatic_fail_comment}}
             </td>
         </tr>
-        <th>Additional Comments</th>
         <tr>
-            <td colspan="2">{{$qa_data->additional_comment}}
-            </td>
+            <th>Additional Comments</th>
+            <th>QA Done By</th>
+        </tr>
+        <tr>
+            <td>{{$qa_data->additional_comment}}</td>
+            <td>{{$qa_data->qa_done_by->full_name}}</td>
         </tr>
     </table>
 </div>

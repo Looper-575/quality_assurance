@@ -121,44 +121,32 @@ if (!function_exists('send_email')) {
         $xheaders .= "From: " . $from . "\r\n";
         $xheaders .= "Reply-To: " . $from . "\r\n";
         $xheaders .= "Return-Path: " . $from . "\r\n";
-        $xheaders .= "Cc: rafianltvc@gmail.com";
-//        $xheaders .= "Cc: danish.sheraz575@gmail.com";
+        $xheaders .= "Cc: danish.sheraz575@gmail.com";
         @mail($email_address, $subject, $email_body, $xheaders);
     }
 }
 if (!function_exists('working_days')) {
     function working_days($startDate, $endDate)
     {
-        if (strtotime($endDate) >= strtotime($startDate)) {
-            $holidays = array();
-            $date = $startDate;
-            $days = 1;
-            while ($date != $endDate) {
-                $date = date("Y-m-d", strtotime("+1 day", strtotime($date)));
-                $weekday = date("w", strtotime($date));
-                if ($weekday != 6 and $weekday != 0 and !in_array($date, $holidays)) $days++;
-            }
-            return $days;
-        } else {
-            return "Please check the dates.";
+        $start = strtotime($startDate);
+        $end = strtotime($endDate);
+        $count = 0;
+        while(date('Y-m-d', $start) <= date('Y-m-d', $end)){
+            $count += date('N', $start) < 6 ? 1 : 0;
+            $start = strtotime("+1 day", $start);
         }
+        return $count;
     }
 }
 if (!function_exists('total_service')) {
     function total_service($startDate, $endDate)
     {
         if (strtotime($endDate) >= strtotime($startDate)) {
-            $holidays = array();
-            $date = $startDate;
-            $days = 0;
-            while ($date != $endDate) {
-                $date = date("Y-m-d", strtotime("+1 day", strtotime($date)));
-                $days++;
-            }
-            $years = floor($days / 365);
-            $months = floor($days / 30);
-            $days = $days - ($months*30);
-            $total_service =  $years . " Years " . $months ." Months " . $days ." days";
+            $diff = abs(strtotime($startDate) - strtotime($endDate));
+            $years = floor($diff / (365*60*60*24));
+            $months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24));
+            $days = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24)/ (60*60*24));
+            $total_service = $years." Year ".$months." Months ". $days." Days";
             return $total_service;
         } else {
             return "Please check the dates.";
@@ -347,15 +335,26 @@ if(!function_exists('add_notifications')){
                 'message' => $message,
             ]);
             if($send_email){
-                $user = User::where('user_id',$for_user_id)->first();
-                $user_email = $user->email;
-                $user_name = $user->full_name;
-                $email_body = 'You have a pending leave approval Request.';
-                $email_subject = 'Pending Leave Approval Request!';
-                $email_view = 'email_templates.notification_email';
-                $email_data = ['name' => $user_name,
-                    'email_body' => $email_body];
-                send_email_laravel($user_email, $user_name, $email_subject, $email_view, $email_data );
+                if($reference_table == 'leave_applications'){
+                    $leaveApplication_details = \App\Models\LeaveApplication::where('leave_id',$reference_id)->first();
+                    $user = User::where('user_id',$for_user_id)->first();
+                    $user_email = $user->email;
+                    $user_name = $user->full_name;
+                    $request_from = "You have a pending leave approval Request from ".$leaveApplication_details->user->full_name.".\n";
+                    $leave_reason = "Reason: ".$leaveApplication_details->reason.".\n";
+                    if($leaveApplication_details->leave_type_id == 4){
+                        $leave_duration = "On: ".$leaveApplication_details->from." For: ".$leaveApplication_details->half_type;
+                    }else{
+                        $leave_duration = "From: ".$leaveApplication_details->from." To: ".$leaveApplication_details->to;
+                    }
+                    $email_subject = 'Pending Leave Approval Request!';
+                    $email_view = 'email_templates.notification_email';
+                    $email_data = ['name' => $user_name,
+                        'request_from' => $request_from,
+                        'leave_reason' => $leave_reason,
+                        'leave_duration' => $leave_duration];
+                    send_email_laravel($user_email, $user_name, $email_subject, $email_view, $email_data );
+                }
             }
         }
     }
@@ -410,10 +409,11 @@ if(!function_exists('get_leave_bucket_leaves')) {
 if(!function_exists('generate_single_employee_leaves_bucket')){
     function generate_single_employee_leaves_bucket($user_id)
     {
+        $employee_conformation_date = \App\Models\Employee::whereUserId($user_id)->pluck('confirmation_date')->first();
         $leave_bucket = \App\Models\LeavesBucket::where('user_id', $user_id)->count();
         if($leave_bucket == 0 && $employee_conformation_date != null){
             \App\Models\LeavesBucket::create(['user_id' => $user_id,
-                'start_date' => get_date(),
+                'start_date' => $employee_conformation_date,
                 'annual_leaves' => 10,
                 'sick_leaves' => 5,
                 'casual_leaves' => 4

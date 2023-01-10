@@ -20,15 +20,15 @@
     <div class="col-12">
         <div class="form-group">
             <label class="font-bold font-14" for="esa_duties">*  Please state your understanding of main duties, responsibilities.</label>
-            <textarea type="text" rows="3" style="width: 100%; max-width: 100%;" name="esa_duties" required>{{$EmployeeAssessment ? $EmployeeAssessment->esa_duties : ''}}</textarea>
+            <textarea type="text" rows="3" class="form-control" name="esa_duties" required> {{$EmployeeAssessment ? $EmployeeAssessment->esa_duties : ''}}</textarea>
         </div>
         <div class="form-group">
             <label class="font-bold font-14" for="esa_achievements">*  Please state your  most important achievement during this review time period.</label>
-            <textarea type="text" rows="3" style="width: 100%; max-width: 100%;" name="esa_achievements" required>{{$EmployeeAssessment ? $EmployeeAssessment->esa_achievements : ''}}</textarea>
+            <textarea type="text" rows="3" class="form-control" name="esa_achievements" required>{{$EmployeeAssessment ? $EmployeeAssessment->esa_achievements : ''}}</textarea>
         </div>
         <div class="form-group">
             <label class="font-bold font-14" for="esa_future_aims">*  Please state your aims and tasks for future.</label>
-            <textarea type="text" rows="3" style="width: 100%; max-width: 100%;" name="esa_future_aims" required>{{$EmployeeAssessment ? $EmployeeAssessment->esa_future_aims : ''}}</textarea>
+            <textarea type="text" rows="3" class="form-control" name="esa_future_aims" required>{{$EmployeeAssessment ? $EmployeeAssessment->esa_future_aims : ''}}</textarea>
         </div>
     </div>
 </div>

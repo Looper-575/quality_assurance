@@ -57,6 +57,8 @@
         <div class="form-group" id="new_phone_div" style="display: none">
             <label class="form-check-label" for="new_phone">New Phone Number</label>
             <input type="tel" class="form-control" name="new_phone_number" id="new_phone">
+            <label class="form-check-label mt-4 pt-1" for="new_tpv">New TPV Number</label>
+            <input type="tel" class="form-control" name="new_tpv_number" id="new_tpv">
         </div>
         <div class="form-group" id="new_lines_div" style="display: none">
             <label class="form-check-label" for="new_lines">Number of Mobile Lines</label>
@@ -351,6 +353,36 @@
                     <div class="m-checkbox-list form-check-inline">
                         <label class="m-checkbox" for="c_cable"> Cable
                             <input class="form-check-input" type="checkbox" name="c_cable" id="c_cable"
+                                   value="1">
+                            <span></span>
+                        </label>
+                    </div>
+                    <hr>
+                </div>
+                <span></span>
+            </label>
+        </div>
+        <div class="m-checkbox-list">
+            <label class="m-checkbox" for="xfinity"> XFINITY
+                <input class="form-check-input provider_chk" type="checkbox" id="xfinity" name="xfinity" value="xfinity">
+                <div class="xf_checks mb-2 service_chk">
+                    <div class="m-checkbox-list form-check-inline">
+                        <label class="m-checkbox" for="xf_internet"> Internet
+                            <input class="form-check-input" type="checkbox" name="xf_internet" id="xf_internet"
+                                   value="1">
+                            <span></span>
+                        </label>
+                    </div>
+                    <div class="m-checkbox-list form-check-inline">
+                        <label class="m-checkbox" for="xf_phone"> Phone
+                            <input class="form-check-input phone_check" type="checkbox" name="xf_phone"
+                                   id="xf_phone" value="1">
+                            <span></span>
+                        </label>
+                    </div>
+                    <div class="m-checkbox-list form-check-inline">
+                        <label class="m-checkbox" for="xf_cable"> Cable
+                            <input class="form-check-input" type="checkbox" name="xf_cable" id="xf_cable"
                                    value="1">
                             <span></span>
                         </label>

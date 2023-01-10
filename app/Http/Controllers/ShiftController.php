@@ -26,6 +26,12 @@ class ShiftController extends Controller
         $data['shifts'] = Shift::with('manager')->orderBy('shift_id', 'desc')->get();
         return view('shift.shift_list' , $data);
     }
+    public function shift()
+    {
+        $data['page_title'] = "Shift Form - Atlantis BPO CRM";
+        $data['agents'] = User::doesnthave('shift')->doesnthave('team_member')->whereNotIn('role_id', [1, 2, 3])->where('status', 1)->get();
+        return view('shift.shift_form' , $data);
+    }
     public function save_shift(Request $request)
     {
         $ids = explode(",",$request->user_ids);
@@ -51,6 +57,26 @@ class ShiftController extends Controller
             $response['result'] = $validator->errors()->toJson();
         }
         return response()->json($response);
+    }
+    public function shift_list()
+    {
+        $data['page_title'] = "Shifts - Atlantis BPO CRM";
+        $data['shifts'] = Shift::with('manager')->orderBy('shift_id', 'desc')->get();
+        return view('shift.shift_list' , $data);
+    }
+    public function show(Request $request)
+    {
+        $data['shift_data'] = Shift::where([
+            'shift_id' => $request->shift_id,
+        ])->with('manager', 'shiftUsers.user', 'shift_teams.team_member')->first();
+        return view('shift.shift_single', $data);
+    }
+    public function edit($id)
+    {
+        $data['page_title'] = "Atlantis BPO CRM - Shift Edit Form";
+        $data['shift_edit'] = Shift::where('shift_id' , $id)->with('manager', 'shiftUsers.user')->get()[0];
+        $data['agents'] = User::doesnthave('shift')->doesnthave('team_member')->where('role_id', '!=', 1)->where('status', 1)->get();
+        return view('shift.shift_edit' , $data);
     }
     public function shift_delete(Request $request)
     {

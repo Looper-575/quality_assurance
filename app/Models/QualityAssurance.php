@@ -22,7 +22,7 @@ class QualityAssurance extends Authenticatable
      * @var array
      */
         protected $fillable = [
-            'rep_name', 'call_date', 'call_type_id' , 'call_number','recording',
+            'rep_name', 'agent_id', 'call_date', 'call_type_id' , 'call_number','recording',
             'greetings_correct', 'greetings_assurity_statement', 'greetings_comment',
             'customer_name_call', 'customer_comment',
             'listening_skills', 'listening_comment',
@@ -32,8 +32,8 @@ class QualityAssurance extends Authenticatable
             'using_hold_informed_customer', 'using_hold_touch' ,'using_hold_thanked', 'using_hold_comment',
             'connecting_calls_department', 'connecting_calls_customer', 'connecting_calls_comment',
             'closing_recap', 'clossing_assistance', 'closing_comment',
-            'automatic_fail_misquoting',' automatic_fail_disconnected', 'automatic_fail_answer', 'automatic_fail_repeating_details', 'automatic_fail_changing_details','automatic_fail_fabricating', 'automatic_fail_other', 'automatic_fail_comment',
-            'additional_comment', 'yes_responses', 'no_responses', 'automatic_fail_response', 'monitor_percentage',
+            'automatic_fail_misquoting','automatic_fail_disconnected', 'automatic_fail_answer', 'automatic_fail_repeating_details', 'automatic_fail_changing_details','automatic_fail_fabricating', 'automatic_fail_other', 'automatic_fail_comment',
+            'additional_comment', 'yes_responses', 'no_responses', 'automatic_fail_response', 'monitor_percentage','call_id','added_by', 'modified_by'
         ];
 
     /**
@@ -73,6 +73,10 @@ class QualityAssurance extends Authenticatable
 
     public function call_disposition(){
         return $this->belongsTo(CallDisposition::class,'call_id','call_id');
+    }
+
+    public function qa_done_by(){
+        return $this->belongsTo(User::class,'added_by','user_id');
     }
 
 }

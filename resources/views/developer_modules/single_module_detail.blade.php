@@ -117,17 +117,6 @@
                         </ul>
                     </div>
                     <hr class="my-5">
-                <div class="mb-5">
-                    <h3 class="h3_txt mb-3">Impact On:</h3>
-                    <ul style="list-style-type:disc" class="p_color">
-                        @if($module->impact_on != NULL && $module->impact_on != '' )
-                            @foreach(explode(',',$module->impact_on) as $impact)
-                                <li>{{$impact}}</li>
-                            @endforeach
-                        @endif
-                    </ul>
-                </div>
-                <hr class="my-5">
                     <div class="mb-5">
                         <h3 class="h3_txt mb-3">Usage:</h3>
                         {!! $module->module_usage !!}

@@ -14,15 +14,11 @@
         </div>
     </div>
     <div class="m-portlet__foot m-portlet__no-border m-portlet__foot--fit">
-        <div class="m-form__actions m-form__actions--solid">
             <div class="row">
-                <div class="col-lg-8">
+                <div class="col-12 text-right">
+                    <a onclick="$('#background_fade').fadeOut(function() { $(this).remove(); });" class="btn btn-primary text-white">Close</a>
                     <input type="submit" class="btn btn-success" name="submit" value="Submit">
-                    <a href="{{route('employee_pip')}}"  class="btn btn-primary">
-                        Back
-                    </a>
                 </div>
             </div>
-        </div>
     </div>
 </form>

@@ -92,6 +92,7 @@ $has_permissions = get_route_permissions( Auth::user()->role->role_id, 'qa_list'
                                 <th>Automatic Fail</th>
                                 <th>Monitor Percentage</th>
                                 <th>Recordings</th>
+                                <th>QA Done By</th>
                                 <th title="Field #9">Added On</th>
                                 <th title="Field #10">Action</th>
                             </tr>
@@ -117,6 +118,7 @@ $has_permissions = get_route_permissions( Auth::user()->role->role_id, 'qa_list'
                                             NA
                                         @endif
                                     </td>
+                                    <td>{{$qa_list->qa_done_by->full_name}}</td>
                                     <td>{{parse_datetime_get($qa_list->added_on)}}</td>
                                     <td>
                                         <div class="btn-group btn-group-sm">

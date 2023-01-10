@@ -70,7 +70,7 @@ class EmployeeSuspensionController extends Controller
                 EmployeeSuspension::create($suspension_data);
             }
             // change user status to Suspended
-            User::where('user_id', $request->user_id)->update(['status' => 4]);
+            USER::where('user_id', $request->user_id)->update(['status' => 4]);
             // change user employee record status to Suspended
             Employee::where('user_id', $request->user_id)->update(['status' => 4]);
 

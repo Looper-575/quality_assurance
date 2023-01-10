@@ -67,7 +67,8 @@
                     <div class="col">
                         <button type="button" class="btn btn-success float-right" onclick="save_payroll_form(this)" value="save">Save</button>
                         <button type="button" class="btn btn-primary float-right mx-2" onclick="save_payroll_form(this)" value="approve">Approve</button>
-                        <button type="button" class="btn btn-danger float-right" onclick="save_payroll_form(this)" value=reject>Reject</button>
+                        <button type="button" class="btn btn-danger float-right ml-2" onclick="save_payroll_form(this)" value=reject>Reject</button>
+                        <button type="button" class="btn btn-warning float-right text-white" onclick="calculate_tax({{$payroll->payroll_id}})">Calculate Income Tax</button>
                     </div>
                 </div>
             </form>
@@ -115,6 +116,31 @@
             }
             let arr = [a];
             call_ajax_with_functions('', '{{route('payroll_save_edit')}}', data, arr);
+        }
+
+        function calculate_tax (me) {
+            let id = me;
+            let data = new FormData();
+            data.append('id', id);
+            data.append('_token', "{{csrf_token()}}");
+            swal({
+                title: "Are you sure?",
+                text: "Do you really want to calculate Income Tax",
+                icon: "warning",
+                buttons: [
+                    'No',
+                    'Yes, calculate Income Tax!'
+                ],
+                dangerMode: true,
+            }).then(function(isConfirm) {
+                if (isConfirm) {
+                    let a = function () {
+                        window.location.reload();
+                    };
+                    let arr = [a];
+                    call_ajax_with_functions('', '{{route('calculate_income_tax')}}', data, arr);
+                }
+            });
         }
     </script>
 @endsection

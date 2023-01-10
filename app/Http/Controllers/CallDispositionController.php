@@ -136,7 +136,7 @@ class CallDispositionController extends Controller
     public  function save(Request $request)
     {
         if(isset($request->rec_id)){
-            $recording =   CallRecording::where('rec_id', $request->rec_id)->get()[0];
+            $recording =   CallRecording::where('rec_id', $request->rec_id)->first();
             if($recording && $recording->disposed == 1){
                 $response['status'] = 'failure';
                 $response['result'] = 'Already Disposed';
@@ -189,6 +189,7 @@ class CallDispositionController extends Controller
                     }
                     if (isset($request->new_phone_number)) {
                         $call_disp->new_phone_number = $request->new_phone_number;
+                        $call_disp->new_tpv_number = $request->new_tpv_number;
                     }
                     $call_disp->save();
                     $call_disp->fresh();
@@ -197,10 +198,7 @@ class CallDispositionController extends Controller
                     $call_disp->services_sold = $services_sold;
                     $call_disp->save();
                     $customer_id=0;
-                    $customer_data = Customers::where('email',$request->email)
-                        ->orWhere('primary_number',$request->phone_number)
-                        ->orWhere('alternate_number','LIKE', '%' . $request->phone_number . '%')
-                        ->first();
+                    $customer_data = Customers::where('email',$request->email)->first();
                     if(!$customer_data){
                         $customer = new Customers();
                         $customer->name = $request->customer_name;
@@ -340,6 +338,7 @@ class CallDispositionController extends Controller
                         'comments' => $request->comments,
                         'mobile_lines' => $request->mobile_lines,
                         'new_phone_number' => $request->new_phone_number,
+                        'new_tpv_number' => $request->new_tpv_number,
                     ]);
                     DB::commit();
                     $response['status'] = 'success';

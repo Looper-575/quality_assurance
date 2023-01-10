@@ -34,7 +34,7 @@
                                 <input type="text" class="form-control" name="full_name" id=full_name" value="{{Auth::user()->full_name}}" readonly>
                                 <input type="hidden" class="form-control" name="user_id" id=user_id" value="{{Auth::user()->user_id}}" readonly>
                             @else
-                                <select class="form-control" name="user_id" id=user_id" required>
+                                <select class="form-control select2" name="user_id" id=user_id" required>
                                     <option value="">Select User</option>
                                     @foreach($agents as $agent)
                                         <option value="{{$agent->user_id}}">{{$agent->full_name}}</option>
@@ -61,6 +61,9 @@
     <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script>
+        $(document).ready(function (){
+            $('.select2').select2();
+        });
         $('#attendance_report_form').submit(function (e) {
             e.preventDefault();
             let data = new FormData(this);

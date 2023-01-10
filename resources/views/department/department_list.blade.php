@@ -10,14 +10,20 @@
                 <div class="m-portlet__head-title float-left">
                     <h3 class="m-portlet__head-text">Departments</h3>
                 </div>
-                @if($has_permissions->add == 1)
-                    <div class="float-right mt-3">
-                        <a id="add_new_btn" data-toggle="modal" data-target="#department_form_modal" href="javascript:;" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill">
-                            <span><i class="la la-phone-square"></i><span>Add New</span></span>
-                        </a>
-                        <div class="m-separator m-separator--dashed d-xl-none"></div>
-                    </div>
-                @endif
+                <div class="float-right mt-3">
+                    @if($has_permissions->add == 1)
+                        <div class="m-portlet__head-tools float-right">
+                            <ul class="nav nav-tabs m-tabs-line m-tabs-line--success m-tabs-line--2x m-tabs-line--right" role="tablist">
+                                <li class="nav-item m-tabs__item">
+                                    <a id="add_new_btn"  data-toggle="modal" data-target="#department_form_modal" class="nav-link m-tabs__link" href="javascript:;">
+                                        <span class="add-new-button"><i class="la la-plus"></i><span>Add New</span></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    @endif
+                    <div class="m-separator m-separator--dashed d-xl-none"></div>
+                </div>
             </div>
         </div>
         <div class="m-portlet__body">

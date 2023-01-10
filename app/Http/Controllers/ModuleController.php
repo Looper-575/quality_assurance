@@ -47,26 +47,6 @@ class ModuleController  extends Controller
             try{
                 $module_data = new ProjectModule();
                 if(!isset($request->module_id)){
-                    $task = ProjectModule::where('task_id',$request->task_id)->first();
-                    if($task){
-                        $response['status'] = 'failure';
-                        $response['result'] = 'Document For this task already submitted';
-                        return response()->json($response);
-                    }
-                    if (str_contains( $request->dependency, '</li>')) {
-                        $dependency_with_tags = explode('</li>',trim( $request->dependency));
-                    }else{
-                        $dependency_with_tags = explode(',',trim( $request->dependency));
-                    }
-                    $dependency_without_tags= [];
-                    foreach($dependency_with_tags as $tag){
-                        $tag = strip_tags($tag);
-                        if($tag == ''){
-                            continue;
-                        }
-                        array_push($dependency_without_tags,trim($tag));
-                    }
-
                     $module_data->project = trim($request->project);
                     $module_data->task_id = trim($request->task_id);
                     $module_data->description = trim($request->description);
@@ -77,24 +57,7 @@ class ModuleController  extends Controller
                     $module_data->module_usage =trim($request->module_usage);
                     $module_data->test_cases =trim($request->test_cases);
                     $module_data->added_by = Auth::user()->user_id;
-                    $impact =  ProjectModule::Where('dependencies', 'like', '%' . $request->models . '%')->pluck('models')->toArray();
-                    $impact_on = NULL;
-                    if($impact){
-                        $impact_on =  implode(',',$impact);
-                    }
-                    $module_data->impact_on = $impact_on;
                     $module_data->save();
-                    foreach ($dependency_without_tags as $dependency){
-                        $existing = ProjectModule::where('models','like', '%' . $dependency . '%')->first();
-                        if($existing){
-                            $module_impact = explode(',',$existing->impact_on);
-                            if(!in_array($request->models,$module_impact)){
-                                array_push($module_impact,$request->models);
-                            }
-                            $existing->impact_on = trim(implode(',',$module_impact),',');
-                            $existing->save();
-                        }
-                    }
                     $send_email = false;
                     add_notifications('project_modules','Project Module',$module_data->id,1,'Project Module Created!',$send_email);
                     Task::where('task_id',$request->task_id)->update([
@@ -113,6 +76,7 @@ class ModuleController  extends Controller
                         'models' =>  $request->models,
                         'views' =>  $request->views,
                         'module_usage' =>  $request->module_usage,
+                        'test_cases' => trim($request->test_cases),
                     ]);
                     Task::where('task_id',$request->task_id)->update([
                         'status' => 2
@@ -142,17 +106,17 @@ class ModuleController  extends Controller
 
         if(Auth::user()->role_id == 1){
             $data['approved_modules'] = ProjectModule::with(['projects','users','task'])->where('approved',1)->orderBy('id','desc')->get();
-            $data['unapproved_modules'] = ProjectModule::with(['projects','users','task'])->whereIn('approved',[0,2])->orderBy('id','desc')->get();
+            $data['unapproved_modules'] = ProjectModule::with(['projects','users','task'])->where('approved',0)->orderBy('id','desc')->get();
         }
         elseif($manager){
             $department_users = User::where('department_id',Auth::user()->department_id)->pluck('user_id')->toArray();
             $data['approved_modules'] = ProjectModule::with(['projects','users','task'])->where('approved',1)->whereIn('added_by',$department_users)->orderBy('id','desc')->get();
-            $data['unapproved_modules'] = ProjectModule::with(['projects','users','task'])->whereIn('approved',[0,2])->whereIn('added_by',$department_users)->orderBy('id','desc')->get();
+            $data['unapproved_modules'] = ProjectModule::with(['projects','users','task'])->where('approved',0)->whereIn('added_by',$department_users)->orderBy('id','desc')->get();
             $data['manager'] = true;
         }
         else{
             $data['approved_modules'] = ProjectModule::where('approved',1)->where('added_by',Auth::user()->user_id)->with(['projects','users','task'])->orderBy('id','desc')->get();
-            $data['unapproved_modules'] = ProjectModule::whereIn('approved',[0,2])->where('added_by',Auth::user()->user_id)->with(['projects','users','task'])->orderBy('id','desc')->get();
+            $data['unapproved_modules'] = ProjectModule::where('approved',0)->where('added_by',Auth::user()->user_id)->with(['projects','users','task'])->orderBy('id','desc')->get();
         }
 
         return view('developer_modules.modules_list',$data);
@@ -198,9 +162,6 @@ class ModuleController  extends Controller
                 $comment->task_id =$request->task_id;
                 $comment->status = 0;
                 $comment->save();
-                ProjectModule::where('id',$request->module_id)->update([
-                    'approved' => 2,
-                ]);
                 $response['result'] = "Module Reopened";
             }
             DB::commit();
@@ -216,22 +177,6 @@ class ModuleController  extends Controller
 
     public function single_module_detail($id)
     {
-//        $all =  ProjectModule::all();
-//
-//        foreach ($all as $single){
-//            $impact =  ProjectModule::Where('dependencies', 'like', '%' . $single->models . '%')->pluck('models')->toArray();
-//           if(count($impact)){
-//               ProjectModule::where('id',$single->id)->update([
-//                   'impact_on' => implode(',',$impact)
-//               ]);
-//           }
-//
-//        }
-
-
-
-
-        //$manager = ManagerialRole::Where('type','Manager')->where('role_id', Auth::user()->role_id)->first();
         $manager = User::select('manager_id')
             ->whereStatus(1)
             ->where('user_type','Employee')

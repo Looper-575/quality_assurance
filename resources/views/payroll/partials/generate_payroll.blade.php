@@ -23,7 +23,7 @@
         <tbody>
         @foreach ($attendance_list as $attendace_log)
             <tr>
-                <td>{{ $attendace_log->user->full_name }}
+                <td>{{ $attendace_log->user->full_name }} ({{$attendace_log->user->employee->designation}})
                     <input type="hidden" name="user_id[]" value="{{$attendace_log->user->user_id}}">
                     <input type="hidden" name="salary_month[]" value="{{date('Y-m-d', $yrdata)}}">
                 </td>
@@ -46,37 +46,49 @@
                     <input type="hidden" name="lates[]" value="{{$attendace_log->lates}}">
                     <input type="hidden" name="absents[]" value="{{$attendace_log->absents}}">
                 </td>
-                <td> {{intval($attendace_log->user->employee->net_salary - (($attendace_log->user->employee->net_salary*10)/100))}} <input type="hidden" name="basic_salary[]" value="{{$attendace_log->user->employee->net_salary - (($attendace_log->user->employee->net_salary*10)/100)}}"></td>
+                <td> {{intval($attendace_log->user->employee->net_salary - $attendace_log->medical_allowance)}} <input type="hidden" name="basic_salary[]" value="{{$attendace_log->user->employee->net_salary - $attendace_log->medical_allowance}}"></td>
                 <td class="p-line-height pt-3">
                 <?php $ded_det = $attendace_log->deductions;?>
-                    <input type="hidden" name="leaves_of_late[]" value="{{$ded_det['leaves_of_late']}}">
+                    <div class="container-fluid">
+                    <input type="hidden" name="carry_forward_half_day[]" value="{{$ded_det['carry_forward_half_day']}}">
                     <input type="hidden" name="leaves_of_half[]" value="{{$ded_det['leaves_of_half']}}">
                     <input type="hidden" name="deduction_bucket[]" value="{{$ded_det['deduction_bucket']}}">
-                    @foreach($ded_det['details'] as $key => $ded)
-                        <p>{{$ded}}:  <span class="float-right">{{$key}}</span></p>
-                        <input value="{{$ded}}" name="deduction_title[{{$attendace_log->user->user_id}}][]" type="hidden" class="form-control" />
-                        <input value="{{$key}}" name="deduction_value[{{$attendace_log->user->user_id}}][]" type="hidden" class="form-control" />
-                    @endforeach
-                    <p><b>Total Deductions:  <span class="float-right">{{ intval($ded_det['total_deductions']) }}</span></b></p>
+                    <div class="row">
+                        @foreach($ded_det['details'] as $key => $ded)
+                            <div class="col-8"><p style="white-space: nowrap;">{{$ded}}: </p></div>
+                            <div class="col-4"><p class="float-right">{{$key}}</p></div>
+                            <input value="{{$ded}}" name="deduction_title[{{$attendace_log->user->user_id}}][]" type="hidden" class="form-control" />
+                            <input value="{{$key}}" name="deduction_value[{{$attendace_log->user->user_id}}][]" type="hidden" class="form-control" />
+                        @endforeach
+                        <div class="col-8"><p style="white-space: nowrap;"><b>Total Deductions:</b></p></div>
+                        <div class="col-4"><p class="float-right"><b>{{ intval($ded_det['total_deductions']) }}</b></p></div>
+                    </div>
+                    </div>
                 </td>
                 <td class="p-line-height pt-3">
                     <?php $allowance = $attendace_log->allowance;?>
+                    <div class="container-fluid">
+                    <div class="row">
                         @foreach($attendace_log->allowance['details'] as $key => $allowanc)
-                            <p>{{$key}}: <span class="float-right">{{intval($allowanc)}}</span></p>
+                            <div class="col-8"><p style="white-space: nowrap;">{{$key}}: </p></div>
+                            <div class="col-4"><p class="float-right">{{intval($allowanc)}}</p></div>
                             <input value="{{$key}}" name="allowance_title[{{$attendace_log->user->user_id}}][]" type="hidden" class="form-control" />
                             <input value="{{$allowanc}}" name="allowance_value[{{$attendace_log->user->user_id}}][]" type="hidden" class="form-control" />
                         @endforeach
-                    <p><b>Total Allowance: <span class="float-right">{{intval($allowance['total_allowance'])}}</span></b></p>
+                        <div class="col-8"><p><b>Total Allowance:</b></p></div>
+                        <div class="col-4"><p class="float-right"><b>{{intval($allowance['total_allowance'])}}</b></p></div>
+                    </div>
+                    </div>
                 </td>
                 <td>
-                     {{ intval(($attendace_log->user->employee->net_salary - (($attendace_log->user->employee->net_salary*10)/100)) - $ded_det['total_deductions'] + $allowance['total_allowance'])}}
-                    <input type="hidden" name="gross_salary[]" value="{{ intval(($attendace_log->user->employee->net_salary - (($attendace_log->user->employee->net_salary*10)/100)) - $ded_det['total_deductions'] + $allowance['total_allowance'])}}">
+                     {{ intval(($attendace_log->user->employee->net_salary - $attendace_log->medical_allowance) - $ded_det['total_deductions'] + $allowance['total_allowance'])}}
+                    <input type="hidden" name="gross_salary[]" value="{{ intval(($attendace_log->user->employee->net_salary - $attendace_log->medical_allowance) - $ded_det['total_deductions'] + $allowance['total_allowance'])}}">
                 </td>
             </tr>
         @endforeach
         @foreach($payroll_exists as $user)
             <tr>
-                <td>{{$user->full_name}}</td>
+                <td>{{$user->full_name}} ({{$user->employee->designation}})</td>
                 <td colspan="10">Payroll Already Created!</td>
             </tr>
         @endforeach

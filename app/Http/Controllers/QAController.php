@@ -26,7 +26,7 @@ class QAController extends Controller
     }
     public function form(){
         $data['page_title'] = "QA From - Atlantis BPO CRM";
-        $data['agents'] = User::whereIn('role_id', [1,2,3,4] )->where('status', 1)->get();
+        $data['agents'] = User::whereIn('role_id', [1,2,3,4,22] )->where('status', 1)->get();
         $data['call_types'] = CallType::get();
         return view('qa.qa_form' , $data);
     }
@@ -37,15 +37,13 @@ class QAController extends Controller
         $data['qa_lists'] = QualityAssurance::where([
             'status'=> 1,
             ])->with(['agent','call_type','qa_status'])->get();
-           // dd($data);
-        // $data['qa_single_data'] = QualityAssurance::find($id)->get();
         return view('qa.qa_list', $data);
     }
     public function show(Request $request)
     {
         $data['qa_data'] = QualityAssurance::where([
             'qa_id' => $request->qa_id,
-        ])->with(['agent', 'call_type'])->get()[0];
+        ])->with(['agent', 'call_type', 'qa_done_by'])->first();
         return view('qa.qa_single', $data);
     }
     public function save(Request $request)
@@ -86,61 +84,85 @@ class QAController extends Controller
                 'additional_comment' => 'required',
         ]);
         if($validator->passes()) {
-
+            $qa_form_data = [
+                'agent_id'	=> $request->rep_name,
+                'call_type_id'=> $request->call_type,
+                'call_number'=>$request->call_number,
+                'greetings_correct'=>$request->greetings_correct,
+                'greetings_assurity_statement'=>$request->greetings_assurity_statement,
+                'greetings_comment'=>$request->greetings_comment,
+                'customer_name_call'=>$request->customer_name_call,
+                'customer_comment'=>$request->customer_comment,
+                'listening_skills'=>$request->listening_skills,
+                'listening_comment' => $request->listening_comment,
+                'courtesy_please'=> $request->courtesy_please,
+                'courtesy_thank_you'=>$request->courtesy_thank_you,
+                'courtesy_interest'=>$request->courtesy_interest,
+                'courtesy_empathy'=>$request->courtesy_empathy,
+                'courtesy_Apologized'=>$request->courtesy_Apologized,
+                'courtesy_comment'=>$request->courtesy_comment,
+                'equipment_system'=>$request->equipment_system,
+                'equipment_comment'=>$request->equipment_comment,
+                'soft_skills_energy'=>$request->soft_skills_energy,
+                'soft_skill_avoided_silence'=>$request-> soft_skill_avoided_silence,
+                'soft_skill_polite'=>$request->soft_skill_polite,
+                'soft_skill_grammar'=>$request->soft_skill_grammar,
+                'soft_skill_refrained_company'=> $request->soft_skill_refrained_company,
+                'soft_skill_positive_words'=> $request->soft_skill_positive_words,
+                'soft_skills_comment'=> $request->soft_skills_comment,
+                'using_hold_informed_customer' => $request->using_hold_informed_customer,
+                'using_hold_touch'=> $request->using_hold_touch,
+                'using_hold_thanked' => $request->using_hold_thanked,
+                'using_hold_comment'=> $request->using_hold_comment,
+                'connecting_calls_department' => $request->connecting_calls_department,
+                'connecting_calls_customer'=> $request->connecting_calls_customer,
+                'connecting_calls_comment'=> $request->connecting_calls_comment,
+                'closing_recap'=> $request->closing_recap,
+                'clossing_assistance' => $request->clossing_assistance,
+                'closing_comment' => $request->closing_comment,
+                'automatic_fail_misquoting'=> $request->automatic_fail_misquoting,
+                'automatic_fail_disconnected'=> $request->automatic_fail_disconnected,
+                'automatic_fail_answer' => $request->automatic_fail_answer,
+                'automatic_fail_repeating_details'=> $request->automatic_fail_repeating_details,
+                'automatic_fail_changing_details' => $request->automatic_fail_changing_details,
+                'automatic_fail_fabricating'=> $request->automatic_fail_fabricating,
+                'automatic_fail_other' => $request->automatic_fail_other,
+                'automatic_fail_comment'=> $request->automatic_fail_comment,
+                'additional_comment' => $request->additional_comment,
+                'yes_responses'=> $request->yes_responses,
+                'no_responses' => $request->no_responses,
+                'automatic_fail_response'=> $request->automatic_fail_response,
+                'monitor_percentage' => $request->monitor_percentage,
+                ];
+            $files = [];
+            if($request->hasfile('recording'))
+            {
+                $current = Carbon::now()->format('YmdHms');
+                $i =1;
+                foreach($request->file('recording') as $file)
+                {
+                    $name= $current.'_'.$i.'.'.$file->getClientOriginalExtension();
+                    $file->move(public_path('recordings'), $name);
+                    $files[] = $name;
+                    $i++;
+                }
+            }
             if($request->qa_id){
                 try {
-                    $qa_data = QualityAssurance::where('qa_id', $request->qa_id)->update([
-                        'agent_id'	=> $request->rep_name,
-                        'call_date' => $request->call_date,
-                        'call_type_id'=> $request->call_type,
-                        'call_number'=>$request->call_number,
-                        'greetings_correct'=>$request->greetings_correct,
-                        'greetings_assurity_statement'=>$request->greetings_assurity_statement,
-                        'greetings_comment'=>$request->greetings_comment,
-                        'customer_name_call'=>$request->customer_name_call,
-                        'customer_comment'=>$request->customer_comment,
-                        'listening_skills'=>$request->listening_skills,
-                        'listening_comment' => $request-> listening_comment,
-                        'courtesy_please'=> $request->courtesy_please,
-                        'courtesy_thank_you'=>$request->courtesy_thank_you,
-                        'courtesy_interest'=>$request->courtesy_interest,
-                        'courtesy_empathy'=>$request-> courtesy_empathy,
-                        'courtesy_Apologized'=>$request->courtesy_Apologized,
-                        'courtesy_comment'=>$request->courtesy_comment,
-                        'equipment_system'=>$request-> equipment_system,
-                        'equipment_comment'=>$request->equipment_comment,
-                        'soft_skills_energy'=>$request->soft_skills_energy,
-                        'soft_skill_avoided_silence'=>$request-> soft_skill_avoided_silence,
-                        'soft_skill_polite'=>$request->soft_skill_polite,
-                        'soft_skill_grammar'=>$request->soft_skill_grammar,
-                        'soft_skill_refrained_company'=> $request->soft_skill_refrained_company,
-                        'soft_skill_positive_words'=> $request->soft_skill_positive_words,
-                        'soft_skills_comment'=> $request->soft_skills_comment,
-                        'using_hold_informed_customer' => $request->using_hold_informed_customer,
-                        'using_hold_touch'=> $request->using_hold_touch,
-                        'using_hold_thanked' => $request->using_hold_thanked,
-                        'using_hold_comment'=> $request->using_hold_comment,
-                        'connecting_calls_department' => $request->connecting_calls_department,
-                        'connecting_calls_customer'=> $request->connecting_calls_customer,
-                        'connecting_calls_comment'=> $request->connecting_calls_comment,
-                        'closing_recap'=> $request->closing_recap,
-                        'clossing_assistance' => $request->clossing_assistance,
-                        'closing_comment' => $request->closing_comment,
-                        'automatic_fail_misquoting'=> $request->automatic_fail_misquoting,
-                        'automatic_fail_disconnected'=> $request->automatic_fail_disconnected,
-                        'automatic_fail_answer' => $request->automatic_fail_answer,
-                        'automatic_fail_repeating_details'=> $request->automatic_fail_repeating_details,
-                        'automatic_fail_changing_details' => $request->automatic_fail_changing_details,
-                        'automatic_fail_fabricating'=> $request->automatic_fail_fabricating,
-                        'automatic_fail_other' => $request->automatic_fail_other,
-                        'automatic_fail_comment'=> $request->automatic_fail_comment,
-                        'additional_comment' => $request->additional_comment,
-                        'yes_responses'=> $request->yes_responses,
-                        'no_responses' => $request->no_responses,
-                        'automatic_fail_response'=> $request->automatic_fail_response,
-                        'monitor_percentage' => $request->monitor_percentage,
-                        'call_id' => $request->call_id,
-                    ]);
+                    $qa_record = QualityAssurance::where('qa_id', $request->qa_id)->pluck('recording')->first();
+                    $old_files = explode(',', $qa_record);
+                    $remaining_files =  explode(',', $request->attached_files);
+                    $trashed_files = array_diff($old_files,$remaining_files);
+                    foreach ($trashed_files as $trash){
+                        if(File::exists(public_path('recordings/'.$trash))){
+                            File::delete(public_path('recordings/'.$trash));
+                        }
+                    }
+                    $recording = array_merge($files,$remaining_files);
+                    $recording = implode(',',$recording);
+                    $qa_form_data['recording'] = $recording;
+                    $qa_form_data['modified_by'] = Auth::user()->user_id;
+                    QualityAssurance::where('qa_id', $request->qa_id)->update($qa_form_data);
                     $response['status'] = 'success';
                     $response['result']= "Updated Successfully";
                 } catch(Exception $e) {
@@ -149,81 +171,20 @@ class QAController extends Controller
                 }
             }
             else{
-                $qa = new QualityAssurance;
-                $qa->added_by = Auth::user()->user_id;
-                $qa->agent_id	= $request->rep_name;
-                $qa->call_date = $request->call_date;
-                $qa->call_type_id = $request->call_type;
-                $qa->call_number = $request->call_number;
-                $current = Carbon::now()->format('YmdHms');
-                $files = [];
-                if($request->hasfile('recording'))
-                {
-                    $i =1;
-                    foreach($request->file('recording') as $file)
-                    {
-                        $name= $current.'_'.$i.'.'.$file->getClientOriginalExtension();
-                        $file->move(public_path('recordings'), $name);
-                        $files[] = $name;
-                        $i++;
-                    }
+                $qa_form_data['added_by'] = Auth::user()->user_id;
+                $qa_form_data['recording'] = implode(',',$files);
+                $qa_form_data['call_id'] = $request->call_id;
+                if($request->call_date != null){
+                    $qa_form_data['call_date'] = $request->call_date;
                 }
-                $qa->recording = implode(',',$files);
-                $qa->greetings_correct = $request->greetings_correct;
-                $qa->greetings_assurity_statement  = $request->greetings_assurity_statement;
-                $qa->greetings_comment = $request->greetings_comment;
-                $qa->customer_name_call = $request->customer_name_call;
-                $qa->customer_comment = $request->customer_comment;
-                $qa->listening_skills = $request->listening_skills;
-                $qa->listening_comment= $request-> listening_comment;
-                $qa->courtesy_please = $request->courtesy_please;
-                $qa->courtesy_thank_you = $request->courtesy_thank_you;
-                $qa->courtesy_interest = $request->courtesy_interest;
-                $qa->courtesy_empathy = $request-> courtesy_empathy;
-                $qa->courtesy_Apologized = $request->courtesy_Apologized;
-                $qa->courtesy_comment = $request->courtesy_comment;
-                $qa->equipment_system = $request-> equipment_system;
-                $qa->equipment_comment = $request->equipment_comment;
-                $qa->soft_skills_energy = $request->soft_skills_energy;
-                $qa->soft_skill_avoided_silence  = $request-> soft_skill_avoided_silence;
-                $qa->soft_skill_polite = $request->soft_skill_polite;
-                $qa->soft_skill_grammar = $request->soft_skill_grammar;
-                $qa->soft_skill_refrained_company= $request->soft_skill_refrained_company;
-                $qa->soft_skill_positive_words = $request->soft_skill_positive_words;
-                $qa->soft_skills_comment = $request->soft_skills_comment;
-                $qa->using_hold_informed_customer = $request->using_hold_informed_customer;
-                $qa->using_hold_touch = $request->using_hold_touch;
-                $qa->using_hold_thanked = $request->using_hold_thanked;
-                $qa->using_hold_comment = $request->using_hold_comment;
-                $qa->connecting_calls_department = $request->connecting_calls_department;
-                $qa->connecting_calls_customer = $request->connecting_calls_customer;
-                $qa->connecting_calls_comment = $request->connecting_calls_comment;
-                $qa->closing_recap = $request->closing_recap;
-                $qa->clossing_assistance = $request->clossing_assistance;
-                $qa->closing_comment= $request->closing_comment;
-                $qa->automatic_fail_misquoting= $request->automatic_fail_misquoting;
-                $qa->automatic_fail_disconnected = $request->automatic_fail_disconnected;
-                $qa->automatic_fail_answer = $request->automatic_fail_answer;
-                $qa->automatic_fail_repeating_details = $request->automatic_fail_repeating_details;
-                $qa->automatic_fail_changing_details = $request->automatic_fail_changing_details;
-                $qa->automatic_fail_fabricating = $request->automatic_fail_fabricating;
-                $qa->automatic_fail_other = $request->automatic_fail_other;
-                $qa-> automatic_fail_comment = $request->automatic_fail_comment;
-                $qa->additional_comment = $request->additional_comment;
-                $qa->yes_responses = $request->yes_responses;
-                $qa->no_responses = $request->no_responses;
-                $qa->automatic_fail_response = $request->automatic_fail_response;
-                $qa->monitor_percentage = $request->monitor_percentage;
-                $qa->call_id = $request->call_id;
                 $call_id = QualityAssurance::select('call_id')->where([
                     'call_id' => $request->call_id,
                 ])->get();
-
                 if(count($call_id)>0){
                     $response['status'] = "Failure!";
                     $response['result'] = "Quality Assessment for this call already exist";
                 } else {
-                    $qa->save();
+                    QualityAssurance::create($qa_form_data);
                     $response['status'] = "Success";
                     $response['result'] = "Added Successfully";
                 }
@@ -237,7 +198,7 @@ class QAController extends Controller
     public function edit($id)
     {
         $data['page_title'] = "QA Form - Atlantis BPO CRM";
-        $data['qa_edit'] = QualityAssurance::where('qa_id' , $id)->with('agent' , 'call_type')->get()[0];
+        $data['qa_edit'] = QualityAssurance::where('qa_id' , $id)->with('agent' , 'call_type')->first();
         return view('qa.qa_edit' , $data);
     }
     public function qa_queue(){
@@ -245,11 +206,13 @@ class QAController extends Controller
         $data['qa_queue'] = CallDisposition::where([
             'status' => 1,
             'disposition_type' => 1
-        ])->with(['user','call_disposition_types','call_dispositions_services'])->doesntHave('qa_assessment')->whereRaw("date(added_on)>='2021-11-29 17:00:00'")->get();
+        ])
+            ->where('added_on','>', '2022-02-07')->with(['user','call_disposition_types','call_dispositions_services'])->doesntHave('qa_assessment')->whereRaw("date(added_on)>='2021-11-29 17:00:00'")->get();
         $data['qa_done'] = QualityAssurance::where([
             'status'=> 1,
             'call_type_id' => 1
-        ])->with(['agent','call_type','qa_status','call_disposition','call_disposition.call_dispositions_services'])->whereRaw("date(added_on)>='2021-11-29 17:00:00'")->get();
+        ])
+            ->where('added_on','>', '2022-02-07')->with(['agent','call_type','qa_status','call_disposition','call_disposition.call_dispositions_services', 'qa_done_by'])->whereRaw("date(added_on)>='2021-11-29 17:00:00'")->get();
         return view('qa.qa_list' , $data);
     }
     public function qa_add($id){

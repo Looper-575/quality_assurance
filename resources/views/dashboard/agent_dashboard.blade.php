@@ -175,7 +175,6 @@
                                                         <!--begin::widget item-->
                                                         <?php
                                                         $daily_mobile = 0;
-
                                                         ?>
                                                         @foreach($daily_stats as $stat)
                                                             <?php
@@ -297,12 +296,10 @@
                                                         <!--begin::widget item-->
                                                         <?php
                                                         $monthly_mobile = 0;
-
                                                         ?>
                                                         @foreach($monthly_stats as $stat)
                                                             <?php
                                                             $monthly_mobile+= ($stat->mobile);
-
                                                             ?>
                                                             <div class="m-widget16__item">
                                                                 <span class="m-widget16__date">
@@ -405,39 +402,6 @@
         $(document).on('click', '.queue_item', function(){
             $('.queue_item').removeClass("active_queue");
             $(this).addClass('active_queue');
-
-            // swal("A wild Pikachu appeared! What do you want to do?", {
-            //     buttons: {
-            //         cancel: "Run away!",
-            //         catch: {
-            //             text: "Throw Pokéball!",
-            //             value: "catch",
-            //         },
-            //         defeat: true,
-            //     },
-            // })
-            //     .then((value) => {
-            //         switch (value) {
-            //
-            //             case "defeat":
-            //                 swal("Pikachu fainted! You gained 500 XP!");
-            //                 break;
-            //
-            //             case "catch":
-            //                 swal("Gotcha!", "Pikachu was caught!", "success");
-            //                 break;
-            //
-            //             default:
-            //                 swal("Got away safely!");
-            //         }
-            //     });
-            //
-            //
-            //
-            // console.log('here');
-            //
-            // return;
-
             let phone = $(this).find('.phone_number').html();
             let rec_id = $(this).find('.rec_id').html();
             let did_id = $(this).find('.did_id').html();
@@ -486,7 +450,6 @@
                 $('.phone_check').each(function (index, obj) {
                     if (this.checked === true) {
                         blnChck = true;
-
                     }
                 });
                 if (blnChck === false) {
@@ -530,7 +493,6 @@
             var first_time = true;
             var max_id = 0;
             let ip = "http://" + window.location.hostname + ":3000";
-
             let socket = io(ip, {query: 'user_id=' + {{Auth::user()->user_id}}});
             let query_data = {"user": {{Auth::user()->vicidialer_id}}};
             setInterval(function () {
@@ -538,7 +500,6 @@
                 socket.emit('get_call_queue', query_data);
             }, 100);
             socket.on('get_call_list', (data) => {
-
                 let queue_item = data.call_queue;
                 if(queue_item.length > 0 && queue_item[queue_item.length-1].rec_id > max_id){
                     $.each(queue_item, function (key, item) {
@@ -602,11 +563,8 @@
             let arr= [a];
             call_ajax_with_functions('customer_details',"{{route('get_customer_info')}}",data,arr)
         }
-
-
-        async function  submit_sale_form(){
-
-           let anyerror = false;
+        function submit_sale_form(){
+            let anyerror = false;
             let checks = $('.m-checkbox-list').find('input[type=checkbox]');
             anyerror = false;
             let msg="";
@@ -657,41 +615,7 @@
                 let phone_number = $('#customer_number').html();
                 let alternate_numbers = $('#customer_alternate').html();
                 let queue_number =  data.get('phone_number');
-
-             // console.log([...data],$('#email_customer').html(),$('#customer_id').html());
-             // return;
-
-            if(data.has('customer_id') && $('#email_customer').html() !== data.get('email')){
-           await  swal("New Email Address!!!", {
-                    buttons: {
-                        cancel: "Create New Customer",
-                        catch: {
-                            text: "Update Existing Customer ",
-                            value: "update_existing",
-                        },
-                        proceed: {
-                            text: "Do Nothing and Proceed",
-                            value: "do_nothing",
-                        },
-                    },
-                }).then((value) => {
-                        switch (value) {
-                            case "do_nothing":
-                                data.append('action', 'nothing');
-                                break;
-                            case "update_existing":
-
-                                data.append('action', 'update');
-                                break;
-                            default:
-
-                                data.append('action', 'create');
-                        }
-                    });
-            }
-
-
-                if($('#customer').html() !== 'No Customer Found' && !data.has('action') && phone_number !== queue_number && !alternate_numbers.includes(queue_number)){
+                if($('#customer').html() !== 'No Customer Found' && phone_number !== queue_number && !alternate_numbers.includes(queue_number)){
                     Swal.fire({
                         title: 'New Number!',
                         text: 'Phone Number will be added to the Alternate Numbers For this customer',
@@ -842,7 +766,6 @@
             daily_data.push({label:'Double Play' , value:{{$services_sold_daily[0]->double_play}}});
             daily_data.push({label:'Triple Play' , value:{{$services_sold_daily[0]->triple_play}}});
             daily_data.push({label:'Quad Play' , value:{{$services_sold_daily[0]->quad_play}}});
-
             monthly_data.push({label:'Single Play' , value:{{$services_sold_monthly[0]->single_play}}});
             monthly_data.push({label:'Double Play' , value:{{$services_sold_monthly[0]->double_play}}});
             monthly_data.push({label:'Triple Play' , value:{{$services_sold_monthly[0]->triple_play}}});
@@ -854,7 +777,6 @@
             $("#daily_stats svg").remove();
             $("#monthly_stats").empty();
             $("#monthly_stats svg").remove();
-
             Morris.Donut(
                 {element:"daily_stats",data:daily_data,
                     labelColor:"#a7a7c2",

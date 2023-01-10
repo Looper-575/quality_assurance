@@ -20,6 +20,7 @@
             <form id="final_settlement_form" action="javascript:save_final_settlement()" method="post">
                 <div class="container-fluid">
                 @csrf
+                <input type="hidden" id="user_id" name="user_id" value="{{$separation->user->user_id}}">
                 <input type="hidden" id="separation_id" name="separation_id" value="{{$separation->separation_id}}">
                 <input type="hidden" id="last_working_day" name="last_working_day" value="{{ $separation->separation_date }}">
                 <input type="hidden" id="length_of_service" name="length_of_service" value="{{total_service($separation->user->employee->joining_date, $separation->separation_date)}}">
@@ -29,7 +30,7 @@
                             <tbody>
                             <tr>
                                 <td>Name:</td>
-                                <td>{{ $separation->user->full_name }}</td>
+                                <td class="text-capitalize">{{ $separation->user->full_name }}</td>
                                 <td colspan="2"></td>
                             </tr>
                             <tr>
@@ -58,8 +59,19 @@
                 <div class="row">
                     <div class="col-12 mt-2">
                         <p><b>Detail:</b> <span>{{$separation->type}}</span>
-                            <span class="m-l-100"><b>Effective From:</b> {{$separation->effective_from}}</span>
+                            <span class="m-l-100"><b>Notice Period:</b> {{$separation->notice_period}}</span>
+                            <span class="m-l-100"><b>Served:</b> {{working_days($separation->resignation_date, $separation->separation_date)}} Days</span>
                             </p>
+                        <div class="row">
+                            <div class="col-6">
+                                <p class="mb-0"><b>Reason</b></p>
+                                <p>{{$separation->reason}}</p>
+                            </div>
+                            <div class="col-6">
+                                <p class="mb-0"><b>General Comments</b></p>
+                                <p>{{$separation->general_comments}}</p>
+                            </div>
+                        </div>
                         <p class="mb-0"><b>
                             @foreach($payroll as $payroll_log)
                                 <span>
@@ -80,7 +92,7 @@
                 <div class="row">
                         <div class="col-6 d-flex form-check p-3">
                             <div class="w-100 p-3" style="border: 2px solid #000000 !important;">
-                            <p><b>Clearance: </b>All assets other than those listed here under have been received.</p>
+                            <p><b>Clearance: </b>All deduction items other than those listed here under have been received.</p>
                             @if($final_settlement)
                                 <p><b>Amount to be Deducted : {{$final_settlement->asset_deduction_amount}}</b>
                             <?php $assets_not_returned = explode(',',$final_settlement->assets_not_returned) ?>
@@ -88,24 +100,26 @@
                                     <p>{{$asset}}</p>
                                 @endforeach
                             @else
-                            <p><b>Amount to be Deducted :</b>
-                                    <input type="number" name="asset_deduction_amount" id="asset_deduction_amount" readonly></p>
-                            <div class="m-form__group form-group">
-                                <label>Please select the Assets, not returned</label>
-                                <div class="m-checkbox-list">
-                                <label class="m-checkbox">
-                                    <input type="checkbox" id="assets_not_returned" name="assets_not_returned"
-                                           data-asset="all" data-price="0" value="0">Select All <span></span>
-                                </label>
-                                    <?php $assets_list = json_decode($separation->assets_list); ?>
-                                    @foreach ($assets_list as $key => $asset)
+                                @if($separation->assets_list != NULL)
+                                    <p><b>Amount to be Deducted :</b>
+                                            <input type="number" class="border-0" name="asset_deduction_amount" id="asset_deduction_amount" readonly></p>
+                                    <div class="m-form__group form-group">
+                                        <label>Please select the Deductions</label>
+                                        <div class="m-checkbox-list">
                                         <label class="m-checkbox">
-                                            <input type="checkbox" name="assets_not_returned[]" data-asset="{{$asset->item}}" data-price="{{$asset->price}}" class="asset_checkbox" value="{{$asset->item}}">
-                                            {{ $asset->item }} ({{ $asset->price }})<span></span>
+                                            <input type="checkbox" id="assets_not_returned" name="assets_not_returned"
+                                                   data-asset="all" data-price="0" value="0">Select All <span></span>
                                         </label>
-                                    @endforeach
-                                </div>
-                            </div>
+                                            <?php $assets_list = json_decode($separation->assets_list); ?>
+                                            @foreach ($assets_list as $key => $asset)
+                                                <label class="m-checkbox">
+                                                    <input type="checkbox" name="assets_not_returned[]" data-asset="{{$asset->item}}" data-price="{{$asset->price}}" class="asset_checkbox" value="{{$asset->item}}">
+                                                    {{ $asset->item }} ({{ $asset->price }})<span></span>
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    @endif
                             @endif
                             </div>
                         </div>
@@ -113,8 +127,8 @@
                             <div class="w-100 p-3" style="border: 2px solid #000000 !important;">
                             <p><b>Earning Dues (in Days)</b></p>
                             @foreach($payroll as $payroll_log)
-                                <p>Salary ({{date('F Y', strtotime($payroll_log->form_date))}}) : Rs {{intval($payroll_log->user->employee->net_salary)}}</p>
-                                <p>Salary ({{date('F Y', strtotime($payroll_log->form_date))}} ({{$payroll_log->attendance_marked-$payroll_log->absents}} days)) : Rs {{intval(($payroll_log->user->employee->net_salary+($separation->bonus_deduction == 0 ? $payroll_log->allowance['total_allowance']:0) ) - $payroll_log->deductions['total_deductions'])}}</p>
+                                <p>Salary ({{date('F Y', strtotime($payroll_log->to_date))}}) : Rs {{intval($payroll_log->user->employee->net_salary)}}</p>
+                                <p>Salary ({{date('F Y', strtotime($payroll_log->to_date))}} ({{$payroll_log->attendance_marked-$payroll_log->absents}} days)) : Rs {{intval($payroll_log->user->employee->net_salary - $payroll_log->deductions['total_deductions'])}}</p>
                                 <p>Dated : {{$payroll_log->form_date}} To {{$payroll_log->to_date}}</p>
                             @endforeach
                             </div>
@@ -147,7 +161,7 @@
                                         <br>
                                         @if($payroll_log->allowance != 0)
                                             @foreach($payroll_log->allowance['details'] as $index => $allowance)
-                                                {{$index}} <span class="float-right">Rs. {{intval($allowance)}}</span><br>
+                                                {{$index}} <span class="float-right">Rs. {{$allowance}}</span><br>
                                             @endforeach
                                         @endif
                                     </td>
@@ -156,7 +170,7 @@
                                             {{$index}} <span class="float-right">Rs. {{intval($deduction)}}</span><br>
                                         @endforeach
                                             @if($loop_count == 0)
-                                                <span> Assets Deductions <span class="float-right">Rs.<span id="assets_deduction"> {{ ($final_settlement == null ? 0 : $final_settlement->asset_deduction_amount) }}</span></span></span>
+                                                <span>Other Deductions <span class="float-right">Rs.<span id="assets_deduction"> {{ ($final_settlement == null ? 0 : $final_settlement->asset_deduction_amount) }}</span></span></span>
                                             @endif
                                     </td>
                                     @if($loop_count != 0 || count($payroll)==1)
@@ -168,6 +182,26 @@
                                     @endif
                                 </tr>
                             @endforeach
+                                <tr>
+                                    <td  class="p-3" colspan="2">
+
+                                        @if(isset($payroll_log) && $payroll_log->allowance != 0)
+                                            <p>{{date('"F Y"', strtotime($last_month_sales['allowance_month']))}}</p>
+                                        @foreach($last_month_sales['details'] as $index => $allowance)
+                                                {{$index}} <span class="float-right">Rs. {{$allowance}}</span><br>
+                                            @endforeach
+                                        @endif
+                                            @if($separation->allowance_list != NULL)
+                                                <?php
+                                                $allowance_amount = 0;
+                                                $allowance_list = json_decode($separation->allowance_list); ?>
+                                                @foreach ($allowance_list as $key => $asset)
+                                                        <?php $allowance_amount += $asset->price; ?>
+                                                        {{$asset->item}} <span class="float-right">Rs. {{$asset->price}}</span><br>
+                                                @endforeach
+                                            @endif
+                                    </td>
+                                </tr>
                             <tr>
                                 <td colspan="2">
                                     <b class="p-3" >
@@ -227,7 +261,7 @@
         function save_final_settlement(){
             let data = new FormData($('#final_settlement_form')[0]);
             let a = function() {
-                window.location.reload();
+                window.location.href = "{{route('employee_separation')}}"+'?active_tab=separated_list';
             }
             let arr = [a];
             call_ajax_with_functions('', '{{route('save_final_settlement')}}', data, arr);

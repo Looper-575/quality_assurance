@@ -27,7 +27,6 @@ class EmployeeController extends Controller
     public function __construct() { }
     public function index()
     {
-        dd('here');
         $data['page_title'] = "Employees List - Atlantis BPO CRM";
         if(Auth::user()->role_id == 1 or Auth::user()->role_id == 5 or Auth::user()->role_id == 34){
             $data['employee_lists'] = Employee::where('status' , 1)->orderBy('employee_id', 'DESC')->get();

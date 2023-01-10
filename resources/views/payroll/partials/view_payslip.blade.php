@@ -17,7 +17,7 @@
         <div class="col-3"><p>Designation:</p></div>
         <div class="col-3"><p>{{$payslip->user->employee->designation}}</p></div>
         <div class="col-3"><p>Basic Salary:</p></div>
-        <div class="col-3"><p>{{intval($payslip->user->employee->net_salary)}}</p></div>
+        <div class="col-3"><p>{{intval($payslip->basic_salary)}}</p></div>
         <div class="col-3"><p>Working Days:</p></div>
         <div class="col-3"><p>{{$payslip->working_days - $payslip->holiday_count - $payslip->leaves - $payslip->attendance_not_marked}}</p></div>
         <div class="col-3"><p>Holidays:</p></div>

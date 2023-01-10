@@ -1,6 +1,7 @@
 $(document).ready(function () {
     $('.datatable').DataTable( {
         stateSave: true,
+        order: [[0, 'desc']],
         initComplete: function () {
             this.api().columns().every( function () {
                 if(this.data().unique()[0].toLowerCase().search('div') != -1 || this.data().unique()[0].toLowerCase().search('<a') != -1){

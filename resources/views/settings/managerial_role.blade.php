@@ -58,62 +58,64 @@
     </div>
 @endsection
 @section('footer_scripts')
-    <div id="managerial_role_form_modal" style="z-index:9999999; height: 100% !important; min-height: 100%; width: 100%; position: fixed; top: 0; background-color: rgba(0, 0, 0, 0.7);display:none;">
-        <div style="z-index:99999999;display: block; padding-right: 17px; top: 100px" class="modal fade show" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog disposition_type_modal" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" id="modal_title">Add Managerial Role</h4>
-                        <button type="button" class="btn" onclick="$('#managerial_role_form_modal').fadeOut();" aria-hidden="true"><i class="fa fa-times"></i></button>
-                    </div>
-                    <div class="modal-body">
-                        <form method="post" id="managerial_role_form">
-                            @csrf
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <label for="role_id">Role</label>
-                                        <select class="form-control" name="role_id" id="role_id" required onchange="check_managerial_role(this)">
-                                            <option class="form-control" value="" selected disabled>Plese Select</option>
-                                            @foreach($user_roles as $user_role)
-                                                <option value="{{$user_role->role_id}}">{{$user_role->title}}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <label for="type">Type</label>
-                                    <div class="form-group ml-4">
-                                        <input
-                                            class="form-check-input check-size"
-                                            type="checkbox"
-                                            name="type[]"
-                                            id="type_team_lead"
-                                            value="Team Lead"
-                                        /><label class="form-check-label pr-4 mt-1 font-14" for="type_team_lead">Team Lead</label>
-                                        <input
-                                            class="form-check-input check-size"
-                                            type="checkbox"
-                                            name="type[]"
-                                            value="Manager"
-                                            id="type_manager"
-                                        /><label class="form-check-label pr-4 mt-1 font-14" for="type_manager">Manager</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                                <div class="col-12">
-                                    <input type="hidden" name="managerial_role_id" value="" id="managerial_role_id">
-                                    <button type="submit" class="btn btn-primary float-right">Save</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+    <div class="modal fade" id="managerial_role_form_modal" tabindex="-1" role="dialog" aria-labelledby="modal_label" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal_label">Add Managerial Role</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
+                <form method="post" id="managerial_role_form" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        @csrf
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="role_id">Role</label>
+                                    <select class="form-control" name="role_id" id="role_id" required onchange="check_managerial_role(this)">
+                                        <option class="form-control" value="" selected disabled>Plese Select</option>
+                                        @foreach($user_roles as $user_role)
+                                            <option value="{{$user_role->role_id}}">{{$user_role->title}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label for="type">Type</label>
+                                <div class="form-group ml-4">
+                                    <input
+                                        class="form-check-input check-size"
+                                        type="checkbox"
+                                        name="type[]"
+                                        id="type_team_lead"
+                                        value="Team Lead"
+                                    /><label class="form-check-label pr-4 mt-1 font-14" for="type_team_lead">Team Lead</label>
+                                    <input
+                                        class="form-check-input check-size"
+                                        type="checkbox"
+                                        name="type[]"
+                                        value="Manager"
+                                        id="type_manager"
+                                    /><label class="form-check-label pr-4 mt-1 font-14" for="type_manager">Manager</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Save changes
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+
     <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script src="{{ asset('assets/bundles/select2/dist/js/select2.full.min.js') }}"></script>
@@ -157,7 +159,7 @@
         $('#add_new_btn').click(function () {
             $(".check-size").prop('checked', false);
             $('#role_id').val(null);
-            $('#managerial_role_form_modal').fadeIn();
+            $('#managerial_role_form_modal').modal('show');
         });
 
         $('#managerial_role_form').submit(function (e) {
@@ -179,7 +181,7 @@
             });
             $('#role_id').val(data.role_id);
             $('#managerial_role_id').val(data.managerial_role_id);
-            $('#managerial_role_form_modal').fadeIn();
+            $('#managerial_role_form_modal').modal('show');
         });
     </script>
 @endsection

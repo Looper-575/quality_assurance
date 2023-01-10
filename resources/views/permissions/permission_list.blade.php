@@ -20,14 +20,20 @@
                 <div class="m-portlet__head-title float-left">
                     <h3 class="m-portlet__head-text">Permissions</h3>
                 </div>
-                @if($has_permissions->add == 1)
                 <div class="float-right mt-3">
-                    <a id="add_new_btn1" href="{{route('add_permissions')}}" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill">
-                        <span><i class="la la-phone-square"></i><span>Add New</span></span>
-                    </a>
-                    <div class="m-separator m-separator--dashed d-xl-none"></div>
-                </div>
+                @if($has_permissions->add == 1)
+                        <div class="m-portlet__head-tools float-right">
+                            <ul class="nav nav-tabs m-tabs-line m-tabs-line--success m-tabs-line--2x m-tabs-line--right" role="tablist">
+                                <li class="nav-item m-tabs__item">
+                                    <a href="{{route('add_permissions')}}"class="nav-link m-tabs__link">
+                                        <span class="add-new-button"><i class="la la-plus"></i><span>Add New</span></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                 @endif
+                <div class="m-separator m-separator--dashed d-xl-none"></div>
+                </div>
             </div>
         </div>
         <div class="m-portlet__body">
@@ -46,10 +52,10 @@
                         <td>{{$item->title}}</td>
                         <td>
                             @if($has_permissions->update == 1)
-                            <div class="btn-group btn-group-sm">
-                                <a class="btn btn-primary edit_btn" title="Edit Menu" href="{{route('edit_permissions',['id' => $item->role_id])}}"><i class="fa fa-edit"></i></a>
-                                 <button type="button" class="btn btn-danger detele_btn" title="Delete Menu" value="{{$item->role_id}}"><i class="fa fa-trash"></i></button>
-                            </div>
+                                <div class="btn-group btn-group-sm">
+                                    <a class="btn btn-primary edit_btn" title="Edit Menu" href="{{route('edit_permissions',['id' => $item->role_id])}}"><i class="fa fa-edit"></i></a>
+                                    <button type="button" class="btn btn-danger detele_btn" title="Delete Menu" value="{{$item->role_id}}"><i class="fa fa-trash"></i></button>
+                                </div>
                             @endif
                         </td>
                     </tr>

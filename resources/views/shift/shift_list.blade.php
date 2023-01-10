@@ -13,9 +13,15 @@
                 </div>
                 <div class="float-right mt-3">
                     @if($has_permissions->add == 1)
-                    <a id="add_new_btn" href="javascript:;" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air m-btn--pill">
-                        <span><i class="la la-phone-square"></i><span>Add New</span></span>
-                    </a>
+                        <div class="m-portlet__head-tools float-right">
+                            <ul class="nav nav-tabs m-tabs-line m-tabs-line--success m-tabs-line--2x m-tabs-line--right" role="tablist">
+                                <li class="nav-item m-tabs__item">
+                                    <a id="add_new_btn" class="nav-link m-tabs__link" href="javascript:;">
+                                        <span class="add-new-button"><i class="fa fa-plus"></i><span>Add New</span></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     @endif
                     <div class="m-separator m-separator--dashed d-xl-none"></div>
                 </div>
@@ -42,10 +48,10 @@
                         <td>
                             <div class="btn-group btn-group-sm">
                                 @if($has_permissions->update == 1)
-                                <button type="button" class="btn btn-primary edit_btn" title="Edit Menu" value="{{json_encode($menu)}}"><i class="fa fa-edit"></i></button>
+                                    <button type="button" class="btn btn-warning edit_btn" title="Edit Menu" value="{{json_encode($menu)}}"><i class="fa fa-edit text-white"></i></button>
                                 @endif
                                 @if(Auth::user()->role_id == 1)
-                                <button type="button" class="btn btn-danger detele_btn" title="Delete Menu" value="{{$menu->shift_id}}"><i class="fa fa-trash"></i></button>
+                                    <button type="button" class="btn btn-danger detele_btn" title="Delete Menu" value="{{$menu->shift_id}}"><i class="fa fa-trash"></i></button>
                                 @endif
                             </div>
                         </td>

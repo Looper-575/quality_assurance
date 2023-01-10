@@ -22,7 +22,6 @@ class EmployeeAssessment extends Model
     protected $fillable = [
         'user_id',
         'employee_id',
-        'period',
         'total_service',
         'evaluation_date',
         'confirmation_status',
@@ -45,7 +44,9 @@ class EmployeeAssessment extends Model
         'probation_extension_to_date',
         'overall_rating',
         'increment',
-        'added_by'
+        'added_by',
+        'from_date',
+        'to_date'
     ];
 
     /**

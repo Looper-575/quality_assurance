@@ -27,9 +27,9 @@
                 <td>{{ $qa_list->call_number }}</td>
                 <td>{{ parse_only_date_time_zone($qa_list->call_date) }}</td>
                 @if($qa_list->call_type->call_type_id == 1 )
-                    <td>{{$qa_list->call_disposition->order_number??'N/A'}}</td>
-                    <td>{{$qa_list->call_disposition->order_confirmation_number??'N/A'}}</td>
-                    <td>{{$qa_list->call_disposition->account_number??'N/A'}}</td>
+                    <td>{{$qa_list->call_disposition->order_number}}</td>
+                    <td>{{$qa_list->call_disposition->order_confirmation_number}}</td>
+                    <td>{{$qa_list->call_disposition->account_number}}</td>
                 @endif
             @if(isset($qa_list->qa_status))
                     <td> <span class="badge text-white"  style="background-color:<?php echo $qa_list->qa_status->badge_color; ?>;">{{ $qa_list->qa_status->monitor_percentage }}    %</span></td>

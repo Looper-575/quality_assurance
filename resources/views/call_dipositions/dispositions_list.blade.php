@@ -47,6 +47,7 @@
                         <table class="datatable table table-bordered" id="sale_made_table" style="width:100%">
                             <thead>
                             <tr>
+                                <th># </th>
                                 <th>DID Name </th>
                                 <th>Account Number</th>
                                 <th>Confirmation Number</th>
@@ -68,6 +69,7 @@
                             <tbody>
                             @foreach ($sale_made as $call_disp_list)
                                 <tr>
+                                    <td>{{ $call_disp_list->call_id }}</td>
                                     <td>{{ isset($call_disp_list->call_disposition_did->title) ? $call_disp_list->call_disposition_did->title : ' ' }}</td>
                                     <td>{{ $call_disp_list->account_number }}</td>
                                     <td>{{ $call_disp_list->order_confirmation_number }}</td>
@@ -103,7 +105,7 @@
                                         }
                                         ?>
                                     </td>
-                                    <td>{{ @$call_disp_list->user->full_name }}</td>
+                                    <td>{{ $call_disp_list->user->full_name }}</td>
                                     <td>{{$call_disp_list->sale_transferred==1?'Yes':'No'}}</td>
                                     @if(isset($call_disp_list->qa_status))
                                         <td> <span class="badge text-white"  style="background-color:<?php echo $call_disp_list->qa_status->badge_color; ?>;">{{ $call_disp_list->qa_status->monitor_percentage }} %</span></td>
@@ -135,6 +137,7 @@
                             </tbody>
                             <tfoot>
                             <tr>
+                                <th>#</th>
                                 <th>DID Name </th>
                                 <th>Account Number</th>
                                 <th>Confirmation Number</th>
@@ -160,6 +163,7 @@
                         <table class="datatable table table-bordered" id="non_sale_table" style="width:100%">
                             <thead>
                             <tr>
+                                <th>#</th>
                                 <th>Disposition Type</th>
                                 <th>Did</th>
                                 <th>Customer Name</th>
@@ -172,11 +176,12 @@
                             <tbody>
                             @foreach ($call_disp_lists as $call_disp_list)
                                 <tr>
+                                    <td>{{ $call_disp_list->call_id }}</td>
                                     <td>{{ $call_disp_list->call_disposition_types->title}}</td>
                                     <td>{{ isset($call_disp_list->call_disposition_did->title) ? $call_disp_list->call_disposition_did->title : ' ' }}</td>
                                     <td>{{ $call_disp_list->customer_name }}</td>
                                     <td>{{ $call_disp_list->phone_number }}</td>
-                                    <td>{{ @$call_disp_list->user->full_name }}</td>
+                                    <td>{{ $call_disp_list->user->full_name }}</td>
                                     <td>{{ parse_datetime_store($call_disp_list->added_on) }}</td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
@@ -202,6 +207,7 @@
                             </tbody>
                             <tfoot>
                             <tr>
+                                <th>#</th>
                                 <th>Disposition Type</th>
                                 <th>Did</th>
                                 <th>Customer Name</th>
@@ -222,7 +228,6 @@
     <script src="{{asset('assets/js/datatables.min.js')}}" type="text/javascript"></script>
     <script src="{{asset('assets/js/datatables_init.js')}}" type="text/javascript"></script>
     <script>
-
         function delete_lead (me) {
             let id = me.id;
             let data = new FormData();

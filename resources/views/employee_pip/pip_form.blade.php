@@ -23,9 +23,9 @@
                         <div class="form-group">
                             <label> Manager Name:  </label>
                             <?php
-                            $user_ddl_perm = ( ((Auth::user()->role->role_id == '5' or Auth::user()->role->role_id == '1') || (Auth::user()->role->role_id != '5' && Auth::user()->role->role_id != '1' && $is_manager == 1)) && $pip );
+                            $user_ddl_perm = ( ((Auth::user()->role->role_id == '5' or Auth::user()->role->role_id == '1') || (Auth::user()->role->role_id != '5' && Auth::user()->role->role_id != '1')) && $pip );
                             ?>
-                            <select class="form-control" name="manager_id" id="manager_id" onchange="get_manager_users_data(this)" required {{ ($user_ddl_perm || $is_manager == 1) ? 'disabled' : '' }}>
+                            <select class="form-control select2" name="manager_id" id="manager_id" onchange="get_manager_users_data(this)" required {{ ($user_ddl_perm || $is_manager == 1) ? 'disabled' : '' }}>
                                 <option value="">Select</option>
                                 @foreach($om as $user)
                                     <option {{$pip ? ($pip->manager_id == $user->user_id ? 'selected': '') : ($user->user_id == Auth::user()->user_id ? 'selected' : '')}} value="{{$user->user_id}}">{{$user->full_name}}</option>
@@ -68,7 +68,7 @@
                     <div class="col-lg-6">
                         <div class="form-group">
                             <label> Employee Name: </label>
-                            <select class="form-control" name="user_id" id="user_id" required {{$user_ddl_perm ? 'disabled' : ''}}>
+                            <select class="form-control select2" name="user_id" id="user_id" required {{$user_ddl_perm ? 'disabled' : ''}}>
                                 <option value="">Select</option>
                                 @foreach($employee as $user)
                                     <option {{$pip ? ($pip->user_id == $user->user_id ? 'selected': '') : ''}} value="{{$user->user_id}}">{{$user->full_name}}</option>
@@ -103,12 +103,8 @@
                         </div>
                     </div>
                     <div class="col-12 text-right">
-                        <button type="submit" class="btn btn-success">
-                            Submit
-                        </button>
-                        <a href="{{route('employee_pip')}}"  class="btn btn-primary">
-                            Back
-                        </a>
+                        <a href="{{route('employee_pip')}}"  class="btn btn-primary mr-2">Back</a>
+                        <button type="submit" class="btn btn-success">Submit</button>
                     </div>
                 </div>
             </form>
@@ -139,11 +135,12 @@
             call_ajax_with_functions('', '{{route('pip_save')}}', form_data, arr);
         }
         $( document ).ready(function() {
+            $('.select2').select2();
             $('#pip_to').change(function() {
                 let pip_from = new Date($('#pip_from').val());
                 let pip_to = new Date($('#pip_to').val());
                 if (pip_from > pip_to){
-                    alert('PIP to date should be equal to / greater then PIP from date');
+                    alert('PIP Start Date should be equal to / greater then PIP End Date');
                     let day = ("0" + pip_from.getDate()).slice(-2);
                     let month = ("0" + (pip_from.getMonth() + 1)).slice(-2);
                     let pip_to = pip_from.getFullYear()+"-"+(month)+"-"+(day);
@@ -154,7 +151,7 @@
                 let target_date = new Date($(this).val());
                 let pip_to = new Date($('#pip_to').val());
                 if (target_date < pip_to){
-                    alert('PIP Target date should be equal to / greater then PIP to date');
+                    alert('PIP Target date should be equal to / greater then PIP End Date');
                     let day = ("0" + pip_to.getDate()).slice(-2);
                     let month = ("0" + (pip_to.getMonth() + 1)).slice(-2);
                     let target_date = pip_to.getFullYear()+"-"+(month)+"-"+(day);
@@ -182,4 +179,12 @@
             });
         });
     </script>
+    <style>
+        span.select2-selection.select2-selection--single {
+            height: 43px;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            top: 20px;
+        }
+    </style>
 @endsection
